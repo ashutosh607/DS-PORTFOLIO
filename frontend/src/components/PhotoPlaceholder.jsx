@@ -15,6 +15,7 @@ export default function PhotoPlaceholder({
   imageUrl = null,
   showBadge = true,
   dark = false,
+  borderRadius = null,
 }) {
   if (imageUrl) {
     return (
@@ -150,7 +151,7 @@ export default function PhotoPlaceholder({
         `,
         backgroundSize: '100% 100%, 24px 24px, 24px 24px',
         border: '1px solid var(--color-nude)',
-        borderRadius: '16px',
+        borderRadius: borderRadius !== null ? borderRadius : (style.borderRadius || '16px'),
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -174,7 +175,7 @@ export default function PhotoPlaceholder({
           position: 'absolute',
           inset: '8px',
           border: '1px dashed rgba(227, 219, 204, 0.7)',
-          borderRadius: '12px',
+          borderRadius: (borderRadius === '0px' || borderRadius === 0 || style.borderRadius === '0px' || style.borderRadius === 0) ? '0px' : '12px',
           pointerEvents: 'none',
         }}
       />

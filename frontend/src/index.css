@@ -39,6 +39,14 @@
   --transition-bounce: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* 21Oaks Editorial Sticky Sliding Card */
+@media (min-width: 1024px) {
+  .editorial-sticky-card {
+    position: sticky !important;
+    top: 5.5rem !important;
+  }
+}
+
 /* Reset & Box Sizing */
 *,
 *::before,
@@ -63,7 +71,7 @@ body {
   background-color: var(--color-off-white);
   color: var(--color-obsidian);
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
 }
 

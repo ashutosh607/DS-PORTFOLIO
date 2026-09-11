@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import HeroSpotlightCarousel from './components/HeroSpotlightCarousel';
-import EditorialScrollStory from './components/EditorialScrollStory';
+import WhatWeDoEditorial from './components/WhatWeDoEditorial';
 import AboutSection from './components/AboutSection';
 import ObsidianCTA from './components/ObsidianCTA';
 import Footer from './components/Footer';
@@ -30,8 +30,8 @@ export default function App() {
       <main>
         <HeroSpotlightCarousel />
 
-        {/* Scroll-driven Editorial Cinematic Storytelling Section (What We Do / Features) */}
-        <EditorialScrollStory />
+        {/* Spacious, Artistic Editorial Photography Section: What We Do */}
+        <WhatWeDoEditorial />
 
         {/* Studio About section with artist portrait, philosophy & exhibition history */}
         <AboutSection />
