@@ -81,10 +81,23 @@ const SERVICES = [
 function SlidingServiceRow({ service, index }) {
   return (
     <div
-      className={`relative w-full ${
-        index === 0 ? 'mt-14 md:mt-20' : 'mt-28 sm:mt-36 md:mt-44 lg:mt-52'
-      }`}
+      className="relative w-full"
+      style={{
+        marginTop: index === 0 ? 'clamp(3.5rem, 6vw, 4.5rem)' : 'clamp(7rem, 14vh, 10rem)',
+      }}
     >
+      {/* Subtle chapter separator between disciplines for clear spatial breathing room */}
+      {index > 0 && (
+        <div className="w-full mb-8 sm:mb-10 md:mb-12 flex items-center justify-between font-mono text-[0.6rem] tracking-[0.24em] text-[var(--color-obsidian-light)] uppercase opacity-60 pb-4 border-b border-[var(--color-nude-subtle)]">
+          <div className="flex items-center gap-3">
+            <span className="w-1.5 h-1.5 bg-[var(--color-obsidian)]" />
+            <span>Chapter [{service.number}] · {service.title}</span>
+          </div>
+          <span className="w-24 sm:w-48 h-[1px] bg-[var(--color-nude)]" />
+          <span className="hidden sm:inline">Maison Édouard Folio</span>
+        </div>
+      )}
+
       {/* Dual Column Layout with tight 12px gap across ALL parts */}
       <div
         className={`flex flex-col ${
@@ -366,7 +379,7 @@ export default function WhatWeDoEditorial() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="mt-28 sm:mt-36 md:mt-44 pt-8 border-t border-[var(--color-nude-subtle)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-[0.625rem] tracking-[0.2em] text-[var(--color-obsidian-light)] uppercase"
+          className="mt-24 sm:mt-32 md:mt-40 pt-8 border-t border-[var(--color-nude-subtle)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-[0.625rem] tracking-[0.2em] text-[var(--color-obsidian-light)] uppercase"
         >
           <div className="flex items-center gap-4">
             <span className="w-1.5 h-1.5 bg-[var(--color-obsidian)]" />
