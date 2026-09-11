@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* ==========================================================================
    MAISON ÉDOUARD — Fine Art Photography Studio
    Design System & Editorial Foundation
@@ -38,7 +40,9 @@
 }
 
 /* Reset & Box Sizing */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -78,7 +82,12 @@ body {
 }
 
 /* Typography Hierarchy */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-serif);
   font-weight: 400;
   line-height: 1.15;
@@ -295,6 +304,7 @@ a {
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

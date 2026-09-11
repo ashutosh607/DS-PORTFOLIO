@@ -13,9 +13,8 @@ export default function Navbar({ onOpenInquiry }) {
   }, []);
 
   const navLinks = [
-    { label: 'Gallery', href: '#gallery' },
-    { label: 'Services', href: '#services' },
-    { label: 'Collections', href: '#collections' },
+    { label: 'Home', href: '#home' },
+    { label: 'What We Do', href: '#what-we-do' },
     { label: 'About', href: '#about' },
     { label: 'Contact', href: '#contact' },
   ];

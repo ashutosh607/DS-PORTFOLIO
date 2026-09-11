@@ -66,7 +66,7 @@ export default function Collections({ onOpenInquiry }) {
       }}
     >
       <div className="container">
-        
+
         {/* Section Header */}
         <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto clamp(3rem, 6vw, 5rem)' }}>
           <span className="eyebrow" style={{ marginBottom: '1rem' }}>

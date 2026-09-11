@@ -200,7 +200,7 @@ export default function HeroSpotlightCarousel() {
 
   return (
     <section
-      id="gallery"
+      id="home"
       style={{
         position: 'relative',
         height: '100vh',
@@ -264,7 +264,7 @@ export default function HeroSpotlightCarousel() {
           justifyContent: 'space-between',
         }}
       >
-        
+
         {/* ===================================================================
             TOP SECTION: EYEBROW & HEADING
             =================================================================== */}
@@ -562,7 +562,7 @@ export default function HeroSpotlightCarousel() {
             BOTTOM SECTION: METADATA, 7 DOTS, COUNTER & ARROWS
             =================================================================== */}
         <div style={{ flexShrink: 0, paddingBottom: '0.5rem' }}>
-          
+
           <div style={{ marginBottom: '0.35rem' }}>
             <span
               style={{
@@ -591,7 +591,7 @@ export default function HeroSpotlightCarousel() {
             >
               {activeProject.title}
             </h2>
-            
+
             <div
               style={{
                 display: 'flex',

@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import HeroSpotlightCarousel from './components/HeroSpotlightCarousel';
-import SelectedWork from './components/SelectedWork';
-import ServicesExperience from './components/ServicesExperience';
-import Collections from './components/Collections';
+import EditorialScrollStory from './components/EditorialScrollStory';
 import AboutSection from './components/AboutSection';
 import ObsidianCTA from './components/ObsidianCTA';
 import Footer from './components/Footer';
@@ -32,19 +30,13 @@ export default function App() {
       <main>
         <HeroSpotlightCarousel />
 
-        {/* 4. Selected Work section with category filtering & museum-grade placeholders */}
-        <SelectedWork onSelectWork={(work) => handleOpenInquiry(work.title)} />
+        {/* Scroll-driven Editorial Cinematic Storytelling Section (What We Do / Features) */}
+        <EditorialScrollStory />
 
-        {/* 5. Services & The Experience section with 3 atelier pillars and 4-step creative methodology */}
-        <ServicesExperience onOpenInquiry={() => handleOpenInquiry()} />
-
-        {/* 6. Featured Collections & Investment packages */}
-        <Collections onOpenInquiry={(pkgName) => handleOpenInquiry(pkgName)} />
-
-        {/* 7. Short About section with artist portrait, philosophy & exhibition history */}
+        {/* Studio About section with artist portrait, philosophy & exhibition history */}
         <AboutSection />
 
-        {/* 8. Strong final CTA on Obsidian background with interactive consultation panel */}
+        {/* Strong final CTA on Obsidian background with interactive consultation panel */}
         <ObsidianCTA onOpenInquiry={() => handleOpenInquiry()} />
       </main>
 

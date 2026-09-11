@@ -88,15 +88,20 @@ export default function Footer() {
                 Navigation
               </span>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                {['Gallery', 'Services', 'Collections', 'About', 'Contact'].map((item) => (
-                  <li key={item}>
+                {[
+                  { name: 'Home', href: '#home' },
+                  { name: 'What We Do', href: '#what-we-do' },
+                  { name: 'About', href: '#about' },
+                  { name: 'Contact', href: '#contact' },
+                ].map((item) => (
+                  <li key={item.name}>
                     <a
-                      href={`#${item.toLowerCase()}`}
+                      href={item.href}
                       style={{ color: 'rgba(243, 240, 233, 0.7)', textDecoration: 'none' }}
                       onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-off-white)')}
                       onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(243, 240, 233, 0.7)')}
                     >
-                      {item}
+                      {item.name}
                     </a>
                   </li>
                 ))}
