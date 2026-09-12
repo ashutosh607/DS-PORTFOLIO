@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Logo from './Logo';
 
@@ -83,7 +84,7 @@ export default function Navbar({ onOpenInquiry }) {
       }}
     >
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        
+
         {/* Studio Identity / Logo */}
         <Link
           to="/"
