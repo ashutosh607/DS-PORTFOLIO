@@ -51,11 +51,6 @@ export default function Navbar({ onOpenInquiry }) {
       isActive: location.pathname === '/' && (!location.hash || location.hash === '#gallery'),
     },
     {
-      label: 'Collections',
-      to: '/collections',
-      isActive: location.pathname === '/collections',
-    },
-    {
       label: 'About',
       hash: '#about',
       isActive: location.pathname === '/' && location.hash === '#about',
