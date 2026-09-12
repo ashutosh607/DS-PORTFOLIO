@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import './CollectionsPage.css';
 
 const CATEGORIES = [
   {
@@ -12,10 +13,10 @@ const CATEGORIES = [
     location: 'Lake Como & Private Estates',
     // French arch top
     cardShapeStyle: {
-      borderRadius: '54px 54px 3px 3px',
+      borderRadius: '68px 68px 4px 4px',
     },
-    cardTransform: 'perspective(1000px) rotateY(12deg) translateY(0px)',
-    coverImage: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?q=80&w=800&auto=format&fit=crop',
+    cardTransform: 'perspective(1200px) rotateY(16deg) translateY(2px)',
+    coverImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1400&auto=format&fit=crop',
       title: 'Ceremony at Lake Como',
@@ -60,10 +61,10 @@ const CATEGORIES = [
     location: 'Cap d’Antibes & Parisian Terraces',
     // Asymmetric sculpted top curve
     cardShapeStyle: {
-      borderRadius: '3px 42px 3px 3px',
+      borderRadius: '4px 44px 4px 4px',
     },
-    cardTransform: 'perspective(1000px) rotateY(7deg) translateY(12px)',
-    coverImage: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop',
+    cardTransform: 'perspective(1200px) rotateY(10deg) translateY(0px)',
+    coverImage: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1400&auto=format&fit=crop',
       title: 'Golden Hour Promenade',
@@ -108,10 +109,10 @@ const CATEGORIES = [
     location: 'Hôtel Particulier & Private Salons',
     // Graceful curved top
     cardShapeStyle: {
-      borderRadius: '26px 26px 3px 3px',
+      borderRadius: '42px 42px 4px 4px',
     },
-    cardTransform: 'perspective(1000px) rotateY(2deg) translateY(4px)',
-    coverImage: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=800&auto=format&fit=crop',
+    cardTransform: 'perspective(1200px) rotateY(2deg) translateY(-4px)',
+    coverImage: 'https://images.unsplash.com/photo-1535141192574-5d4897c13136?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1400&auto=format&fit=crop',
       title: 'Candlelit Celebration',
@@ -154,11 +155,11 @@ const CATEGORIES = [
     quote: 'Soulful character in every glance.',
     medium: 'Hasselblad 503CW · Carl Zeiss 80mm Planar',
     location: 'Paris Atelier & Natural Light Daylight Studio',
-    // Arch dome top
+    // Arch sculpted top
     cardShapeStyle: {
-      borderRadius: '52px 52px 3px 3px',
+      borderRadius: '4px 46px 4px 4px',
     },
-    cardTransform: 'perspective(1000px) rotateY(-3deg) translateY(15px)',
+    cardTransform: 'perspective(1200px) rotateY(-6deg) translateY(0px)',
     coverImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1400&auto=format&fit=crop',
@@ -202,12 +203,11 @@ const CATEGORIES = [
     quote: 'The living pulse of celebrated evenings.',
     medium: 'Leica Q3 · 28mm Summilux & Leica M11',
     location: 'Palais Brongniart & Private Châteaux',
-    // Slanted top slope
+    // Clean architectural top
     cardShapeStyle: {
-      borderRadius: '0 0 3px 3px',
-      clipPath: 'polygon(0 6%, 100% 0, 100% 100%, 0 100%)',
+      borderRadius: '4px 4px 4px 4px',
     },
-    cardTransform: 'perspective(1000px) rotateY(-8deg) translateY(6px)',
+    cardTransform: 'perspective(1200px) rotateY(-12deg) translateY(4px)',
     coverImage: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1400&auto=format&fit=crop',
@@ -251,12 +251,11 @@ const CATEGORIES = [
     quote: 'Purity of form, shadow, and tactile desire.',
     medium: 'Phase One IQ4 150MP & Schneider Kreuznach',
     location: 'Atelier Minimaliste & Concept Showrooms',
-    // Soft sculpted top slope
+    // Clean architectural top
     cardShapeStyle: {
-      borderRadius: '0 0 3px 3px',
-      clipPath: 'polygon(0 0, 100% 5%, 100% 100%, 0 100%)',
+      borderRadius: '4px 4px 4px 4px',
     },
-    cardTransform: 'perspective(1000px) rotateY(-14deg) translateY(18px)',
+    cardTransform: 'perspective(1200px) rotateY(-18deg) translateY(8px)',
     coverImage: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1400&auto=format&fit=crop',
@@ -568,88 +567,79 @@ export default function CollectionsPage({ onOpenInquiry }) {
           - Spacious breathing room between each card
           - Undulating thread line weaving behind cards
           - Cards ~180-200px wide, ~380-420px tall
-          - Gap ~28-36px between cards
+      {/* =====================================================================
+          2. CATEGORY CARDS RIBBON
+          Matches Reference Image 2:
+          - Cards are compact, slender, centered (124-154px wide, 270-325px tall)
+          - Clear, visible gaps (~24-32px) between cards so they never touch
+          - Clean separation between Ribbon and Gallery Detail sections
           ===================================================================== */}
       <section
         ref={categoriesRibbonRef}
         id="collection-categories-ribbon"
-        className="relative w-full mt-28 sm:mt-32 md:mt-40 pt-6 sm:pt-8 pb-16 sm:pb-20 md:pb-24 overflow-hidden"
+        className="collections-ribbon-section"
       >
-        {/* Subtle decorative curved undulating thread stroke waving across behind the cards */}
-        <div className="absolute top-[48%] left-0 right-0 -translate-y-1/2 pointer-events-none select-none z-0">
-          <svg className="w-full h-40" viewBox="0 0 1400 160" preserveAspectRatio="none" fill="none">
+        {/* Delicate decorative curved undulating thread stroke waving across behind the cards */}
+        <div className="collections-ribbon-thread">
+          <svg className="w-full h-44" viewBox="0 0 1400 160" preserveAspectRatio="none" fill="none">
+            {/* Left accent cursive artistic loop */}
             <path
-              d="M -30 80 C 140 130, 260 15, 420 75 C 580 130, 700 15, 860 70 C 1020 125, 1180 25, 1340 65 C 1420 80, 1450 65, 1460 60"
-              stroke="#D5CDBD"
-              strokeWidth="1.1"
-            />
-            {/* Left accent loop stroke matching reference */}
-            <path
-              d="M 45 105 C 5 85, 0 130, 55 130 C 95 130, 110 85, 78 65"
-              stroke="#D5CDBD"
-              strokeWidth="0.9"
+              d="M 32 112 C 8 92, 2 136, 48 136 C 82 136, 96 92, 72 72 C 52 52, 26 72, 36 96"
+              stroke="#D2C8B8"
+              strokeWidth="0.95"
               strokeDasharray="2 3"
+            />
+            {/* Undulating thread line matching reference */}
+            <path
+              d="M 42 96 C 160 140, 250 25, 410 80 C 570 135, 670 20, 830 75 C 970 130, 1070 30, 1210 70 C 1290 85, 1360 60, 1430 75"
+              stroke="#D2C8B8"
+              strokeWidth="1.1"
             />
           </svg>
         </div>
 
-        {/* Full-width container for cards to spread across */}
-        <div className="relative z-10 mx-auto px-6 sm:px-10 md:px-12 lg:px-16 max-w-[1380px]">
+        {/* Centered container for cards to spread across without edge collision */}
+        <div className="relative z-10 mx-auto px-4 sm:px-6 md:px-8 max-w-[1260px]">
 
-          {/* Horizontal Row of 6 Cards — Spacious, Large, 3D Arc */}
-          <div
-            className="w-full flex justify-center items-end gap-5 sm:gap-6 md:gap-7 lg:gap-8 xl:gap-9 overflow-x-auto lg:overflow-visible pb-8 pt-6 px-2 no-scrollbar"
-            style={{
-              perspective: '1200px',
-              perspectiveOrigin: '50% 50%',
-            }}
-          >
+          {/* Horizontal Row of 6 Cards — Dedicated CSS track with explicit 24-32px gaps */}
+          <div className="collections-ribbon-track">
             {CATEGORIES.map((cat) => {
               const isActive = cat.id === activeCategoryId;
 
               return (
-                <motion.div
+                <div
                   key={cat.id}
-                  onClick={() => handleSelectCategory(cat.id)}
-                  whileHover={{
-                    y: -12,
-                    scale: 1.04,
-                    rotateY: 0,
-                    transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
-                  }}
+                  className="category-ribbon-card-anchor"
                   style={{
                     transform: cat.cardTransform,
                     transformStyle: 'preserve-3d',
-                    flex: '0 0 auto',
-                    width: 'clamp(155px, 15.5vw, 200px)',
                   }}
-                  className="group cursor-pointer select-none flex-shrink-0"
                 >
-                  {/* Card Body: Taller Height (380px – 420px) */}
-                  <div
-                    className="relative w-full h-[340px] sm:h-[370px] md:h-[390px] lg:h-[410px] overflow-hidden flex flex-col justify-between p-4 sm:p-5 transition-all duration-400"
+                  <motion.div
+                    onClick={() => handleSelectCategory(cat.id)}
+                    whileHover={{
+                      y: -10,
+                      scale: 1.025,
+                      transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
+                    }}
+                    className="category-ribbon-card-inner group"
                     style={{
                       ...cat.cardShapeStyle,
                       boxShadow: isActive
-                        ? '0 24px 48px -12px rgba(16, 16, 16, 0.38), 0 0 0 2px #101010'
-                        : '0 16px 34px -10px rgba(16, 16, 16, 0.18)',
+                        ? '0 24px 44px -10px rgba(18, 16, 14, 0.38), 0 0 0 2px #101010'
+                        : '0 16px 36px -10px rgba(18, 16, 14, 0.22), 0 4px 12px -4px rgba(18, 16, 14, 0.1)',
                     }}
                   >
-                    {/* Background Photograph */}
+                    {/* Background Photograph with warm editorial tone */}
                     <img
                       src={cat.coverImage}
                       alt={`${cat.name} Collection`}
-                      className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.88] contrast-[1.02] group-hover:scale-105 group-hover:brightness-[0.94] transition-all duration-600 ease-out"
+                      className="category-ribbon-card-img"
                       loading="lazy"
                     />
 
-                    {/* Dark gradient overlay for bottom legibility */}
-                    <div
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background: 'linear-gradient(to bottom, rgba(16, 16, 16, 0.28) 0%, rgba(16, 16, 16, 0.03) 35%, rgba(16, 16, 16, 0.72) 78%, rgba(16, 16, 16, 0.93) 100%)',
-                      }}
-                    />
+                    {/* Dark gradient overlay for bottom legibility matching reference */}
+                    <div className="category-ribbon-card-scrim" />
 
                     {/* Top: Category Number with small underline rule */}
                     <div className="relative z-10 flex flex-col items-start">
@@ -666,34 +656,34 @@ export default function CollectionsPage({ onOpenInquiry }) {
                       >
                         {cat.id}
                       </span>
-                      <span className="w-5 h-[1px] bg-white/40 mt-1.5" />
+                      <span className="w-4 h-[1px] bg-white/45 mt-1.5" />
                     </div>
 
-                    {/* Bottom: Category Name & Arrow */}
+                    {/* Bottom: Category Name & Arrow matching reference */}
                     <div className="relative z-10 pt-3">
                       <h3
                         style={{
                           fontFamily: 'var(--font-serif)',
-                          fontSize: 'clamp(1.25rem, 1.5vw, 1.5rem)',
+                          fontSize: 'clamp(1.15rem, 1.35vw, 1.35rem)',
                           color: '#FFFFFF',
                           fontWeight: 400,
                           lineHeight: 1.15,
-                          marginBottom: '0.35rem',
+                          marginBottom: '0.25rem',
                           textShadow: '0 2px 8px rgba(0,0,0,0.65)',
                         }}
                       >
                         {cat.name}
                       </h3>
 
-                      {/* Small clean arrow indicator matching reference */}
-                      <div className="flex items-center gap-1.5 text-white/85 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-300">
+                      {/* Small clean arrow indicator matching reference: —→ */}
+                      <div className="flex items-center gap-1.5 text-white/80 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-300">
                         <span className="w-5 h-[1px] bg-current" />
                         <span className="text-[10px] leading-none">→</span>
                       </div>
                     </div>
 
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               );
             })}
           </div>
@@ -702,13 +692,17 @@ export default function CollectionsPage({ onOpenInquiry }) {
       </section>
 
       {/* =====================================================================
-          3. WEDDINGS SECTION (Generous 100px – 150px vertical spacing)
-          Appears comfortably below category cards.
+          3. WEDDINGS / GALLERY DETAIL SECTION
+          Dedicated spacing and alignment:
+          - Clean vertical gap from ribbon above
+          - Clear ~44px margin between header rule and photo grid
+          - Generous ~44px gap between master photo and 2x2 supporting grid
+          - Clear ~20px gap between each supporting photo
           ===================================================================== */}
       <section
         ref={galleryRevealRef}
         id="collection-gallery-detail"
-        className="relative w-full pt-16 sm:pt-20 md:pt-24 lg:pt-28 pb-28 sm:pb-36 overflow-hidden"
+        className="collections-gallery-section"
       >
         <div className="container mx-auto px-6 sm:px-10 md:px-12 max-w-[1260px] relative z-10">
 
@@ -721,24 +715,24 @@ export default function CollectionsPage({ onOpenInquiry }) {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             >
               {/* Header: "01 ──── Weddings ... VIEW ALL →" */}
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8 sm:mb-12 pb-5 border-b border-[#E0D8CA]">
+              <div className="collections-gallery-header">
                 <div>
-                  <div className="flex items-center gap-3.5 mb-1.5">
+                  <div className="collections-gallery-title-group">
                     <span
                       style={{
                         fontFamily: 'var(--font-serif)',
-                        fontSize: '1.15rem',
+                        fontSize: '1.25rem',
                         color: '#101010',
                         fontWeight: 400,
                       }}
                     >
                       {activeCategory.id}
                     </span>
-                    <span className="w-10 sm:w-14 h-[1px] bg-[#CFC5B4]" />
+                    <span className="collections-gallery-rule" />
                     <h2
                       style={{
                         fontFamily: 'var(--font-serif)',
-                        fontSize: 'clamp(2rem, 3.5vw, 2.85rem)',
+                        fontSize: 'clamp(2.4rem, 4vw, 3.25rem)',
                         fontWeight: 400,
                         color: '#141414',
                         lineHeight: 1,
@@ -751,8 +745,8 @@ export default function CollectionsPage({ onOpenInquiry }) {
                   <p
                     style={{
                       fontFamily: 'var(--font-sans)',
-                      fontSize: 'clamp(0.85rem, 1vw, 0.95rem)',
-                      color: '#635F57',
+                      fontSize: 'clamp(0.875rem, 1vw, 0.975rem)',
+                      color: '#5C5852',
                       maxWidth: '480px',
                     }}
                   >
@@ -772,17 +766,14 @@ export default function CollectionsPage({ onOpenInquiry }) {
                 </div>
               </div>
 
-              {/* Gallery Composition Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start relative">
+              {/* Gallery Composition Grid — Spacious Gaps Between Master & Supporting Photos */}
+              <div className="collections-gallery-layout">
 
-                {/* LEFT: Large Master Hero Photograph (~58% width / 7 cols) */}
-                <div className="lg:col-span-7">
+                {/* LEFT: Large Master Hero Photograph */}
+                <div>
                   <div
                     onClick={() => setViewAllModalOpen(true)}
-                    className="group relative w-full overflow-hidden bg-[#1D1C19] rounded-[3px] shadow-[0_16px_36px_-10px_rgba(20,18,15,0.12)] border border-[#E0D8CA] cursor-pointer"
-                    style={{
-                      aspectRatio: '16/10.5',
-                    }}
+                    className="gallery-master-frame group"
                   >
                     <img
                       src={activeCategory.featured.image}
@@ -828,41 +819,42 @@ export default function CollectionsPage({ onOpenInquiry }) {
                   </div>
                 </div>
 
-                {/* RIGHT: 4 Supporting Photographs in 2x2 Grid (~42% width / 5 cols) */}
-                <div className="lg:col-span-5 grid grid-cols-2 gap-3.5 sm:gap-4">
+                {/* RIGHT: 4 Supporting Photographs in 2x2 Grid with Generous Gaps */}
+                <div className="gallery-supporting-grid">
                   {activeCategory.supporting.map((item, idx) => (
                     <motion.div
                       key={item.id}
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.06 + idx * 0.05 }}
-                      whileHover={{ scale: 1.025 }}
+                      whileHover={{ scale: 1.02 }}
                       onClick={() => setViewAllModalOpen(true)}
-                      className="group relative bg-[#EFECE5] rounded-[3px] overflow-hidden shadow-[0_10px_22px_-8px_rgba(20,18,15,0.08)] border border-[#E0D8CA] cursor-pointer"
-                      style={{ aspectRatio: '4/3' }}
+                      className="gallery-supporting-card group"
                     >
-                      <img
-                        src={item.image}
-                        alt={item.tag}
-                        className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02] group-hover:scale-105 transition-transform duration-500 ease-out"
-                        loading="lazy"
-                      />
+                      <div className="gallery-supporting-card-inner">
+                        <img
+                          src={item.image}
+                          alt={item.tag}
+                          className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02] group-hover:scale-105 transition-transform duration-500 ease-out"
+                          loading="lazy"
+                        />
 
-                      {/* Subtle hover overlay */}
-                      <div className="absolute inset-0 bg-[rgba(16,16,16,0.65)] backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 text-white">
-                        <span className="font-mono text-[0.55rem] tracking-[0.16em] uppercase text-[#E3DBCC]">
-                          Frame 0{idx + 2} / 06
-                        </span>
-                        <p
-                          style={{
-                            fontFamily: 'var(--font-serif)',
-                            fontSize: '0.825rem',
-                            lineHeight: 1.25,
-                          }}
-                          className="mt-1 line-clamp-2 text-white/95"
-                        >
-                          {item.tag}
-                        </p>
+                        {/* Subtle hover overlay */}
+                        <div className="absolute inset-0 bg-[rgba(16,16,16,0.65)] backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2.5 sm:p-3 text-white">
+                          <span className="font-mono text-[0.55rem] tracking-[0.16em] uppercase text-[#E3DBCC]">
+                            Frame 0{idx + 2} / 06
+                          </span>
+                          <p
+                            style={{
+                              fontFamily: 'var(--font-serif)',
+                              fontSize: '0.8rem',
+                              lineHeight: 1.25,
+                            }}
+                            className="mt-0.5 line-clamp-2 text-white/95"
+                          >
+                            {item.tag}
+                          </p>
+                        </div>
                       </div>
                     </motion.div>
                   ))}
