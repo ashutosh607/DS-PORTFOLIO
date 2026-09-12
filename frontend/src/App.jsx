@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/home/HomePage';
 import CollectionsPage from './pages/collections/CollectionsPage';
+import ServicesPage from './pages/services/ServicesPage';
 import Footer from './components/layout/Footer';
 import InquiryModal from './components/modals/InquiryModal';
 
@@ -40,13 +41,14 @@ export default function App() {
       {/* 1. Minimal luxury navigation */}
       <Navbar onOpenInquiry={() => handleOpenInquiry()} />
 
-      {/* Multi-route content: Home & Collections */}
+      {/* Multi-route content: Home, Collections, Services */}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route
           path="/collections"
           element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
         />
+        <Route path="/services" element={<ServicesPage />} />
       </Routes>
 
       {/* Minimal footer with CET studio time and social directory */}
