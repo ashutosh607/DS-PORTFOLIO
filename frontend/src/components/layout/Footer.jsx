@@ -1,28 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Logo from './Logo';
 
 export default function Footer({ onOpenInquiry }) {
-  const [parisTime, setParisTime] = useState('');
-
-  useEffect(() => {
-    const updateTime = () => {
-      try {
-        const timeStr = new Intl.DateTimeFormat('en-GB', {
-          timeZone: 'Europe/Paris',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        }).format(new Date());
-        setParisTime(timeStr);
-      } catch {
-        setParisTime('12:00:00');
-      }
-    };
-    updateTime();
-    const timer = setInterval(updateTime, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -30,187 +9,117 @@ export default function Footer({ onOpenInquiry }) {
   return (
     <footer
       style={{
-        backgroundColor: 'var(--color-obsidian)',
-        borderTop: '1px solid rgba(227, 219, 204, 0.15)',
-        color: 'rgba(243, 240, 233, 0.65)',
-        padding: '4rem 0 3rem',
-        fontSize: '0.85rem',
+        backgroundColor: '#101010',
+        color: 'rgba(243, 240, 233, 0.7)',
+        borderTop: '1px solid rgba(227, 219, 204, 0.1)',
+        paddingTop: '100px',
+        paddingBottom: '50px',
       }}
     >
-      <div className="container">
-        
-        {/* Top Footer Row */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: '3rem',
-            paddingBottom: '3rem',
-            borderBottom: '1px solid rgba(227, 219, 204, 0.1)',
-          }}
-        >
-          {/* Brand Col with Theme-Matched Light Logo */}
-          <div style={{ maxWidth: '380px' }}>
-            <div style={{ marginBottom: '1rem' }}>
-              <Logo
-                variant="light"
-                height={52}
-                withText={true}
-              />
-            </div>
-            <p style={{ color: 'rgba(243, 240, 233, 0.65)', fontSize: '0.85rem', lineHeight: 1.6 }}>
-              Fine art editorial photography, cinematic films, and spatial monographs. Available for private commissions and commercial assignments worldwide.
+      <div
+        style={{
+          maxWidth: '1440px',
+          margin: '0 auto',
+          paddingLeft: 'clamp(24px, 5vw, 80px)',
+          paddingRight: 'clamp(24px, 5vw, 80px)',
+        }}
+      >
+        {/* Main Balanced Multi-Column Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-14 pb-14 border-b border-[#E3DBCC]/10 items-start">
+          
+          {/* Left Branding Block (6 columns) */}
+          <div className="md:col-span-6 space-y-4 pr-0 lg:pr-12">
+            <Logo variant="light" height={42} withText={true} />
+            <p className="font-sans text-xs sm:text-[13px] text-[#F3F0E9]/60 leading-relaxed max-w-sm">
+              Fine art editorial photography, cinematic films, and spatial monographs. Available for private commissions worldwide.
             </p>
+            <div className="flex items-center gap-2 text-xs font-sans tracking-wider text-[#E3DBCC]/60 pt-1">
+              <span>Paris</span>
+              <span className="text-[#E3DBCC]/30">•</span>
+              <span>London</span>
+              <span className="text-[#E3DBCC]/30">•</span>
+              <span>Commissions Worldwide</span>
+            </div>
           </div>
 
-          {/* Navigation Links */}
-          <div style={{ display: 'flex', gap: '3.5rem', flexWrap: 'wrap' }}>
-            <div>
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.675rem',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-nude)',
-                  display: 'block',
-                  marginBottom: '1rem',
-                  fontWeight: 600,
-                }}
-              >
-                Navigation
-              </span>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                {[
-                  { name: 'Home', href: '#home' },
-                  { name: 'What We Do', href: '#what-we-do' },
-                  { name: 'About', href: '#about' },
-                  { name: 'Contact', onClick: onOpenInquiry },
-                ].map((item) => (
-                  <li key={item.name}>
-                    <a
-                      href={item.href || '#'}
-                      onClick={(e) => {
-                        if (item.onClick) {
-                          e.preventDefault();
-                          item.onClick();
-                        }
-                      }}
-                      style={{ color: 'rgba(243, 240, 233, 0.7)', textDecoration: 'none', cursor: 'pointer' }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-off-white)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(243, 240, 233, 0.7)')}
-                    >
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Navigation Column (3 columns) */}
+          <div className="md:col-span-3">
+            <span className="block font-sans text-[10px] font-semibold tracking-[0.2em] text-[#E3DBCC]/70 uppercase mb-4">
+              Navigation
+            </span>
+            <ul className="space-y-3 font-sans text-xs sm:text-[13px]">
+              {[
+                { name: 'Home', href: '/' },
+                { name: 'Collections', href: '/collections' },
+                { name: 'Services & Pricing', href: '/services' },
+                { name: 'Private Inquiry', onClick: onOpenInquiry },
+              ].map((item) => (
+                <li key={item.name}>
+                  <a
+                    href={item.href || '#'}
+                    onClick={(e) => {
+                      if (item.onClick) {
+                        e.preventDefault();
+                        item.onClick();
+                      }
+                    }}
+                    className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors cursor-pointer"
+                  >
+                    {item.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            <div>
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.675rem',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-nude)',
-                  display: 'block',
-                  marginBottom: '1rem',
-                  fontWeight: 600,
-                }}
-              >
-                Archive & Social
-              </span>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                {['Instagram (@edouard)', 'Substack Monograph', 'Behance Curated', 'VSCO Journal'].map((item) => (
-                  <li key={item}>
-                    <a
-                      href="#social"
-                      onClick={(e) => e.preventDefault()}
-                      style={{ color: 'rgba(243, 240, 233, 0.7)', textDecoration: 'none' }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-off-white)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(243, 240, 233, 0.7)')}
-                    >
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.675rem',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-nude)',
-                  display: 'block',
-                  marginBottom: '1rem',
-                  fontWeight: 600,
-                }}
-              >
-                Studio Time (CET)
-              </span>
-              <div
-                style={{
-                  fontFamily: 'monospace',
-                  fontSize: '1.25rem',
-                  color: 'var(--color-off-white)',
-                  letterSpacing: '0.08em',
-                  backgroundColor: '#161616',
-                  padding: '0.45rem 0.85rem',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(227, 219, 204, 0.15)',
-                  display: 'inline-block',
-                }}
-              >
-                {parisTime || '14:32:00'}
-              </div>
-              <span style={{ display: 'block', marginTop: '0.5rem', fontSize: '0.75rem', color: 'rgba(243, 240, 233, 0.45)' }}>
-                Paris Studio Active
-              </span>
-            </div>
+          {/* Social Links Column (3 columns) */}
+          <div className="md:col-span-3">
+            <span className="block font-sans text-[10px] font-semibold tracking-[0.2em] text-[#E3DBCC]/70 uppercase mb-4">
+              Archive & Social
+            </span>
+            <ul className="space-y-3 font-sans text-xs sm:text-[13px]">
+              {[
+                'Instagram (@edouard)',
+                'Substack Monograph',
+                'Behance Curated',
+                'VSCO Journal',
+              ].map((item) => (
+                <li key={item}>
+                  <a
+                    href="#social"
+                    onClick={(e) => e.preventDefault()}
+                    className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        {/* Bottom Footer Row */}
-        <div
-          style={{
-            paddingTop: '2rem',
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '1.5rem',
-          }}
-        >
-          <div style={{ fontSize: '0.775rem', color: 'rgba(243, 240, 233, 0.5)' }}>
-            © {new Date().getFullYear()} Maison Édouard. All rights reserved. Archival preservation protected.
-          </div>
+        {/* Bottom Copyright & Back to Top Row */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-sans text-xs text-[#F3F0E9]/40">
+          <p>
+            © {new Date().getFullYear()} Maison Édouard / DS Photography. All rights reserved.
+          </p>
 
           <button
+            type="button"
             onClick={scrollToTop}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              fontFamily: 'var(--font-sans)',
-              fontSize: '0.75rem',
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: 'var(--color-nude)',
-              cursor: 'pointer',
-              background: 'none',
-              border: 'none',
-            }}
+            className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-[#E3DBCC]/70 hover:text-[#FDFCF8] transition-colors cursor-pointer bg-transparent border-0"
           >
             <span>Back to top</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M18 15l-6-6-6 6" />
             </svg>
           </button>

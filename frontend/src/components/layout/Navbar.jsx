@@ -254,11 +254,10 @@ export default function Navbar({ onOpenInquiry }) {
           <button
             onClick={() => {
               if (location.pathname === '/services') {
-                const el = document.getElementById('booking-form');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-                else window.scrollTo({ top: 500, behavior: 'smooth' });
+                window.dispatchEvent(new CustomEvent('open-booking-form'));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
               } else {
-                navigateWithTransition('/services', 'SERVICES');
+                navigateWithTransition('/services#book', 'SERVICES');
               }
             }}
             className="btn-primary desktop-cta"
