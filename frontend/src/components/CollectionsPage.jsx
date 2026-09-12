@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import './CollectionsPage.css';
 
 const CATEGORIES = [
   {
@@ -330,7 +329,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
   return (
     <div
-      className="collections-page-root w-full min-h-screen text-[#101010] overflow-x-hidden"
+      className="w-full min-h-screen text-[#101010] overflow-x-hidden"
       style={{
         backgroundColor: '#F6F3EC',
         fontFamily: 'var(--font-sans)',
@@ -614,10 +613,15 @@ export default function CollectionsPage({ onOpenInquiry }) {
       <section
         ref={categoriesRibbonRef}
         id="collection-categories-ribbon"
-        className="collections-ribbon-section"
+        className="relative w-full overflow-visible"
+        style={{
+          marginTop: 'clamp(2.5rem, 5vw, 4.5rem)',
+          paddingTop: '1.5rem',
+          paddingBottom: 'clamp(4.5rem, 7vw, 6.5rem)',
+        }}
       >
         {/* Delicate decorative curved undulating thread stroke waving across behind the cards */}
-        <div className="collections-ribbon-thread">
+        <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 pointer-events-none select-none z-0 w-full">
           <svg className="w-full h-44" viewBox="0 0 1400 160" preserveAspectRatio="none" fill="none">
             {/* Left accent cursive artistic loop */}
             <path
@@ -649,14 +653,20 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
           {/* Horizontal Row of 6 Cards — Centered */}
           <div
-            className="collections-ribbon-track"
+            className="relative z-10 flex flex-nowrap justify-center items-end py-5 px-2 w-max max-w-full mx-auto"
             style={{
               display: 'flex',
+              flexWrap: 'nowrap',
               justifyContent: 'center',
               alignItems: 'flex-end',
-              margin: '0 auto',
+              gap: 'clamp(12px, 1.8vw, 24px)',
+              perspective: '1400px',
+              perspectiveOrigin: '50% 50%',
+              padding: '1.25rem 0.5rem',
               width: 'max-content',
               maxWidth: '100%',
+              marginLeft: 'auto',
+              marginRight: 'auto',
             }}
           >
             {CATEGORIES.map((cat) => {
@@ -665,10 +675,13 @@ export default function CollectionsPage({ onOpenInquiry }) {
               return (
                 <div
                   key={cat.id}
-                  className="category-ribbon-card-anchor"
+                  className="flex-none [transform-style:preserve-3d] [will-change:transform]"
                   style={{
+                    flex: '0 0 auto',
+                    width: 'clamp(124px, 11vw, 154px)',
                     transform: cat.cardTransform,
                     transformStyle: 'preserve-3d',
+                    willChange: 'transform',
                   }}
                 >
                   <motion.div
@@ -678,9 +691,11 @@ export default function CollectionsPage({ onOpenInquiry }) {
                       scale: 1.025,
                       transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
                     }}
-                    className="category-ribbon-card-inner group"
+                    className="group relative w-full overflow-hidden flex flex-col justify-between cursor-pointer select-none bg-[#1A1816] border border-white/20 transition-[box-shadow] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]"
                     style={{
                       ...cat.cardShapeStyle,
+                      height: 'clamp(270px, 25vw, 325px)',
+                      padding: 'clamp(0.75rem, 1.2vw, 1rem)',
                       boxShadow: isActive
                         ? '0 24px 44px -10px rgba(18, 16, 14, 0.38), 0 0 0 2px #101010'
                         : '0 16px 36px -10px rgba(18, 16, 14, 0.22), 0 4px 12px -4px rgba(18, 16, 14, 0.1)',
@@ -690,12 +705,18 @@ export default function CollectionsPage({ onOpenInquiry }) {
                     <img
                       src={cat.coverImage}
                       alt={`${cat.name} Collection`}
-                      className="category-ribbon-card-img"
+                      className="absolute inset-0 w-full h-full object-cover object-center transition-[transform,filter] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 [filter:sepia(0.06)_contrast(1.04)_brightness(0.92)] group-hover:[filter:sepia(0)_contrast(1.06)_brightness(0.98)]"
                       loading="lazy"
                     />
 
                     {/* Dark gradient overlay for bottom legibility matching reference */}
-                    <div className="category-ribbon-card-scrim" />
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background:
+                          'linear-gradient(to bottom, rgba(16, 16, 16, 0.2) 0%, rgba(16, 16, 16, 0) 30%, rgba(16, 16, 16, 0.55) 70%, rgba(16, 16, 16, 0.9) 100%)',
+                      }}
+                    />
 
                     {/* Top: Category Number with small underline rule */}
                     <div className="relative z-10 flex flex-col items-start">
@@ -758,7 +779,11 @@ export default function CollectionsPage({ onOpenInquiry }) {
       <section
         ref={galleryRevealRef}
         id="collection-gallery-detail"
-        className="collections-gallery-section"
+        className="relative w-full [scroll-margin-top:100px]"
+        style={{
+          paddingTop: 'clamp(2.5rem, 4.5vw, 4rem)',
+          paddingBottom: 'clamp(6rem, 9vw, 9rem)',
+        }}
       >
         <div className="container mx-auto px-6 sm:px-10 md:px-12 max-w-[1260px] relative z-10">
 
@@ -771,9 +796,14 @@ export default function CollectionsPage({ onOpenInquiry }) {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             >
               {/* Header: "01 ──── Weddings ... VIEW ALL →" */}
-              <div className="collections-gallery-header">
+              <div
+                className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-[#E2DACD]"
+                style={{
+                  marginBottom: 'clamp(2.25rem, 3.8vw, 3.5rem)',
+                }}
+              >
                 <div>
-                  <div className="collections-gallery-title-group">
+                  <div className="flex items-center gap-4 mb-2">
                     <span
                       style={{
                         fontFamily: 'var(--font-serif)',
@@ -784,7 +814,12 @@ export default function CollectionsPage({ onOpenInquiry }) {
                     >
                       {activeCategory.id}
                     </span>
-                    <span className="collections-gallery-rule" />
+                    <span
+                      className="h-[1px] bg-[#D1C8B8]"
+                      style={{
+                        width: 'clamp(36px, 5vw, 64px)',
+                      }}
+                    />
                     <h2
                       style={{
                         fontFamily: 'var(--font-serif)',
@@ -823,13 +858,18 @@ export default function CollectionsPage({ onOpenInquiry }) {
               </div>
 
               {/* Gallery Composition Grid — Spacious Gaps Between Master & Supporting Photos */}
-              <div className="collections-gallery-layout">
+              <div
+                className="grid grid-cols-1 lg:[grid-template-columns:7fr_5fr] items-start relative"
+                style={{
+                  gap: 'clamp(2rem, 3.5vw, 3.5rem)',
+                }}
+              >
 
                 {/* LEFT: Large Master Hero Photograph */}
                 <div>
                   <div
                     onClick={() => setViewAllModalOpen(true)}
-                    className="gallery-master-frame group"
+                    className="group relative w-full aspect-[16/10.5] rounded-[4px] overflow-hidden bg-[#1D1C19] border border-[#E0D8CA] shadow-[0_20px_45px_-12px_rgba(20,18,15,0.16)] cursor-pointer"
                   >
                     <img
                       src={activeCategory.featured.image}
@@ -876,7 +916,12 @@ export default function CollectionsPage({ onOpenInquiry }) {
                 </div>
 
                 {/* RIGHT: 4 Supporting Photographs in 2x2 Grid with Generous Gaps */}
-                <div className="gallery-supporting-grid">
+                <div
+                  className="grid grid-cols-2"
+                  style={{
+                    gap: 'clamp(14px, 1.8vw, 22px)',
+                  }}
+                >
                   {activeCategory.supporting.map((item, idx) => (
                     <motion.div
                       key={item.id}
@@ -885,9 +930,12 @@ export default function CollectionsPage({ onOpenInquiry }) {
                       transition={{ duration: 0.4, delay: 0.06 + idx * 0.05 }}
                       whileHover={{ scale: 1.02 }}
                       onClick={() => setViewAllModalOpen(true)}
-                      className="gallery-supporting-card group"
+                      className="group relative bg-white rounded-[4px] border border-[#E2DACD] shadow-[0_10px_24px_-8px_rgba(20,18,15,0.08)] overflow-hidden cursor-pointer transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[0_16px_32px_-10px_rgba(20,18,15,0.15)]"
+                      style={{
+                        padding: 'clamp(6px, 0.8vw, 8px)',
+                      }}
                     >
-                      <div className="gallery-supporting-card-inner">
+                      <div className="relative w-full aspect-[4/3] overflow-hidden rounded-[2px] bg-[#ECE7DC]">
                         <img
                           src={item.image}
                           alt={item.tag}
