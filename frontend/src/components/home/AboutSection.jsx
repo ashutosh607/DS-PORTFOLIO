@@ -1,6 +1,6 @@
 import React from 'react';
-import PhotoPlaceholder from './PhotoPlaceholder';
-import ScrollBlurCharReveal from './ScrollBlurCharReveal';
+import PhotoPlaceholder from '../common/PhotoPlaceholder';
+import ScrollBlurCharReveal from '../common/ScrollBlurCharReveal';
 
 export default function AboutSection() {
   return (

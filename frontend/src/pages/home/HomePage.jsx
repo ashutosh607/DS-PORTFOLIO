@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import HeroSpotlightCarousel from './HeroSpotlightCarousel';
-import WhatWeDoEditorial from './WhatWeDoEditorial';
-import AboutSection from './AboutSection';
+import HeroSpotlightCarousel from '../../components/home/HeroSpotlightCarousel';
+import WhatWeDoEditorial from '../../components/home/WhatWeDoEditorial';
+import AboutSection from '../../components/home/AboutSection';
 
 export default function HomePage() {
   const location = useLocation();

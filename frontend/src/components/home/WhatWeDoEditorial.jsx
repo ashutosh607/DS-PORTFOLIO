@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import PhotoPlaceholder from './PhotoPlaceholder';
-import ScrollBlurCharReveal from './ScrollBlurCharReveal';
+import PhotoPlaceholder from '../common/PhotoPlaceholder';
+import ScrollBlurCharReveal from '../common/ScrollBlurCharReveal';
 
 /**
  * Editorial Photography Services Data

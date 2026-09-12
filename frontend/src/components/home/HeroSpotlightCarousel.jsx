@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import PhotoPlaceholder from './PhotoPlaceholder';
+import PhotoPlaceholder from '../common/PhotoPlaceholder';
 
 const PROJECTS = [
   {

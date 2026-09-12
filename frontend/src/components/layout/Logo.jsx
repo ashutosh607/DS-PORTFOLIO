@@ -1,6 +1,6 @@
 import React from 'react';
-import dsLogoDark from '../assets/ds-logo-dark.png';
-import dsLogoLight from '../assets/ds-logo-light.png';
+import dsLogoDark from '../../assets/ds-logo-dark.png';
+import dsLogoLight from '../../assets/ds-logo-light.png';
 
 /**
  * Theme-aware Logo Component

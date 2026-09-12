@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import HomePage from './components/HomePage';
-import CollectionsPage from './components/CollectionsPage';
-import Footer from './components/Footer';
-import InquiryModal from './components/InquiryModal';
+import Navbar from './components/layout/Navbar';
+import HomePage from './pages/home/HomePage';
+import CollectionsPage from './pages/collections/CollectionsPage';
+import Footer from './components/layout/Footer';
+import InquiryModal from './components/modals/InquiryModal';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
