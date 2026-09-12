@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import HeroSpotlightCarousel from './components/HeroSpotlightCarousel';
-import WhatWeDoEditorial from './components/WhatWeDoEditorial';
-import AboutSection from './components/AboutSection';
+import HomePage from './components/HomePage';
+import CollectionsPage from './components/CollectionsPage';
 import Footer from './components/Footer';
 import InquiryModal from './components/InquiryModal';
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
+
+  return null;
+}
 
 export default function App() {
   const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
@@ -22,19 +34,20 @@ export default function App() {
 
   return (
     <div className="portfolio-app-root">
+      {/* Auto scroll to top on navigation */}
+      <ScrollToTop />
+
       {/* 1. Minimal luxury navigation */}
       <Navbar onOpenInquiry={() => handleOpenInquiry()} />
 
-      {/* 2 & 3. Hero section with editorial heading & the 3D Concave Arc Spotlight Carousel */}
-      <main>
-        <HeroSpotlightCarousel />
-
-        {/* Spacious, Artistic Editorial Photography Section: What We Do */}
-        <WhatWeDoEditorial />
-
-        {/* Studio About section with artist portrait, philosophy & exhibition history */}
-        <AboutSection />
-      </main>
+      {/* Multi-route content: Home & Collections */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/collections"
+          element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
+        />
+      </Routes>
 
       {/* Minimal footer with CET studio time and social directory */}
       <Footer onOpenInquiry={() => handleOpenInquiry()} />

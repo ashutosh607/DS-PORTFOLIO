@@ -200,7 +200,7 @@ export default function HeroSpotlightCarousel() {
 
   return (
     <section
-      id="home"
+      id="gallery"
       style={{
         position: 'relative',
         height: '100vh',
