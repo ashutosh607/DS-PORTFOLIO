@@ -66,97 +66,123 @@ export default function CollectionsRibbon({
             marginRight: 'auto',
           }}
         >
-          {categories.map((cat) => {
+          {categories.map((cat, index) => {
             const isActive = cat.id === activeCategoryId;
+            const isLeft = index < 3;
+            // 3 cards come from left (indexes 0, 1, 2) and 3 from right (indexes 3, 4, 5)
+            const initialX = isLeft ? -160 - (2 - index) * 40 : 160 + (index - 3) * 40;
+            const delay = isLeft ? index * 0.12 : (5 - index) * 0.12;
 
             return (
-              <div
+              <motion.div
                 key={cat.id}
-                className="flex-none [transform-style:preserve-3d] [will-change:transform]"
+                initial={{
+                  opacity: 0,
+                  x: initialX,
+                  filter: 'blur(8px)',
+                }}
+                whileInView={{
+                  opacity: 1,
+                  x: 0,
+                  filter: 'blur(0px)',
+                }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{
+                  duration: 0.85,
+                  delay: delay,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="flex-none"
                 style={{
                   flex: '0 0 auto',
                   width: 'clamp(124px, 11vw, 154px)',
-                  transform: cat.cardTransform,
-                  transformStyle: 'preserve-3d',
-                  willChange: 'transform',
                 }}
               >
-                <motion.div
-                  onClick={() => onSelectCategory(cat.id)}
-                  whileHover={{
-                    y: -10,
-                    scale: 1.025,
-                    transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
-                  }}
-                  className="group relative w-full overflow-hidden flex flex-col justify-between cursor-pointer select-none bg-[#1A1816] border border-[#1C1A17] transition-[box-shadow] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                <div
+                  className="w-full [transform-style:preserve-3d] [will-change:transform]"
                   style={{
-                    borderRadius: '9999px 9999px 4px 4px',
-                    height: 'clamp(270px, 25vw, 325px)',
-                    padding: 'clamp(1.1rem, 1.5vw, 1.35rem) clamp(0.85rem, 1.2vw, 1.1rem) clamp(0.85rem, 1.2vw, 1.1rem)',
-                    boxShadow: isActive
-                      ? '0 24px 44px -10px rgba(18, 16, 14, 0.42), 0 0 0 2px #101010'
-                      : '0 16px 36px -10px rgba(18, 16, 14, 0.22), 0 4px 12px -4px rgba(18, 16, 14, 0.1)',
+                    transform: cat.cardTransform,
+                    transformStyle: 'preserve-3d',
+                    willChange: 'transform',
                   }}
                 >
-                  {/* Background Photograph with warm editorial tone */}
-                  <img
-                    src={cat.coverImage}
-                    alt={`${cat.name} Collection`}
-                    className="absolute inset-0 w-full h-full object-cover object-center transition-[transform,filter] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 [filter:sepia(0.06)_contrast(1.04)_brightness(0.92)] group-hover:[filter:sepia(0)_contrast(1.06)_brightness(0.98)]"
-                    loading="lazy"
-                  />
-
-                  {/* Dark gradient overlay for bottom legibility matching reference */}
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        'linear-gradient(to bottom, rgba(16, 16, 16, 0.2) 0%, rgba(16, 16, 16, 0) 30%, rgba(16, 16, 16, 0.55) 70%, rgba(16, 16, 16, 0.9) 100%)',
+                  <motion.div
+                    onClick={() => onSelectCategory(cat.id)}
+                    whileHover={{
+                      y: -10,
+                      scale: 1.025,
+                      transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
                     }}
-                  />
+                    className="group relative w-full overflow-hidden flex flex-col justify-between cursor-pointer select-none bg-[#1A1816] border border-[#1C1A17] transition-[box-shadow] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                    style={{
+                      borderRadius: '9999px 9999px 4px 4px',
+                      height: 'clamp(270px, 25vw, 325px)',
+                      padding: 'clamp(1.1rem, 1.5vw, 1.35rem) clamp(0.85rem, 1.2vw, 1.1rem) clamp(0.85rem, 1.2vw, 1.1rem)',
+                      boxShadow: isActive
+                        ? '0 24px 44px -10px rgba(18, 16, 14, 0.42), 0 0 0 2px #101010'
+                        : '0 16px 36px -10px rgba(18, 16, 14, 0.22), 0 4px 12px -4px rgba(18, 16, 14, 0.1)',
+                    }}
+                  >
+                    {/* Background Photograph with warm editorial tone */}
+                    <img
+                      src={cat.coverImage}
+                      alt={`${cat.name} Collection`}
+                      className="absolute inset-0 w-full h-full object-cover object-center transition-[transform,filter] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 [filter:sepia(0.06)_contrast(1.04)_brightness(0.92)] group-hover:[filter:sepia(0)_contrast(1.06)_brightness(0.98)]"
+                      loading="lazy"
+                    />
 
-                  {/* Top: Category Number with small underline rule */}
-                  <div className="relative z-10 flex flex-col items-start pt-1">
-                    <span
+                    {/* Dark gradient overlay for bottom legibility matching reference */}
+                    <div
+                      className="absolute inset-0 pointer-events-none"
                       style={{
-                        fontFamily: 'var(--font-serif)',
-                        fontSize: '1.15rem',
-                        color: '#FFFFFF',
-                        fontWeight: 400,
-                        textShadow: '0 1px 4px rgba(0,0,0,0.5)',
-                        opacity: 0.95,
-                        lineHeight: 1,
+                        background:
+                          'linear-gradient(to bottom, rgba(16, 16, 16, 0.2) 0%, rgba(16, 16, 16, 0) 30%, rgba(16, 16, 16, 0.55) 70%, rgba(16, 16, 16, 0.9) 100%)',
                       }}
-                    >
-                      {cat.id}
-                    </span>
-                    <span className="w-5 h-[1px] bg-white/55 mt-1.5" />
-                  </div>
+                    />
 
-                  {/* Bottom: Category Name & Arrow matching reference */}
-                  <div className="relative z-10 pt-3 pb-0.5">
-                    <h3
-                      style={{
-                        fontFamily: 'var(--font-serif)',
-                        fontSize: 'clamp(1.15rem, 1.35vw, 1.35rem)',
-                        color: '#FFFFFF',
-                        fontWeight: 400,
-                        lineHeight: 1.15,
-                        marginBottom: '0.35rem',
-                        textShadow: '0 2px 8px rgba(0,0,0,0.65)',
-                      }}
-                    >
-                      {cat.name}
-                    </h3>
-
-                    {/* Small clean arrow indicator matching reference: —→ */}
-                    <div className="flex items-center gap-1.5 text-white/80 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-300">
-                      <span className="w-6 h-[1px] bg-current" />
-                      <span className="text-[10px] leading-none">→</span>
+                    {/* Top: Category Number with small underline rule */}
+                    <div className="relative z-10 flex flex-col items-start pt-1">
+                      <span
+                        style={{
+                          fontFamily: 'var(--font-serif)',
+                          fontSize: '1.15rem',
+                          color: '#FFFFFF',
+                          fontWeight: 400,
+                          textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                          opacity: 0.95,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {cat.id}
+                      </span>
+                      <span className="w-5 h-[1px] bg-white/55 mt-1.5" />
                     </div>
-                  </div>
-                </motion.div>
-              </div>
+
+                    {/* Bottom: Category Name & Arrow matching reference */}
+                    <div className="relative z-10 pt-3 pb-0.5">
+                      <h3
+                        style={{
+                          fontFamily: 'var(--font-serif)',
+                          fontSize: 'clamp(1.15rem, 1.35vw, 1.35rem)',
+                          color: '#FFFFFF',
+                          fontWeight: 400,
+                          lineHeight: 1.15,
+                          marginBottom: '0.35rem',
+                          textShadow: '0 2px 8px rgba(0,0,0,0.65)',
+                        }}
+                      >
+                        {cat.name}
+                      </h3>
+
+                      {/* Small clean arrow indicator matching reference: —→ */}
+                      <div className="flex items-center gap-1.5 text-white/80 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-300">
+                        <span className="w-6 h-[1px] bg-current" />
+                        <span className="text-[10px] leading-none">→</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
             );
           })}
         </div>

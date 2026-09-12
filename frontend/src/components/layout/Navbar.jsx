@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Logo from './Logo';
+import { usePageTransition } from '../common/PageTransition';
 
 export default function Navbar({ onOpenInquiry }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { navigateWithTransition } = usePageTransition();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,12 +52,7 @@ export default function Navbar({ onOpenInquiry }) {
       isActive: location.pathname === '/' && !location.hash,
     },
     {
-      label: 'About',
-      hash: '#about',
-      isActive: location.pathname === '/' && location.hash === '#about',
-    },
-    {
-      label: 'Portfolio',
+      label: 'Collections',
       to: '/collections',
       isActive: location.pathname === '/collections',
     },
@@ -64,11 +60,6 @@ export default function Navbar({ onOpenInquiry }) {
       label: 'Services',
       to: '/services',
       isActive: location.pathname === '/services',
-    },
-    {
-      label: 'Contact',
-      onClick: onOpenInquiry,
-      isActive: false,
     },
   ];
 
@@ -91,14 +82,19 @@ export default function Navbar({ onOpenInquiry }) {
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
         {/* Studio Identity / Logo */}
-        <Link
-          to="/"
+        <a
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            navigateWithTransition('/', 'HOME');
+          }}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.85rem',
             textDecoration: 'none',
             transition: 'opacity 0.25s ease',
+            cursor: 'pointer',
           }}
           className="hover:opacity-85"
         >
@@ -135,7 +131,7 @@ export default function Navbar({ onOpenInquiry }) {
               PHOTOGRAPHY
             </span>
           </div>
-        </Link>
+        </a>
 
         {/* Desktop Navigation Links */}
         <nav
@@ -151,9 +147,13 @@ export default function Navbar({ onOpenInquiry }) {
 
             if (link.to) {
               return (
-                <Link
+                <a
                   key={link.label}
-                  to={link.to}
+                  href={link.to}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateWithTransition(link.to, link.label.toUpperCase());
+                  }}
                   style={{
                     fontFamily: 'var(--font-sans)',
                     fontSize: '0.8125rem',
@@ -189,7 +189,7 @@ export default function Navbar({ onOpenInquiry }) {
                       }}
                     />
                   )}
-                </Link>
+                </a>
               );
             }
 
@@ -246,7 +246,7 @@ export default function Navbar({ onOpenInquiry }) {
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
                 else window.scrollTo({ top: 500, behavior: 'smooth' });
               } else {
-                navigate('/services');
+                navigateWithTransition('/services', 'SERVICES');
               }
             }}
             className="btn-primary"
@@ -328,10 +328,14 @@ export default function Navbar({ onOpenInquiry }) {
           {navLinks.map((link) => {
             if (link.to) {
               return (
-                <Link
+                <a
                   key={link.label}
-                  to={link.to}
-                  onClick={() => setMobileMenuOpen(false)}
+                  href={link.to}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setMobileMenuOpen(false);
+                    navigateWithTransition(link.to, link.label.toUpperCase());
+                  }}
                   style={{
                     fontFamily: 'var(--font-serif)',
                     fontSize: '1.5rem',
@@ -351,7 +355,7 @@ export default function Navbar({ onOpenInquiry }) {
                       Active
                     </span>
                   )}
-                </Link>
+                </a>
               );
             }
 
@@ -380,7 +384,7 @@ export default function Navbar({ onOpenInquiry }) {
           <button
             onClick={() => {
               setMobileMenuOpen(false);
-              navigate('/services');
+              navigateWithTransition('/services', 'SERVICES');
             }}
             className="btn-primary"
             style={{ width: '100%', marginTop: '0.5rem' }}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { usePageTransition } from '../../../components/common/PageTransition';
 
 export default function ConfirmationScreen({
   formData,
@@ -8,6 +9,7 @@ export default function ConfirmationScreen({
   submissionDate,
 }) {
   const navigate = useNavigate();
+  const { navigateWithTransition } = usePageTransition();
 
   // Construct structured WhatsApp click-to-chat URL with pre-filled message
   const generateWhatsAppUrl = () => {
@@ -140,7 +142,7 @@ Sent via Raven & Lens Editorial Booking`;
 
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigateWithTransition('/', 'HOME')}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent hover:bg-[#EFE9DF] text-[#4A3B2C] border border-[#CBB9A4] px-7 py-4 rounded-full font-mono text-xs sm:text-sm font-medium uppercase tracking-[0.2em] transition-all duration-200 cursor-pointer"
           >
             BACK TO HOME

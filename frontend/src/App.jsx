@@ -6,6 +6,7 @@ import CollectionsPage from './pages/collections/CollectionsPage';
 import ServicesPage from './pages/services/ServicesPage';
 import Footer from './components/layout/Footer';
 import InquiryModal from './components/modals/InquiryModal';
+import { PageTransitionProvider } from './components/common/PageTransition';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -34,32 +35,34 @@ export default function App() {
   };
 
   return (
-    <div className="portfolio-app-root">
-      {/* Auto scroll to top on navigation */}
-      <ScrollToTop />
+    <PageTransitionProvider>
+      <div className="portfolio-app-root">
+        {/* Auto scroll to top on navigation */}
+        <ScrollToTop />
 
-      {/* 1. Minimal luxury navigation */}
-      <Navbar onOpenInquiry={() => handleOpenInquiry()} />
+        {/* 1. Minimal luxury navigation */}
+        <Navbar onOpenInquiry={() => handleOpenInquiry()} />
 
-      {/* Multi-route content: Home, Collections, Services */}
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route
-          path="/collections"
-          element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
+        {/* Multi-route content: Home, Collections, Services */}
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/collections"
+            element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
+          />
+          <Route path="/services" element={<ServicesPage />} />
+        </Routes>
+
+        {/* Minimal footer with CET studio time and social directory */}
+        <Footer onOpenInquiry={() => handleOpenInquiry()} />
+
+        {/* Interactive Consultation / Inquiry Modal */}
+        <InquiryModal
+          isOpen={inquiryModalOpen}
+          onClose={handleCloseInquiry}
+          prefillTier={selectedTier}
         />
-        <Route path="/services" element={<ServicesPage />} />
-      </Routes>
-
-      {/* Minimal footer with CET studio time and social directory */}
-      <Footer onOpenInquiry={() => handleOpenInquiry()} />
-
-      {/* Interactive Consultation / Inquiry Modal */}
-      <InquiryModal
-        isOpen={inquiryModalOpen}
-        onClose={handleCloseInquiry}
-        prefillTier={selectedTier}
-      />
-    </div>
+      </div>
+    </PageTransitionProvider>
   );
 }
