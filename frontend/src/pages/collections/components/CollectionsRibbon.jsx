@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export default function CollectionsRibbon({
@@ -7,6 +7,17 @@ export default function CollectionsRibbon({
   onSelectCategory,
   ribbonRef,
 }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(typeof window !== 'undefined' && window.innerWidth < 1024);
+    };
+    checkScreen();
+    window.addEventListener('resize', checkScreen);
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
+
   return (
     <section
       ref={ribbonRef}
@@ -37,57 +48,55 @@ export default function CollectionsRibbon({
         </svg>
       </div>
 
-      {/* Centered container for cards */}
+      {/* Scrollable on mobile, Centered on desktop */}
       <div
-        className="relative z-10 w-full flex justify-center items-center px-4 mx-auto"
+        className="collections-ribbon-scroll-container relative z-10 w-full overflow-x-auto overflow-y-visible flex justify-start lg:justify-center items-center px-4 sm:px-8 lg:px-4"
         style={{
           display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          margin: '0 auto',
+          overflowX: 'auto',
+          overflowY: 'visible',
+          WebkitOverflowScrolling: 'touch',
+          scrollSnapType: 'x proximity',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
         }}
       >
-        {/* Horizontal Row of 6 Cards — Centered */}
+        {/* Horizontal Row of 6 Cards */}
         <div
-          className="relative z-10 flex flex-nowrap justify-center items-end py-5 px-2 w-max max-w-full mx-auto"
+          className="relative z-10 flex flex-nowrap items-end py-5 px-3 min-w-max mx-auto lg:mx-auto"
           style={{
             display: 'flex',
             flexWrap: 'nowrap',
-            justifyContent: 'center',
             alignItems: 'flex-end',
-            gap: 'clamp(12px, 1.8vw, 24px)',
+            gap: 'clamp(14px, 1.8vw, 24px)',
             perspective: '1400px',
             perspectiveOrigin: '50% 50%',
-            padding: '1.25rem 0.5rem',
+            padding: '1.25rem 0.75rem',
             width: 'max-content',
-            maxWidth: '100%',
-            marginLeft: 'auto',
-            marginRight: 'auto',
           }}
         >
           {categories.map((cat, index) => {
             const isActive = cat.id === activeCategoryId;
             const isLeft = index < 3;
-            // 3 cards come from left (indexes 0, 1, 2) and 3 from right (indexes 3, 4, 5)
+            // 3 cards come from left (indexes 0, 1, 2) and 3 from right (indexes 3, 4, 5) only on desktop
             const initialX = isLeft ? -160 - (2 - index) * 40 : 160 + (index - 3) * 40;
             const delay = isLeft ? index * 0.12 : (5 - index) * 0.12;
 
             return (
               <motion.div
                 key={cat.id}
-                initial={{
+                initial={isMobile ? false : {
                   opacity: 0,
                   x: initialX,
                   filter: 'blur(8px)',
                 }}
-                whileInView={{
+                whileInView={isMobile ? undefined : {
                   opacity: 1,
                   x: 0,
                   filter: 'blur(0px)',
                 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{
+                viewport={isMobile ? undefined : { once: false, amount: 0.2 }}
+                transition={isMobile ? { duration: 0 } : {
                   duration: 0.85,
                   delay: delay,
                   ease: [0.16, 1, 0.3, 1],
@@ -95,7 +104,8 @@ export default function CollectionsRibbon({
                 className="flex-none"
                 style={{
                   flex: '0 0 auto',
-                  width: 'clamp(124px, 11vw, 154px)',
+                  width: 'clamp(136px, 32vw, 154px)',
+                  scrollSnapAlign: 'center',
                 }}
               >
                 <div
@@ -187,6 +197,19 @@ export default function CollectionsRibbon({
           })}
         </div>
       </div>
+
+      {/* Mobile Swipe Navigation Hint */}
+      <div className="flex lg:hidden items-center justify-center gap-2 mt-4 text-[10px] font-mono tracking-[0.24em] text-[#7A6E5D] uppercase select-none">
+        <span>←</span>
+        <span>Swipe to explore categories</span>
+        <span>→</span>
+      </div>
+
+      <style>{`
+        .collections-ribbon-scroll-container::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 }
