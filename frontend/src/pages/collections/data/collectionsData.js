@@ -9,7 +9,7 @@ export const CATEGORIES = [
     location: 'Lake Como & Private Estates',
     // French arch top
     cardShapeStyle: {
-      borderRadius: '68px 68px 4px 4px',
+      borderRadius: '9999px 9999px 4px 4px',
     },
     cardTransform: 'perspective(1200px) rotateY(12deg) translateY(2px)',
     coverImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop',
@@ -55,9 +55,9 @@ export const CATEGORIES = [
     quote: 'Quiet chapters before the vows.',
     medium: 'Hasselblad H6D · Natural Ambient Glow',
     location: 'Cap d’Antibes & Parisian Terraces',
-    // Asymmetric sculpted top curve
+    // French arch top
     cardShapeStyle: {
-      borderRadius: '4px 44px 4px 4px',
+      borderRadius: '9999px 9999px 4px 4px',
     },
     cardTransform: 'perspective(1200px) rotateY(7deg) translateY(0px)',
     coverImage: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop',
@@ -103,9 +103,9 @@ export const CATEGORIES = [
     quote: 'Moments of joy etched forever.',
     medium: 'Leica SL2 · 50mm F/1.2 & 28mm Elmarit',
     location: 'Hôtel Particulier & Private Salons',
-    // Graceful curved top
+    // French arch top
     cardShapeStyle: {
-      borderRadius: '42px 42px 4px 4px',
+      borderRadius: '9999px 9999px 4px 4px',
     },
     cardTransform: 'perspective(1200px) rotateY(2deg) translateY(-4px)',
     coverImage: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=800&auto=format&fit=crop',
@@ -151,9 +151,9 @@ export const CATEGORIES = [
     quote: 'Soulful character in every glance.',
     medium: 'Hasselblad 503CW · Carl Zeiss 80mm Planar',
     location: 'Paris Atelier & Natural Light Daylight Studio',
-    // Arch sculpted top
+    // French arch top
     cardShapeStyle: {
-      borderRadius: '4px 46px 4px 4px',
+      borderRadius: '9999px 9999px 4px 4px',
     },
     cardTransform: 'perspective(1200px) rotateY(-2deg) translateY(-4px)',
     coverImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
@@ -199,9 +199,9 @@ export const CATEGORIES = [
     quote: 'The living pulse of celebrated evenings.',
     medium: 'Leica Q3 · 28mm Summilux & Leica M11',
     location: 'Palais Brongniart & Private Châteaux',
-    // Clean architectural top
+    // French arch top
     cardShapeStyle: {
-      borderRadius: '4px 4px 4px 4px',
+      borderRadius: '9999px 9999px 4px 4px',
     },
     cardTransform: 'perspective(1200px) rotateY(-7deg) translateY(0px)',
     coverImage: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=800&auto=format&fit=crop',
@@ -247,9 +247,9 @@ export const CATEGORIES = [
     quote: 'Purity of form, shadow, and tactile desire.',
     medium: 'Phase One IQ4 150MP & Schneider Kreuznach',
     location: 'Atelier Minimaliste & Concept Showrooms',
-    // Clean architectural top
+    // French arch top
     cardShapeStyle: {
-      borderRadius: '4px 4px 4px 4px',
+      borderRadius: '9999px 9999px 4px 4px',
     },
     cardTransform: 'perspective(1200px) rotateY(-12deg) translateY(2px)',
     coverImage: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=800&auto=format&fit=crop',

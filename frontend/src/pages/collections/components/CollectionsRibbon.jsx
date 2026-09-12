@@ -88,13 +88,13 @@ export default function CollectionsRibbon({
                     scale: 1.025,
                     transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
                   }}
-                  className="group relative w-full overflow-hidden flex flex-col justify-between cursor-pointer select-none bg-[#1A1816] border border-white/20 transition-[box-shadow] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                  className="group relative w-full overflow-hidden flex flex-col justify-between cursor-pointer select-none bg-[#1A1816] border border-[#1C1A17] transition-[box-shadow] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]"
                   style={{
-                    ...cat.cardShapeStyle,
+                    borderRadius: '9999px 9999px 4px 4px',
                     height: 'clamp(270px, 25vw, 325px)',
-                    padding: 'clamp(0.75rem, 1.2vw, 1rem)',
+                    padding: 'clamp(1.1rem, 1.5vw, 1.35rem) clamp(0.85rem, 1.2vw, 1.1rem) clamp(0.85rem, 1.2vw, 1.1rem)',
                     boxShadow: isActive
-                      ? '0 24px 44px -10px rgba(18, 16, 14, 0.38), 0 0 0 2px #101010'
+                      ? '0 24px 44px -10px rgba(18, 16, 14, 0.42), 0 0 0 2px #101010'
                       : '0 16px 36px -10px rgba(18, 16, 14, 0.22), 0 4px 12px -4px rgba(18, 16, 14, 0.1)',
                   }}
                 >
@@ -116,11 +116,11 @@ export default function CollectionsRibbon({
                   />
 
                   {/* Top: Category Number with small underline rule */}
-                  <div className="relative z-10 flex flex-col items-start">
+                  <div className="relative z-10 flex flex-col items-start pt-1">
                     <span
                       style={{
                         fontFamily: 'var(--font-serif)',
-                        fontSize: '1.1rem',
+                        fontSize: '1.15rem',
                         color: '#FFFFFF',
                         fontWeight: 400,
                         textShadow: '0 1px 4px rgba(0,0,0,0.5)',
@@ -130,11 +130,11 @@ export default function CollectionsRibbon({
                     >
                       {cat.id}
                     </span>
-                    <span className="w-4 h-[1px] bg-white/45 mt-1.5" />
+                    <span className="w-5 h-[1px] bg-white/55 mt-1.5" />
                   </div>
 
                   {/* Bottom: Category Name & Arrow matching reference */}
-                  <div className="relative z-10 pt-3">
+                  <div className="relative z-10 pt-3 pb-0.5">
                     <h3
                       style={{
                         fontFamily: 'var(--font-serif)',
@@ -142,7 +142,7 @@ export default function CollectionsRibbon({
                         color: '#FFFFFF',
                         fontWeight: 400,
                         lineHeight: 1.15,
-                        marginBottom: '0.25rem',
+                        marginBottom: '0.35rem',
                         textShadow: '0 2px 8px rgba(0,0,0,0.65)',
                       }}
                     >
@@ -151,7 +151,7 @@ export default function CollectionsRibbon({
 
                     {/* Small clean arrow indicator matching reference: —→ */}
                     <div className="flex items-center gap-1.5 text-white/80 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-300">
-                      <span className="w-5 h-[1px] bg-current" />
+                      <span className="w-6 h-[1px] bg-current" />
                       <span className="text-[10px] leading-none">→</span>
                     </div>
                   </div>
