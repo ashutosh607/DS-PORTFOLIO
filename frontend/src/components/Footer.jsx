@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Logo from './Logo';
 
 export default function Footer() {
   const [parisTime, setParisTime] = useState('');
@@ -50,23 +51,17 @@ export default function Footer() {
             borderBottom: '1px solid rgba(227, 219, 204, 0.1)',
           }}
         >
-          {/* Brand Col */}
-          <div style={{ maxWidth: '360px' }}>
-            <span
-              style={{
-                fontFamily: 'var(--font-serif)',
-                fontSize: '1.65rem',
-                color: 'var(--color-off-white)',
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                display: 'block',
-                marginBottom: '0.5rem',
-              }}
-            >
-              Maison Édouard
-            </span>
-            <p style={{ color: 'rgba(243, 240, 233, 0.55)', fontSize: '0.85rem', lineHeight: 1.6 }}>
-              Atelier de photographie fine art, archives spatiales et campagnes éditoriales de haute couture. Paris · Zurich · New York.
+          {/* Brand Col with Theme-Matched Light Logo */}
+          <div style={{ maxWidth: '380px' }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <Logo
+                variant="light"
+                height={52}
+                withText={true}
+              />
+            </div>
+            <p style={{ color: 'rgba(243, 240, 233, 0.65)', fontSize: '0.85rem', lineHeight: 1.6 }}>
+              Fine art editorial photography, cinematic films, and spatial monographs. Available for private commissions and commercial assignments worldwide.
             </p>
           </div>
 

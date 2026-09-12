@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import PhotoPlaceholder from './PhotoPlaceholder';
+import ScrollBlurCharReveal from './ScrollBlurCharReveal';
 
 /**
  * Editorial Photography Services Data
@@ -135,18 +136,26 @@ function SlidingServiceRow({ service, index }) {
                 </span>
               </div>
 
-              {/* Service Title */}
-              <h3
+              {/* Service Title with character blur-to-sharp reveal */}
+              <ScrollBlurCharReveal
+                as="h3"
+                text={service.title}
                 className="font-serif text-[clamp(2.4rem,4.5vw,3.6rem)] text-[var(--color-obsidian)] font-normal leading-[1.08] tracking-[-0.025em] mb-3 sm:mb-4"
                 style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                {service.title}
-              </h3>
+                blurAmount={12}
+                initialOpacity={0.14}
+                offset={['start 0.90', 'start 0.45']}
+              />
 
-              {/* One-line Description */}
-              <p className="font-sans text-base sm:text-lg text-[var(--color-obsidian-muted)] leading-relaxed font-light mb-4 sm:mb-5">
-                “{service.tagline}”
-              </p>
+              {/* One-line Description with character blur-to-sharp reveal */}
+              <ScrollBlurCharReveal
+                as="p"
+                text={`“${service.tagline}”`}
+                className="font-sans text-base sm:text-lg text-[var(--color-obsidian-muted)] leading-relaxed font-light mb-4 sm:mb-5"
+                blurAmount={9}
+                initialOpacity={0.18}
+                offset={['start 0.90', 'start 0.45']}
+              />
 
               {/* Subtle Editorial Metadata Line */}
               <div className="pt-3 sm:pt-4 border-t border-[var(--color-nude-light)] flex items-center gap-2">
@@ -318,40 +327,36 @@ export default function WhatWeDoEditorial() {
           {/* Asymmetric Header Layout: Big Serif Left, Editorial Copy Right */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
             
-            {/* Left Column: Monumental Serif Heading */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-6 xl:col-span-7"
-            >
-              <h2
+            {/* Left Column: Monumental Serif Heading with character blur reveal */}
+            <div className="lg:col-span-6 xl:col-span-7">
+              <ScrollBlurCharReveal
+                as="h2"
+                text="What We Do"
                 className="font-serif text-[clamp(3.2rem,7.2vw,6.5rem)] font-normal leading-[0.98] tracking-[-0.03em] text-[var(--color-obsidian)]"
                 style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                What We Do
-              </h2>
-            </motion.div>
+                blurAmount={16}
+                initialOpacity={0.12}
+                offset={['start 0.92', 'start 0.42']}
+              />
+            </div>
 
-            {/* Right Column: Editorial Introduction & Monograph Statement */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-6 xl:col-span-5 flex flex-col justify-end pt-2 lg:pt-4"
-            >
-              <p className="font-sans text-[clamp(1.05rem,1.4vw,1.3rem)] text-[var(--color-obsidian-muted)] leading-[1.75] font-light">
-                “From intimate portraits to celebrations and meaningful brand stories, we create photographs that feel honest, timeless, and unmistakably yours.”
-              </p>
+            {/* Right Column: Editorial Introduction & Monograph Statement with character blur reveal */}
+            <div className="lg:col-span-6 xl:col-span-5 flex flex-col justify-end pt-2 lg:pt-4">
+              <ScrollBlurCharReveal
+                as="p"
+                text="“From intimate portraits to celebrations and meaningful brand stories, we create photographs that feel honest, timeless, and unmistakably yours.”"
+                className="font-sans text-[clamp(1.05rem,1.4vw,1.3rem)] text-[var(--color-obsidian-muted)] leading-[1.75] font-light"
+                blurAmount={10}
+                initialOpacity={0.16}
+                offset={['start 0.90', 'start 0.38']}
+              />
 
               {/* Editorial Spec Footnote */}
               <div className="mt-6 sm:mt-8 flex items-center justify-between font-mono text-[0.625rem] tracking-widest text-[var(--color-obsidian-light)] uppercase pt-4 border-t border-[var(--color-nude-subtle)]">
                 <span>Medium Format & 35mm Analog</span>
                 <span>Four Disciplines</span>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Logo from './Logo';
 
 export default function Navbar({ onOpenInquiry }) {
   const [scrolled, setScrolled] = useState(false);
@@ -37,40 +38,22 @@ export default function Navbar({ onOpenInquiry }) {
     >
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         
-        {/* Studio Identity / Wordmark */}
+        {/* Studio Identity / Inverted Theme-Matched Logo */}
         <a
           href="#"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
+            display: 'inline-flex',
+            alignItems: 'center',
             textDecoration: 'none',
+            transition: 'opacity 0.25s ease, transform 0.25s ease',
           }}
+          className="hover:opacity-85 active:scale-95"
         >
-          <span
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: '1.45rem',
-              fontWeight: 500,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--color-obsidian)',
-              lineHeight: 1.1,
-            }}
-          >
-            Maison Édouard
-          </span>
-          <span
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '0.625rem',
-              letterSpacing: '0.24em',
-              textTransform: 'uppercase',
-              color: 'var(--color-obsidian-light)',
-              marginTop: '2px',
-            }}
-          >
-            Studio de Photographie · Paris
-          </span>
+          <Logo
+            variant="dark"
+            height={scrolled ? 38 : 44}
+            withText={true}
+          />
         </a>
 
         {/* Desktop Navigation Links */}

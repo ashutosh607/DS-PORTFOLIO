@@ -1,5 +1,6 @@
 import React from 'react';
 import PhotoPlaceholder from './PhotoPlaceholder';
+import ScrollBlurCharReveal from './ScrollBlurCharReveal';
 
 export default function AboutSection() {
   return (
@@ -53,7 +54,9 @@ export default function AboutSection() {
                 backdropFilter: 'blur(10px)',
               }}
             >
-              <p
+              <ScrollBlurCharReveal
+                as="p"
+                text="“To photograph is to hold one's breath when all faculties converge to captivate fleeting reality.”"
                 style={{
                   fontFamily: 'var(--font-serif)',
                   fontSize: '1.2rem',
@@ -62,9 +65,10 @@ export default function AboutSection() {
                   lineHeight: 1.5,
                   marginBottom: '0.5rem',
                 }}
-              >
-                “To photograph is to hold one's breath when all faculties converge to captivate fleeting reality.”
-              </p>
+                blurAmount={10}
+                initialOpacity={0.16}
+                offset={['start 0.90', 'start 0.40']}
+              />
               <span
                 style={{
                   fontFamily: 'var(--font-sans)',
@@ -85,9 +89,14 @@ export default function AboutSection() {
             <span className="eyebrow" style={{ marginBottom: '1rem' }}>
               The Studio
             </span>
-            <h2 style={{ marginBottom: '1.5rem' }}>
-              Stillness in an <span className="editorial-italic">accelerated world</span>.
-            </h2>
+            <ScrollBlurCharReveal
+              as="h2"
+              text="Stillness in an accelerated world."
+              style={{ marginBottom: '1.5rem' }}
+              blurAmount={14}
+              initialOpacity={0.14}
+              offset={['start 0.90', 'start 0.40']}
+            />
 
             <div
               style={{
