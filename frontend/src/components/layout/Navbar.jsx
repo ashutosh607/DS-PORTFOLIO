@@ -46,19 +46,24 @@ export default function Navbar({ onOpenInquiry }) {
 
   const navLinks = [
     {
-      label: 'Gallery',
-      hash: '#gallery',
-      isActive: location.pathname === '/' && (!location.hash || location.hash === '#gallery'),
-    },
-    {
-      label: 'Collections',
-      to: '/collections',
-      isActive: location.pathname === '/collections',
+      label: 'Home',
+      to: '/',
+      isActive: location.pathname === '/' && !location.hash,
     },
     {
       label: 'About',
       hash: '#about',
       isActive: location.pathname === '/' && location.hash === '#about',
+    },
+    {
+      label: 'Portfolio',
+      to: '/collections',
+      isActive: location.pathname === '/collections',
+    },
+    {
+      label: 'Services',
+      to: '/services',
+      isActive: location.pathname === '/services',
     },
     {
       label: 'Contact',
@@ -91,16 +96,45 @@ export default function Navbar({ onOpenInquiry }) {
           style={{
             display: 'inline-flex',
             alignItems: 'center',
+            gap: '0.85rem',
             textDecoration: 'none',
-            transition: 'opacity 0.25s ease, transform 0.25s ease',
+            transition: 'opacity 0.25s ease',
           }}
-          className="hover:opacity-85 active:scale-95"
+          className="hover:opacity-85"
         >
           <Logo
             variant="dark"
-            height={scrolled ? 38 : 44}
-            withText={true}
+            height={scrolled ? 34 : 38}
+            withText={false}
           />
+          <div className="flex flex-col text-left">
+            <span
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: '1.05rem',
+                letterSpacing: '0.14em',
+                fontWeight: 500,
+                lineHeight: 1.1,
+                color: '#1E1B18',
+                textTransform: 'uppercase',
+              }}
+            >
+              RAVEN &amp; LENS
+            </span>
+            <span
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.55rem',
+                letterSpacing: '0.28em',
+                fontWeight: 600,
+                color: '#7A6E5D',
+                textTransform: 'uppercase',
+                marginTop: '1px',
+              }}
+            >
+              PHOTOGRAPHY
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -206,7 +240,15 @@ export default function Navbar({ onOpenInquiry }) {
         {/* Right CTA Button & Mobile Trigger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
           <button
-            onClick={onOpenInquiry}
+            onClick={() => {
+              if (location.pathname === '/services') {
+                const el = document.getElementById('booking-form');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                else window.scrollTo({ top: 500, behavior: 'smooth' });
+              } else {
+                navigate('/services');
+              }
+            }}
             className="btn-primary"
             style={{
               padding: '0.65rem 1.45rem',
@@ -214,7 +256,7 @@ export default function Navbar({ onOpenInquiry }) {
               letterSpacing: '0.16em',
             }}
           >
-            <span>Inquire</span>
+            <span>Book a Session</span>
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 13L13 3M13 3H6M13 3V10" />
             </svg>
@@ -338,12 +380,12 @@ export default function Navbar({ onOpenInquiry }) {
           <button
             onClick={() => {
               setMobileMenuOpen(false);
-              onOpenInquiry();
+              navigate('/services');
             }}
             className="btn-primary"
             style={{ width: '100%', marginTop: '0.5rem' }}
           >
-            Inquire For Commission
+            Book a Session
           </button>
         </div>
       )}
