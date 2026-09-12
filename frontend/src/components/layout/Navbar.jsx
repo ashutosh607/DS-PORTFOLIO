@@ -2,13 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Logo from './Logo';
 import { usePageTransition } from '../common/PageTransition';
+import StaggeredMenu from './StaggeredMenu';
 
 export default function Navbar({ onOpenInquiry }) {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { navigateWithTransition } = usePageTransition();
+
+  const mobileMenuItems = [
+    { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
+    { label: 'Collections', ariaLabel: 'Explore photo collections', link: '/collections' },
+    { label: 'Services', ariaLabel: 'Photographer services & booking', link: '/services' },
+  ];
+
+  const socialItems = [
+    { label: 'Instagram', link: 'https://instagram.com' },
+    { label: 'WhatsApp', link: 'https://wa.me/919876543210' },
+    { label: 'Inquiries', link: 'mailto:hello@ravenandlens.com' },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -237,7 +249,7 @@ export default function Navbar({ onOpenInquiry }) {
           })}
         </nav>
 
-        {/* Right CTA Button & Mobile Trigger */}
+        {/* Right CTA Button & Mobile StaggeredMenu */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
           <button
             onClick={() => {
@@ -249,7 +261,7 @@ export default function Navbar({ onOpenInquiry }) {
                 navigateWithTransition('/services', 'SERVICES');
               }
             }}
-            className="btn-primary"
+            className="btn-primary desktop-cta"
             style={{
               padding: '0.65rem 1.45rem',
               fontSize: '0.75rem',
@@ -262,146 +274,49 @@ export default function Navbar({ onOpenInquiry }) {
             </svg>
           </button>
 
-          {/* Hamburger for mobile */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="mobile-menu-toggle"
-            aria-label="Toggle navigation menu"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--color-ivory)',
-              border: '1px solid var(--color-nude)',
-              cursor: 'pointer',
-              gap: '5px',
-            }}
-          >
-            <span
-              style={{
-                width: '18px',
-                height: '1.5px',
-                backgroundColor: 'var(--color-obsidian)',
-                transition: 'all 0.3s ease',
-                transform: mobileMenuOpen ? 'rotate(45deg) translate(2.5px, 2.5px)' : 'none',
+          {/* StaggeredMenu from React Bits for Small Devices */}
+          <div className="mobile-staggered-menu">
+            <StaggeredMenu
+              position="right"
+              items={mobileMenuItems}
+              socialItems={socialItems}
+              displaySocials={true}
+              displayItemNumbering={true}
+              showLogo={false}
+              menuButtonColor="#1E1B18"
+              openMenuButtonColor="#1E1B18"
+              accentColor="#685444"
+              colors={['#E6DAC8', '#CBB9A4', '#8C7764']}
+              onItemClick={(it) => {
+                navigateWithTransition(it.link, it.label.toUpperCase());
               }}
             />
-            <span
-              style={{
-                width: '18px',
-                height: '1.5px',
-                backgroundColor: 'var(--color-obsidian)',
-                transition: 'all 0.3s ease',
-                opacity: mobileMenuOpen ? 0 : 1,
-              }}
-            />
-            <span
-              style={{
-                width: '18px',
-                height: '1.5px',
-                backgroundColor: 'var(--color-obsidian)',
-                transition: 'all 0.3s ease',
-                transform: mobileMenuOpen ? 'rotate(-45deg) translate(2.5px, -2.5px)' : 'none',
-              }}
-            />
-          </button>
+          </div>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <div
-          style={{
-            backgroundColor: 'var(--color-off-white)',
-            borderBottom: '1px solid var(--color-nude)',
-            padding: '2rem 1.5rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.5rem',
-            animation: 'fadeIn 0.3s ease forwards',
-          }}
-        >
-          {navLinks.map((link) => {
-            if (link.to) {
-              return (
-                <a
-                  key={link.label}
-                  href={link.to}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setMobileMenuOpen(false);
-                    navigateWithTransition(link.to, link.label.toUpperCase());
-                  }}
-                  style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontSize: '1.5rem',
-                    color: 'var(--color-obsidian)',
-                    textDecoration: 'none',
-                    borderBottom: '1px solid var(--color-nude-subtle)',
-                    paddingBottom: '0.75rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <span>{link.label}</span>
-                  {link.isActive && (
-                    <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-sans)', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--color-obsidian-light)' }}>
-                      Active
-                    </span>
-                  )}
-                </a>
-              );
-            }
-
-            return (
-              <a
-                key={link.label}
-                href={link.hash || '#'}
-                onClick={(e) => {
-                  setMobileMenuOpen(false);
-                  handleNavClick(e, link);
-                }}
-                style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontSize: '1.5rem',
-                  color: 'var(--color-obsidian)',
-                  textDecoration: 'none',
-                  borderBottom: '1px solid var(--color-nude-subtle)',
-                  paddingBottom: '0.75rem',
-                  cursor: 'pointer',
-                }}
-              >
-                {link.label}
-              </a>
-            );
-          })}
-          <button
-            onClick={() => {
-              setMobileMenuOpen(false);
-              navigateWithTransition('/services', 'SERVICES');
-            }}
-            className="btn-primary"
-            style={{ width: '100%', marginTop: '0.5rem' }}
-          >
-            Book a Session
-          </button>
-        </div>
-      )}
-
       {/* Responsive media query styling */}
       <style>{`
-        @media (min-width: 900px) {
+        @media (min-width: 1024px) {
           .desktop-nav {
             display: flex !important;
           }
-          .mobile-menu-toggle {
+          .desktop-cta {
+            display: inline-flex !important;
+          }
+          .mobile-staggered-menu {
             display: none !important;
+          }
+        }
+        @media (max-width: 1023px) {
+          .desktop-nav {
+            display: none !important;
+          }
+          .desktop-cta {
+            display: none !important;
+          }
+          .mobile-staggered-menu {
+            display: block !important;
           }
         }
       `}</style>
