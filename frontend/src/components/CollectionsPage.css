@@ -41,35 +41,29 @@
   width: 100%;
 }
 
-/* 3D Perspective Track Container */
+/* 3D Perspective Track Container — Always Centered */
 .collections-ribbon-track {
-  display: flex;
+  display: flex !important;
   flex-wrap: nowrap;
-  justify-content: center;
+  justify-content: center !important;
   align-items: flex-end;
-  gap: clamp(18px, 2.2vw, 32px); /* Visible, elegant spacing between cards */
+  gap: clamp(12px, 1.8vw, 24px); /* Visible, elegant spacing between cards */
   perspective: 1400px;
   perspective-origin: 50% 50%;
   padding: 1.25rem 0.5rem;
   position: relative;
   z-index: 10;
-  width: 100%;
-  max-width: 1260px;
-  margin: 0 auto;
+  width: max-content !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 768px) {
   .collections-ribbon-track {
-    justify-content: flex-start;
-    overflow-x: auto;
-    overflow-y: visible;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .collections-ribbon-track::-webkit-scrollbar {
-    display: none;
+    justify-content: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 }
 

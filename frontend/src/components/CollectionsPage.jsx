@@ -15,7 +15,7 @@ const CATEGORIES = [
     cardShapeStyle: {
       borderRadius: '68px 68px 4px 4px',
     },
-    cardTransform: 'perspective(1200px) rotateY(16deg) translateY(2px)',
+    cardTransform: 'perspective(1200px) rotateY(12deg) translateY(2px)',
     coverImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1400&auto=format&fit=crop',
@@ -63,7 +63,7 @@ const CATEGORIES = [
     cardShapeStyle: {
       borderRadius: '4px 44px 4px 4px',
     },
-    cardTransform: 'perspective(1200px) rotateY(10deg) translateY(0px)',
+    cardTransform: 'perspective(1200px) rotateY(7deg) translateY(0px)',
     coverImage: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1400&auto=format&fit=crop',
@@ -112,7 +112,7 @@ const CATEGORIES = [
       borderRadius: '42px 42px 4px 4px',
     },
     cardTransform: 'perspective(1200px) rotateY(2deg) translateY(-4px)',
-    coverImage: 'https://images.unsplash.com/photo-1535141192574-5d4897c13136?q=80&w=800&auto=format&fit=crop',
+    coverImage: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1400&auto=format&fit=crop',
       title: 'Candlelit Celebration',
@@ -159,7 +159,7 @@ const CATEGORIES = [
     cardShapeStyle: {
       borderRadius: '4px 46px 4px 4px',
     },
-    cardTransform: 'perspective(1200px) rotateY(-6deg) translateY(0px)',
+    cardTransform: 'perspective(1200px) rotateY(-2deg) translateY(-4px)',
     coverImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1400&auto=format&fit=crop',
@@ -207,7 +207,7 @@ const CATEGORIES = [
     cardShapeStyle: {
       borderRadius: '4px 4px 4px 4px',
     },
-    cardTransform: 'perspective(1200px) rotateY(-12deg) translateY(4px)',
+    cardTransform: 'perspective(1200px) rotateY(-7deg) translateY(0px)',
     coverImage: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1400&auto=format&fit=crop',
@@ -255,7 +255,7 @@ const CATEGORIES = [
     cardShapeStyle: {
       borderRadius: '4px 4px 4px 4px',
     },
-    cardTransform: 'perspective(1200px) rotateY(-18deg) translateY(8px)',
+    cardTransform: 'perspective(1200px) rotateY(-12deg) translateY(2px)',
     coverImage: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1400&auto=format&fit=crop',
@@ -330,10 +330,11 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
   return (
     <div
-      className="collections-page-root w-full min-h-screen text-[#101010]"
+      className="collections-page-root w-full min-h-screen text-[#101010] overflow-x-hidden"
       style={{
         backgroundColor: '#F6F3EC',
         fontFamily: 'var(--font-sans)',
+        overflowX: 'hidden',
       }}
     >
       {/* =====================================================================
@@ -463,8 +464,8 @@ export default function CollectionsPage({ onOpenInquiry }) {
                 </div>
               </div>
 
-              {/* Collage Box: Spacious CROSS Layout — Photos spread apart with visible gaps */}
-              <div className="relative w-full max-w-[580px] h-[500px] sm:h-[540px] mr-0 xl:mr-8">
+              {/* Collage Box: Compact Layout with explicit White Polaroid borders */}
+              <div className="relative w-full max-w-[480px] h-[430px] mx-auto lg:mr-4">
 
                 {/* Handwritten Cursive Script Annotation */}
                 <div
@@ -492,17 +493,29 @@ export default function CollectionsPage({ onOpenInquiry }) {
                   </svg>
                 </div>
 
-                {/* 1. Main Polaroid Card — Center-Left Position */}
+                {/* 1. Main Polaroid Card — Wedding Couple with Crisp White Border */}
                 <motion.div
                   initial={{ opacity: 0, y: 20, rotate: 3 }}
                   animate={{ opacity: 1, y: 0, rotate: 3 }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                   whileHover={{ scale: 1.02, rotate: 1.5, zIndex: 28 }}
                   onClick={() => handleSelectCategory('01')}
-                  className="absolute left-0 sm:left-4 top-[80px] sm:top-[90px] z-20 w-[220px] sm:w-[250px] md:w-[280px] bg-white p-2.5 sm:p-3 pb-8 sm:pb-9 shadow-[0_20px_40px_-10px_rgba(30,28,24,0.16)] border border-[rgba(215,206,190,0.65)] rounded-[2px] cursor-pointer"
-                  style={{ transformOrigin: 'center center' }}
+                  className="cursor-pointer"
+                  style={{
+                    position: 'absolute',
+                    left: '10px',
+                    top: '55px',
+                    zIndex: 20,
+                    width: '235px',
+                    backgroundColor: '#FFFFFF',
+                    padding: '10px 10px 34px 10px',
+                    boxShadow: '0 18px 38px -8px rgba(25, 22, 18, 0.22), 0 3px 10px rgba(0,0,0,0.06)',
+                    border: '1.5px solid #D8CFBF',
+                    borderRadius: '2px',
+                    transformOrigin: 'center center',
+                  }}
                 >
-                  <div className="relative w-full aspect-[3/4] overflow-hidden bg-[#E9E4D8]">
+                  <div className="relative w-full aspect-[3/4] overflow-hidden bg-[#E9E4D8] border border-[rgba(0,0,0,0.06)]">
                     <img
                       src="/images/hero_polaroid_wedding.jpg"
                       alt="Romantic wedding couple on coastal cliff at sunset"
@@ -512,17 +525,29 @@ export default function CollectionsPage({ onOpenInquiry }) {
                   </div>
                 </motion.div>
 
-                {/* 2. Secondary Polaroid Card — Top-Right, Separated with gap */}
+                {/* 2. Secondary Polaroid Card — Top-Right Vintage Camera with Prominent White Border */}
                 <motion.div
                   initial={{ opacity: 0, y: 25, rotate: -6 }}
                   animate={{ opacity: 1, y: 0, rotate: -6 }}
                   transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
                   whileHover={{ scale: 1.025, rotate: -3.5, zIndex: 28 }}
                   onClick={() => handleSelectCategory('04')}
-                  className="absolute right-0 sm:right-4 top-[50px] sm:top-[60px] z-10 w-[175px] sm:w-[195px] md:w-[220px] bg-white p-2 sm:p-2.5 pb-6 sm:pb-7 shadow-[0_18px_36px_-10px_rgba(30,28,24,0.14)] border border-[rgba(215,206,190,0.65)] rounded-[2px] cursor-pointer"
-                  style={{ transformOrigin: 'center center' }}
+                  className="cursor-pointer"
+                  style={{
+                    position: 'absolute',
+                    right: '15px',
+                    top: '20px',
+                    zIndex: 10,
+                    width: '185px',
+                    backgroundColor: '#FFFFFF',
+                    padding: '10px 10px 28px 10px',
+                    boxShadow: '0 18px 38px -8px rgba(25, 22, 18, 0.2), 0 3px 10px rgba(0,0,0,0.06)',
+                    border: '1.5px solid #D8CFBF',
+                    borderRadius: '2px',
+                    transformOrigin: 'center center',
+                  }}
                 >
-                  <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#E9E4D8]">
+                  <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#E9E4D8] border border-[rgba(0,0,0,0.06)]">
                     <img
                       src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800&auto=format&fit=crop"
                       alt="Hands holding vintage camera in rich monochrome"
@@ -532,17 +557,29 @@ export default function CollectionsPage({ onOpenInquiry }) {
                   </div>
                 </motion.div>
 
-                {/* 3. Small Third Polaroid Card — Bottom-Right, Clear gap from others */}
+                {/* 3. Small Third Polaroid Card — Bottom-Right Wildflowers with Prominent White Border */}
                 <motion.div
                   initial={{ opacity: 0, y: 25, rotate: 5 }}
                   animate={{ opacity: 1, y: 0, rotate: 5 }}
                   transition={{ duration: 0.8, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
                   whileHover={{ scale: 1.03, rotate: 2, zIndex: 28 }}
                   onClick={() => handleSelectCategory('06')}
-                  className="absolute right-6 sm:right-10 bottom-0 sm:bottom-[5px] z-20 w-[135px] sm:w-[150px] md:w-[165px] bg-white p-1.5 sm:p-2 pb-5 sm:pb-6 shadow-[0_20px_38px_-10px_rgba(30,28,24,0.15)] border border-[rgba(215,206,190,0.65)] rounded-[2px] cursor-pointer"
-                  style={{ transformOrigin: 'center center' }}
+                  className="cursor-pointer"
+                  style={{
+                    position: 'absolute',
+                    right: '35px',
+                    bottom: '15px',
+                    zIndex: 22,
+                    width: '140px',
+                    backgroundColor: '#FFFFFF',
+                    padding: '8px 8px 24px 8px',
+                    boxShadow: '0 18px 38px -8px rgba(25, 22, 18, 0.2), 0 3px 10px rgba(0,0,0,0.06)',
+                    border: '1.5px solid #D8CFBF',
+                    borderRadius: '2px',
+                    transformOrigin: 'center center',
+                  }}
                 >
-                  <div className="relative w-full aspect-square overflow-hidden bg-[#E9E4D8]">
+                  <div className="relative w-full aspect-square overflow-hidden bg-[#E9E4D8] border border-[rgba(0,0,0,0.06)]">
                     <img
                       src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop"
                       alt="Delicate white daisies and summer wildflowers in field"
@@ -598,11 +635,30 @@ export default function CollectionsPage({ onOpenInquiry }) {
           </svg>
         </div>
 
-        {/* Centered container for cards to spread across without edge collision */}
-        <div className="relative z-10 mx-auto px-4 sm:px-6 md:px-8 max-w-[1260px]">
+        {/* Centered container for cards */}
+        <div
+          className="relative z-10 w-full flex justify-center items-center px-4 mx-auto"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            margin: '0 auto',
+          }}
+        >
 
-          {/* Horizontal Row of 6 Cards — Dedicated CSS track with explicit 24-32px gaps */}
-          <div className="collections-ribbon-track">
+          {/* Horizontal Row of 6 Cards — Centered */}
+          <div
+            className="collections-ribbon-track"
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              margin: '0 auto',
+              width: 'max-content',
+              maxWidth: '100%',
+            }}
+          >
             {CATEGORIES.map((cat) => {
               const isActive = cat.id === activeCategoryId;
 
