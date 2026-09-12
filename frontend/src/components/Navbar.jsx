@@ -17,7 +17,7 @@ export default function Navbar({ onOpenInquiry }) {
     { label: 'Home', href: '#home' },
     { label: 'What We Do', href: '#what-we-do' },
     { label: 'About', href: '#about' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Contact', onClick: onOpenInquiry },
   ];
 
   return (
@@ -68,7 +68,13 @@ export default function Navbar({ onOpenInquiry }) {
           {navLinks.map((link) => (
             <a
               key={link.label}
-              href={link.href}
+              href={link.href || '#'}
+              onClick={(e) => {
+                if (link.onClick) {
+                  e.preventDefault();
+                  link.onClick();
+                }
+              }}
               style={{
                 fontFamily: 'var(--font-sans)',
                 fontSize: '0.825rem',
@@ -78,6 +84,7 @@ export default function Navbar({ onOpenInquiry }) {
                 color: 'var(--color-obsidian)',
                 position: 'relative',
                 padding: '0.25rem 0',
+                cursor: 'pointer',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = '#7A7770';
@@ -173,8 +180,14 @@ export default function Navbar({ onOpenInquiry }) {
           {navLinks.map((link) => (
             <a
               key={link.label}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
+              href={link.href || '#'}
+              onClick={(e) => {
+                setMobileMenuOpen(false);
+                if (link.onClick) {
+                  e.preventDefault();
+                  link.onClick();
+                }
+              }}
               style={{
                 fontFamily: 'var(--font-serif)',
                 fontSize: '1.5rem',
@@ -182,6 +195,7 @@ export default function Navbar({ onOpenInquiry }) {
                 textDecoration: 'none',
                 borderBottom: '1px solid var(--color-nude-subtle)',
                 paddingBottom: '0.75rem',
+                cursor: 'pointer',
               }}
             >
               {link.label}

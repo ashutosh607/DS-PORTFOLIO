@@ -3,7 +3,6 @@ import Navbar from './components/Navbar';
 import HeroSpotlightCarousel from './components/HeroSpotlightCarousel';
 import WhatWeDoEditorial from './components/WhatWeDoEditorial';
 import AboutSection from './components/AboutSection';
-import ObsidianCTA from './components/ObsidianCTA';
 import Footer from './components/Footer';
 import InquiryModal from './components/InquiryModal';
 
@@ -35,13 +34,10 @@ export default function App() {
 
         {/* Studio About section with artist portrait, philosophy & exhibition history */}
         <AboutSection />
-
-        {/* Strong final CTA on Obsidian background with interactive consultation panel */}
-        <ObsidianCTA onOpenInquiry={() => handleOpenInquiry()} />
       </main>
 
-      {/* 9. Minimal footer with CET studio time and social directory */}
-      <Footer />
+      {/* Minimal footer with CET studio time and social directory */}
+      <Footer onOpenInquiry={() => handleOpenInquiry()} />
 
       {/* Interactive Consultation / Inquiry Modal */}
       <InquiryModal

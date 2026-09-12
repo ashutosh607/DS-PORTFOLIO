@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Logo from './Logo';
 
-export default function Footer() {
+export default function Footer({ onOpenInquiry }) {
   const [parisTime, setParisTime] = useState('');
 
   useEffect(() => {
@@ -87,12 +87,18 @@ export default function Footer() {
                   { name: 'Home', href: '#home' },
                   { name: 'What We Do', href: '#what-we-do' },
                   { name: 'About', href: '#about' },
-                  { name: 'Contact', href: '#contact' },
+                  { name: 'Contact', onClick: onOpenInquiry },
                 ].map((item) => (
                   <li key={item.name}>
                     <a
-                      href={item.href}
-                      style={{ color: 'rgba(243, 240, 233, 0.7)', textDecoration: 'none' }}
+                      href={item.href || '#'}
+                      onClick={(e) => {
+                        if (item.onClick) {
+                          e.preventDefault();
+                          item.onClick();
+                        }
+                      }}
+                      style={{ color: 'rgba(243, 240, 233, 0.7)', textDecoration: 'none', cursor: 'pointer' }}
                       onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-off-white)')}
                       onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(243, 240, 233, 0.7)')}
                     >
