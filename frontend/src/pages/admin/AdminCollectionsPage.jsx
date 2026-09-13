@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus } from 'lucide-react';
+import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus, Pencil, RotateCcw, Sparkles } from 'lucide-react';
 import { CATEGORIES } from '../collections/data/collectionsData';
 import AddMediaModal from './components/AddMediaModal';
+import EditMediaModal from './components/EditMediaModal';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import { useAdminAuth } from './context/AdminAuthContext';
 import './AdminDashboard.css';
@@ -17,11 +18,10 @@ export default function AdminCollectionsPage() {
   const [loading, setLoading] = useState(true);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all'); // all, photo, video
-
-
 
   // Sync category param with active slug
   useEffect(() => {
@@ -72,6 +72,48 @@ export default function AdminCollectionsPage() {
     setMediaList((prev) => [newMedia, ...prev]);
   };
 
+  const handleMediaUpdated = (updatedMedia) => {
+    setMediaList((prev) => {
+      const exists = prev.some(
+        (m) =>
+          m._id === updatedMedia._id ||
+          (updatedMedia.baselineId && m.baselineId === updatedMedia.baselineId)
+      );
+      if (exists) {
+        return prev.map((m) =>
+          m._id === updatedMedia._id ||
+          (updatedMedia.baselineId && m.baselineId === updatedMedia.baselineId)
+            ? updatedMedia
+            : m
+        );
+      }
+      return [updatedMedia, ...prev];
+    });
+  };
+
+  const handleResetBaseline = async (item) => {
+    try {
+      const targetId = item._id || item.baselineId || item.id;
+      const res = await fetch(`/api/media/${targetId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
+      if (res.ok) {
+        setMediaList((prev) =>
+          prev.filter(
+            (m) =>
+              m._id !== item._id &&
+              m.baselineId !== item.baselineId &&
+              m.baselineId !== item.id
+          )
+        );
+      }
+    } catch (err) {
+      console.error('Failed to reset baseline item:', err);
+    }
+  };
+
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
@@ -94,73 +136,115 @@ export default function AdminCollectionsPage() {
     }
   };
 
-
-
   // Active Category Data
   const currentCategoryObj = CATEGORIES.find(
     (c) => c.slug.toLowerCase() === activeCategorySlug.toLowerCase()
   );
 
-  // Baseline items computation
+  // Baseline items computation with overrides applied
   const getBaselineItems = () => {
-    if (activeCategorySlug === 'all') {
-      return CATEGORIES.flatMap((cat) => [
-        {
-          id: `seed-cover-${cat.id}`,
-          title: `${cat.slug}-01.jpg`,
-          category: cat.slug,
-          type: 'photo',
-          url: cat.coverImage,
-          size: '2.4 MB',
-          date: '2025',
-        },
-        ...(cat.supporting || []).map((sup, idx) => ({
-          id: `seed-sup-${cat.id}-${idx}`,
-          title: sup.title ? `${sup.title.toLowerCase().replace(/\s+/g, '-')}.jpg` : `${cat.slug}-0${idx + 2}.jpg`,
-          category: cat.slug,
-          type: sup.type || 'photo',
-          url: sup.image,
-          size: sup.type === 'video' ? '18.8 MB' : '2.8 MB',
-          date: '2025',
-        })),
-      ]);
-    }
+    const rawDefaults =
+      activeCategorySlug === 'all'
+        ? CATEGORIES.flatMap((cat) => [
+            {
+              id: `seed-cover-${cat.id}`,
+              baselineId: `seed-cover-${cat.id}`,
+              title: `${cat.slug}-01.jpg`,
+              category: cat.slug,
+              type: 'photo',
+              url: cat.coverImage,
+              caption: cat.quote || '',
+              meta: cat.medium || '',
+              size: '2.4 MB',
+              date: '2025',
+              isBaseline: true,
+            },
+            ...(cat.supporting || []).map((sup, idx) => ({
+              id: `seed-sup-${cat.id}-${idx}`,
+              baselineId: `seed-sup-${cat.id}-${idx}`,
+              title: sup.tag || (sup.title ? `${sup.title.toLowerCase().replace(/\s+/g, '-')}.jpg` : `${cat.slug}-0${idx + 2}.jpg`),
+              category: cat.slug,
+              type: sup.type || 'photo',
+              url: sup.image,
+              caption: sup.tag || '',
+              meta: sup.meta || '',
+              size: sup.type === 'video' ? '18.8 MB' : '2.8 MB',
+              date: '2025',
+              isBaseline: true,
+            })),
+          ])
+        : !currentCategoryObj
+        ? []
+        : [
+            {
+              id: `seed-cover-${currentCategoryObj.id}`,
+              baselineId: `seed-cover-${currentCategoryObj.id}`,
+              title: `${currentCategoryObj.slug}-01.jpg`,
+              category: currentCategoryObj.slug,
+              type: 'photo',
+              url: currentCategoryObj.coverImage,
+              caption: currentCategoryObj.quote || '',
+              meta: currentCategoryObj.medium || '',
+              size: '2.3 MB',
+              date: '2025',
+              isBaseline: true,
+            },
+            ...(currentCategoryObj.supporting || []).map((sup, idx) => ({
+              id: `seed-sup-${currentCategoryObj.id}-${idx}`,
+              baselineId: `seed-sup-${currentCategoryObj.id}-${idx}`,
+              title: sup.tag || (sup.title ? `${sup.title.toLowerCase().replace(/\s+/g, '-')}.jpg` : `${currentCategoryObj.slug}-0${idx + 2}.jpg`),
+              category: currentCategoryObj.slug,
+              type: sup.type || 'photo',
+              url: sup.image,
+              caption: sup.tag || '',
+              meta: sup.meta || '',
+              size: sup.type === 'video' ? '16.7 MB' : '2.5 MB',
+              date: '2025',
+              isBaseline: true,
+            })),
+          ];
 
-    if (!currentCategoryObj) return [];
-
-    return [
-      {
-        id: `seed-cover-${currentCategoryObj.id}`,
-        title: `${currentCategoryObj.slug}-01.jpg`,
-        category: currentCategoryObj.slug,
-        type: 'photo',
-        url: currentCategoryObj.coverImage,
-        size: '2.3 MB',
-        date: '2025',
-      },
-      ...(currentCategoryObj.supporting || []).map((sup, idx) => ({
-        id: `seed-sup-${currentCategoryObj.id}-${idx}`,
-        title: sup.title ? `${sup.title.toLowerCase().replace(/\s+/g, '-')}.jpg` : `${currentCategoryObj.slug}-0${idx + 2}.jpg`,
-        category: currentCategoryObj.slug,
-        type: sup.type || 'photo',
-        url: sup.image,
-        size: sup.type === 'video' ? '16.7 MB' : '2.5 MB',
-        date: '2025',
-      })),
-    ];
+    // Merge in any saved overrides from MongoDB/mediaList
+    return rawDefaults.map((item) => {
+      const override = mediaList.find(
+        (m) =>
+          (m.isBaseline || m.baselineId) &&
+          (m.baselineId === item.baselineId || m.baselineId === item.id)
+      );
+      if (override) {
+        return {
+          ...item,
+          ...override,
+          _id: override._id,
+          id: override._id || item.id,
+          baselineId: item.baselineId,
+          url: override.url || item.url,
+          title: override.title || item.title,
+          category: override.category || item.category,
+          type: override.type || item.type,
+          caption: override.caption || item.caption,
+          meta: override.meta || item.meta,
+          isBaseline: true,
+          isModifiedBaseline: true,
+        };
+      }
+      return item;
+    });
   };
 
   const baselineItems = getBaselineItems();
 
-  // Filter items by type and search query
-  const filteredCustomMedia = mediaList.filter((item) => {
-    const matchesType = typeFilter === 'all' || item.type === typeFilter;
-    const matchesSearch =
-      !searchQuery ||
-      item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.category?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesType && matchesSearch;
-  });
+  // Filter custom items by type and search query (excluding baseline overrides)
+  const filteredCustomMedia = mediaList
+    .filter((item) => !item.isBaseline && !item.baselineId)
+    .filter((item) => {
+      const matchesType = typeFilter === 'all' || item.type === typeFilter;
+      const matchesSearch =
+        !searchQuery ||
+        item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.category?.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesType && matchesSearch;
+    });
 
   const filteredBaseline = baselineItems.filter((item) => {
     const matchesType = typeFilter === 'all' || item.type === typeFilter;
@@ -208,31 +292,48 @@ export default function AdminCollectionsPage() {
               {item.type === 'video' ? 'Video' : 'Photo'}
             </span>
             {isBaseline && (
-              <span className="text-[9px] tracking-[0.1em] uppercase font-medium text-[#8E887E] bg-[#F0EAE0] px-2 py-0.5 rounded-full">
-                Baseline
+              <span
+                className={`text-[9px] tracking-[0.1em] uppercase font-medium px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                  item.isModifiedBaseline
+                    ? 'text-[#6A5A38] bg-[#F5EEDC]'
+                    : 'text-[#8E887E] bg-[#F0EAE0]'
+                }`}
+              >
+                {item.isModifiedBaseline && <Sparkles size={10} />}
+                {item.isModifiedBaseline ? 'Baseline · Customized' : 'Baseline'}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
-              className="text-[#8E887E] hover:text-[#181818] transition-colors p-1"
-              title="Options"
+              onClick={() => setEditTarget({ ...item, isBaseline })}
+              className="text-[#8E887E] hover:text-[#181818] transition-colors p-1.5 rounded-full hover:bg-[#EFEAE2] cursor-pointer"
+              title={isBaseline ? 'Edit baseline photo' : 'Edit custom photo'}
             >
-              <MoreHorizontal size={15} />
+              <Pencil size={14} />
             </button>
-            <button
-              type="button"
-              onClick={() => !isBaseline && setDeleteTarget(item)}
-              disabled={isBaseline}
-              className={`p-1 transition-colors ${isBaseline
-                  ? 'text-[#D4CCC0] cursor-not-allowed'
-                  : 'text-[#8E887E] hover:text-red-600 cursor-pointer'
-                }`}
-              title={isBaseline ? 'Baseline assets are locked' : 'Delete asset'}
-            >
-              <Trash2 size={15} />
-            </button>
+            {isBaseline ? (
+              item.isModifiedBaseline ? (
+                <button
+                  type="button"
+                  onClick={() => handleResetBaseline(item)}
+                  className="p-1.5 text-[#8E887E] hover:text-amber-700 transition-colors rounded-full hover:bg-[#FAF0F0] cursor-pointer"
+                  title="Reset modifications and restore default photo"
+                >
+                  <RotateCcw size={14} />
+                </button>
+              ) : null
+            ) : (
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(item)}
+                className="p-1.5 text-[#8E887E] hover:text-red-600 transition-colors rounded-full hover:bg-[#FAF0F0] cursor-pointer"
+                title="Delete asset"
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -440,6 +541,15 @@ export default function AdminCollectionsPage() {
         onClose={() => setAddModalOpen(false)}
         onSuccess={handleMediaAdded}
         defaultCategory={activeCategorySlug !== 'all' ? activeCategorySlug : 'weddings'}
+      />
+
+      {/* Edit Media Modal */}
+      <EditMediaModal
+        isOpen={!!editTarget}
+        onClose={() => setEditTarget(null)}
+        onSuccess={handleMediaUpdated}
+        onResetBaseline={handleResetBaseline}
+        mediaItem={editTarget}
       />
 
       {/* Delete Confirmation Modal */}

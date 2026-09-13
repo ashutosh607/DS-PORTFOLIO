@@ -97,14 +97,110 @@ const createMedia = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @route   PUT /api/media/:id
+ * @desc    Update media asset (custom or baseline)
+ * @access  Protected (Admin)
+ */
+const updateMedia = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { category, title, caption, meta, url, type } = req.body;
+  const mongoose = require("mongoose");
+
+  let existingMedia = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    existingMedia = await Media.findById(id);
+  }
+  if (!existingMedia) {
+    existingMedia = await Media.findOne({ baselineId: id });
+  }
+
+  let mediaUrl = url ? url.trim() : (existingMedia ? existingMedia.url : "");
+  let publicId = existingMedia ? existingMedia.publicId : "";
+  let mediaType = type || (existingMedia ? existingMedia.type : "photo");
+  const targetCategory = (category || existingMedia?.category || "weddings").toLowerCase().trim();
+
+  // 1. Handle uploaded file if present
+  if (req.file) {
+    const isVideo = req.file.mimetype?.startsWith("video/");
+    if (isVideo) {
+      mediaType = "video";
+    }
+
+    const folder = `ds_portfolio/collections/${targetCategory}`;
+    const result = await uploadOnCloudinary(req.file.path, folder);
+
+    if (!result || !result.secure_url) {
+      throw new ApiError(500, "Failed to upload asset to Cloudinary media storage");
+    }
+
+    // Delete old asset from Cloudinary if previously stored
+    if (existingMedia?.publicId) {
+      try {
+        const oldResourceType = existingMedia.type === "video" ? "video" : "image";
+        await deleteFromCloudinary(existingMedia.publicId, oldResourceType);
+      } catch (cloudErr) {
+        console.warn("Could not delete previous Cloudinary asset:", cloudErr.message);
+      }
+    }
+
+    mediaUrl = result.secure_url;
+    publicId = result.public_id;
+    if (result.resource_type === "video") {
+      mediaType = "video";
+    }
+  }
+
+  // 2. If record exists in DB, update it
+  if (existingMedia) {
+    if (mediaUrl) existingMedia.url = mediaUrl;
+    if (publicId) existingMedia.publicId = publicId;
+    if (mediaType) existingMedia.type = mediaType;
+    if (category) existingMedia.category = targetCategory;
+    if (title !== undefined) existingMedia.title = title.trim();
+    if (caption !== undefined) existingMedia.caption = caption.trim();
+    if (meta !== undefined) existingMedia.meta = meta.trim();
+
+    const updated = await existingMedia.save();
+    return res.status(200).json(
+      new ApiResponse(200, updated, "Media asset updated successfully")
+    );
+  }
+
+  // 3. If baseline asset edited for the first time, persist new baseline override in MongoDB
+  const newBaselineOverride = await Media.create({
+    url: mediaUrl || "",
+    publicId,
+    type: mediaType,
+    category: targetCategory,
+    title: title !== undefined ? title.trim() : "",
+    caption: caption !== undefined ? caption.trim() : "",
+    meta: meta !== undefined ? meta.trim() : "",
+    isBaseline: true,
+    baselineId: id,
+  });
+
+  return res.status(200).json(
+    new ApiResponse(200, newBaselineOverride, "Baseline asset customized successfully")
+  );
+});
+
+/**
  * @route   DELETE /api/media/:id
- * @desc    Delete media from database and Cloudinary storage
+ * @desc    Delete media from database and Cloudinary storage, or reset baseline override
  * @access  Protected (Admin)
  */
 const deleteMedia = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const mongoose = require("mongoose");
 
-  const media = await Media.findById(id);
+  let media = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    media = await Media.findById(id);
+  }
+  if (!media) {
+    media = await Media.findOne({ baselineId: id });
+  }
+
   if (!media) {
     throw new ApiError(404, "Media item not found");
   }
@@ -121,10 +217,10 @@ const deleteMedia = asyncHandler(async (req, res) => {
   }
 
   // 2. Remove document from database
-  await Media.findByIdAndDelete(id);
+  await Media.findByIdAndDelete(media._id);
 
   return res.status(200).json(
-    new ApiResponse(200, { id, category: media.category }, "Media item deleted successfully")
+    new ApiResponse(200, { id, baselineId: media.baselineId, category: media.category }, "Media item deleted successfully")
   );
 });
 
@@ -132,5 +228,6 @@ module.exports = {
   getAllMedia,
   getMediaByCategory,
   createMedia,
+  updateMedia,
   deleteMedia,
 };

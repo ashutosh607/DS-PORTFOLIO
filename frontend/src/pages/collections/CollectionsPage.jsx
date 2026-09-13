@@ -48,10 +48,14 @@ export default function CollectionsPage({ onOpenInquiry }) {
     };
   }, []);
 
-  // Dynamically augment categories with newly uploaded media
+  // Dynamically augment categories with newly uploaded media & customized baseline items
   const dynamicCategories = CATEGORIES.map((cat) => {
+    // Only true custom uploads
     const customItems = mediaList.filter(
-      (m) => m.category?.toLowerCase() === cat.slug.toLowerCase()
+      (m) =>
+        m.category?.toLowerCase() === cat.slug.toLowerCase() &&
+        !m.isBaseline &&
+        !m.baselineId
     );
 
     const formattedCustom = customItems.map((item, idx) => ({
@@ -65,26 +69,40 @@ export default function CollectionsPage({ onOpenInquiry }) {
       isCustom: true,
     }));
 
+    // Find any baseline overrides for this category
+    const coverOverride = mediaList.find(
+      (m) =>
+        (m.isBaseline || m.baselineId) &&
+        (m.baselineId === `seed-cover-${cat.id}` || m.baselineId === `${cat.id}-featured`)
+    );
+
     const baseFeatured = {
       id: `${cat.id}-featured`,
-      image: cat.featured.image,
-      title: cat.featured.title,
-      tag: cat.featured.title,
+      image: coverOverride?.url || cat.featured.image,
+      title: coverOverride?.title || cat.featured.title,
+      tag: coverOverride?.title || cat.featured.title,
       count: cat.featured.count,
-      caption: cat.featured.caption,
-      meta: cat.featured.meta,
-      type: cat.featured.type || 'photo',
+      caption: coverOverride?.caption || cat.featured.caption,
+      meta: coverOverride?.meta || cat.featured.meta,
+      type: coverOverride?.type || cat.featured.type || 'photo',
     };
 
-    const baseSupporting = (cat.supporting || []).map((s, idx) => ({
-      id: s.id || `${cat.id}-sup-${idx}`,
-      image: s.image,
-      title: s.tag,
-      tag: s.tag,
-      meta: s.meta,
-      caption: s.meta,
-      type: s.type || 'photo',
-    }));
+    const baseSupporting = (cat.supporting || []).map((s, idx) => {
+      const supOverride = mediaList.find(
+        (m) =>
+          (m.isBaseline || m.baselineId) &&
+          (m.baselineId === `seed-sup-${cat.id}-${idx}` || m.baselineId === s.id)
+      );
+      return {
+        id: s.id || `${cat.id}-sup-${idx}`,
+        image: supOverride?.url || s.image,
+        title: supOverride?.title || s.tag,
+        tag: supOverride?.title || s.tag,
+        meta: supOverride?.meta || s.meta,
+        caption: supOverride?.caption || s.meta,
+        type: supOverride?.type || s.type || 'photo',
+      };
+    });
 
     // Comprehensive archive list: base featured, initial supporting, custom uploads, and extra supporting
     const allMedia = [

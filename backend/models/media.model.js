@@ -39,6 +39,15 @@ const mediaSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    isBaseline: {
+      type: Boolean,
+      default: false,
+    },
+    baselineId: {
+      type: String,
+      default: "",
+      index: true,
+    },
   },
   {
     timestamps: true,
