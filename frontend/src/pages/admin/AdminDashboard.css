@@ -9,12 +9,20 @@
   background-color: #FAF8F5;
   color: #181818;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
 }
 
-/* --- Sidebar Shell --- */
+@media (min-width: 1024px) {
+  .admin-dashboard-container {
+    flex-direction: row;
+  }
+}
+
+/* --- Sidebar Shell (Generous top padding, clean margins) --- */
 .admin-sidebar-shell {
-  width: 256px;
-  min-width: 256px;
+  width: 260px;
+  min-width: 260px;
   background-color: #FAF8F5;
   border-right: 1px solid #E8E2D6;
   display: flex;
@@ -25,6 +33,36 @@
   top: 0;
   z-index: 40;
   overflow-y: auto;
+  padding: 48px 22px 36px 26px;
+  box-sizing: border-box;
+}
+
+/* --- Main Workspace (Generous Top Padding & Spacious Gap from Sidebar) --- */
+.admin-main-workspace {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  background-color: #FAF8F5;
+  padding: 56px 64px 80px 64px; /* 56px TOP padding, 64px LEFT gap from sidebar, 64px RIGHT padding */
+  box-sizing: border-box;
+}
+
+@media (max-width: 1280px) {
+  .admin-main-workspace {
+    padding: 48px 44px 68px 48px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .admin-main-workspace {
+    padding: 36px 24px 48px 24px;
+  }
+}
+
+.admin-content-inner {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
 }
 
 /* --- Sidebar Nav Item --- */
@@ -40,6 +78,7 @@
   text-decoration: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .admin-sidebar-nav-item:hover {

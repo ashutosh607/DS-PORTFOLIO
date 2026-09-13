@@ -57,7 +57,7 @@ export default function AdminSidebar() {
       >
         {/* Brand Area */}
         <div>
-          <div className="pt-9 px-8 pb-8">
+          <div className="mb-9 px-2">
             <span className="block text-[13px] tracking-[0.22em] text-[#181818] uppercase font-semibold leading-tight">
               STUDIO ADMIN
             </span>
@@ -67,7 +67,7 @@ export default function AdminSidebar() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="px-5 space-y-1.5">
+          <nav className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -99,26 +99,24 @@ export default function AdminSidebar() {
         </div>
 
         {/* Bottom User Info & Logout */}
-        <div className="px-6 pb-8">
-          <div className="border-t border-[#E8E2D6] pt-6 space-y-1">
-            {/* User Email */}
-            <div className="flex items-center gap-2.5 px-3 py-2 text-[#6E6960]">
-              <User size={15} strokeWidth={1.5} className="text-[#8E887E] shrink-0" />
-              <span className="text-[12px] truncate" title={adminUser?.email}>
-                {adminUser?.email || 'admin@dsphotography.com'}
-              </span>
-            </div>
-
-            {/* Logout */}
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] text-[#6E6960] hover:text-[#181818] hover:bg-[#F0EAE0] text-[12px] transition-colors cursor-pointer text-left font-normal"
-            >
-              <LogOut size={15} strokeWidth={1.5} className="text-[#8E887E] shrink-0" />
-              <span>Logout</span>
-            </button>
+        <div className="pt-6 border-t border-[#E8E2D6] space-y-1">
+          {/* User Email */}
+          <div className="flex items-center gap-2.5 px-3 py-2 text-[#6E6960]">
+            <User size={15} strokeWidth={1.5} className="text-[#8E887E] shrink-0" />
+            <span className="text-[12px] truncate" title={adminUser?.email}>
+              {adminUser?.email || 'admin@dsphotography.com'}
+            </span>
           </div>
+
+          {/* Logout */}
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] text-[#6E6960] hover:text-[#181818] hover:bg-[#F0EAE0] text-[12px] transition-colors cursor-pointer text-left font-normal"
+          >
+            <LogOut size={15} strokeWidth={1.5} className="text-[#8E887E] shrink-0" />
+            <span>Logout</span>
+          </button>
         </div>
       </aside>
     </>
