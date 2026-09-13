@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Camera } from 'lucide-react';
 import { useAdminAuth } from './context/AdminAuthContext';
+import './AdminLogin.css';
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => localStorage.getItem('ds_admin_remember_email') || '');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(() => !!localStorage.getItem('ds_admin_remember_email'));
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -12,7 +16,6 @@ export default function AdminLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Redirect to dashboard if already logged in
   useEffect(() => {
     if (isAuthenticated) {
       const destination = location.state?.from?.pathname || '/admin/dashboard';
@@ -25,13 +28,18 @@ export default function AdminLoginPage() {
     setError('');
 
     if (!email.trim() || !password) {
-      setError('Please provide both administrator email and password.');
+      setError('Please provide both email and password.');
       return;
     }
 
     setSubmitting(true);
     try {
-      await login(email, password);
+      if (rememberMe) {
+        localStorage.setItem('ds_admin_remember_email', email.trim());
+      } else {
+        localStorage.removeItem('ds_admin_remember_email');
+      }
+      await login(email.trim(), password);
       const destination = location.state?.from?.pathname || '/admin/dashboard';
       navigate(destination, { replace: true });
     } catch (err) {
@@ -42,91 +50,173 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCF8] text-[#101010] flex flex-col justify-center items-center px-[20px] py-[36px] selection:bg-[#E3DBCC] selection:text-[#101010]">
-      {/* Container Box */}
-      <div className="w-full max-w-[480px]">
-        {/* Studio Branding Header */}
-        <div className="text-center mb-[32px]">
-          <span className="font-mono text-[11px] tracking-[0.25em] text-[#7A7770] uppercase block mb-3">
-            ATELIER CURATION SYSTEM
-          </span>
-          <h1
-            style={{ fontFamily: 'var(--font-serif)' }}
-            className="text-[32px] sm:text-[38px] font-normal leading-tight text-[#101010] tracking-[-0.01em]"
-          >
-            Studio Admin
+    <div
+      className="admin-login-page"
+      style={{
+        backgroundImage: `url('/images/admin-login-bg.jpg')`,
+      }}
+    >
+      {/* ─── Top Navigation ─── */}
+      <header className="admin-login-header">
+        <Link to="/" className="admin-login-brand">
+          <Camera className="admin-login-brand-icon" strokeWidth={1.3} />
+          <div className="admin-login-brand-name">
+            <span className="admin-login-brand-title">Frame &amp; Feel</span>
+            <span className="admin-login-brand-sub">PHOTOGRAPHY</span>
+          </div>
+        </Link>
+
+        <nav className="admin-login-nav">
+          <Link to="/collections">CAPTURE</Link>
+          <span className="admin-login-nav-sep">/</span>
+          <Link to="/services">CREATE</Link>
+          <span className="admin-login-nav-sep">/</span>
+          <Link to="/collections">KEEP</Link>
+        </nav>
+      </header>
+
+      {/* ─── Main Content: Left Text + Right Card ─── */}
+      <main className="admin-login-content">
+        {/* Left — Brand Storytelling */}
+        <div className="admin-login-left">
+          <h1 className="admin-login-heading">
+            Every moment<br />
+            deserves to be<br />
+            remembered
           </h1>
-          <p className="font-sans text-xs sm:text-sm text-[#7A7770] mt-[12px]">
-            Authenticate to manage portfolio collection media.
+          <hr className="admin-login-heading-bar" />
+          <p className="admin-login-subtitle">
+            Log in to access your gallery, book a session or continue your creative journey.
           </p>
         </div>
 
-        {/* Card Form: 28-32px padding, 14-16px rounded */}
-        <div className="bg-[#FAF8F5] border border-[#E3DBCC] rounded-[16px] p-[24px] sm:p-[32px] md:p-[36px] shadow-[0_4px_24px_-8px_rgba(16,16,16,0.05)]">
-          {error && (
-            <div className="mb-[24px] p-[14px] rounded-[8px] bg-[#FAF0F0] border border-[#E8C4C4] text-[#992E2E] font-sans text-xs leading-relaxed">
-              {error}
-            </div>
-          )}
+        {/* Right — Login Card */}
+        <div className="admin-login-right">
+          <div className="admin-login-card">
+            {/* Script Title */}
+            <h2 className="admin-login-script-title">Welcome Back</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-[24px]">
-            <div>
-              <label className="block font-sans text-[11px] font-semibold tracking-[0.14em] uppercase text-[#55493A] mb-[8px]">
-                Administrator Email
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@dsphotography.com"
-                className="w-full h-[50px] px-[16px] rounded-[8px] bg-[#FDFCF8] border border-[#E3DBCC] text-sm text-[#101010] outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
-              />
+            {/* Heart Divider */}
+            <div className="admin-login-divider">
+              <span className="admin-login-divider-line" />
+              <span className="admin-login-divider-heart">♡</span>
+              <span className="admin-login-divider-line" />
             </div>
 
-            <div>
-              <label className="block font-sans text-[11px] font-semibold tracking-[0.14em] uppercase text-[#55493A] mb-[8px]">
-                Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full h-[50px] px-[16px] rounded-[8px] bg-[#FDFCF8] border border-[#E3DBCC] text-sm text-[#101010] outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
-              />
-            </div>
+            {/* Error */}
+            {error && <div className="admin-login-error">{error}</div>}
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full h-[50px] px-[24px] rounded-full bg-[#101010] hover:bg-[#262422] text-[#FDFCF8] font-sans text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {submitting ? (
-                <>
-                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>AUTHENTICATING...</span>
-                </>
-              ) : (
-                <>
-                  <span>SIGN IN</span>
-                  <span>→</span>
-                </>
-              )}
-            </button>
-          </form>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="admin-login-form">
+              {/* Email */}
+              <div>
+                <label htmlFor="admin-email" className="admin-login-label">
+                  Email Address
+                </label>
+                <div className="admin-login-input-wrap">
+                  <Mail className="admin-login-input-icon" strokeWidth={1.5} />
+                  <input
+                    id="admin-email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="admin-login-input"
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
 
-          <div className="mt-[32px] pt-[24px] border-t border-[#E3DBCC]/60 text-center">
-            <a
-              href="/"
-              className="font-sans text-xs text-[#7A7770] hover:text-[#101010] tracking-wider uppercase transition-colors"
-            >
-              ← Return to public portfolio
-            </a>
+              {/* Password */}
+              <div>
+                <label htmlFor="admin-password" className="admin-login-label">
+                  Password
+                </label>
+                <div className="admin-login-input-wrap">
+                  <Lock className="admin-login-input-icon" strokeWidth={1.5} />
+                  <input
+                    id="admin-password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="admin-login-input"
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="admin-login-eye-btn"
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff width={17} height={17} strokeWidth={1.5} />
+                    ) : (
+                      <Eye width={17} height={17} strokeWidth={1.5} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember Me */}
+              <div className="admin-login-remember">
+                <input
+                  type="checkbox"
+                  id="remember-me"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                <label htmlFor="remember-me">Remember me</label>
+              </div>
+
+              {/* Submit */}
+              <button type="submit" disabled={submitting} className="admin-login-btn">
+                {submitting ? (
+                  <>
+                    <span className="admin-login-spinner" />
+                    <span>LOGGING IN...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>LOG IN</span>
+                    <ArrowRight width={16} height={16} strokeWidth={2} />
+                  </>
+                )}
+              </button>
+            </form>
           </div>
         </div>
-      </div>
+      </main>
+
+      {/* ─── Bottom Footer ─── */}
+      <footer className="admin-login-footer">
+        <Link to="/" className="admin-login-back-link">
+          <span className="admin-login-back-arrow">←</span>
+          <span>Return to portfolio</span>
+        </Link>
+
+        <div className="admin-login-quote-area">
+          <svg
+            className="admin-login-quote-sprig"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+          </svg>
+          <div className="admin-login-quote-text">
+            Good photos<br />
+            tell great stories ♡
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
