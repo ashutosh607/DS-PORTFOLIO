@@ -102,12 +102,23 @@ export default function CollectionsGallery({
                   onClick={onOpenViewAll}
                   className="group relative w-full aspect-[16/10.5] rounded-[4px] overflow-hidden bg-[#1D1C19] border border-[#E0D8CA] shadow-[0_20px_45px_-12px_rgba(20,18,15,0.16)] cursor-pointer"
                 >
-                  <img
-                    src={activeCategory.featured.image}
-                    alt={activeCategory.featured.title}
-                    className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02] group-hover:scale-[1.02] transition-transform duration-600 ease-out"
-                    loading="lazy"
-                  />
+                  {activeCategory.featured.type === 'video' ? (
+                    <video
+                      src={activeCategory.featured.image}
+                      className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    />
+                  ) : (
+                    <img
+                      src={activeCategory.featured.image}
+                      alt={activeCategory.featured.title}
+                      className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02] group-hover:scale-[1.02] transition-transform duration-600 ease-out"
+                      loading="lazy"
+                    />
+                  )}
 
                   {/* Gradient Overlay at Bottom */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,16,16,0.85)] via-[rgba(16,16,16,0.2)] to-transparent pointer-events-none" />
@@ -165,12 +176,24 @@ export default function CollectionsGallery({
                     }}
                   >
                     <div className="relative w-full aspect-[4/3] overflow-hidden rounded-[2px] bg-[#ECE7DC]">
-                      <img
-                        src={item.image}
-                        alt={item.tag}
-                        className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02] group-hover:scale-105 transition-transform duration-500 ease-out"
-                        loading="lazy"
-                      />
+                      {item.type === 'video' ? (
+                        <video
+                          src={item.image}
+                          className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
+                          muted
+                          loop
+                          playsInline
+                          onMouseEnter={(e) => e.target.play().catch(() => {})}
+                          onMouseLeave={(e) => e.target.pause()}
+                        />
+                      ) : (
+                        <img
+                          src={item.image}
+                          alt={item.tag}
+                          className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02] group-hover:scale-105 transition-transform duration-500 ease-out"
+                          loading="lazy"
+                        />
+                      )}
 
                       {/* Subtle hover overlay */}
                       <div className="absolute inset-0 bg-[rgba(16,16,16,0.65)] backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2.5 sm:p-3 text-white">

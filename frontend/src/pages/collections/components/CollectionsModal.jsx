@@ -66,11 +66,19 @@ export default function CollectionsModal({
                 {/* Featured Frame */}
                 <div className="flex flex-col gap-2">
                   <div className="relative aspect-[4/3] rounded-[3px] overflow-hidden bg-[#1A1917] border border-[#E0D8CA]">
-                    <img
-                      src={activeCategory.featured.image}
-                      alt={activeCategory.featured.title}
-                      className="w-full h-full object-cover"
-                    />
+                    {activeCategory.featured.type === 'video' ? (
+                      <video
+                        src={activeCategory.featured.image}
+                        controls
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <img
+                        src={activeCategory.featured.image}
+                        alt={activeCategory.featured.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
                   <span className="font-mono text-[0.6rem] uppercase tracking-wider text-[#7A746B]">
                     01 / Master Hero Frame
@@ -81,11 +89,19 @@ export default function CollectionsModal({
                 {activeCategory.supporting.map((sup, i) => (
                   <div key={sup.id} className="flex flex-col gap-2">
                     <div className="relative aspect-[4/3] rounded-[3px] overflow-hidden bg-[#1A1917] border border-[#E0D8CA]">
-                      <img
-                        src={sup.image}
-                        alt={sup.tag}
-                        className="w-full h-full object-cover"
-                      />
+                      {sup.type === 'video' ? (
+                        <video
+                          src={sup.image}
+                          controls
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={sup.image}
+                          alt={sup.tag}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </div>
                     <span className="font-mono text-[0.6rem] uppercase tracking-wider text-[#7A746B]">
                       0{i + 2} / {sup.tag.split('—')[0]}

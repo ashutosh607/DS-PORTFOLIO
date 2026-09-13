@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CATEGORIES } from './data/collectionsData';
 import CollectionsHero from './components/CollectionsHero';
 import CollectionsRibbon from './components/CollectionsRibbon';
@@ -8,10 +8,73 @@ import CollectionsModal from './components/CollectionsModal';
 export default function CollectionsPage({ onOpenInquiry }) {
   const [activeCategoryId, setActiveCategoryId] = useState('01');
   const [viewAllModalOpen, setViewAllModalOpen] = useState(false);
+  const [mediaList, setMediaList] = useState([]);
   const categoriesRibbonRef = useRef(null);
   const galleryRevealRef = useRef(null);
 
-  const activeCategory = CATEGORIES.find((c) => c.id === activeCategoryId) || CATEGORIES[0];
+  // Fetch dynamic collection media from backend API
+  useEffect(() => {
+    let isMounted = true;
+    async function loadMedia() {
+      try {
+        const res = await fetch('/api/media');
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted && Array.isArray(json.data)) {
+            setMediaList(json.data);
+          }
+        }
+      } catch {
+        // Fall back gracefully to static seed data
+      }
+    }
+    loadMedia();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Dynamically augment categories with newly uploaded media
+  const dynamicCategories = CATEGORIES.map((cat) => {
+    const customItems = mediaList.filter(
+      (m) => m.category?.toLowerCase() === cat.slug.toLowerCase()
+    );
+
+    if (customItems.length === 0) {
+      return cat;
+    }
+
+    const formattedCustom = customItems.map((item) => ({
+      id: item._id,
+      image: item.url,
+      tag: item.title || `${cat.name} Specimen`,
+      meta: item.caption || item.meta || 'Atelier Master Archive',
+      type: item.type || 'photo',
+    }));
+
+    // If custom items exist, use the newest as featured, and prepend others to supporting
+    const featured = {
+      image: formattedCustom[0].image,
+      title: formattedCustom[0].tag,
+      count: `01 / 0${Math.max(6, formattedCustom.length)}`,
+      caption: formattedCustom[0].meta,
+      meta: cat.featured.meta,
+      type: formattedCustom[0].type,
+    };
+
+    const remainingCustom = formattedCustom.slice(1);
+    const supporting = [...remainingCustom, ...cat.supporting].slice(0, 8);
+
+    return {
+      ...cat,
+      featured,
+      supporting,
+      customMedia: formattedCustom,
+    };
+  });
+
+  const activeCategory =
+    dynamicCategories.find((c) => c.id === activeCategoryId) || dynamicCategories[0];
 
   const handleSelectCategory = (id) => {
     setActiveCategoryId(id);

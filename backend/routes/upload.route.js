@@ -15,7 +15,7 @@ router.post("/single", upload.single("file"), uploadSingleFile);
 router.post("/multiple", upload.array("files", 10), uploadMultipleFiles);
 
 // Delete file by public_id (passed as query param, body, or route param)
-router.delete("/file/*", deleteFile);
+router.delete("/file/:publicId", deleteFile);
 router.delete("/:publicId", deleteFile);
 router.delete("/", deleteFile);
 
