@@ -103,9 +103,9 @@ export default function AdminSidebar() {
           {/* User Email */}
           <div className="flex items-center gap-2.5 px-3 py-2 text-[#6E6960]">
             <User size={15} strokeWidth={1.5} className="text-[#8E887E] shrink-0" />
-            <span className="text-[12px] truncate" title={adminUser?.email}>
-              {adminUser?.email || 'admin@dsphotography.com'}
-            </span>
+              <span className="text-[12px] truncate" title={adminUser?.email}>
+                {adminUser?.email || 'Administrator'}
+              </span>
           </div>
 
           {/* Logout */}

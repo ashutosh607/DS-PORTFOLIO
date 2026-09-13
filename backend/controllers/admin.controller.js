@@ -1,15 +1,14 @@
 const jwt = require("jsonwebtoken");
+const Admin = require("../models/admin.model");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@dsphotography.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123456";
 const JWT_SECRET = process.env.JWT_SECRET || "ds_portfolio_atelier_secret_jwt_key_2026";
 
 /**
  * @route   POST /api/admin/login
- * @desc    Authenticate admin and set HTTP-only cookie
+ * @desc    Authenticate admin against MongoDB Atlas using bcrypt hashed credentials
  * @access  Public
  */
 const login = asyncHandler(async (req, res) => {
@@ -19,21 +18,30 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Email and password are required");
   }
 
-  // Strictly validate credentials against server environment
-  const targetEmail = process.env.ADMIN_EMAIL || ADMIN_EMAIL;
-  const targetPassword = process.env.ADMIN_PASSWORD || ADMIN_PASSWORD;
+  const normalizedEmail = email.trim().toLowerCase();
 
-  if (email.trim().toLowerCase() !== targetEmail.trim().toLowerCase() || password !== targetPassword) {
+  // Find admin document in MongoDB Atlas
+  const admin = await Admin.findOne({ email: normalizedEmail });
+
+  if (!admin) {
+    throw new ApiError(401, "Invalid administrator credentials");
+  }
+
+  // Compare candidate password with bcrypt hash in database
+  const isPasswordValid = await admin.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
     throw new ApiError(401, "Invalid administrator credentials");
   }
 
   // Generate 7-day JWT session token
   const token = jwt.sign(
     {
-      email: targetEmail,
-      role: "admin",
+      id: admin._id,
+      email: admin.email,
+      role: admin.role || "admin",
     },
-    process.env.JWT_SECRET || JWT_SECRET,
+    JWT_SECRET,
     {
       expiresIn: "7d",
     }
@@ -53,9 +61,10 @@ const login = asyncHandler(async (req, res) => {
     new ApiResponse(
       200,
       {
-        email: targetEmail,
-        role: "admin",
-        token, // Also return token for environments where cookies might be blocked
+        id: admin._id,
+        email: admin.email,
+        role: admin.role || "admin",
+        token,
       },
       "Admin login successful"
     )
@@ -80,16 +89,28 @@ const logout = asyncHandler(async (req, res) => {
 
 /**
  * @route   GET /api/admin/me
- * @desc    Verify current session and return admin profile
+ * @desc    Verify current session against MongoDB Atlas and return admin profile
  * @access  Protected (Admin)
  */
 const getMe = asyncHandler(async (req, res) => {
+  let admin = null;
+  if (req.admin?.id) {
+    admin = await Admin.findById(req.admin.id).select("-password");
+  } else if (req.admin?.email) {
+    admin = await Admin.findOne({ email: req.admin.email }).select("-password");
+  }
+
+  if (!admin) {
+    throw new ApiError(401, "Admin account not found");
+  }
+
   return res.status(200).json(
     new ApiResponse(
       200,
       {
-        email: req.admin.email,
-        role: req.admin.role,
+        id: admin._id,
+        email: admin.email,
+        role: admin.role,
       },
       "Admin session active"
     )

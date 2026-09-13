@@ -1,5 +1,6 @@
 const express = require("express");
 const upload = require("../middlewares/multer.middleware");
+const { verifyAdmin } = require("../middlewares/auth.middleware");
 const {
   uploadSingleFile,
   uploadMultipleFiles,
@@ -9,14 +10,15 @@ const {
 const router = express.Router();
 
 // Upload single file (field name: "file")
-router.post("/single", upload.single("file"), uploadSingleFile);
+router.post("/single", verifyAdmin, upload.single("file"), uploadSingleFile);
 
 // Upload multiple files (field name: "files", up to 10 files)
-router.post("/multiple", upload.array("files", 10), uploadMultipleFiles);
+router.post("/multiple", verifyAdmin, upload.array("files", 10), uploadMultipleFiles);
 
 // Delete file by public_id (passed as query param, body, or route param)
-router.delete("/file/:publicId", deleteFile);
-router.delete("/:publicId", deleteFile);
-router.delete("/", deleteFile);
+router.delete("/file/:publicId", verifyAdmin, deleteFile);
+router.delete("/:publicId", verifyAdmin, deleteFile);
+router.delete("/", verifyAdmin, deleteFile);
 
 module.exports = router;
+

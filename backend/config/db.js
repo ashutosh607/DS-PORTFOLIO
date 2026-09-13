@@ -1,6 +1,15 @@
 const mongoose = require("mongoose");
+const dns = require("dns");
+
+// Set reliable DNS servers for MongoDB Atlas SRV lookups on Windows
+try {
+  dns.setServers(["1.1.1.1", "8.8.8.8"]);
+} catch (dnsErr) {
+  // Ignore if not allowed
+}
 
 const connectDB = async () => {
+
   try {
     const uri = process.env.MONGODB_URI;
     const dbName = process.env.DB_NAME || "ds_portfolio";

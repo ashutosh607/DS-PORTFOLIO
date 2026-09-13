@@ -71,9 +71,14 @@ app.use((req, res, next) => {
 // Centralized Error Handling Middleware
 app.use(errorHandler);
 
+const initAdminAccount = require("./config/initAdmin");
+
 // Connect to Database and start server
 connectDB()
-  .then(() => {
+  .then(async () => {
+    // Automatically synchronize and bcrypt hash admin credentials from .env to MongoDB Atlas
+    await initAdminAccount();
+
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on port ${PORT}`);
       console.log(`🔗 Health Check: http://localhost:${PORT}/api/v1/health`);
@@ -86,5 +91,6 @@ connectDB()
       console.log(`🔗 Health Check: http://localhost:${PORT}/api/v1/health`);
     });
   });
+
 
 module.exports = app;
