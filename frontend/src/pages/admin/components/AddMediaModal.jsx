@@ -205,11 +205,10 @@ export default function AddMediaModal({
                 <button
                   type="button"
                   onClick={() => setMediaType('photo')}
-                  className={`h-[40px] px-6 rounded-[9px] text-[11px] font-semibold tracking-[0.08em] uppercase transition-all cursor-pointer flex items-center gap-2 ${
-                    mediaType === 'photo'
+                  className={`h-[40px] px-6 rounded-[9px] text-[11px] font-semibold tracking-[0.08em] uppercase transition-all cursor-pointer flex items-center gap-2 ${mediaType === 'photo'
                       ? 'bg-[#181818] text-white shadow-sm'
                       : 'text-[#5C5852] hover:text-[#181818]'
-                  }`}
+                    }`}
                 >
                   <Image size={14} strokeWidth={1.8} />
                   PHOTO
@@ -217,11 +216,10 @@ export default function AddMediaModal({
                 <button
                   type="button"
                   onClick={() => setMediaType('video')}
-                  className={`h-[40px] px-6 rounded-[9px] text-[11px] font-semibold tracking-[0.08em] uppercase transition-all cursor-pointer flex items-center gap-2 ${
-                    mediaType === 'video'
+                  className={`h-[40px] px-6 rounded-[9px] text-[11px] font-semibold tracking-[0.08em] uppercase transition-all cursor-pointer flex items-center gap-2 ${mediaType === 'video'
                       ? 'bg-[#181818] text-white shadow-sm'
                       : 'text-[#5C5852] hover:text-[#181818]'
-                  }`}
+                    }`}
                 >
                   <Film size={14} strokeWidth={1.8} />
                   VIDEO

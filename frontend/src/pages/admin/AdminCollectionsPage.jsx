@@ -225,11 +225,10 @@ export default function AdminCollectionsPage() {
               type="button"
               onClick={() => !isBaseline && setDeleteTarget(item)}
               disabled={isBaseline}
-              className={`p-1 transition-colors ${
-                isBaseline
+              className={`p-1 transition-colors ${isBaseline
                   ? 'text-[#D4CCC0] cursor-not-allowed'
                   : 'text-[#8E887E] hover:text-red-600 cursor-pointer'
-              }`}
+                }`}
               title={isBaseline ? 'Baseline assets are locked' : 'Delete asset'}
             >
               <Trash2 size={15} />
