@@ -13,8 +13,22 @@ export default function Navbar({ onOpenInquiry }) {
   const mobileMenuItems = [
     { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
     { label: 'Collections', ariaLabel: 'Explore photo collections', link: '/collections' },
-    { label: 'Services', ariaLabel: 'Photographer services & booking', link: '/services' },
+    { label: 'Services', ariaLabel: 'Photographer services & pricing', link: '/services' },
+    { label: 'Book a Session', ariaLabel: 'Book a photography session', link: '/services#book', isBooking: true },
   ];
+
+  const handleMobileMenuClick = (it) => {
+    if (it.isBooking || it.link === '/services#book') {
+      if (location.pathname === '/services') {
+        window.dispatchEvent(new CustomEvent('open-booking-form'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        navigateWithTransition('/services#book', 'SERVICES');
+      }
+    } else {
+      navigateWithTransition(it.link, it.label.toUpperCase());
+    }
+  };
 
   const socialItems = [
     { label: 'Instagram', link: 'https://instagram.com' },
@@ -286,9 +300,7 @@ export default function Navbar({ onOpenInquiry }) {
               openMenuButtonColor="#1E1B18"
               accentColor="#685444"
               colors={['#E6DAC8', '#CBB9A4', '#8C7764']}
-              onItemClick={(it) => {
-                navigateWithTransition(it.link, it.label.toUpperCase());
-              }}
+              onItemClick={handleMobileMenuClick}
             />
           </div>
         </div>

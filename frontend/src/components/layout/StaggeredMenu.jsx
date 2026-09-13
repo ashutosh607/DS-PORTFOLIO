@@ -369,6 +369,33 @@ export const StaggeredMenu = ({
     };
   }, [closeOnClickAway, open, closeMenu]);
 
+  // Lock body scroll completely when mobile menu is open
+  useEffect(() => {
+    if (open) {
+      const scrollY = window.scrollY;
+      const originalBodyOverflow = document.body.style.overflow;
+      const originalHtmlOverflow = document.documentElement.style.overflow;
+      const originalPosition = document.body.style.position;
+      const originalTop = document.body.style.top;
+      const originalWidth = document.body.style.width;
+
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+
+      return () => {
+        document.body.style.overflow = originalBodyOverflow;
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        document.body.style.position = originalPosition;
+        document.body.style.top = originalTop;
+        document.body.style.width = originalWidth;
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [open]);
+
   return (
     <div
       className={(className ? className + ' ' : '') + 'staggered-menu-wrapper' + (isFixed ? ' fixed-wrapper' : '')}
@@ -376,6 +403,12 @@ export const StaggeredMenu = ({
       data-position={position}
       data-open={open || undefined}
     >
+      {/* Dimmed backdrop to prevent underlying page visibility */}
+      <div
+        className={`sm-backdrop ${open ? 'active' : ''}`}
+        onClick={closeMenu}
+        aria-hidden="true"
+      />
       <div ref={preLayersRef} className="sm-prelayers" aria-hidden="true">
         {(() => {
           const raw = colors && colors.length ? colors.slice(0, 4) : ['#E6DAC8', '#CBB9A4', '#8C7764'];
@@ -488,13 +521,15 @@ export const StaggeredMenu = ({
               onClick={() => {
                 closeMenu();
                 if (onItemClick) {
-                  onItemClick({ link: '/services', label: 'SERVICES' });
+                  onItemClick({ link: '/services#book', label: 'BOOK A SESSION', isBooking: true });
                 }
               }}
-              className="w-full inline-flex items-center justify-center gap-2 bg-[#685444] hover:bg-[#524133] text-[#FAF8F5] py-3.5 px-6 rounded-full font-mono text-xs font-semibold uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(104,84,68,0.35)] cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 bg-[#101010] hover:bg-[#242424] text-[#FDFCF8] py-3.5 px-6 rounded-full font-sans text-xs font-semibold uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(16,16,16,0.25)] cursor-pointer"
             >
               <span>Book a Session</span>
-              <span>→</span>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 13L13 3M13 3H6M13 3V10" />
+              </svg>
             </button>
           </div>
 
