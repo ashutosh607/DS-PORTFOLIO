@@ -1,0 +1,177 @@
+/* ==========================================================================
+   DS Photography & Films — Admin Dashboard & Collections Stylesheet
+   Spacious, Exact Editorial Layout Matching Design Specification
+   ========================================================================== */
+
+.admin-dashboard-container {
+  min-height: 100vh;
+  background-color: #FAF8F5;
+  color: #181818;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Sidebar Shell */
+.admin-sidebar-shell {
+  width: 250px;
+  min-width: 250px;
+  background-color: #FAF8F5;
+  border-right: 1px solid #E8E2D6;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.admin-sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #5C5852;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.admin-sidebar-nav-item:hover {
+  color: #181818;
+  background-color: #F0EAE0;
+}
+
+.admin-sidebar-nav-item.active {
+  background-color: #EBE6DE;
+  color: #181818;
+  font-weight: 500;
+}
+
+/* Card Shell */
+.admin-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E8E2D6;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-card:hover {
+  border-color: #D4CCC0;
+}
+
+/* Typography Classes */
+.admin-serif-title {
+  font-family: 'Cormorant Garamond', Garamond, Georgia, serif !important;
+  font-weight: 400 !important;
+  line-height: 1.15 !important;
+  color: #181818 !important;
+}
+
+.admin-eyebrow {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 11px !important;
+  letter-spacing: 0.2em !important;
+  text-transform: uppercase !important;
+  color: #7A756D !important;
+  font-weight: 600 !important;
+}
+
+.admin-subtext {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  color: #7A756D !important;
+  line-height: 1.5 !important;
+}
+
+.admin-link {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #181818 !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: color 0.2s ease !important;
+}
+
+.admin-link:hover {
+  color: #7A756D !important;
+}
+
+/* Navigation Horizontal Underline Tabs */
+.admin-tab {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #7A756D;
+  padding-bottom: 10px;
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-tab:hover {
+  color: #181818;
+}
+
+.admin-tab.active {
+  color: #181818;
+  font-weight: 600;
+}
+
+.admin-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #181818;
+  border-radius: 1px;
+}
+
+/* Category Filter Pills */
+.admin-pill {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background-color: #EFEAE2;
+  color: #5C5852;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-pill:hover {
+  color: #181818;
+  background-color: #E5DFD5;
+}
+
+.admin-pill.active {
+  background-color: #181818;
+  color: #FFFFFF;
+}
+
+/* Dropzone */
+.admin-dropzone {
+  border: 2px dashed #D4CCC0;
+  border-radius: 16px;
+  background-color: transparent;
+  padding: 40px 24px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.admin-dropzone:hover {
+  background-color: rgba(240, 234, 224, 0.4);
+  border-color: #B5AB9D;
+}

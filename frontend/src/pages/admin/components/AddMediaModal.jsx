@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { X, Upload, Image, Film } from 'lucide-react';
 import { CATEGORIES } from '../../collections/data/collectionsData';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import '../AdminDashboard.css';
 
 export default function AddMediaModal({
   isOpen,
@@ -129,98 +131,103 @@ export default function AddMediaModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-[20px] sm:p-[28px] overflow-y-auto">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-black/55 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity"
       />
 
-      {/* Modal Dialog: 28-32px padding, 16px radius, max-w-2xl */}
-      <div className="relative z-10 w-full max-w-2xl bg-[#FAF8F5] border border-[#E3DBCC] rounded-[16px] p-[20px] sm:p-[28px] lg:p-[32px] shadow-2xl my-8">
-        {/* Header: Header -> content 24-32px */}
-        <div className="flex items-center justify-between pb-[20px] mb-[28px] border-b border-[#E3DBCC]">
+      {/* Modal Card */}
+      <div className="relative z-10 w-full max-w-[540px] bg-white border border-[#E8E2D6] rounded-[20px] p-6 sm:p-8 shadow-2xl my-8">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
           <div>
-            <span className="font-mono text-[10px] tracking-[0.2em] text-[#7A7770] uppercase block mb-1">
+            <span className="admin-eyebrow block mb-1">
               PORTFOLIO ARCHIVE
             </span>
-            <h3
-              style={{ fontFamily: 'var(--font-serif)' }}
-              className="text-[24px] sm:text-[28px] font-normal text-[#101010] leading-tight"
-            >
+            <h3 className="admin-serif-title text-[28px] sm:text-[30px]">
               Add Collection Media
             </h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="w-10 h-10 rounded-full border border-[#E3DBCC] hover:bg-[#101010] hover:text-[#FDFCF8] transition-colors flex items-center justify-center text-sm cursor-pointer"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#7A756D] hover:text-[#181818] hover:bg-[#F0EAE0] transition-colors cursor-pointer"
             aria-label="Close"
           >
-            ✕
+            <X size={18} strokeWidth={1.8} />
           </button>
         </div>
 
+        {/* Error Notification */}
         {error && (
-          <div className="mb-[24px] p-[14px] rounded-[8px] bg-[#FAF0F0] border border-[#E8C4C4] text-[#992E2E] font-sans text-xs leading-relaxed">
+          <div className="mb-5 p-3 rounded-[8px] bg-[#FAF0F0] border border-[#E8C4C4] text-[#992E2E] text-[12px] leading-relaxed">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-[24px]">
-          {/* Collection Category Select */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Collection Category */}
           <div>
-            <label className="block font-sans text-[11px] font-semibold tracking-[0.14em] uppercase text-[#55493A] mb-[8px]">
-              Collection Category *
+            <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2">
+              COLLECTION CATEGORY *
             </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full h-[50px] px-[16px] rounded-[8px] bg-[#FDFCF8] border border-[#E3DBCC] text-sm text-[#101010] outline-none transition-colors focus:border-[#101010] cursor-pointer"
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat.slug} value={cat.slug}>
-                  {cat.name} ({cat.slug})
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full h-[46px] px-3.5 rounded-[10px] bg-white border border-[#E8E2D6] text-[13px] text-[#181818] outline-none focus:border-[#181818] cursor-pointer appearance-none"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat.slug} value={cat.slug}>
+                    {cat.name} ({cat.slug})
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#8E887E]">
+                ▼
+              </div>
+            </div>
           </div>
 
           {/* Media Type Toggle */}
           <div>
-            <label className="block font-sans text-[11px] font-semibold tracking-[0.14em] uppercase text-[#55493A] mb-[8px]">
-              Media Type
+            <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2">
+              MEDIA TYPE
             </label>
-            <div className="flex gap-[12px]">
+            <div className="inline-flex p-1 bg-[#EFEAE2] rounded-[10px] gap-1">
               <button
                 type="button"
                 onClick={() => setMediaType('photo')}
-                className={`flex-1 h-[48px] px-[16px] rounded-[8px] border font-sans text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer ${
+                className={`h-[34px] px-4 rounded-[8px] text-[12px] font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                   mediaType === 'photo'
-                    ? 'bg-[#101010] text-[#FDFCF8] border-[#101010]'
-                    : 'bg-[#FDFCF8] text-[#55493A] border-[#E3DBCC] hover:border-[#101010]'
+                    ? 'bg-[#181818] text-white shadow-xs'
+                    : 'text-[#5C5852] hover:text-[#181818]'
                 }`}
               >
-                Photo
+                <Image size={13} strokeWidth={1.8} />
+                PHOTO
               </button>
               <button
                 type="button"
                 onClick={() => setMediaType('video')}
-                className={`flex-1 h-[48px] px-[16px] rounded-[8px] border font-sans text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer ${
+                className={`h-[34px] px-4 rounded-[8px] text-[12px] font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                   mediaType === 'video'
-                    ? 'bg-[#101010] text-[#FDFCF8] border-[#101010]'
-                    : 'bg-[#FDFCF8] text-[#55493A] border-[#E3DBCC] hover:border-[#101010]'
+                    ? 'bg-[#181818] text-white shadow-xs'
+                    : 'text-[#5C5852] hover:text-[#181818]'
                 }`}
               >
-                Video
+                <Film size={13} strokeWidth={1.8} />
+                VIDEO
               </button>
             </div>
           </div>
 
-          {/* 13. Spacious Upload Area: min-height 180px, padding 32-40px */}
+          {/* Upload Drop Area */}
           <div>
-            <label className="block font-sans text-[11px] font-semibold tracking-[0.14em] uppercase text-[#55493A] mb-[8px]">
-              Upload Photo or Video File
+            <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2">
+              UPLOAD PHOTO OR VIDEO FILE
             </label>
             <input
               ref={fileInputRef}
@@ -232,43 +239,39 @@ export default function AddMediaModal({
 
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="w-full min-h-[180px] border-2 border-dashed border-[#D1C7B7] hover:border-[#101010] rounded-[12px] p-[32px] sm:p-[40px] flex flex-col items-center justify-center text-center bg-[#FDFCF8] cursor-pointer transition-colors group"
+              className="w-full min-h-[150px] border-2 border-dashed border-[#D4CCC0] hover:border-[#181818] rounded-[14px] p-6 flex flex-col items-center justify-center text-center bg-[#FAF8F5] cursor-pointer transition-colors group"
             >
               {filePreview ? (
-                <div className="relative w-full max-h-52 flex items-center justify-center overflow-hidden rounded-[10px]">
+                <div className="relative w-full max-h-40 flex items-center justify-center overflow-hidden rounded-[8px]">
                   {mediaType === 'video' ? (
                     <video
                       src={filePreview}
-                      className="max-h-48 rounded-[8px]"
+                      className="max-h-36 rounded-[8px]"
                       controls
                     />
                   ) : (
                     <img
                       src={filePreview}
                       alt="Preview"
-                      className="max-h-48 object-contain rounded-[8px]"
+                      className="max-h-36 object-contain rounded-[8px]"
                     />
                   )}
-                  <span className="absolute bottom-2.5 right-2.5 bg-black/75 text-white text-[11px] px-3 py-1.5 rounded-full tracking-wider">
-                    Click to replace
+                  <span className="absolute bottom-2 right-2 bg-black/75 text-white text-[10px] px-2 py-0.5 rounded-full">
+                    Change file
                   </span>
                 </div>
               ) : (
                 <>
-                  {/* Upload icon ↓ 12px */}
-                  <div className="w-12 h-12 rounded-full bg-[#F3F0E9] flex items-center justify-center text-[#55493A] text-xl mb-[12px] group-hover:scale-105 transition-transform">
-                    ↑
+                  <div className="w-10 h-10 rounded-full bg-[#EFEAE2] flex items-center justify-center mb-2.5 text-[#5C5852] group-hover:scale-105 transition-transform">
+                    <Upload size={18} strokeWidth={1.5} />
                   </div>
-                  {/* "Add photos or videos" ↓ 8px */}
-                  <span className="font-sans text-sm font-semibold text-[#101010] block mb-[8px]">
+                  <span className="text-[13px] font-semibold text-[#181818] block mb-1">
                     Add photos or videos
                   </span>
-                  {/* "Upload media for this collection" ↓ 20px */}
-                  <span className="font-mono text-xs text-[#7A7770] block mb-[20px]">
+                  <span className="text-[11px] text-[#7A756D] block mb-3.5">
                     Upload media for this collection (JPG, PNG, WEBP, MP4, MOV up to 100MB)
                   </span>
-                  {/* [ SELECT FILE ] */}
-                  <span className="inline-flex items-center justify-center h-[38px] px-[20px] rounded-full bg-[#101010] text-[#FDFCF8] font-sans text-xs font-semibold tracking-wider uppercase group-hover:bg-[#262422] transition-colors">
+                  <span className="inline-flex items-center justify-center h-[34px] px-4 rounded-[8px] bg-[#101010] text-white text-[11px] font-medium group-hover:bg-[#252525] transition-colors">
                     SELECT FILE
                   </span>
                 </>
@@ -276,17 +279,17 @@ export default function AddMediaModal({
             </div>
 
             {file && (
-              <div className="mt-[10px] flex items-center justify-between text-xs font-mono text-[#55493A] px-1">
-                <span className="truncate max-w-[320px]">{file.name}</span>
+              <div className="mt-2 flex items-center justify-between text-[11px] text-[#5C5852] px-1">
+                <span className="truncate max-w-[300px]">{file.name}</span>
                 <span>{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
               </div>
             )}
           </div>
 
-          {/* Or Direct URL Fallback */}
+          {/* External URL */}
           <div>
-            <label className="block font-sans text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7A7770] mb-[8px]">
-              Or External Media URL (Optional)
+            <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2">
+              OR EXTERNAL MEDIA URL (optional)
             </label>
             <input
               type="url"
@@ -296,59 +299,58 @@ export default function AddMediaModal({
                 if (e.target.value) setError('');
               }}
               placeholder="https://images.unsplash.com/... or cloud URL"
-              className="w-full h-[50px] px-[16px] rounded-[8px] bg-[#FDFCF8] border border-[#E3DBCC] text-xs text-[#101010] outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
+              className="w-full h-[44px] px-3.5 rounded-[10px] bg-white border border-[#E8E2D6] text-[13px] text-[#181818] outline-none focus:border-[#181818] placeholder:text-[#8E887E]"
             />
           </div>
 
-          {/* Title / Caption */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[20px]">
+          {/* Title & Caption */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label className="block font-sans text-[11px] font-semibold tracking-[0.14em] uppercase text-[#55493A] mb-[8px]">
-                Title / Subject
+              <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2">
+                TITLE / SUBJECT
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Lake Como Vows"
-                className="w-full h-[50px] px-[16px] rounded-[8px] bg-[#FDFCF8] border border-[#E3DBCC] text-xs text-[#101010] outline-none transition-colors focus:border-[#101010]"
+                className="w-full h-[44px] px-3.5 rounded-[10px] bg-white border border-[#E8E2D6] text-[13px] text-[#181818] outline-none focus:border-[#181818] placeholder:text-[#8E887E]"
               />
             </div>
-
             <div>
-              <label className="block font-sans text-[11px] font-semibold tracking-[0.14em] uppercase text-[#55493A] mb-[8px]">
-                Caption / Notes
+              <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2">
+                CAPTION / NOTES
               </label>
               <input
                 type="text"
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 placeholder="e.g., Golden hour ceremony"
-                className="w-full h-[50px] px-[16px] rounded-[8px] bg-[#FDFCF8] border border-[#E3DBCC] text-xs text-[#101010] outline-none transition-colors focus:border-[#101010]"
+                className="w-full h-[44px] px-3.5 rounded-[10px] bg-white border border-[#E8E2D6] text-[13px] text-[#181818] outline-none focus:border-[#181818] placeholder:text-[#8E887E]"
               />
             </div>
           </div>
 
-          {/* Action Buttons: 24-32px top spacing, 10-12px gap */}
-          <div className="pt-[28px] mt-[28px] border-t border-[#E3DBCC] flex items-center justify-end gap-[12px]">
+          {/* Footer Buttons */}
+          <div className="pt-4 border-t border-[#E8E2D6] flex items-center justify-end gap-3">
             <button
               type="button"
               disabled={uploading}
               onClick={onClose}
-              className="h-[48px] px-[20px] rounded-[8px] border border-[#E3DBCC] hover:bg-[#F3F0E9] text-[#55493A] font-sans text-xs font-semibold tracking-[0.14em] uppercase transition-colors cursor-pointer disabled:opacity-50"
+              className="h-[40px] px-4 rounded-[8px] text-[11px] font-semibold tracking-[0.1em] uppercase text-[#5C5852] hover:bg-[#F0EAE0] transition-colors cursor-pointer disabled:opacity-50"
             >
-              Cancel
+              CANCEL
             </button>
 
             <button
               type="submit"
               disabled={uploading}
-              className="h-[48px] px-[24px] rounded-[8px] bg-[#101010] hover:bg-[#262422] text-[#FDFCF8] font-sans text-xs font-semibold tracking-[0.14em] uppercase transition-all cursor-pointer shadow-sm disabled:opacity-50 flex items-center gap-2"
+              className="h-[40px] px-5 rounded-[8px] bg-[#101010] hover:bg-[#252525] text-white text-[11px] font-semibold tracking-[0.1em] uppercase transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
             >
               {uploading ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>UPLOADING TO COLLECTION...</span>
+                  <span>UPLOADING...</span>
                 </>
               ) : (
                 <span>UPLOAD TO COLLECTION</span>

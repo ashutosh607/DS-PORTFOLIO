@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Layers, ImageIcon, PlayCircle, Upload, ArrowRight, Video } from 'lucide-react';
 import { CATEGORIES } from '../collections/data/collectionsData';
 import AddMediaModal from './components/AddMediaModal';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import { useAdminAuth } from './context/AdminAuthContext';
+import './AdminDashboard.css';
 
 export default function AdminDashboardPage() {
   const { getAuthHeaders } = useAdminAuth();
@@ -64,277 +66,220 @@ export default function AdminDashboardPage() {
     const catMedia = mediaList.filter(
       (m) => m.category?.toLowerCase() === cat.slug.toLowerCase()
     );
-    const photosCount = catMedia.filter((m) => m.type !== 'video').length;
-    const videosCount = catMedia.filter((m) => m.type === 'video').length;
-
-    // Base seed count from collectionsData if no custom uploads yet
-    const seedPhotosCount = (cat.supporting?.length || 0) + 1; // supporting + featured
+    const customPhotosCount = catMedia.filter((m) => m.type !== 'video').length;
+    const customVideosCount = catMedia.filter((m) => m.type === 'video').length;
+    const seedPhotosCount = (cat.supporting?.length || 0) + 1;
 
     return {
       ...cat,
-      photosCount: photosCount > 0 ? photosCount : seedPhotosCount,
-      videosCount,
+      photosCount: customPhotosCount > 0 ? customPhotosCount : seedPhotosCount,
+      videosCount: customVideosCount,
       customUploadsCount: catMedia.length,
     };
   });
 
   const totalPhotos = categoryStats.reduce((acc, cat) => acc + cat.photosCount, 0);
   const totalVideos = categoryStats.reduce((acc, cat) => acc + cat.videosCount, 0);
-  const recentMedia = mediaList.slice(0, 8);
+
+  // Collect seed images for preview strip fallback so 5 items are always displayed
+  const allSeedImages = CATEGORIES.flatMap((c) => [
+    c.coverImage,
+    ...(c.supporting?.map((s) => s.image) || []),
+  ]).filter(Boolean);
+
+  // Build 5 items for recently added media
+  const recentDisplayMedia = [
+    ...mediaList.map((m) => ({
+      id: m._id,
+      url: m.url,
+      type: m.type,
+      title: m.title || 'Media asset',
+    })),
+    ...allSeedImages.map((url, i) => ({
+      id: `seed-${i}`,
+      url,
+      type: 'photo',
+      title: 'Gallery still',
+    })),
+  ].slice(0, 5);
+
+  // Format current date
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  const statCards = [
+    {
+      label: 'TOTAL COLLECTIONS',
+      value: CATEGORIES.length,
+      sub: 'Active portfolio galleries',
+      icon: Layers,
+    },
+    {
+      label: 'TOTAL PHOTOS',
+      value: totalPhotos,
+      sub: 'Curated & custom stills',
+      icon: ImageIcon,
+    },
+    {
+      label: 'TOTAL VIDEOS',
+      value: totalVideos,
+      sub: 'Cinematic film clips',
+      icon: PlayCircle,
+    },
+    {
+      label: 'CUSTOM UPLOADS',
+      value: mediaList.length,
+      sub: 'Uploaded database assets',
+      icon: Upload,
+    },
+  ];
 
   return (
-    <div className="space-y-[56px]">
-      {/* 3. Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-[28px] border-b border-[#E3DBCC]">
-        <div>
-          <span className="font-mono text-[11px] tracking-[0.25em] text-[#7A7770] uppercase block mb-3">
-            STUDIO OVERVIEW
+    <div className="space-y-9 w-full">
+      {/* Page Header */}
+      <div>
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <span className="admin-eyebrow block mb-2">
+              COLLECTIONS DASHBOARD
+            </span>
+            <h1 className="admin-serif-title text-[36px] sm:text-[40px] lg:text-[42px]">
+              Studio Overview
+            </h1>
+            <p className="admin-subtext mt-1.5">
+              Here's a quick look at your collections and media.
+            </p>
+          </div>
+          <span className="text-[12px] text-[#7A756D] font-normal shrink-0 pt-1">
+            {dateStr}
           </span>
-          <h1
-            style={{ fontFamily: 'var(--font-serif)' }}
-            className="text-[28px] sm:text-[32px] lg:text-[38px] font-normal leading-tight text-[#101010] tracking-[-0.01em]"
-          >
-            Collections Dashboard
-          </h1>
-          <p className="font-sans text-xs sm:text-sm text-[#7A7770] mt-[14px]">
-            Comprehensive archive metrics and collection media management.
-          </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setAddModalOpen(true)}
-          className="h-[48px] px-[24px] rounded-full bg-[#101010] hover:bg-[#262422] text-[#FDFCF8] font-sans text-xs font-semibold tracking-[0.14em] uppercase transition-all duration-200 cursor-pointer shadow-sm hover:-translate-y-0.5 flex items-center justify-center gap-2 shrink-0"
-        >
-          <span>+ ADD MEDIA</span>
-        </button>
+        {/* Clean divider line under header matching screenshot */}
+        <div className="border-b border-[#E8E2D6] mt-7" />
       </div>
 
-      {/* 7. Clean Statistics Grid */}
+      {/* Stats Grid — 4 cards */}
       <section>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px] lg:gap-[24px]">
-          <div className="p-[24px] lg:p-[28px] bg-[#FAF8F5] border border-[#E3DBCC] rounded-[16px]">
-            <span className="block font-mono text-[11px] tracking-[0.18em] text-[#7A7770] uppercase mb-[12px]">
-              Total Collections
-            </span>
-            <span className="font-serif text-3xl sm:text-4xl text-[#101010] font-normal block leading-none mb-[8px]">
-              {CATEGORIES.length}
-            </span>
-            <span className="block font-sans text-xs text-[#7A7770]">
-              Active portfolio galleries
-            </span>
-          </div>
-
-          <div className="p-[24px] lg:p-[28px] bg-[#FAF8F5] border border-[#E3DBCC] rounded-[16px]">
-            <span className="block font-mono text-[11px] tracking-[0.18em] text-[#7A7770] uppercase mb-[12px]">
-              Total Photos
-            </span>
-            <span className="font-serif text-3xl sm:text-4xl text-[#101010] font-normal block leading-none mb-[8px]">
-              {totalPhotos}
-            </span>
-            <span className="block font-sans text-xs text-[#7A7770]">
-              Curated &amp; custom stills
-            </span>
-          </div>
-
-          <div className="p-[24px] lg:p-[28px] bg-[#FAF8F5] border border-[#E3DBCC] rounded-[16px]">
-            <span className="block font-mono text-[11px] tracking-[0.18em] text-[#7A7770] uppercase mb-[12px]">
-              Total Videos
-            </span>
-            <span className="font-serif text-3xl sm:text-4xl text-[#101010] font-normal block leading-none mb-[8px]">
-              {totalVideos}
-            </span>
-            <span className="block font-sans text-xs text-[#7A7770]">
-              Cinematic film clips
-            </span>
-          </div>
-
-          <div className="p-[24px] lg:p-[28px] bg-[#FAF8F5] border border-[#E3DBCC] rounded-[16px]">
-            <span className="block font-mono text-[11px] tracking-[0.18em] text-[#7A7770] uppercase mb-[12px]">
-              Custom Uploads
-            </span>
-            <span className="font-serif text-3xl sm:text-4xl text-[#101010] font-normal block leading-none mb-[8px]">
-              {mediaList.length}
-            </span>
-            <span className="block font-sans text-xs text-[#7A7770]">
-              Uploaded database assets
-            </span>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          {statCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <div
+                key={card.label}
+                className="admin-card p-6 flex flex-col justify-between"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <span className="text-[10px] tracking-[0.16em] uppercase font-semibold text-[#7A756D]">
+                    {card.label}
+                  </span>
+                  <Icon size={18} strokeWidth={1.3} className="text-[#8E887E]" />
+                </div>
+                <div className="admin-serif-title text-[38px] leading-none my-2">
+                  {card.value}
+                </div>
+                <span className="block text-[11px] text-[#7A756D]">
+                  {card.sub}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* 8. Manage Collections Section */}
+      {/* Manage Collections */}
       <section>
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-[28px]">
+        <div className="flex items-baseline justify-between mb-5">
           <div>
-            <h2
-              style={{ fontFamily: 'var(--font-serif)' }}
-              className="text-[24px] sm:text-[28px] text-[#101010] font-normal"
-            >
+            <h2 className="admin-serif-title text-[22px]">
               Manage Collections
             </h2>
-            <p className="font-sans text-xs sm:text-sm text-[#7A7770] mt-[10px]">
-              Organized by the 6 live categories published on the portfolio.
+            <p className="admin-subtext text-[12px] mt-1">
+              Organized by the {CATEGORIES.length} live categories published on the portfolio.
             </p>
           </div>
-
-          <Link
-            to="/admin/collections"
-            className="font-sans text-xs font-semibold tracking-[0.14em] uppercase text-[#101010] hover:text-[#7A7770] transition-colors pb-1 border-b border-[#101010] self-start sm:self-auto"
-          >
-            All Collections →
+          <Link to="/admin/collections" className="admin-link text-[12px]">
+            View all <ArrowRight size={13} strokeWidth={2} />
           </Link>
         </div>
 
-        {/* 3 cols desktop, 2 tablet, 1 mobile; gap 24/20/16px */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px] md:gap-[20px] lg:gap-[24px]">
+        {/* Horizontal collection cards — 3 cols */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {categoryStats.map((cat) => (
             <div
               key={cat.id}
-              className="group p-[20px] md:p-[24px] lg:p-[28px] bg-[#FAF8F5] border border-[#E3DBCC] rounded-[16px] hover:shadow-xs transition-shadow flex flex-col justify-between"
+              onClick={() => navigate(`/admin/collections/${cat.slug}`)}
+              className="admin-card p-4 flex items-center gap-4 group cursor-pointer"
             >
-              {/* Card Image: Inset with padding, rounded, 20px bottom margin */}
-              <div className="relative aspect-[16/10] bg-[#1A1917] rounded-[10px] overflow-hidden mb-[20px]">
+              {/* Thumbnail */}
+              <div className="w-[110px] h-[75px] rounded-[10px] overflow-hidden bg-[#EFEAE2] shrink-0">
                 <img
                   src={cat.coverImage || cat.featured?.image}
                   alt={cat.name}
-                  className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                <span className="absolute bottom-3 left-3.5 font-mono text-[10px] tracking-[0.2em] uppercase text-white/90">
-                  Folio {cat.id}
-                </span>
               </div>
 
-              {/* Card Info */}
-              <div className="flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-baseline justify-between gap-2 mb-[12px]">
-                    <h3
-                      style={{ fontFamily: 'var(--font-serif)' }}
-                      className="text-[20px] sm:text-[22px] font-normal text-[#101010]"
-                    >
-                      {cat.name}
-                    </h3>
-                    <span className="font-mono text-[11px] tracking-wider text-[#7A7770]">
-                      /{cat.slug}
-                    </span>
-                  </div>
-
-                  {/* Counts: content -> content spacing */}
-                  <div className="flex items-center gap-6 py-[14px] border-y border-[#E3DBCC]/60 font-mono text-xs text-[#55493A] mb-[24px]">
-                    <div>
-                      <span className="font-bold text-[#101010]">{cat.photosCount}</span>{' '}
-                      <span className="text-[#7A7770]">Photos</span>
-                    </div>
-                    <div>
-                      <span className="font-bold text-[#101010]">{cat.videosCount}</span>{' '}
-                      <span className="text-[#7A7770]">Videos</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Button */}
-                <Link
-                  to={`/admin/collections/${cat.slug}`}
-                  className="w-full h-[48px] px-[20px] rounded-[8px] bg-[#FDFCF8] hover:bg-[#101010] text-[#101010] hover:text-[#FDFCF8] border border-[#E3DBCC] hover:border-[#101010] font-sans text-xs font-semibold tracking-[0.14em] uppercase transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>MANAGE MEDIA</span>
-                  <span>→</span>
-                </Link>
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <h3 className="admin-serif-title text-[16px] mb-0.5">
+                  {cat.name}
+                </h3>
+                <p className="text-[11px] text-[#7A756D] mb-2 font-normal">
+                  {cat.photosCount} Photos · {cat.videosCount} Videos
+                </p>
+                <span className="admin-link text-[11px]">
+                  Manage media <ArrowRight size={11} strokeWidth={2} />
+                </span>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 9. Recently Added Media Grid (4 columns desktop, 3 tablet, 2 mobile, 20-24px gap) */}
+      {/* Recently Added Media — horizontal strip */}
       <section>
-        <div className="flex items-baseline justify-between mb-[28px]">
-          <div>
-            <h2
-              style={{ fontFamily: 'var(--font-serif)' }}
-              className="text-[24px] sm:text-[28px] text-[#101010] font-normal"
-            >
-              Recently Added Media
-            </h2>
-            <p className="font-sans text-xs sm:text-sm text-[#7A7770] mt-[10px]">
-              Latest assets uploaded to cloud storage and database.
-            </p>
-          </div>
-          <span className="font-mono text-xs text-[#7A7770]">
-            {mediaList.length} database assets
-          </span>
+        <div className="flex items-baseline justify-between mb-4">
+          <h2 className="admin-serif-title text-[20px]">
+            Recently added media
+          </h2>
+          <Link to="/admin/collections" className="admin-link text-[12px]">
+            View all <ArrowRight size={13} strokeWidth={2} />
+          </Link>
         </div>
 
         {loading ? (
-          <div className="py-16 text-center text-xs font-mono text-[#7A7770]">
-            Loading media archive...
-          </div>
-        ) : recentMedia.length === 0 ? (
-          <div className="p-[32px] sm:p-[40px] text-center bg-[#FAF8F5] border border-dashed border-[#D1C7B7] rounded-[16px]">
-            <p className="font-sans text-sm text-[#55493A] mb-[16px]">
-              No custom media uploaded yet. The public website is currently displaying the initial baseline portfolio.
-            </p>
-            <button
-              type="button"
-              onClick={() => setAddModalOpen(true)}
-              className="h-[48px] px-[24px] rounded-full bg-[#101010] text-white font-sans text-xs tracking-wider uppercase cursor-pointer"
-            >
-              + Add First Media Item
-            </button>
+          <div className="py-12 text-center text-xs text-[#7A756D]">
+            Loading media...
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[20px] lg:gap-[24px]">
-            {recentMedia.map((item) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3.5">
+            {recentDisplayMedia.map((item) => (
               <div
-                key={item._id}
-                className="group p-[16px] sm:p-[20px] bg-[#FAF8F5] border border-[#E3DBCC] rounded-[16px] flex flex-col justify-between"
+                key={item.id}
+                className="relative aspect-[16/10] rounded-[10px] overflow-hidden bg-[#E8E2D6] group"
               >
-                {/* Preview Box: Inset with breathing room */}
-                <div className="relative aspect-square rounded-[10px] overflow-hidden bg-[#1A1917] mb-[14px]">
-                  {item.type === 'video' ? (
-                    <video src={item.url} className="w-full h-full object-cover" />
-                  ) : (
-                    <img src={item.url} alt={item.title || 'Media'} className="w-full h-full object-cover" />
-                  )}
-
-                  {/* Badge */}
-                  <span className="absolute top-2.5 left-2.5 bg-black/75 text-white font-mono text-[9px] uppercase px-2 py-0.5 rounded-full tracking-wider">
-                    {item.type}
-                  </span>
-                  <span className="absolute top-2.5 right-2.5 bg-white/90 text-[#101010] font-mono text-[9px] uppercase px-2 py-0.5 rounded-full tracking-wider">
-                    {item.category}
-                  </span>
-                </div>
-
-                {/* Metadata & Actions */}
-                <div>
-                  <h4 className="font-serif text-sm text-[#101010] font-medium truncate mb-1">
-                    {item.title || 'Untitled Asset'}
-                  </h4>
-                  <span className="block font-mono text-[10px] text-[#A59C8F] mb-[14px]">
-                    Added {new Date(item.createdAt).toLocaleDateString()}
-                  </span>
-
-                  <div className="pt-[12px] border-t border-[#E3DBCC]/60 flex items-center justify-between">
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] font-sans text-[#7A7770] hover:text-[#101010] tracking-wider uppercase"
-                    >
-                      View ↗
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => setDeleteTarget(item)}
-                      className="min-h-[36px] px-3.5 rounded-[6px] bg-[#FAF0F0] hover:bg-[#992E2E] text-[#992E2E] hover:text-white border border-[#E8C4C4] font-sans text-[11px] font-semibold tracking-wider uppercase transition-colors cursor-pointer"
-                    >
-                      Delete
-                    </button>
+                {item.type === 'video' ? (
+                  <video src={item.url} className="w-full h-full object-cover" />
+                ) : (
+                  <img
+                    src={item.url}
+                    alt={item.title || 'Media'}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                )}
+                {item.type === 'video' && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-7 h-7 rounded-full bg-black/50 flex items-center justify-center">
+                      <Video size={13} className="text-white ml-0.5" />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ))}
           </div>
