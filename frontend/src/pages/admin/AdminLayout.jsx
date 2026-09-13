@@ -11,7 +11,7 @@ export default function AdminLayout() {
 
       {/* Main Spacious Workspace Area */}
       <main className="flex-1 min-w-0 overflow-y-auto bg-[#FAF8F5]">
-        <div className="w-full max-w-[1360px] mx-auto px-6 py-8 sm:px-10 sm:py-10 lg:px-16 lg:py-12">
+        <div className="w-full max-w-[1440px] mx-auto px-7 py-9 sm:px-12 sm:py-12 lg:px-16 lg:py-14">
           <Outlet />
         </div>
       </main>

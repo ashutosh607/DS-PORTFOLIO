@@ -22,19 +22,19 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="lg:hidden flex items-center justify-between px-6 py-4 bg-[#FAF8F5] border-b border-[#E8E2D6] sticky top-0 z-40">
+      <div className="lg:hidden flex items-center justify-between px-5 py-3.5 bg-[#FAF8F5] border-b border-[#E8E2D6] sticky top-0 z-40">
         <div>
-          <span className="font-sans text-[13px] font-semibold tracking-[0.18em] text-[#181818] uppercase block">
+          <span className="block text-[12px] tracking-[0.18em] text-[#181818] uppercase font-semibold">
             STUDIO ADMIN
           </span>
-          <span className="block font-sans text-[9px] tracking-[0.22em] text-[#7A756D] uppercase mt-0.5">
+          <span className="block text-[9px] tracking-[0.2em] text-[#7A756D] uppercase mt-0.5 font-medium">
             DS PHOTOGRAPHY &amp; FILMS
           </span>
         </div>
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 border border-[#E8E2D6] rounded-lg text-[#181818] text-sm hover:bg-[#F0EAE0] transition-colors"
+          className="w-9 h-9 flex items-center justify-center border border-[#E8E2D6] rounded-lg text-[#181818] text-sm hover:bg-[#F0EAE0] transition-colors"
           aria-label="Toggle menu"
         >
           {mobileOpen ? '✕' : '☰'}
@@ -45,7 +45,7 @@ export default function AdminSidebar() {
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 bg-black/30 z-40 lg:hidden backdrop-blur-xs"
+          className="fixed inset-0 bg-black/30 z-40 lg:hidden"
         />
       )}
 
@@ -55,19 +55,19 @@ export default function AdminSidebar() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         } fixed lg:sticky top-0 left-0 bottom-0 z-50`}
       >
-        {/* Top Header / Brand Area */}
+        {/* Brand Area */}
         <div>
-          <div className="pt-9 px-7 pb-8">
-            <span className="block text-[13px] tracking-[0.2em] text-[#181818] uppercase font-semibold">
+          <div className="pt-9 px-8 pb-8">
+            <span className="block text-[13px] tracking-[0.22em] text-[#181818] uppercase font-semibold leading-tight">
               STUDIO ADMIN
             </span>
-            <span className="block text-[9px] tracking-[0.22em] text-[#7A756D] uppercase mt-1 font-medium">
+            <span className="block text-[9px] tracking-[0.2em] text-[#7A756D] uppercase mt-2 font-medium">
               DS PHOTOGRAPHY &amp; FILMS
             </span>
           </div>
 
           {/* Navigation Links */}
-          <nav className="px-4 space-y-1.5">
+          <nav className="px-5 space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -99,8 +99,8 @@ export default function AdminSidebar() {
         </div>
 
         {/* Bottom User Info & Logout */}
-        <div className="px-5 pb-7">
-          <div className="border-t border-[#E8E2D6] pt-4 space-y-1">
+        <div className="px-6 pb-8">
+          <div className="border-t border-[#E8E2D6] pt-6 space-y-1">
             {/* User Email */}
             <div className="flex items-center gap-2.5 px-3 py-2 text-[#6E6960]">
               <User size={15} strokeWidth={1.5} className="text-[#8E887E] shrink-0" />
@@ -113,7 +113,7 @@ export default function AdminSidebar() {
             <button
               type="button"
               onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[8px] text-[#6E6960] hover:text-[#181818] hover:bg-[#F0EAE0] text-[12px] transition-colors cursor-pointer text-left font-normal"
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] text-[#6E6960] hover:text-[#181818] hover:bg-[#F0EAE0] text-[12px] transition-colors cursor-pointer text-left font-normal"
             >
               <LogOut size={15} strokeWidth={1.5} className="text-[#8E887E] shrink-0" />
               <span>Logout</span>

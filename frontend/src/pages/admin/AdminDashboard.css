@@ -1,8 +1,9 @@
 /* ==========================================================================
    DS Photography & Films — Admin Dashboard & Collections Stylesheet
-   Spacious, Exact Editorial Layout Matching Design Specification
+   Clean Editorial Design System with Generous Spacing & Framed Media Cards
    ========================================================================== */
 
+/* --- Root Container --- */
 .admin-dashboard-container {
   min-height: 100vh;
   background-color: #FAF8F5;
@@ -10,10 +11,10 @@
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Sidebar Shell */
+/* --- Sidebar Shell --- */
 .admin-sidebar-shell {
-  width: 250px;
-  min-width: 250px;
+  width: 256px;
+  min-width: 256px;
   background-color: #FAF8F5;
   border-right: 1px solid #E8E2D6;
   display: flex;
@@ -23,19 +24,22 @@
   position: sticky;
   top: 0;
   z-index: 40;
+  overflow-y: auto;
 }
 
+/* --- Sidebar Nav Item --- */
 .admin-sidebar-nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 11px 16px;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 400;
   color: #5C5852;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
 }
 
 .admin-sidebar-nav-item:hover {
@@ -49,20 +53,64 @@
   font-weight: 500;
 }
 
-/* Card Shell */
+/* --- Base Card Shell --- */
 .admin-card {
   background-color: #FFFFFF;
   border: 1px solid #E8E2D6;
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .admin-card:hover {
   border-color: #D4CCC0;
 }
 
-/* Typography Classes */
+/* --- Framed Media Card (Padding on All 4 Sides for Photos & Videos) --- */
+.admin-media-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E8E2D6;
+  border-radius: 16px;
+  padding: 14px; /* Generous padding all around top, bottom, left, right */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-media-card:hover {
+  border-color: #D4CCC0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+
+.admin-media-card .photo-frame {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #EFEAE2;
+  border: 1px solid rgba(232, 226, 214, 0.5);
+}
+
+.admin-media-card .photo-frame img,
+.admin-media-card .photo-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-media-card:hover .photo-frame img,
+.admin-media-card:hover .photo-frame video {
+  transform: scale(1.04);
+}
+
+.admin-media-card .card-meta {
+  padding: 14px 4px 2px 4px;
+}
+
+/* --- Typography --- */
 .admin-serif-title {
   font-family: 'Cormorant Garamond', Garamond, Georgia, serif !important;
   font-weight: 400 !important;
@@ -83,7 +131,7 @@
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 13px !important;
   color: #7A756D !important;
-  line-height: 1.5 !important;
+  line-height: 1.6 !important;
 }
 
 .admin-link {
@@ -95,20 +143,22 @@
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
-  transition: color 0.2s ease !important;
+  transition: color 0.2s ease, transform 0.2s ease !important;
 }
 
 .admin-link:hover {
   color: #7A756D !important;
 }
 
-/* Navigation Horizontal Underline Tabs */
+/* --- Tab Navigation --- */
 .admin-tab {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13px;
   font-weight: 500;
   color: #7A756D;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
+  padding-left: 4px;
+  padding-right: 4px;
   position: relative;
   background: none;
   border: none;
@@ -137,12 +187,12 @@
   border-radius: 1px;
 }
 
-/* Category Filter Pills */
+/* --- Category Filter Pills --- */
 .admin-pill {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  padding: 6px 14px;
+  padding: 8px 18px;
   border-radius: 9999px;
   background-color: #EFEAE2;
   color: #5C5852;
@@ -161,17 +211,208 @@
   color: #FFFFFF;
 }
 
-/* Dropzone */
+/* --- Dropzone (Enhanced Padding & Framing) --- */
 .admin-dropzone {
   border: 2px dashed #D4CCC0;
-  border-radius: 16px;
-  background-color: transparent;
-  padding: 40px 24px;
+  border-radius: 18px;
+  background-color: #FAFAF8;
+  padding: 56px 36px;
   text-align: center;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .admin-dropzone:hover {
-  background-color: rgba(240, 234, 224, 0.4);
-  border-color: #B5AB9D;
+  background-color: #F5EFE6;
+  border-color: #9E9484;
+}
+
+/* --- Stat Card (Enhanced Padding) --- */
+.admin-stat-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E8E2D6;
+  border-radius: 16px;
+  padding: 26px 28px 24px; /* Generous padding all around */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 142px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.admin-stat-card:hover {
+  border-color: #D4CCC0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  transform: translateY(-2px);
+}
+
+.admin-stat-card .stat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.admin-stat-card .stat-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #7A756D;
+}
+
+.admin-stat-card .stat-icon {
+  color: #8E887E;
+  flex-shrink: 0;
+}
+
+.admin-stat-card .stat-value {
+  font-family: 'Cormorant Garamond', Garamond, Georgia, serif;
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 1;
+  color: #181818;
+  margin-bottom: 8px;
+}
+
+.admin-stat-card .stat-sub {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  color: #7A756D;
+  font-weight: 400;
+}
+
+/* --- Collection Row Card (Enhanced Padding & Photo Framing) --- */
+.admin-collection-row {
+  background-color: #FFFFFF;
+  border: 1px solid #E8E2D6;
+  border-radius: 16px;
+  padding: 20px 22px; /* Generous padding top, bottom, left, right */
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s ease;
+}
+
+.admin-collection-row:hover {
+  border-color: #D4CCC0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+
+.admin-collection-row .thumb {
+  width: 92px;
+  height: 74px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #EFEAE2;
+  border: 1px solid rgba(232, 226, 214, 0.6);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.admin-collection-row .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-collection-row:hover .thumb img {
+  transform: scale(1.08);
+}
+
+.admin-collection-row .info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-collection-row .info h3 {
+  font-family: 'Cormorant Garamond', Garamond, Georgia, serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.25;
+  color: #181818;
+  margin-bottom: 4px;
+}
+
+.admin-collection-row .info .meta {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  color: #7A756D;
+  margin-bottom: 8px;
+}
+
+.admin-collection-row .info .manage-link {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #181818;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s ease;
+}
+
+.admin-collection-row:hover .info .manage-link {
+  color: #7A756D;
+}
+
+/* --- Recent Media Strip with Framed Photo Cards --- */
+.admin-recent-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .admin-recent-strip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-recent-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.admin-recent-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E8E2D6;
+  border-radius: 14px;
+  padding: 10px; /* Framing padding on top, bottom, left, right around photo */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.admin-recent-card:hover {
+  border-color: #D4CCC0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+
+.admin-recent-card .media-thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #E8E2D6;
+}
+
+.admin-recent-card .media-thumb img,
+.admin-recent-card .media-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-recent-card:hover .media-thumb img,
+.admin-recent-card:hover .media-thumb video {
+  transform: scale(1.06);
 }

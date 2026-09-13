@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus } from 'lucide-react';
 import { CATEGORIES } from '../collections/data/collectionsData';
@@ -21,7 +21,7 @@ export default function AdminCollectionsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all'); // all, photo, video
 
-  const fileInputRef = useRef(null);
+
 
   // Sync category param with active slug
   useEffect(() => {
@@ -94,35 +94,7 @@ export default function AdminCollectionsPage() {
     }
   };
 
-  // Quick file upload handler for dropzone
-  const handleQuickUpload = async (e) => {
-    const files = e.target.files;
-    if (!files?.length) return;
 
-    const file = files[0];
-    const isVideo = file.type.startsWith('video/');
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('category', activeCategorySlug === 'all' ? 'weddings' : activeCategorySlug);
-    formData.append('type', isVideo ? 'video' : 'photo');
-
-    try {
-      const res = await fetch('/api/media', {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-        body: formData,
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        handleMediaAdded(data.data);
-      }
-    } catch (err) {
-      console.error('Quick upload failed:', err);
-    }
-  };
 
   // Active Category Data
   const currentCategoryObj = CATEGORIES.find(
@@ -140,7 +112,7 @@ export default function AdminCollectionsPage() {
           type: 'photo',
           url: cat.coverImage,
           size: '2.4 MB',
-          date: '16 Sep 2025',
+          date: '2025',
         },
         ...(cat.supporting || []).map((sup, idx) => ({
           id: `seed-sup-${cat.id}-${idx}`,
@@ -149,7 +121,7 @@ export default function AdminCollectionsPage() {
           type: sup.type || 'photo',
           url: sup.image,
           size: sup.type === 'video' ? '18.8 MB' : '2.8 MB',
-          date: `${14 - idx} Sep 2025`,
+          date: '2025',
         })),
       ]);
     }
@@ -163,8 +135,8 @@ export default function AdminCollectionsPage() {
         category: currentCategoryObj.slug,
         type: 'photo',
         url: currentCategoryObj.coverImage,
-        size: '2.4 MB',
-        date: '16 Sep 2025',
+        size: '2.3 MB',
+        date: '2025',
       },
       ...(currentCategoryObj.supporting || []).map((sup, idx) => ({
         id: `seed-sup-${currentCategoryObj.id}-${idx}`,
@@ -172,8 +144,8 @@ export default function AdminCollectionsPage() {
         category: currentCategoryObj.slug,
         type: sup.type || 'photo',
         url: sup.image,
-        size: sup.type === 'video' ? '18.8 MB' : '2.8 MB',
-        date: `${14 - idx} Sep 2025`,
+        size: sup.type === 'video' ? '16.7 MB' : '2.5 MB',
+        date: '2025',
       })),
     ];
   };
@@ -199,41 +171,122 @@ export default function AdminCollectionsPage() {
     return matchesType && matchesSearch;
   });
 
+  // Shared media card renderer with generous padding and framed presentation
+  const renderMediaCard = (item, isBaseline = false) => (
+    <div
+      key={item._id || item.id}
+      className="admin-media-card group"
+    >
+      {/* Framed Media Preview (Padded on all sides) */}
+      <div className="photo-frame">
+        {item.type === 'video' ? (
+          <video src={item.url} className="w-full h-full object-cover" />
+        ) : (
+          <img
+            src={item.url}
+            alt={item.title || 'Media'}
+            className="w-full h-full object-cover"
+          />
+        )}
+
+        {/* Video Play Badge */}
+        {item.type === 'video' && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-10 h-10 rounded-full bg-white/85 backdrop-blur-xs flex items-center justify-center text-[#181818] shadow-md">
+              <Video size={15} className="ml-0.5" />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Card Meta with generous internal padding */}
+      <div className="card-meta">
+        {/* Type + Actions Row */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] tracking-[0.14em] uppercase font-bold text-[#7A756D]">
+              {item.type === 'video' ? 'Video' : 'Photo'}
+            </span>
+            {isBaseline && (
+              <span className="text-[9px] tracking-[0.1em] uppercase font-medium text-[#8E887E] bg-[#F0EAE0] px-2 py-0.5 rounded-full">
+                Baseline
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="text-[#8E887E] hover:text-[#181818] transition-colors p-1"
+              title="Options"
+            >
+              <MoreHorizontal size={15} />
+            </button>
+            <button
+              type="button"
+              onClick={() => !isBaseline && setDeleteTarget(item)}
+              disabled={isBaseline}
+              className={`p-1 transition-colors ${
+                isBaseline
+                  ? 'text-[#D4CCC0] cursor-not-allowed'
+                  : 'text-[#8E887E] hover:text-red-600 cursor-pointer'
+              }`}
+              title={isBaseline ? 'Baseline assets are locked' : 'Delete asset'}
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
+        </div>
+
+        {/* Filename / Title */}
+        <h5 className="font-sans font-semibold text-[13px] text-[#181818] truncate leading-snug">
+          {item.title || `${item.category || 'media'}-upload.jpg`}
+        </h5>
+
+        {/* Size & Date */}
+        <p className="text-[11px] text-[#8E887E] mt-1">
+          {item.size || '2.4 MB'} · {item.createdAt
+            ? new Date(item.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+            : item.date || '2025'}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-8 w-full">
-      {/* Top Header Section */}
+    <div className="w-full" style={{ display: 'flex', flexDirection: 'column', gap: '52px' }}>
+
+      {/* ─── Page Header ─── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <span className="admin-eyebrow block mb-2">
             COLLECTION REPOSITORY
           </span>
-          <h1 className="admin-serif-title text-[36px] sm:text-[40px] lg:text-[42px]">
+          <h1 className="admin-serif-title text-[36px] sm:text-[40px] lg:text-[44px]">
             {activeCategorySlug === 'all'
               ? 'Collection Repository'
               : currentCategoryObj?.name || 'Category Gallery'}
           </h1>
-          <p className="admin-subtext mt-1.5">
+          <p className="admin-subtext mt-2">
             {activeCategorySlug === 'all'
               ? 'Manage your media across all collections.'
-              : currentCategoryObj?.subtitle || `Timeless visual stories curated for ${currentCategoryObj?.name}.`}
+              : currentCategoryObj?.tagline || `Timeless visual stories curated for ${currentCategoryObj?.name}.`}
           </p>
         </div>
 
-        {/* Right Actions: Search + Add Media Button */}
-        <div className="flex items-center gap-3">
-          {/* Back button if in category detail */}
+        {/* Right Actions */}
+        <div className="flex items-center gap-3 shrink-0">
           {activeCategorySlug !== 'all' && (
             <button
               type="button"
               onClick={() => handleCategorySelect('all')}
-              className="admin-link text-[12px] mr-2"
+              className="admin-link text-[12px] mr-1"
             >
               <ArrowLeft size={14} /> Back to Collections
             </button>
           )}
 
           {/* Search Box */}
-          <div className="flex items-center gap-2 px-3.5 h-[38px] border border-[#E8E2D6] rounded-[8px] bg-white text-[13px] w-[200px] sm:w-[260px] focus-within:border-[#181818] transition-colors">
+          <div className="flex items-center gap-2 px-3.5 h-[38px] border border-[#E8E2D6] rounded-[8px] bg-white text-[13px] w-[200px] sm:w-[240px] focus-within:border-[#181818] transition-colors">
             <Search size={14} className="text-[#8E887E] shrink-0" />
             <input
               type="text"
@@ -256,32 +309,31 @@ export default function AdminCollectionsPage() {
         </div>
       </div>
 
-      {/* Category Navigation Tabs */}
-      <div className="border-b border-[#E8E2D6] pb-0">
-        <div className="flex items-center gap-7 overflow-x-auto no-scrollbar">
-          <button
-            type="button"
-            onClick={() => handleCategorySelect('all')}
-            className={`admin-tab ${activeCategorySlug === 'all' ? 'active' : ''}`}
-          >
-            All
-          </button>
-          {CATEGORIES.map((cat) => (
+      {/* ─── Category Tabs (All view) OR Type Pill Filters (Single category) ─── */}
+      {activeCategorySlug === 'all' ? (
+        <div className="border-b border-[#E8E2D6] pb-0 -mt-2">
+          <div className="flex items-center gap-7 overflow-x-auto no-scrollbar">
             <button
-              key={cat.id}
               type="button"
-              onClick={() => handleCategorySelect(cat.slug)}
-              className={`admin-tab ${activeCategorySlug === cat.slug ? 'active' : ''}`}
+              onClick={() => handleCategorySelect('all')}
+              className={`admin-tab ${activeCategorySlug === 'all' ? 'active' : ''}`}
             >
-              {cat.name}
+              All
             </button>
-          ))}
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => handleCategorySelect(cat.slug)}
+                className={`admin-tab ${activeCategorySlug === cat.slug ? 'active' : ''}`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-
-      {/* Type Filter Pills (when inside a single category) */}
-      {activeCategorySlug !== 'all' && (
-        <div className="flex items-center gap-2">
+      ) : (
+        <div className="flex items-center gap-2 -mt-2">
           {['all', 'photo', 'video'].map((type) => (
             <button
               key={type}
@@ -295,45 +347,14 @@ export default function AdminCollectionsPage() {
         </div>
       )}
 
-      {/* Quick Upload Dropzone (When inside a specific category) */}
-      {activeCategorySlug !== 'all' && (
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="admin-dropzone cursor-pointer"
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*,video/*"
-            className="hidden"
-            onChange={handleQuickUpload}
-          />
-          <div className="w-10 h-10 rounded-full bg-[#EFEAE2] flex items-center justify-center mx-auto mb-3 text-[#5C5852]">
-            <Upload size={18} strokeWidth={1.5} />
-          </div>
-          <h4 className="font-sans font-semibold text-[14px] text-[#181818] mb-1">
-            Add photos or videos
-          </h4>
-          <p className="text-[12px] text-[#7A756D] mb-4">
-            Upload media for this collection (JPG, PNG, WEBP, MP4, MOV up to 100MB)
-          </p>
-          <button
-            type="button"
-            className="px-5 py-2 rounded-full bg-[#101010] text-white text-[12px] font-medium inline-flex items-center gap-1.5 hover:bg-[#252525] transition-colors"
-          >
-            Choose Files
-          </button>
-        </div>
-      )}
-
-      {/* SECTION 1: Custom Uploads */}
-      <section className="space-y-4">
+      {/* ─── SECTION: Custom Uploads ─── */}
+      <section style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div className="flex items-baseline justify-between">
           <div>
-            <h3 className="font-sans font-semibold text-[15px] text-[#181818]">
+            <h3 className="font-sans font-semibold text-[16px] text-[#181818]">
               Custom Uploads
             </h3>
-            <p className="text-[12px] text-[#7A756D] mt-0.5">
+            <p className="text-[12px] text-[#7A756D] mt-1">
               Media uploaded through the admin panel.
             </p>
           </div>
@@ -342,14 +363,39 @@ export default function AdminCollectionsPage() {
           </span>
         </div>
 
+        {/* Upload Dropzone — opens the modal form (single-category view) */}
+        {activeCategorySlug !== 'all' && (
+          <div
+            onClick={() => setAddModalOpen(true)}
+            className="admin-dropzone cursor-pointer"
+          >
+            <div className="w-11 h-11 rounded-full bg-[#EFEAE2] flex items-center justify-center mx-auto mb-3 text-[#5C5852]">
+              <Upload size={18} strokeWidth={1.5} />
+            </div>
+            <h4 className="font-sans font-semibold text-[14px] text-[#181818] mb-1">
+              Add photos or videos
+            </h4>
+            <p className="text-[12px] text-[#7A756D] mb-5">
+              Upload media for this collection
+            </p>
+            <button
+              type="button"
+              className="px-5 py-2.5 rounded-full bg-[#101010] text-white text-[12px] font-medium hover:bg-[#252525] transition-colors"
+            >
+              Choose Files
+            </button>
+          </div>
+        )}
+
+        {/* Uploaded media grid */}
         {loading ? (
-          <div className="py-12 text-center text-xs text-[#7A756D]">
+          <div className="py-14 text-center text-xs text-[#7A756D]">
             Loading media items...
           </div>
-        ) : filteredCustomMedia.length === 0 ? (
-          <div className="p-8 text-center bg-white border border-dashed border-[#D4CCC0] rounded-[14px]">
-            <p className="text-[13px] text-[#5C5852] mb-3">
-              No custom uploads yet in this view.
+        ) : filteredCustomMedia.length === 0 && activeCategorySlug === 'all' ? (
+          <div className="p-10 text-center bg-white border border-dashed border-[#D4CCC0] rounded-[14px]">
+            <p className="text-[13px] text-[#5C5852] mb-4">
+              No custom uploads yet.
             </p>
             <button
               type="button"
@@ -359,153 +405,33 @@ export default function AdminCollectionsPage() {
               <Plus size={14} /> Add Media
             </button>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {filteredCustomMedia.map((item) => (
-              <div
-                key={item._id}
-                className="admin-card rounded-[14px] overflow-hidden group flex flex-col justify-between"
-              >
-                {/* Media Preview Box */}
-                <div className="relative aspect-[16/10] bg-[#EFEAE2] overflow-hidden">
-                  {item.type === 'video' ? (
-                    <video src={item.url} className="w-full h-full object-cover" />
-                  ) : (
-                    <img
-                      src={item.url}
-                      alt={item.title || 'Custom media'}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  )}
-
-                  {/* Video Play Badge */}
-                  {item.type === 'video' && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="w-9 h-9 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-[#181818] shadow-sm">
-                        <Video size={14} className="ml-0.5" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Card Info & Actions */}
-                <div className="p-3.5 bg-white">
-                  <div className="flex items-center justify-between text-[#7A756D]">
-                    <span className="text-[10px] tracking-[0.14em] uppercase font-bold">
-                      {item.type === 'video' ? 'VIDEO' : 'PHOTO'}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        className="text-[#8E887E] hover:text-[#181818] transition-colors p-0.5"
-                        title="Options"
-                      >
-                        <MoreHorizontal size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeleteTarget(item)}
-                        className="text-[#8E887E] hover:text-red-600 transition-colors p-0.5 cursor-pointer"
-                        title="Delete asset"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <h5 className="font-sans font-semibold text-[13px] text-[#181818] truncate mt-1">
-                    {item.title || `${item.category || 'media'}-upload.jpg`}
-                  </h5>
-
-                  <p className="text-[11px] text-[#8E887E] mt-0.5">
-                    {item.size || '2.4 MB'} · {item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '16 Sep 2025'}
-                  </p>
-                </div>
-              </div>
-            ))}
+        ) : filteredCustomMedia.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredCustomMedia.map((item) => renderMediaCard(item, false))}
           </div>
-        )}
+        ) : null}
       </section>
 
-      {/* SECTION 2: Baseline Portfolio */}
-      <section className="space-y-4 pt-4">
-        <div className="flex items-baseline justify-between">
-          <div>
-            <h3 className="font-sans font-semibold text-[15px] text-[#181818]">
-              Baseline Portfolio
-            </h3>
-            <p className="text-[12px] text-[#7A756D] mt-0.5">
-              Default media from the original portfolio.
-            </p>
+      {/* ─── SECTION: Baseline Portfolio ─── */}
+      <section style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="border-t border-[#E8E2D6] pt-10">
+          <div className="flex items-baseline justify-between">
+            <div>
+              <h3 className="font-sans font-semibold text-[16px] text-[#181818]">
+                {activeCategorySlug === 'all' ? 'Baseline Portfolio' : 'Baseline Portfolio Specimens'}
+              </h3>
+              <p className="text-[12px] text-[#7A756D] mt-1">
+                Default media from the original portfolio.
+              </p>
+            </div>
+            <span className="text-[12px] text-[#7A756D] font-normal">
+              {filteredBaseline.length} {filteredBaseline.length === 1 ? 'item' : 'items'}
+            </span>
           </div>
-          <span className="text-[12px] text-[#7A756D] font-normal">
-            {filteredBaseline.length} {filteredBaseline.length === 1 ? 'item' : 'items'}
-          </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {filteredBaseline.map((item) => (
-            <div
-              key={item.id}
-              className="admin-card rounded-[14px] overflow-hidden group flex flex-col justify-between"
-            >
-              {/* Media Preview Box */}
-              <div className="relative aspect-[16/10] bg-[#EFEAE2] overflow-hidden">
-                {item.type === 'video' ? (
-                  <video src={item.url} className="w-full h-full object-cover" />
-                ) : (
-                  <img
-                    src={item.url}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                )}
-
-                {/* Video Play Badge */}
-                {item.type === 'video' && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-9 h-9 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-[#181818] shadow-sm">
-                      <Video size={14} className="ml-0.5" />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Card Info & Actions */}
-              <div className="p-3.5 bg-white">
-                <div className="flex items-center justify-between text-[#7A756D]">
-                  <span className="text-[10px] tracking-[0.14em] uppercase font-bold">
-                    {item.type === 'video' ? 'VIDEO' : 'PHOTO'}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      className="text-[#8E887E] hover:text-[#181818] transition-colors p-0.5"
-                      title="Options"
-                    >
-                      <MoreHorizontal size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      disabled
-                      className="text-[#D4CCC0] p-0.5 cursor-not-allowed"
-                      title="Baseline assets are locked"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-
-                <h5 className="font-sans font-semibold text-[13px] text-[#181818] truncate mt-1">
-                  {item.title}
-                </h5>
-
-                <p className="text-[11px] text-[#8E887E] mt-0.5">
-                  {item.size} · {item.date}
-                </p>
-              </div>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {filteredBaseline.map((item) => renderMediaCard(item, true))}
         </div>
       </section>
 

@@ -140,66 +140,56 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    <div className="space-y-9 w-full">
-      {/* Page Header */}
+    <div className="space-y-12 sm:space-y-14 w-full">
+      {/* ─── Page Header ─── */}
       <div>
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div>
-            <span className="admin-eyebrow block mb-2">
+            <span className="admin-eyebrow block mb-2.5">
               COLLECTIONS DASHBOARD
             </span>
-            <h1 className="admin-serif-title text-[36px] sm:text-[40px] lg:text-[42px]">
+            <h1 className="admin-serif-title text-[36px] sm:text-[42px] lg:text-[46px]">
               Studio Overview
             </h1>
-            <p className="admin-subtext mt-1.5">
+            <p className="admin-subtext mt-2.5">
               Here's a quick look at your collections and media.
             </p>
           </div>
-          <span className="text-[12px] text-[#7A756D] font-normal shrink-0 pt-1">
+          <span className="text-[12px] text-[#7A756D] font-normal shrink-0 pt-2">
             {dateStr}
           </span>
         </div>
 
-        {/* Clean divider line under header matching screenshot */}
-        <div className="border-b border-[#E8E2D6] mt-7" />
+        <div className="border-b border-[#E8E2D6] mt-8" />
       </div>
 
-      {/* Stats Grid — 4 cards */}
+      {/* ─── Statistics Grid ─── */}
       <section>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6">
           {statCards.map((card) => {
             const Icon = card.icon;
             return (
-              <div
-                key={card.label}
-                className="admin-card p-6 flex flex-col justify-between"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-[10px] tracking-[0.16em] uppercase font-semibold text-[#7A756D]">
-                    {card.label}
-                  </span>
-                  <Icon size={18} strokeWidth={1.3} className="text-[#8E887E]" />
+              <div key={card.label} className="admin-stat-card">
+                <div className="stat-header">
+                  <span className="stat-label">{card.label}</span>
+                  <Icon size={18} strokeWidth={1.3} className="stat-icon" />
                 </div>
-                <div className="admin-serif-title text-[38px] leading-none my-2">
-                  {card.value}
-                </div>
-                <span className="block text-[11px] text-[#7A756D]">
-                  {card.sub}
-                </span>
+                <div className="stat-value">{card.value}</div>
+                <span className="stat-sub">{card.sub}</span>
               </div>
             );
           })}
         </div>
       </section>
 
-      {/* Manage Collections */}
+      {/* ─── Manage Collections ─── */}
       <section>
-        <div className="flex items-baseline justify-between mb-5">
+        <div className="flex items-baseline justify-between mb-6">
           <div>
-            <h2 className="admin-serif-title text-[22px]">
+            <h2 className="admin-serif-title text-[24px]">
               Manage Collections
             </h2>
-            <p className="admin-subtext text-[12px] mt-1">
+            <p className="admin-subtext text-[12px] mt-1.5">
               Organized by the {CATEGORIES.length} live categories published on the portfolio.
             </p>
           </div>
@@ -208,32 +198,29 @@ export default function AdminDashboardPage() {
           </Link>
         </div>
 
-        {/* Horizontal collection cards — 3 cols */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        {/* Horizontal collection row cards — 3 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
           {categoryStats.map((cat) => (
             <div
               key={cat.id}
               onClick={() => navigate(`/admin/collections/${cat.slug}`)}
-              className="admin-card p-4 flex items-center gap-4 group cursor-pointer"
+              className="admin-collection-row"
             >
               {/* Thumbnail */}
-              <div className="w-[110px] h-[75px] rounded-[10px] overflow-hidden bg-[#EFEAE2] shrink-0">
+              <div className="thumb">
                 <img
                   src={cat.coverImage || cat.featured?.image}
                   alt={cat.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
               {/* Info */}
-              <div className="flex-1 min-w-0">
-                <h3 className="admin-serif-title text-[16px] mb-0.5">
-                  {cat.name}
-                </h3>
-                <p className="text-[11px] text-[#7A756D] mb-2 font-normal">
+              <div className="info">
+                <h3>{cat.name}</h3>
+                <p className="meta">
                   {cat.photosCount} Photos · {cat.videosCount} Videos
                 </p>
-                <span className="admin-link text-[11px]">
+                <span className="manage-link">
                   Manage media <ArrowRight size={11} strokeWidth={2} />
                 </span>
               </div>
@@ -242,10 +229,10 @@ export default function AdminDashboardPage() {
         </div>
       </section>
 
-      {/* Recently Added Media — horizontal strip */}
+      {/* ─── Recently Added Media ─── */}
       <section>
-        <div className="flex items-baseline justify-between mb-4">
-          <h2 className="admin-serif-title text-[20px]">
+        <div className="flex items-baseline justify-between mb-6">
+          <h2 className="admin-serif-title text-[22px]">
             Recently added media
           </h2>
           <Link to="/admin/collections" className="admin-link text-[12px]">
@@ -254,32 +241,42 @@ export default function AdminDashboardPage() {
         </div>
 
         {loading ? (
-          <div className="py-12 text-center text-xs text-[#7A756D]">
+          <div className="py-16 text-center text-xs text-[#7A756D]">
             Loading media...
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3.5">
+          <div className="admin-recent-strip">
             {recentDisplayMedia.map((item) => (
               <div
                 key={item.id}
-                className="relative aspect-[16/10] rounded-[10px] overflow-hidden bg-[#E8E2D6] group"
+                onClick={() => navigate('/admin/collections')}
+                className="admin-recent-card"
               >
-                {item.type === 'video' ? (
-                  <video src={item.url} className="w-full h-full object-cover" />
-                ) : (
-                  <img
-                    src={item.url}
-                    alt={item.title || 'Media'}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                )}
-                {item.type === 'video' && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-7 h-7 rounded-full bg-black/50 flex items-center justify-center">
-                      <Video size={13} className="text-white ml-0.5" />
+                <div className="media-thumb">
+                  {item.type === 'video' ? (
+                    <video src={item.url} />
+                  ) : (
+                    <img
+                      src={item.url}
+                      alt={item.title || 'Media'}
+                    />
+                  )}
+                  {item.type === 'video' && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center shadow-sm">
+                        <Video size={13} className="text-[#181818] ml-0.5" />
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+                <div className="pt-2.5 px-1 pb-0.5">
+                  <p className="text-[11px] font-medium text-[#181818] truncate leading-tight">
+                    {item.title || 'Portfolio Asset'}
+                  </p>
+                  <p className="text-[10px] text-[#8E887E] mt-0.5 uppercase tracking-wider">
+                    {item.type === 'video' ? 'Video' : 'Photo'}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
