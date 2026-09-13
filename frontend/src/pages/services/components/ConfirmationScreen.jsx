@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { buildWhatsAppMessage, getWhatsAppUrl } from '../../../utils/whatsapp';
 
 export default function ConfirmationScreen({
   formData,
@@ -11,37 +12,8 @@ export default function ConfirmationScreen({
 
   // Construct structured WhatsApp transmission draft
   const generateWhatsAppUrl = () => {
-    const phoneNumber = '12128409281'; // Atelier Concierge direct number
-    const disciplinesFormatted = (formData.disciplines || ['fine-art-photo', 'archival-album'])
-      .map((d) => (d === 'fine-art-photo' ? 'Fine-Art Photography' : d === 'cinematography' ? 'Cinematography (Super 8 / 4K)' : d === 'drone-aerial' ? 'Drone & Aerial' : 'Archival Fine-Art Album'))
-      .join(', ');
-
-    const message = `*ATELIER COMMISSION BRIEF — RAVEN & LENS*
-────────────────────────
-*Dossier Ref:* ${inquiryId || 'RL-2025-D98'}
-*Selected Suite:* ${collectionName} Collection
-*Commission Investment:* ${selectedCollection?.price || '$8,400'}
-
-*Client / Couple:* ${formData.name || 'Private Client'}
-*Primary Email:* ${formData.email || 'N/A'}
-*Phone:* ${formData.countryCode || '+91'} ${formData.phone || 'N/A'}
-
-*Event Horizon:* ${formData.eventType || 'Wedding Celebration'}
-*Target Date:* ${formData.eventDate || 'Pending Schedule'}
-*Coverage Duration:* ${formData.duration || '2 Days'}
-*Location / Venue:* ${formData.location || 'Pending Venue Entry'}
-
-*Selected Disciplines:*
-${disciplinesFormatted}
-
-*Creative Notes & Vision:*
-${formData.message || 'Standard atelier direction'}
-
-*Referral Provenance:* ${formData.source || 'Instagram'}
-────────────────────────
-Sent via Atelier de Lumière Digital Transmission`;
-
-    return `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    const message = buildWhatsAppMessage({ formData, selectedCollection });
+    return getWhatsAppUrl(message);
   };
 
   return (

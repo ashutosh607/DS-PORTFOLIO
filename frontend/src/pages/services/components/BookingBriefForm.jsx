@@ -6,6 +6,7 @@ import {
   COUNTRY_CODES,
   COLLECTIONS,
 } from '../data/servicesData';
+import { handleWhatsAppSubmit } from '../../../utils/whatsapp';
 
 export default function BookingBriefForm({
   formData,
@@ -70,13 +71,24 @@ export default function BookingBriefForm({
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      const el = document.getElementById('booking-form-top');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      const firstErrorKey = Object.keys(newErrors)[0];
+      const targetEl = document.getElementById(`booking-field-${firstErrorKey}`);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetEl.focus();
+      } else {
+        const el = document.getElementById('booking-form-top');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }
       return;
     }
 
     setErrors({});
-    onSubmit();
+    if (onSubmit) {
+      onSubmit();
+    } else {
+      handleWhatsAppSubmit({ formData, selectedCollection });
+    }
   };
 
   const currentDisciplines = formData.disciplines || ['fine-art-photo', 'archival-album'];
@@ -142,6 +154,7 @@ export default function BookingBriefForm({
             FULL NAME / COUPLE NAMES *
           </label>
           <input
+            id="booking-field-name"
             type="text"
             value={formData.name || ''}
             onChange={(e) => {
@@ -190,6 +203,7 @@ export default function BookingBriefForm({
               PRIMARY EMAIL *
             </label>
             <input
+              id="booking-field-email"
               type="email"
               value={formData.email || ''}
               onChange={(e) => {
@@ -252,6 +266,7 @@ export default function BookingBriefForm({
               </select>
 
               <input
+                id="booking-field-phone"
                 type="tel"
                 value={formData.phone || ''}
                 onChange={(e) => {
@@ -387,6 +402,7 @@ export default function BookingBriefForm({
               TARGET EVENT DATE *
             </label>
             <input
+              id="booking-field-eventDate"
               type="date"
               value={formData.eventDate || ''}
               onChange={(e) => {
@@ -474,6 +490,7 @@ export default function BookingBriefForm({
             LOCATION, CITY, &amp; VENUE NAME *
           </label>
           <input
+            id="booking-field-location"
             type="text"
             value={formData.location || ''}
             onChange={(e) => {

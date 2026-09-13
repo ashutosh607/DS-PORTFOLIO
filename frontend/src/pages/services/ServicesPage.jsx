@@ -8,6 +8,7 @@ import CompareMatrixModal from './components/CompareMatrixModal';
 import CommissionSummaryCard from './components/CommissionSummaryCard';
 import BookingBriefForm from './components/BookingBriefForm';
 import ConfirmationScreen from './components/ConfirmationScreen';
+import { handleWhatsAppSubmit } from '../../utils/whatsapp';
 
 export default function ServicesPage() {
   const [stage, setStage] = useState(1); // 1 = Collections, 2 = Booking Form, 3 = Confirmation
@@ -99,8 +100,12 @@ export default function ServicesPage() {
     const generatedRef = `RL-2025-${Math.floor(100 + Math.random() * 900)}`;
     setInquiryId(generatedRef);
 
+    // 1. Open WhatsApp with pre-filled encoded message synchronously (preserves user gesture)
+    handleWhatsAppSubmit({ formData, selectedCollection });
+
+    // 2. Background persistence resilience
     try {
-      await fetch('/api/inquiries', {
+      fetch('/api/inquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,11 +117,12 @@ export default function ServicesPage() {
       }).catch(() => {});
     } catch {
       // Resilience
-    } finally {
-      setIsSubmitting(false);
-      setStage(3);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // 3. Keep current page intact and reset submission status after debounce
+    setTimeout(() => {
+      setIsSubmitting(false);
+    }, 1200);
   };
 
   const handleReset = () => {
