@@ -1,16 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import { CATEGORIES } from './data/collectionsData';
 import CollectionsHero from './components/CollectionsHero';
 import CollectionsRibbon from './components/CollectionsRibbon';
 import CollectionsGallery from './components/CollectionsGallery';
-import CollectionsModal from './components/CollectionsModal';
 
 export default function CollectionsPage({ onOpenInquiry }) {
+  const { categorySlug } = useParams();
   const [activeCategoryId, setActiveCategoryId] = useState('01');
-  const [viewAllModalOpen, setViewAllModalOpen] = useState(false);
   const [mediaList, setMediaList] = useState([]);
   const categoriesRibbonRef = useRef(null);
   const galleryRevealRef = useRef(null);
+
+  // Sync with URL category slug (e.g. /collections/weddings)
+  useEffect(() => {
+    if (categorySlug) {
+      const matched = CATEGORIES.find(
+        (c) =>
+          c.slug?.toLowerCase() === categorySlug.toLowerCase() ||
+          c.name?.toLowerCase() === categorySlug.toLowerCase()
+      );
+      if (matched) {
+        setActiveCategoryId(matched.id);
+      }
+    }
+  }, [categorySlug]);
 
   // Fetch dynamic collection media from backend API
   useEffect(() => {
@@ -40,35 +54,64 @@ export default function CollectionsPage({ onOpenInquiry }) {
       (m) => m.category?.toLowerCase() === cat.slug.toLowerCase()
     );
 
-    if (customItems.length === 0) {
-      return cat;
-    }
-
-    const formattedCustom = customItems.map((item) => ({
-      id: item._id,
+    const formattedCustom = customItems.map((item, idx) => ({
+      id: item._id || `custom-${cat.id}-${idx}`,
       image: item.url,
+      title: item.title || `${cat.name} Specimen`,
       tag: item.title || `${cat.name} Specimen`,
       meta: item.caption || item.meta || 'Atelier Master Archive',
+      caption: item.caption || item.meta || 'Atelier Master Archive',
       type: item.type || 'photo',
+      isCustom: true,
     }));
 
-    // If custom items exist, use the newest as featured, and prepend others to supporting
-    const featured = {
-      image: formattedCustom[0].image,
-      title: formattedCustom[0].tag,
-      count: `01 / 0${Math.max(6, formattedCustom.length)}`,
-      caption: formattedCustom[0].meta,
+    const baseFeatured = {
+      id: `${cat.id}-featured`,
+      image: cat.featured.image,
+      title: cat.featured.title,
+      tag: cat.featured.title,
+      count: cat.featured.count,
+      caption: cat.featured.caption,
       meta: cat.featured.meta,
-      type: formattedCustom[0].type,
+      type: cat.featured.type || 'photo',
     };
 
-    const remainingCustom = formattedCustom.slice(1);
-    const supporting = [...remainingCustom, ...cat.supporting].slice(0, 8);
+    const baseSupporting = (cat.supporting || []).map((s, idx) => ({
+      id: s.id || `${cat.id}-sup-${idx}`,
+      image: s.image,
+      title: s.tag,
+      tag: s.tag,
+      meta: s.meta,
+      caption: s.meta,
+      type: s.type || 'photo',
+    }));
+
+    // Comprehensive archive list: base featured, initial supporting, custom uploads, and extra supporting
+    const allMedia = [
+      baseFeatured,
+      ...baseSupporting.slice(0, 4),
+      ...formattedCustom,
+      ...baseSupporting.slice(4),
+    ];
+
+    // If custom uploads exist, feature the latest custom upload
+    const featured = formattedCustom.length > 0 ? {
+      ...baseFeatured,
+      image: formattedCustom[0].image,
+      title: formattedCustom[0].tag,
+      caption: formattedCustom[0].meta,
+      type: formattedCustom[0].type,
+    } : baseFeatured;
+
+    const supporting = formattedCustom.length > 0
+      ? [...formattedCustom.slice(1), ...baseSupporting].slice(0, 4)
+      : baseSupporting.slice(0, 4);
 
     return {
       ...cat,
       featured,
       supporting,
+      allMedia,
       customMedia: formattedCustom,
     };
   });
@@ -128,21 +171,12 @@ export default function CollectionsPage({ onOpenInquiry }) {
         ribbonRef={categoriesRibbonRef}
       />
 
-      {/* 3. Weddings / Active Category Gallery Detail */}
+      {/* 3. Weddings / Active Category Gallery Detail with In-Place Master Update & Horizontal Rail */}
       <CollectionsGallery
         activeCategory={activeCategory}
-        onOpenViewAll={() => setViewAllModalOpen(true)}
         onPrevCategory={handlePrevCategory}
         onNextCategory={handleNextCategory}
         galleryRef={galleryRevealRef}
-      />
-
-      {/* 4. Archival Contact Sheet View-All Modal */}
-      <CollectionsModal
-        isOpen={viewAllModalOpen}
-        onClose={() => setViewAllModalOpen(false)}
-        activeCategory={activeCategory}
-        onOpenInquiry={onOpenInquiry}
       />
     </div>
   );

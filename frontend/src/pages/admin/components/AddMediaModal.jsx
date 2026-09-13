@@ -130,57 +130,59 @@ export default function AddMediaModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity"
+        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
       />
 
-      {/* Modal Card */}
-      <div className="relative z-10 w-full max-w-[560px] bg-white border border-[#E8E2D6] rounded-[20px] shadow-2xl my-8">
+      {/* Modal Card with Scrollable Body and Fixed Header/Footer */}
+      <div className="admin-modal-card">
 
-        {/* ─── Header ─── */}
-        <div className="flex items-start justify-between px-7 sm:px-9 pt-8 pb-6 border-b border-[#E8E2D6]">
-          <div>
-            <span className="admin-eyebrow block mb-1.5">
-              PORTFOLIO ARCHIVE
-            </span>
-            <h3 className="admin-serif-title text-[26px] sm:text-[30px]">
-              Add Collection Media
-            </h3>
-          </div>
+        {/* ─── Header: Centered & Fixed at Top ─── */}
+        <div className="admin-modal-header">
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#7A756D] hover:text-[#181818] hover:bg-[#F0EAE0] transition-colors cursor-pointer mt-1"
+            className="admin-modal-close-btn"
             aria-label="Close"
           >
             <X size={18} strokeWidth={1.8} />
           </button>
+
+          <span className="admin-eyebrow block mb-2">
+            PORTFOLIO ARCHIVE
+          </span>
+          <h3 className="admin-serif-title text-[28px] sm:text-[32px]">
+            Add Collection Media
+          </h3>
+          <p className="admin-subtext text-[12px] sm:text-[13px] mt-2 max-w-[400px] mx-auto">
+            Upload or link high-resolution visual stories for your collection.
+          </p>
         </div>
 
-        {/* ─── Form Body ─── */}
-        <div className="px-7 sm:px-9 py-7">
+        {/* ─── Form Body: Scrollable with Generous Padding ─── */}
+        <div className="admin-modal-body">
           {/* Error Notification */}
           {error && (
-            <div className="mb-6 p-3.5 rounded-[10px] bg-[#FAF0F0] border border-[#E8C4C4] text-[#992E2E] text-[12px] leading-relaxed">
+            <div className="mb-7 p-4 rounded-[12px] bg-[#FAF0F0] border border-[#E8C4C4] text-[#992E2E] text-[12px] leading-relaxed text-center">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
 
             {/* Collection Category */}
-            <div>
-              <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2.5">
+            <div className="admin-form-group">
+              <label className="admin-form-label">
                 COLLECTION CATEGORY *
               </label>
               <div className="relative">
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full h-[46px] px-4 rounded-[10px] bg-white border border-[#E8E2D6] text-[13px] text-[#181818] outline-none focus:border-[#181818] cursor-pointer appearance-none transition-colors"
+                  className="admin-form-select cursor-pointer appearance-none"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat.slug} value={cat.slug}>
@@ -188,48 +190,48 @@ export default function AddMediaModal({
                     </option>
                   ))}
                 </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#8E887E] text-[10px]">
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#8E887E] text-[11px]">
                   ▼
                 </div>
               </div>
             </div>
 
-            {/* Media Type Toggle */}
-            <div>
-              <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2.5">
+            {/* Media Type Toggle: Centered & Padded */}
+            <div className="admin-form-group items-center text-center">
+              <label className="admin-form-label">
                 MEDIA TYPE
               </label>
-              <div className="inline-flex p-1 bg-[#EFEAE2] rounded-[10px] gap-1">
+              <div className="inline-flex p-1.5 bg-[#EFEAE2] rounded-[12px] gap-1.5 mt-1">
                 <button
                   type="button"
                   onClick={() => setMediaType('photo')}
-                  className={`h-[36px] px-5 rounded-[8px] text-[11px] font-semibold tracking-[0.06em] uppercase transition-all cursor-pointer flex items-center gap-2 ${
+                  className={`h-[40px] px-6 rounded-[9px] text-[11px] font-semibold tracking-[0.08em] uppercase transition-all cursor-pointer flex items-center gap-2 ${
                     mediaType === 'photo'
-                      ? 'bg-[#181818] text-white shadow-xs'
+                      ? 'bg-[#181818] text-white shadow-sm'
                       : 'text-[#5C5852] hover:text-[#181818]'
                   }`}
                 >
-                  <Image size={13} strokeWidth={1.8} />
+                  <Image size={14} strokeWidth={1.8} />
                   PHOTO
                 </button>
                 <button
                   type="button"
                   onClick={() => setMediaType('video')}
-                  className={`h-[36px] px-5 rounded-[8px] text-[11px] font-semibold tracking-[0.06em] uppercase transition-all cursor-pointer flex items-center gap-2 ${
+                  className={`h-[40px] px-6 rounded-[9px] text-[11px] font-semibold tracking-[0.08em] uppercase transition-all cursor-pointer flex items-center gap-2 ${
                     mediaType === 'video'
-                      ? 'bg-[#181818] text-white shadow-xs'
+                      ? 'bg-[#181818] text-white shadow-sm'
                       : 'text-[#5C5852] hover:text-[#181818]'
                   }`}
                 >
-                  <Film size={13} strokeWidth={1.8} />
+                  <Film size={14} strokeWidth={1.8} />
                   VIDEO
                 </button>
               </div>
             </div>
 
-            {/* Upload Drop Area */}
-            <div>
-              <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2.5">
+            {/* Upload Drop Area: Centered, Padded, Never Touching Borders */}
+            <div className="admin-form-group">
+              <label className="admin-form-label text-center">
                 UPLOAD PHOTO OR VIDEO FILE
               </label>
               <input
@@ -242,41 +244,41 @@ export default function AddMediaModal({
 
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full min-h-[180px] border-2 border-dashed border-[#D4CCC0] hover:border-[#181818] rounded-[16px] p-8 sm:p-9 flex flex-col items-center justify-center text-center bg-[#FAFAF8] cursor-pointer transition-colors group"
+                className="admin-upload-dropzone group"
               >
                 {filePreview ? (
-                  <div className="relative w-full p-4 bg-[#EFEAE2] rounded-[12px] flex items-center justify-center">
-                    <div className="relative max-h-48 overflow-hidden rounded-[8px] flex items-center justify-center">
+                  <div className="relative w-full p-4 bg-[#EFEAE2] rounded-[14px] flex items-center justify-center">
+                    <div className="relative max-h-52 overflow-hidden rounded-[10px] flex items-center justify-center">
                       {mediaType === 'video' ? (
                         <video
                           src={filePreview}
-                          className="max-h-44 rounded-[8px]"
+                          className="max-h-48 rounded-[8px]"
                           controls
                         />
                       ) : (
                         <img
                           src={filePreview}
                           alt="Preview"
-                          className="max-h-44 object-contain rounded-[8px]"
+                          className="max-h-48 object-contain rounded-[8px]"
                         />
                       )}
                     </div>
-                    <span className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-xs text-white text-[10px] px-3 py-1.5 rounded-full tracking-wider font-semibold uppercase shadow-sm">
+                    <span className="absolute bottom-3.5 right-3.5 bg-black/85 backdrop-blur-xs text-white text-[10px] px-3.5 py-1.5 rounded-full tracking-wider font-semibold uppercase shadow-sm">
                       Change file
                     </span>
                   </div>
                 ) : (
                   <>
                     <div className="w-12 h-12 rounded-full bg-[#EFEAE2] flex items-center justify-center mb-3.5 text-[#5C5852] group-hover:scale-105 transition-transform">
-                      <Upload size={19} strokeWidth={1.5} />
+                      <Upload size={20} strokeWidth={1.5} />
                     </div>
                     <span className="text-[14px] font-semibold text-[#181818] block mb-1.5">
                       Add photos or videos
                     </span>
-                    <span className="text-[11px] text-[#7A756D] block mb-5 leading-relaxed max-w-[340px]">
-                      Upload media for this collection (JPG, PNG, WEBP, MP4, MOV up to 100MB)
+                    <span className="text-[12px] text-[#7A756D] block mb-5 leading-relaxed max-w-[340px]">
+                      Upload media for this collection (JPG, PNG, WEBP, MP4 up to 100MB)
                     </span>
-                    <span className="inline-flex items-center justify-center h-[38px] px-6 rounded-[8px] bg-[#101010] text-white text-[11px] font-semibold tracking-[0.08em] uppercase group-hover:bg-[#252525] transition-colors">
+                    <span className="admin-btn-upload-select group-hover:bg-[#252525]">
                       SELECT FILE
                     </span>
                   </>
@@ -284,16 +286,16 @@ export default function AddMediaModal({
               </div>
 
               {file && (
-                <div className="mt-2.5 flex items-center justify-between text-[11px] text-[#5C5852] px-1">
-                  <span className="truncate max-w-[320px]">{file.name}</span>
+                <div className="mt-2.5 flex items-center justify-between text-[11px] text-[#5C5852] px-2">
+                  <span className="truncate max-w-[340px]">{file.name}</span>
                   <span>{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
                 </div>
               )}
             </div>
 
             {/* External URL */}
-            <div>
-              <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2.5">
+            <div className="admin-form-group">
+              <label className="admin-form-label">
                 OR EXTERNAL MEDIA URL <span className="font-normal lowercase tracking-normal">(optional)</span>
               </label>
               <input
@@ -303,15 +305,15 @@ export default function AddMediaModal({
                   setDirectUrl(e.target.value);
                   if (e.target.value) setError('');
                 }}
-                placeholder="https://images.unsplash.com/... or cloud URL"
-                className="w-full h-[46px] px-4 rounded-[10px] bg-white border border-[#E8E2D6] text-[13px] text-[#181818] outline-none focus:border-[#181818] placeholder:text-[#8E887E] transition-colors"
+                placeholder="https://images.unsplash.com/... or direct media link"
+                className="admin-form-input"
               />
             </div>
 
             {/* Title & Caption */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="admin-form-group">
+                <label className="admin-form-label">
                   TITLE / SUBJECT
                 </label>
                 <input
@@ -319,11 +321,11 @@ export default function AddMediaModal({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g., Lake Como Vows"
-                  className="w-full h-[46px] px-4 rounded-[10px] bg-white border border-[#E8E2D6] text-[13px] text-[#181818] outline-none focus:border-[#181818] placeholder:text-[#8E887E] transition-colors"
+                  className="admin-form-input"
                 />
               </div>
-              <div>
-                <label className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-[#7A756D] mb-2.5">
+              <div className="admin-form-group">
+                <label className="admin-form-label">
                   CAPTION / NOTES
                 </label>
                 <input
@@ -331,20 +333,20 @@ export default function AddMediaModal({
                   value={caption}
                   onChange={(e) => setCaption(e.target.value)}
                   placeholder="e.g., Golden hour ceremony"
-                  className="w-full h-[46px] px-4 rounded-[10px] bg-white border border-[#E8E2D6] text-[13px] text-[#181818] outline-none focus:border-[#181818] placeholder:text-[#8E887E] transition-colors"
+                  className="admin-form-input"
                 />
               </div>
             </div>
           </form>
         </div>
 
-        {/* ─── Footer Buttons ─── */}
-        <div className="px-7 sm:px-9 py-5 border-t border-[#E8E2D6] flex items-center justify-end gap-3">
+        {/* ─── Footer Buttons: High-Contrast & Clearly Visible "SEND / UPLOAD" ─── */}
+        <div className="admin-modal-footer">
           <button
             type="button"
             disabled={uploading}
             onClick={onClose}
-            className="h-[42px] px-5 rounded-[8px] text-[11px] font-semibold tracking-[0.1em] uppercase text-[#5C5852] hover:bg-[#F0EAE0] transition-colors cursor-pointer disabled:opacity-50"
+            className="admin-btn-secondary"
           >
             CANCEL
           </button>
@@ -353,15 +355,19 @@ export default function AddMediaModal({
             type="button"
             disabled={uploading}
             onClick={handleSubmit}
-            className="h-[42px] px-6 rounded-[8px] bg-[#101010] hover:bg-[#252525] text-white text-[11px] font-semibold tracking-[0.1em] uppercase transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+            className="admin-btn-primary"
+            title="Upload and send media to collection"
           >
             {uploading ? (
               <>
-                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>UPLOADING...</span>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>SENDING...</span>
               </>
             ) : (
-              <span>UPLOAD TO COLLECTION</span>
+              <>
+                <Upload size={15} strokeWidth={2} />
+                <span>SEND / UPLOAD</span>
+              </>
             )}
           </button>
         </div>

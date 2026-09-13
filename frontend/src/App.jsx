@@ -63,6 +63,10 @@ export default function App() {
               path="/collections"
               element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
             />
+            <Route
+              path="/collections/:categorySlug"
+              element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
+            />
             <Route path="/services" element={<ServicesPage />} />
 
             {/* Admin Authentication */}
