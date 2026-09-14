@@ -16,6 +16,7 @@ const healthRouter = require("./routes/health.route");
 const uploadRouter = require("./routes/upload.route");
 const adminRouter = require("./routes/admin.route");
 const mediaRouter = require("./routes/media.route");
+const categoryRouter = require("./routes/category.route");
 
 const path = require("path");
 const fs = require("fs");
@@ -52,6 +53,7 @@ app.get("/", (req, res) => {
       health: "/api/v1/health",
       admin: "/api/admin",
       media: "/api/media",
+      categories: "/api/categories",
       uploadSingle: "POST /api/v1/upload/single",
     },
   });
@@ -62,6 +64,7 @@ app.use("/api/v1/health", healthRouter);
 app.use("/api/v1/upload", uploadRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/media", mediaRouter);
+app.use("/api/categories", categoryRouter);
 
 // Catch-all 404 handler for undefined routes
 app.use((req, res, next) => {

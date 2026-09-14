@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Upload, Image, Film, Check, RotateCcw, Sparkles } from 'lucide-react';
-import { CATEGORIES } from '../../collections/data/collectionsData';
+import { CATEGORIES as DEFAULT_CATEGORIES } from '../../collections/data/collectionsData';
+import { useCategories } from '../../../utils/categoryManager';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import '../AdminDashboard.css';
 
@@ -12,6 +13,9 @@ export default function EditMediaModal({
   mediaItem,
 }) {
   const { getAuthHeaders } = useAdminAuth();
+  const { categories: dynamicCategories } = useCategories();
+  const availableCategories = (dynamicCategories && dynamicCategories.length > 0) ? dynamicCategories : DEFAULT_CATEGORIES;
+
   const [file, setFile] = useState(null);
   const [filePreview, setFilePreview] = useState('');
   const [directUrl, setDirectUrl] = useState('');
@@ -314,9 +318,9 @@ export default function EditMediaModal({
                     onChange={(e) => setCategory(e.target.value)}
                     className="admin-form-select cursor-pointer appearance-none"
                   >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat.slug} value={cat.slug}>
-                        {cat.name} ({cat.slug})
+                    {availableCategories.map((cat) => (
+                      <option key={cat.slug || cat.id} value={cat.slug || cat.id}>
+                        {cat.name} ({cat.slug || cat.id})
                       </option>
                     ))}
                   </select>

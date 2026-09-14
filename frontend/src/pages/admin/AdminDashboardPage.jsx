@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Layers, ImageIcon, PlayCircle, Upload, ArrowRight, Video } from 'lucide-react';
-import { CATEGORIES } from '../collections/data/collectionsData';
+import { CATEGORIES as DEFAULT_CATEGORIES } from '../collections/data/collectionsData';
+import { useCategories } from '../../utils/categoryManager';
 import AddMediaModal from './components/AddMediaModal';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import { useAdminAuth } from './context/AdminAuthContext';
@@ -9,6 +10,8 @@ import './AdminDashboard.css';
 
 export default function AdminDashboardPage() {
   const { getAuthHeaders } = useAdminAuth();
+  const { categories } = useCategories();
+  const currentCategories = (categories && categories.length > 0) ? categories : DEFAULT_CATEGORIES;
   const navigate = useNavigate();
 
   const [mediaList, setMediaList] = useState([]);
@@ -62,7 +65,7 @@ export default function AdminDashboardPage() {
   };
 
   // Compute category counts
-  const categoryStats = CATEGORIES.map((cat) => {
+  const categoryStats = currentCategories.map((cat) => {
     const catMedia = mediaList.filter(
       (m) => m.category?.toLowerCase() === cat.slug.toLowerCase()
     );
@@ -82,7 +85,7 @@ export default function AdminDashboardPage() {
   const totalVideos = categoryStats.reduce((acc, cat) => acc + cat.videosCount, 0);
 
   // Collect seed images for preview strip fallback so 5 items are always displayed
-  const allSeedImages = CATEGORIES.flatMap((c) => [
+  const allSeedImages = currentCategories.flatMap((c) => [
     c.coverImage,
     ...(c.supporting?.map((s) => s.image) || []),
   ]).filter(Boolean);
@@ -115,7 +118,7 @@ export default function AdminDashboardPage() {
   const statCards = [
     {
       label: 'TOTAL COLLECTIONS',
-      value: CATEGORIES.length,
+      value: currentCategories.length,
       sub: 'Active portfolio galleries',
       icon: Layers,
     },
@@ -190,7 +193,7 @@ export default function AdminDashboardPage() {
               Manage Collections
             </h2>
             <p className="admin-subtext text-[12px] mt-1.5">
-              Organized by the {CATEGORIES.length} live categories published on the portfolio.
+              Organized by the {currentCategories.length} live categories published on the portfolio.
             </p>
           </div>
           <Link to="/admin/collections" className="admin-link text-[12px]">

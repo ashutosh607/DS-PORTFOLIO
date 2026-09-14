@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { CATEGORIES } from './data/collectionsData';
+import { CATEGORIES as DEFAULT_CATEGORIES } from './data/collectionsData';
+import { useCategories } from '../../utils/categoryManager';
 import CollectionsHero from './components/CollectionsHero';
 import CollectionsRibbon from './components/CollectionsRibbon';
 import CollectionsGallery from './components/CollectionsGallery';
 
 export default function CollectionsPage({ onOpenInquiry }) {
   const { categorySlug } = useParams();
+  const { categories: rawCategories } = useCategories();
+  const baseCategories = (rawCategories && rawCategories.length > 0) ? rawCategories : DEFAULT_CATEGORIES;
   const [activeCategoryId, setActiveCategoryId] = useState('01');
   const [mediaList, setMediaList] = useState([]);
   const categoriesRibbonRef = useRef(null);
@@ -15,7 +18,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
   // Sync with URL category slug (e.g. /collections/weddings)
   useEffect(() => {
     if (categorySlug) {
-      const matched = CATEGORIES.find(
+      const matched = baseCategories.find(
         (c) =>
           c.slug?.toLowerCase() === categorySlug.toLowerCase() ||
           c.name?.toLowerCase() === categorySlug.toLowerCase()
@@ -23,8 +26,10 @@ export default function CollectionsPage({ onOpenInquiry }) {
       if (matched) {
         setActiveCategoryId(matched.id);
       }
+    } else if (baseCategories.length > 0 && !baseCategories.some((c) => c.id === activeCategoryId)) {
+      setActiveCategoryId(baseCategories[0].id);
     }
-  }, [categorySlug]);
+  }, [categorySlug, baseCategories]);
 
   // Fetch dynamic collection media from backend API
   useEffect(() => {
@@ -49,7 +54,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
   }, []);
 
   // Dynamically augment categories with newly uploaded media & customized baseline items
-  const dynamicCategories = CATEGORIES.map((cat) => {
+  const dynamicCategories = baseCategories.map((cat) => {
     // Only true custom uploads
     const customItems = mediaList.filter(
       (m) =>
@@ -78,13 +83,13 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
     const baseFeatured = {
       id: `${cat.id}-featured`,
-      image: coverOverride?.url || cat.featured.image,
-      title: coverOverride?.title || cat.featured.title,
-      tag: coverOverride?.title || cat.featured.title,
-      count: cat.featured.count,
-      caption: coverOverride?.caption || cat.featured.caption,
-      meta: coverOverride?.meta || cat.featured.meta,
-      type: coverOverride?.type || cat.featured.type || 'photo',
+      image: coverOverride?.url || cat.coverImage || cat.featured?.image,
+      title: coverOverride?.title || cat.featured?.title || cat.name,
+      tag: coverOverride?.title || cat.featured?.title || cat.name,
+      count: cat.featured?.count || '1/08',
+      caption: coverOverride?.caption || cat.featured?.caption || cat.tagline,
+      meta: coverOverride?.meta || cat.featured?.meta || cat.medium || 'Medium Format Film / 35mm',
+      type: coverOverride?.type || cat.featured?.type || 'photo',
     };
 
     const baseSupporting = (cat.supporting || []).map((s, idx) => {
@@ -153,15 +158,15 @@ export default function CollectionsPage({ onOpenInquiry }) {
   };
 
   const handleNextCategory = () => {
-    const currentIndex = CATEGORIES.findIndex((c) => c.id === activeCategoryId);
-    const nextIndex = (currentIndex + 1) % CATEGORIES.length;
-    handleSelectCategory(CATEGORIES[nextIndex].id);
+    const currentIndex = baseCategories.findIndex((c) => c.id === activeCategoryId);
+    const nextIndex = (currentIndex + 1) % baseCategories.length;
+    handleSelectCategory(baseCategories[nextIndex].id);
   };
 
   const handlePrevCategory = () => {
-    const currentIndex = CATEGORIES.findIndex((c) => c.id === activeCategoryId);
-    const prevIndex = (currentIndex - 1 + CATEGORIES.length) % CATEGORIES.length;
-    handleSelectCategory(CATEGORIES[prevIndex].id);
+    const currentIndex = baseCategories.findIndex((c) => c.id === activeCategoryId);
+    const prevIndex = (currentIndex - 1 + baseCategories.length) % baseCategories.length;
+    handleSelectCategory(baseCategories[prevIndex].id);
   };
 
   return (
@@ -183,7 +188,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
       {/* 2. Category Cards 3D Ribbon */}
       <CollectionsRibbon
-        categories={CATEGORIES}
+        categories={dynamicCategories}
         activeCategoryId={activeCategoryId}
         onSelectCategory={handleSelectCategory}
         ribbonRef={categoriesRibbonRef}

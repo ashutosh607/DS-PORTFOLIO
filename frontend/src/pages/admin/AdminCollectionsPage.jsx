@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus, Pencil, RotateCcw, Sparkles } from 'lucide-react';
-import { CATEGORIES } from '../collections/data/collectionsData';
+import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus, Pencil, RotateCcw, Sparkles, FolderPlus } from 'lucide-react';
+import { useCategories } from '../../utils/categoryManager';
 import AddMediaModal from './components/AddMediaModal';
 import EditMediaModal from './components/EditMediaModal';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
+import AddCategoryModal from './components/AddCategoryModal';
+import EditCategoryModal from './components/EditCategoryModal';
+import DeleteCategoryModal from './components/DeleteCategoryModal';
 import { useAdminAuth } from './context/AdminAuthContext';
 import './AdminDashboard.css';
 
@@ -12,6 +15,7 @@ export default function AdminCollectionsPage() {
   const { category: categoryParam } = useParams();
   const navigate = useNavigate();
   const { getAuthHeaders } = useAdminAuth();
+  const { categories, refresh: refreshCategories } = useCategories();
 
   const [activeCategorySlug, setActiveCategorySlug] = useState(categoryParam || 'all');
   const [mediaList, setMediaList] = useState([]);
@@ -22,6 +26,11 @@ export default function AdminCollectionsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all'); // all, photo, video
+
+  // Category Modals State
+  const [addCategoryModalOpen, setAddCategoryModalOpen] = useState(false);
+  const [editCategoryTarget, setEditCategoryTarget] = useState(null);
+  const [deleteCategoryTarget, setDeleteCategoryTarget] = useState(null);
 
   // Sync category param with active slug
   useEffect(() => {
@@ -136,16 +145,35 @@ export default function AdminCollectionsPage() {
     }
   };
 
+  // Category handlers
+  const handleCategoryAdded = async (newCat) => {
+    await refreshCategories();
+    if (newCat?.slug) {
+      handleCategorySelect(newCat.slug);
+    }
+  };
+
+  const handleCategoryUpdated = async (updatedCat) => {
+    await refreshCategories();
+  };
+
+  const handleCategoryDeleted = async (deletedCat) => {
+    await refreshCategories();
+    if (activeCategorySlug === deletedCat.slug || activeCategorySlug === deletedCat.id) {
+      handleCategorySelect('all');
+    }
+  };
+
   // Active Category Data
-  const currentCategoryObj = CATEGORIES.find(
-    (c) => c.slug.toLowerCase() === activeCategorySlug.toLowerCase()
+  const currentCategoryObj = categories.find(
+    (c) => c.slug?.toLowerCase() === activeCategorySlug.toLowerCase()
   );
 
   // Baseline items computation with overrides applied
   const getBaselineItems = () => {
     const rawDefaults =
       activeCategorySlug === 'all'
-        ? CATEGORIES.flatMap((cat) => [
+        ? categories.flatMap((cat) => [
             {
               id: `seed-cover-${cat.id}`,
               baselineId: `seed-cover-${cat.id}`,
@@ -364,12 +392,12 @@ export default function AdminCollectionsPage() {
           <h1 className="admin-serif-title text-[36px] sm:text-[40px] lg:text-[44px]">
             {activeCategorySlug === 'all'
               ? 'Collection Repository'
-              : currentCategoryObj?.name || 'Category Gallery'}
+              : currentCategoryObj?.name || activeCategorySlug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
           </h1>
           <p className="admin-subtext mt-2">
             {activeCategorySlug === 'all'
               ? 'Manage your media across all collections.'
-              : currentCategoryObj?.tagline || `Timeless visual stories curated for ${currentCategoryObj?.name}.`}
+              : currentCategoryObj?.tagline || `Timeless visual stories curated for ${currentCategoryObj?.name || activeCategorySlug}.`}
           </p>
         </div>
 
@@ -397,6 +425,17 @@ export default function AdminCollectionsPage() {
             />
           </div>
 
+          {/* + Add Category Button */}
+          <button
+            type="button"
+            onClick={() => setAddCategoryModalOpen(true)}
+            className="h-[38px] px-3.5 rounded-[8px] border border-[#E8E2D6] bg-white text-[#181818] hover:bg-[#FAF8F5] text-[12px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+            title="Create a new portfolio collection category"
+          >
+            <FolderPlus size={14} />
+            <span>Add Category</span>
+          </button>
+
           {/* + Add Media Button */}
           <button
             type="button"
@@ -409,6 +448,56 @@ export default function AdminCollectionsPage() {
         </div>
       </div>
 
+      {/* ─── Category Banner (Single Category view with Edit & Delete Category) ─── */}
+      {activeCategorySlug !== 'all' && currentCategoryObj && (
+        <div className="p-5 rounded-2xl border border-[#E8E2D6] bg-white flex flex-col md:flex-row md:items-center justify-between gap-5 shadow-xs -mt-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="w-16 h-16 rounded-xl overflow-hidden border border-[#E8E2D6] shrink-0 bg-[#FAF8F5]">
+              <img
+                src={currentCategoryObj.coverImage || currentCategoryObj.featured?.image}
+                alt={currentCategoryObj.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-serif text-[22px] text-[#181818] font-normal">
+                  {currentCategoryObj.name}
+                </h3>
+                <span className="text-[10px] tracking-[0.14em] uppercase text-[#7A756D] font-semibold bg-[#FAF8F5] border border-[#E8E2D6] px-2 py-0.5 rounded-full">
+                  /{currentCategoryObj.slug}
+                </span>
+              </div>
+              <p className="text-[12px] text-[#7A756D] mt-0.5 line-clamp-1">
+                {currentCategoryObj.tagline || 'Custom Photography Collection'}
+              </p>
+            </div>
+          </div>
+
+          {/* Edit & Delete Category Actions */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setEditCategoryTarget(currentCategoryObj)}
+              className="h-[34px] px-3.5 rounded-lg border border-[#E8E2D6] bg-[#FAF8F5] text-[#181818] hover:bg-[#F0EAE0] text-[12px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Edit category details and cover photo"
+            >
+              <Pencil size={13} />
+              <span>Edit Category</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeleteCategoryTarget(currentCategoryObj)}
+              className="h-[34px] px-3.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-[12px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Delete this category"
+            >
+              <Trash2 size={13} />
+              <span>Delete Category</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ─── Category Tabs (All view) OR Type Pill Filters (Single category) ─── */}
       {activeCategorySlug === 'all' ? (
         <div className="border-b border-[#E8E2D6] pb-0 -mt-2">
@@ -420,9 +509,9 @@ export default function AdminCollectionsPage() {
             >
               All
             </button>
-            {CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <button
-                key={cat.id}
+                key={cat.id || cat.slug}
                 type="button"
                 onClick={() => handleCategorySelect(cat.slug)}
                 className={`admin-tab ${activeCategorySlug === cat.slug ? 'active' : ''}`}
@@ -430,6 +519,16 @@ export default function AdminCollectionsPage() {
                 {cat.name}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => setAddCategoryModalOpen(true)}
+              className="admin-tab text-[#7A756D] hover:text-[#181818] flex items-center gap-1 shrink-0 cursor-pointer"
+              style={{ borderBottomColor: 'transparent' }}
+              title="Add a new category"
+            >
+              <Plus size={13} />
+              <span>New Category</span>
+            </button>
           </div>
         </div>
       ) : (
@@ -552,13 +651,36 @@ export default function AdminCollectionsPage() {
         mediaItem={editTarget}
       />
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Media Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteConfirm}
         isDeleting={isDeleting}
         mediaItem={deleteTarget}
+      />
+
+      {/* Add Category Modal */}
+      <AddCategoryModal
+        isOpen={addCategoryModalOpen}
+        onClose={() => setAddCategoryModalOpen(false)}
+        onSuccess={handleCategoryAdded}
+      />
+
+      {/* Edit Category Modal */}
+      <EditCategoryModal
+        isOpen={!!editCategoryTarget}
+        category={editCategoryTarget}
+        onClose={() => setEditCategoryTarget(null)}
+        onSuccess={handleCategoryUpdated}
+      />
+
+      {/* Delete Category Modal */}
+      <DeleteCategoryModal
+        isOpen={!!deleteCategoryTarget}
+        category={deleteCategoryTarget}
+        onClose={() => setDeleteCategoryTarget(null)}
+        onSuccess={handleCategoryDeleted}
       />
     </div>
   );
