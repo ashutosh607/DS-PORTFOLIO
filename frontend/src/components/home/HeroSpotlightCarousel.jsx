@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PhotoPlaceholder from '../common/PhotoPlaceholder';
 
+import img01 from '../../assets/landing-page-images/landing-01.png';
+import img02 from '../../assets/landing-page-images/landing-02.png';
+import img03 from '../../assets/landing-page-images/landing-03.png';
+import img04 from '../../assets/landing-page-images/landing-04.png';
+import img05 from '../../assets/landing-page-images/landing-05.png';
+import img06 from '../../assets/landing-page-images/landing-06.png';
+import img07 from '../../assets/landing-page-images/landing-07.png';
+
 const PROJECTS = [
   {
     id: '01',
@@ -10,6 +18,7 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.4',
     format: 'Hasselblad 100c · 80mm',
+    image: img01,
   },
   {
     id: '02',
@@ -19,6 +28,7 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.2',
     format: 'Medium Format 6x7',
+    image: img02,
   },
   {
     id: '03',
@@ -28,6 +38,7 @@ const PROJECTS = [
     year: '2026',
     score: '★ 9.6',
     format: 'Large Format 4x5',
+    image: img03,
   },
   {
     id: '04',
@@ -37,6 +48,7 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.1',
     format: '35mm Tri-X 400',
+    image: img04,
   },
   {
     id: '05',
@@ -46,6 +58,7 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.0',
     format: 'Leica Summilux 50mm',
+    image: img05,
   },
   {
     id: '06',
@@ -55,6 +68,7 @@ const PROJECTS = [
     year: '2026',
     score: '★ 9.5',
     format: 'Hasselblad H6D',
+    image: img06,
   },
   {
     id: '07',
@@ -64,6 +78,7 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.3',
     format: 'Platinotype Gelatin Silver',
+    image: img07,
   },
 ];
 
@@ -231,27 +246,6 @@ export default function HeroSpotlightCarousel() {
         }}
       />
 
-      {/* Dynamic Background Serif Watermark Number */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '44%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          fontFamily: 'var(--font-serif)',
-          fontSize: 'clamp(200px, 28vw, 340px)',
-          fontWeight: 300,
-          lineHeight: 1,
-          color: 'rgba(227, 219, 204, 0.25)',
-          pointerEvents: 'none',
-          userSelect: 'none',
-          zIndex: 0,
-          transition: 'all 0.5s ease',
-        }}
-      >
-        {activeProject.id}
-      </div>
-
       <div
         className="container"
         style={{
@@ -284,7 +278,7 @@ export default function HeroSpotlightCarousel() {
               }}
             >
               <span style={{ width: '22px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
-              <span>The Spotlight Collection · Vol. 01</span>
+              <span>The Spotlight Collection</span>
               <span style={{ width: '22px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
             </div>
           </div>
@@ -309,10 +303,7 @@ export default function HeroSpotlightCarousel() {
         </div>
 
         {/* ===================================================================
-            MIDDLE SECTION: INWARD CONCAVE CURVED 3D GALLERY (EXACT PHOTO MATCH)
-            The center card is recessed inward at z = 0; side cards curve
-            FORWARD towards the viewer (positive Z) and rotate inward,
-            appearing naturally taller at the edges just like in the picture.
+            MIDDLE SECTION: INWARD CONCAVE CURVED 3D GALLERY (CLEAN MINIMALIST)
             =================================================================== */}
         <div
           onMouseDown={handlePointerDown}
@@ -325,12 +316,12 @@ export default function HeroSpotlightCarousel() {
           style={{
             position: 'relative',
             width: '100%',
-            height: 'clamp(280px, 33vh, 340px)',
+            height: 'clamp(310px, 37vh, 375px)',
             margin: '0.25rem auto',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            perspective: '900px', // Exact perspective depth for natural inward cylindrical arc
+            perspective: '950px',
             perspectiveOrigin: '50% 50%',
             cursor: isDragging ? 'grabbing' : 'grab',
             userSelect: 'none',
@@ -347,22 +338,21 @@ export default function HeroSpotlightCarousel() {
             const absD = Math.abs(d);
 
             // ===============================================================
-            // EXACT INWARD CONCAVE CYLINDER CURVE FROM THE PHOTO
+            // INWARD CONCAVE CYLINDER CURVE WITH SLIGHTLY INCREASED SIZE
             // ===============================================================
-            // 1. Spacing along the horizontal axis
-            const spacing = typeof window !== 'undefined' && window.innerWidth < 768 ? 165 : 225;
+            // 1. Spacing along the horizontal axis (balanced for new card width)
+            const spacing = typeof window !== 'undefined' && window.innerWidth < 768 ? 180 : 248;
             const translateX = d * spacing;
 
             // 2. Inward curve: center card sits inward at z = 0;
-            // Side cards curve FORWARD towards viewer (+translateZ),
-            // making them appear taller and closer at the edges
+            // Side cards curve FORWARD towards viewer (+translateZ)
             const isVisible = absD < 2.65;
-            const translateZ = isVisible ? Math.pow(absD, 1.4) * 62 : -600;
+            const translateZ = isVisible ? Math.pow(absD, 1.4) * 64 : -600;
 
-            // 3. Inward rotation: cards on left face right (+deg), cards on right face left (-deg)
+            // 3. Inward rotation
             const rotateY = -d * 16.5;
 
-            // 4. Smooth fade out at the edges so cards NEVER jump or fly across visibly
+            // 4. Smooth fade out at the edges
             const opacity = absD >= 2.65 ? 0 : absD <= 1.85 ? 1 : Math.max(0, (2.65 - absD) / 0.8);
 
             // Z-index: outer cards that curve forward are layered cleanly
@@ -370,7 +360,7 @@ export default function HeroSpotlightCarousel() {
             const isActive = absD < 0.45;
 
             // 3D specular sheen reflecting the card's inward angle
-            const sheenOpacity = Math.min(0.25, absD * 0.08);
+            const sheenOpacity = Math.min(0.22, absD * 0.08);
             const sheenAngle = d > 0 ? '120deg' : '240deg';
 
             return (
@@ -384,17 +374,15 @@ export default function HeroSpotlightCarousel() {
                 }}
                 style={{
                   position: 'absolute',
-                  // Card size exactly proportioned
-                  width: 'clamp(142px, 12.5vw, 175px)',
-                  height: 'clamp(205px, 18.5vw, 255px)',
+                  // Card size slightly increased ("thoda sa") for editorial presence without congestion
+                  width: 'clamp(162px, 14vw, 198px)',
+                  height: 'clamp(236px, 20.5vw, 290px)',
                   transformStyle: 'preserve-3d',
                   transform: `translateX(${translateX}px) translateY(0px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`,
                   opacity,
                   visibility: isVisible ? 'visible' : 'hidden',
                   pointerEvents: isVisible ? 'auto' : 'none',
                   zIndex,
-                  // Pure 60fps JavaScript animation without CSS transition conflicts!
-                  // Eliminates any juggling or cards flying across the front
                   transition: isDragging ? 'none' : 'box-shadow 0.35s ease, border-color 0.35s ease',
                   cursor: isActive ? 'default' : 'pointer',
                   willChange: 'transform, opacity',
@@ -404,14 +392,14 @@ export default function HeroSpotlightCarousel() {
                 <div
                   style={{
                     position: 'absolute',
-                    bottom: '-26px',
-                    left: '8%',
-                    width: '84%',
-                    height: isActive ? '22px' : '16px',
+                    bottom: '-28px',
+                    left: '9%',
+                    width: '82%',
+                    height: isActive ? '24px' : '18px',
                     borderRadius: '50%',
                     background: isActive
-                      ? 'radial-gradient(ellipse at center, rgba(16, 16, 16, 0.45) 0%, rgba(16, 16, 16, 0.16) 45%, transparent 75%)'
-                      : 'radial-gradient(ellipse at center, rgba(16, 16, 16, 0.3) 0%, rgba(16, 16, 16, 0.1) 45%, transparent 75%)',
+                      ? 'radial-gradient(ellipse at center, rgba(16, 16, 16, 0.42) 0%, rgba(16, 16, 16, 0.15) 45%, transparent 75%)'
+                      : 'radial-gradient(ellipse at center, rgba(16, 16, 16, 0.28) 0%, rgba(16, 16, 16, 0.09) 45%, transparent 75%)',
                     filter: isActive ? 'blur(9px)' : 'blur(7px)',
                     transform: `scale(${1 + absD * 0.04})`,
                     opacity: opacity * 0.95,
@@ -421,7 +409,7 @@ export default function HeroSpotlightCarousel() {
                   }}
                 />
 
-                {/* Card Body */}
+                {/* Card Body - Pure Photography, Zero Distractions */}
                 <div
                   style={{
                     position: 'relative',
@@ -434,32 +422,42 @@ export default function HeroSpotlightCarousel() {
                     boxShadow: isActive
                       ? `
                         inset 0 1px 1px 0 rgba(255, 255, 255, 0.3),
-                        0 8px 20px -3px rgba(16, 16, 16, 0.35),
-                        0 24px 50px -8px rgba(16, 16, 16, 0.45),
-                        0 45px 85px -15px rgba(16, 16, 16, 0.5)
+                        0 8px 22px -3px rgba(16, 16, 16, 0.38),
+                        0 26px 52px -8px rgba(16, 16, 16, 0.48),
+                        0 48px 90px -15px rgba(16, 16, 16, 0.52)
                       `
                       : `
                         inset 0 1px 1px 0 rgba(255, 255, 255, 0.15),
-                        0 6px 16px -3px rgba(16, 16, 16, 0.28),
-                        0 18px 40px -8px rgba(16, 16, 16, 0.35),
-                        0 32px 65px -12px rgba(16, 16, 16, 0.38)
+                        0 6px 18px -3px rgba(16, 16, 16, 0.3),
+                        0 18px 42px -8px rgba(16, 16, 16, 0.36),
+                        0 34px 70px -12px rgba(16, 16, 16, 0.4)
                       `,
                     display: 'flex',
                     flexDirection: 'column',
                     transition: 'box-shadow 0.35s ease, border-color 0.35s ease',
                   }}
                 >
-                  <PhotoPlaceholder
-                    dark={true}
-                    aspectRatio="auto"
-                    showBadge={false}
-                    className="w-full h-full"
-                    style={{
-                      borderRadius: '0',
-                      border: 'none',
-                      height: '100%',
-                    }}
-                  />
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt="Portfolio showcase"
+                      className="w-full h-full object-cover select-none pointer-events-none"
+                      loading={Math.abs(d) <= 1 ? 'eager' : 'lazy'}
+                      draggable={false}
+                    />
+                  ) : (
+                    <PhotoPlaceholder
+                      dark={true}
+                      aspectRatio="auto"
+                      showBadge={false}
+                      className="w-full h-full"
+                      style={{
+                        borderRadius: '0',
+                        border: 'none',
+                        height: '100%',
+                      }}
+                    />
+                  )}
 
                   {/* 3D Specular Light Sheen */}
                   {d !== 0 && (
@@ -472,73 +470,6 @@ export default function HeroSpotlightCarousel() {
                       }}
                     />
                   )}
-
-                  {/* Top Vignette Gradient */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: '55px',
-                      background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.65) 0%, transparent 100%)',
-                      pointerEvents: 'none',
-                    }}
-                  />
-
-                  {/* Top-Left Card Number (Pure White Minimalist Sans) */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '14px',
-                      left: '14px',
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: '0.8rem',
-                      fontWeight: 600,
-                      letterSpacing: '0.04em',
-                      color: 'rgba(255, 255, 255, 0.95)',
-                      textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-                    }}
-                  >
-                    {item.id}
-                  </div>
-
-                  {/* Bottom Vignette Gradient */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: '80px',
-                      background: 'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%)',
-                      pointerEvents: 'none',
-                    }}
-                  />
-
-                  {/* Bottom-Left Card Title (Pure White Serif) */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '14px',
-                      left: '14px',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-serif)',
-                        fontSize: '1.18rem',
-                        fontWeight: 500,
-                        color: '#FFFFFF',
-                        letterSpacing: '-0.01em',
-                        lineHeight: 1.1,
-                        textShadow: '0 1px 4px rgba(0,0,0,0.7)',
-                      }}
-                    >
-                      {item.title}
-                    </span>
-                  </div>
                 </div>
               </div>
             );
@@ -559,105 +490,56 @@ export default function HeroSpotlightCarousel() {
         />
 
         {/* ===================================================================
-            BOTTOM SECTION: METADATA, 7 DOTS, COUNTER & ARROWS
+            BOTTOM CONTROLS: 7 DOTS, COUNTER & ARROWS (CLEAN & MINIMAL)
             =================================================================== */}
         <div style={{ flexShrink: 0, paddingBottom: '0.5rem' }}>
 
-          <div style={{ marginBottom: '0.35rem' }}>
-            <span
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.625rem',
-                letterSpacing: '0.28em',
-                textTransform: 'uppercase',
-                color: 'var(--color-obsidian-light)',
-                fontWeight: 600,
-              }}
-            >
-              DRAG · SWIPE · ARROW KEYS
-            </span>
+          {/* 7 Minimalist Pagination Dots */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem', marginBottom: '0.55rem' }}>
+            {PROJECTS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  targetPosRef.current = i;
+                  startSpringAnimation();
+                }}
+                aria-label={`Go to photo ${i + 1}`}
+                style={{
+                  height: '5px',
+                  width: activeNormalizedIndex === i ? '22px' : '5px',
+                  borderRadius: '999px',
+                  backgroundColor: activeNormalizedIndex === i ? '#2B579A' : 'var(--color-nude)',
+                  transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                  padding: 0,
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              />
+            ))}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <h2
-              style={{
-                fontFamily: 'var(--font-serif)',
-                fontSize: 'clamp(1.75rem, 3vw, 2.35rem)',
-                fontWeight: 500,
-                color: 'var(--color-obsidian)',
-                marginBottom: '0.2rem',
-                lineHeight: 1.1,
-              }}
-            >
-              {activeProject.title}
-            </h2>
-
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.55rem',
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.775rem',
-                letterSpacing: '0.08em',
-                color: 'var(--color-obsidian-light)',
-                marginBottom: '0.55rem',
-              }}
-            >
-              <span>{activeProject.year}</span>
-              <span>·</span>
-              <span>{activeProject.category}</span>
-              <span>·</span>
-              <span style={{ color: '#2B579A', fontWeight: 600 }}>{activeProject.score}</span>
-            </div>
-
-            {/* 7 Pagination Dots */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.45rem' }}>
-              {PROJECTS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    targetPosRef.current = i;
-                    startSpringAnimation();
-                  }}
-                  aria-label={`Go to slide ${i + 1}`}
-                  style={{
-                    height: '5px',
-                    width: activeNormalizedIndex === i ? '20px' : '5px',
-                    borderRadius: '999px',
-                    backgroundColor: activeNormalizedIndex === i ? '#2B579A' : 'var(--color-nude)',
-                    transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-                    padding: 0,
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom Bar: 02 / 07 Counter (Left) & Minimal Circular Arrows (Right) */}
+          {/* Bottom Bar: Slide Counter (Left) & Minimal Circular Navigation Arrows (Right) */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               maxWidth: '920px',
-              margin: '0.2rem auto 0',
-              paddingTop: '0.4rem',
+              margin: '0 auto',
+              paddingTop: '0.2rem',
             }}
           >
             <div style={{ textAlign: 'left', minWidth: '100px' }}>
               <span
                 style={{
                   fontFamily: 'var(--font-serif)',
-                  fontSize: '2rem',
+                  fontSize: '1.85rem',
                   fontWeight: 500,
                   color: 'var(--color-obsidian)',
                   lineHeight: 1,
                 }}
               >
-                {activeProject.id}
+                {String(activeNormalizedIndex + 1).padStart(2, '0')}
               </span>
               <span
                 style={{
@@ -676,7 +558,7 @@ export default function HeroSpotlightCarousel() {
               <button
                 onClick={handlePrev}
                 className="circle-nav-btn"
-                aria-label="Previous work"
+                aria-label="Previous photo"
                 style={{ width: '38px', height: '38px' }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -686,7 +568,7 @@ export default function HeroSpotlightCarousel() {
               <button
                 onClick={handleNext}
                 className="circle-nav-btn"
-                aria-label="Next work"
+                aria-label="Next photo"
                 style={{ width: '38px', height: '38px' }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
