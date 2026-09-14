@@ -1,230 +1,468 @@
 import React from 'react';
 import PhotoPlaceholder from '../common/PhotoPlaceholder';
-import ScrollBlurCharReveal from '../common/ScrollBlurCharReveal';
 
-export default function AboutSection() {
+/**
+ * Editorial About Section — Dishant (DS Photography & Films)
+ * 
+ * Styled after luxury high-fashion editorial monographs:
+ * - Asymmetric layout: Offset portrait on the left with warm ivory/nude backdrop
+ * - Editorial typography: Cormorant Garamond serif heading & Plus Jakarta Sans labels
+ * - Arched circular stamp: "PHOTOGRAPHY × FILMS"
+ * - Script signature detail with fountain-pen underline
+ * - Pure factual studio identifiers (zero invented claims/statistics)
+ * - Generous 100–140px desktop breathing room
+ */
+export default function AboutSection({ imageUrl = null }) {
   return (
     <section
       id="about"
+      aria-label="About the Photographer"
       style={{
-        padding: 'clamp(5rem, 10vw, 8rem) 0',
-        backgroundColor: 'var(--color-off-white)',
+        backgroundColor: 'var(--color-off-white, #FDFCF8)',
+        borderTop: '1px solid var(--color-nude, #E3DBCC)',
+        position: 'relative',
+        overflow: 'hidden',
+        padding: 'clamp(100px, 8.5vw, 140px) 0',
       }}
     >
-      <div className="container">
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: 'clamp(3rem, 6vw, 6rem)',
-            alignItems: 'center',
-          }}
-        >
-          {/* Left: Photographer Portrait Placeholder & Quote */}
-          <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                borderRadius: '24px',
-                overflow: 'hidden',
-                boxShadow: 'var(--shadow-spotlight)',
-                border: '1px solid var(--color-nude)',
-              }}
-            >
-              <PhotoPlaceholder
-                aspectRatio="4/5"
-                label="PHOTOGRAPHER PORTRAIT — TO BE ADDED"
-                meta="Édouard Vauquelin · Studio Portrait · 35mm Tri-X"
-                title="Atelier Paris, 2026"
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '1440px',
+          margin: '0 auto',
+          paddingLeft: 'clamp(24px, 5.5vw, 80px)',
+          paddingRight: 'clamp(24px, 5.5vw, 80px)',
+          position: 'relative',
+        }}
+      >
+        {/* Main Editorial Grid: Left Photo Composition / Right Editorial Persona */}
+        <div className="about-editorial-grid">
+          {/* =========================================================
+              LEFT COLUMN: Offset Portrait & Editorial Framing
+              ========================================================= */}
+          <div className="about-portrait-col">
+            <div className="about-portrait-wrapper">
+              {/* Warm Nude/Ivory Accent Backdrop Block (Offset Top-Left) */}
+              <div
+                className="about-accent-block"
+                aria-hidden="true"
               />
+
+              {/* Single Photographer Portrait Image Placeholder */}
+              <div className="about-portrait-frame">
+                <PhotoPlaceholder
+                  imageUrl={imageUrl}
+                  aspectRatio="4/5"
+                  label="DISHANT · PORTRAIT"
+                  meta="DS PHOTOGRAPHY & FILMS"
+                  title="Studio Portrait"
+                  borderRadius="14px"
+                  dark={false}
+                />
+              </div>
             </div>
 
-            {/* Floating Quote Card */}
-            <div
-              style={{
-                position: 'relative',
-                marginTop: '-2.5rem',
-                marginRight: 'auto',
-                marginLeft: '1.5rem',
-                maxWidth: '85%',
-                backgroundColor: 'var(--color-ivory)',
-                border: '1px solid var(--color-nude)',
-                borderRadius: '16px',
-                padding: '1.5rem 1.75rem',
-                boxShadow: 'var(--shadow-card)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <ScrollBlurCharReveal
-                as="p"
-                text="“To photograph is to hold one's breath when all faculties converge to captivate fleeting reality.”"
-                style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontSize: '1.2rem',
-                  fontStyle: 'italic',
-                  color: 'var(--color-obsidian)',
-                  lineHeight: 1.5,
-                  marginBottom: '0.5rem',
-                }}
-                blurAmount={10}
-                initialOpacity={0.16}
-                offset={['start 0.90', 'start 0.40']}
-              />
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.675rem',
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-obsidian-light)',
-                  fontWeight: 600,
-                }}
-              >
-                — Édouard Vauquelin, Principal Photographer
+            {/* Bottom-left Editorial Tagline & Accent Rule */}
+            <div className="about-corner-tagline">
+              <span className="about-corner-text">
+                CAPTURING<br />WHAT MATTERS
               </span>
+              <span className="about-corner-rule" aria-hidden="true" />
             </div>
           </div>
 
-          {/* Right: Biography, Philosophy & Recognition */}
-          <div>
-            <span className="eyebrow" style={{ marginBottom: '1rem' }}>
-              The Studio
-            </span>
-            <ScrollBlurCharReveal
-              as="h2"
-              text="Stillness in an accelerated world."
-              style={{ marginBottom: '1.5rem' }}
-              blurAmount={14}
-              initialOpacity={0.14}
-              offset={['start 0.90', 'start 0.40']}
-            />
-
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1.25rem',
-                fontSize: '1.05rem',
-                lineHeight: 1.75,
-                color: 'var(--color-obsidian-muted)',
-                marginBottom: '2.5rem',
-              }}
-            >
-              <p>
-                Founded in Paris in 2014, Maison Édouard is an editorial and fine art photography studio dedicated to the purist traditions of medium-format and large-format capture. We work exclusively with natural ambient light and deliberate spatial geometry.
-              </p>
-              <p>
-                Whether documenting a private brutalist residence in the Swiss Alps or crafting an haute couture campaign for European fashion houses, our process rejects haste in favor of contemplative composition, tonal purity, and museum-grade archival permanence.
-              </p>
-            </div>
-
-            {/* Atelier Metrics */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '1.5rem',
-                padding: '1.75rem 0',
-                borderTop: '1px solid var(--color-nude)',
-                borderBottom: '1px solid var(--color-nude)',
-                marginBottom: '2.5rem',
-              }}
-            >
-              <div>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontSize: '2.25rem',
-                    color: 'var(--color-obsidian)',
-                    fontWeight: 500,
-                    lineHeight: 1,
-                    display: 'block',
-                    marginBottom: '0.25rem',
-                  }}
-                >
-                  12+
-                </span>
-                <span style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-obsidian-light)' }}>
-                  Years Atelier Craft
+          {/* =========================================================
+              RIGHT COLUMN: Editorial Content & Typography
+              ========================================================= */}
+          <div className="about-content-col">
+            {/* Top Row: Label & Arched Typography Stamp */}
+            <div className="about-header-row">
+              <div className="about-label-wrap">
+                <span className="about-section-label">
+                  ABOUT THE PHOTOGRAPHER
                 </span>
               </div>
-              <div>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontSize: '2.25rem',
-                    color: 'var(--color-obsidian)',
-                    fontWeight: 500,
-                    lineHeight: 1,
-                    display: 'block',
-                    marginBottom: '0.25rem',
-                  }}
-                >
-                  24
-                </span>
-                <span style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-obsidian-light)' }}>
-                  Published Monographs
-                </span>
-              </div>
-              <div>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontSize: '2.25rem',
-                    color: 'var(--color-obsidian)',
-                    fontWeight: 500,
-                    lineHeight: 1,
-                    display: 'block',
-                    marginBottom: '0.25rem',
-                  }}
-                >
-                  3
-                </span>
-                <span style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-obsidian-light)' }}>
-                  Global Studios (FR · CH · US)
-                </span>
-              </div>
-            </div>
 
-            {/* Selected Exhibitions & Monograph Honors */}
-            <div>
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.7rem',
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-obsidian-light)',
-                  fontWeight: 600,
-                  display: 'block',
-                  marginBottom: '1rem',
-                }}
-              >
-                Selected Recognition & Folios
-              </span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-                {['Paris Photo Grand Palais', 'Venice Biennale Collateral', 'Hasselblad Masters Finalist', 'Vogue Italia Curation', 'Architectural Digest Award'].map((item, i) => (
-                  <span
-                    key={i}
+              {/* Arched "PHOTOGRAPHY × FILMS" Editorial Stamp */}
+              <div className="about-arch-stamp" aria-hidden="true">
+                <svg
+                  viewBox="0 0 160 80"
+                  style={{
+                    width: '130px',
+                    height: '65px',
+                    overflow: 'visible',
+                  }}
+                >
+                  <path
+                    id="archPath"
+                    d="M 15,75 A 65,65 0 0,1 145,75"
+                    fill="none"
+                  />
+                  <text
                     style={{
                       fontFamily: 'var(--font-sans)',
-                      fontSize: '0.775rem',
-                      letterSpacing: '0.08em',
-                      color: 'var(--color-obsidian)',
-                      backgroundColor: 'var(--color-ivory)',
-                      border: '1px solid var(--color-nude)',
-                      borderRadius: '999px',
-                      padding: '0.4rem 0.95rem',
+                      fontSize: '9.5px',
+                      letterSpacing: '0.28em',
+                      textTransform: 'uppercase',
+                      fill: 'var(--color-obsidian-light, #7A7770)',
+                      fontWeight: 600,
                     }}
                   >
-                    {item}
-                  </span>
-                ))}
+                    <textPath href="#archPath" startOffset="50%" textAnchor="middle">
+                      PHOTOGRAPHY × FILMS
+                    </textPath>
+                  </text>
+                </svg>
               </div>
             </div>
 
+            {/* Primary Editorial Heading */}
+            <h2 className="about-primary-heading">
+              Hi,<br />
+              I’m Dishant.
+            </h2>
+
+            {/* Supporting Storyteller Subheading */}
+            <p className="about-supporting-title">
+              Photographer & Visual Storyteller
+            </p>
+
+            {/* Minimal Editorial Text */}
+            <p className="about-description-text">
+              Capturing honest moments, meaningful stories, and the details that make each frame yours.
+            </p>
+
+            {/* Handwritten Signature Flourish */}
+            <div className="about-signature-wrap">
+              <span className="about-signature-text">
+                Dishant
+              </span>
+              <svg
+                width="130"
+                height="14"
+                viewBox="0 0 130 14"
+                fill="none"
+                className="about-signature-stroke"
+                aria-hidden="true"
+              >
+                <path
+                  d="M 2 10 C 35 3, 75 12, 128 4"
+                  stroke="var(--color-obsidian, #101010)"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  opacity="0.75"
+                />
+              </svg>
+            </div>
+
+            {/* Studio Identifier Metadata Bar (Factual DS Details Only) */}
+            <div className="about-studio-meta-grid">
+              <div className="about-meta-item">
+                <span className="about-meta-label">STUDIO</span>
+                <span className="about-meta-val">DS Photography & Films</span>
+              </div>
+              <div className="about-meta-divider" aria-hidden="true" />
+              <div className="about-meta-item">
+                <span className="about-meta-label">DISCIPLINE</span>
+                <span className="about-meta-val">Photography & Films</span>
+              </div>
+              <div className="about-meta-divider" aria-hidden="true" />
+              <div className="about-meta-item">
+                <span className="about-meta-label">APPROACH</span>
+                <span className="about-meta-val">Honest & Meaningful</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Right Margin Folio Index Indicator (Desktop) */}
+        <div className="about-side-folio" aria-hidden="true">
+          <span className="about-folio-num">01</span>
+          <span className="about-folio-sep">/</span>
+          <span className="about-folio-total">ABOUT</span>
+          <span className="about-folio-line" />
+        </div>
       </div>
+
+      {/* Scoped CSS for Editorial Typography, Grid & Responsive Spacing */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* Main 2-Column Asymmetric Composition */
+        .about-editorial-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: clamp(40px, 6vw, 80px);
+          align-items: center;
+        }
+
+        @media (min-width: 992px) {
+          .about-editorial-grid {
+            grid-template-columns: minmax(360px, 0.9fr) minmax(440px, 1.1fr);
+            gap: clamp(48px, 6vw, 96px);
+          }
+        }
+
+        /* Left Column: Portrait & Offset Block */
+        .about-portrait-col {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          width: 100%;
+          max-width: 480px;
+          margin: 0 auto;
+        }
+
+        .about-portrait-wrapper {
+          position: relative;
+          width: 100%;
+          padding-top: 24px;
+          padding-left: 24px;
+        }
+
+        @media (max-width: 640px) {
+          .about-portrait-wrapper {
+            padding-top: 16px;
+            padding-left: 16px;
+          }
+        }
+
+        /* Offset Warm Nude Accent Block */
+        .about-accent-block {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 72%;
+          height: 72%;
+          background-color: var(--color-nude, #E3DBCC);
+          opacity: 0.75;
+          border-radius: 12px;
+          z-index: 1;
+        }
+
+        /* Main Portrait Frame with Subtle Rounded Corners */
+        .about-portrait-frame {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          border-radius: 14px;
+          overflow: hidden;
+          box-shadow: 0 20px 45px -15px rgba(16, 16, 16, 0.08);
+          border: 1px solid var(--color-nude, #E3DBCC);
+          background-color: var(--color-ivory, #F3F0E9);
+        }
+
+        /* Bottom-Left Corner Tagline */
+        .about-corner-tagline {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-top: 32px;
+          padding-left: 24px;
+        }
+
+        @media (max-width: 640px) {
+          .about-corner-tagline {
+            padding-left: 16px;
+            margin-top: 24px;
+          }
+        }
+
+        .about-corner-text {
+          font-family: var(--font-sans);
+          font-size: 0.65rem;
+          line-height: 1.4;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--color-obsidian-light, #7A7770);
+          font-weight: 600;
+        }
+
+        .about-corner-rule {
+          display: inline-block;
+          width: 32px;
+          height: 1px;
+          background-color: var(--color-nude, #E3DBCC);
+        }
+
+        /* Right Column: Content */
+        .about-content-col {
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          z-index: 2;
+        }
+
+        /* Header Row: Label & Arched Stamp */
+        .about-header-row {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          margin-bottom: clamp(16px, 2.5vw, 28px);
+        }
+
+        .about-section-label {
+          font-family: var(--font-sans);
+          font-size: 0.725rem;
+          text-transform: uppercase;
+          letter-spacing: 0.24em;
+          color: var(--color-obsidian-light, #7A7770);
+          font-weight: 600;
+          display: inline-block;
+        }
+
+        .about-arch-stamp {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          margin-top: -12px;
+          user-select: none;
+          pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+          .about-arch-stamp {
+            transform: scale(0.85);
+            transform-origin: right top;
+          }
+        }
+
+        /* Large Editorial Heading */
+        .about-primary-heading {
+          font-family: var(--font-serif);
+          font-size: clamp(2.75rem, 5.8vw, 5.25rem);
+          line-height: 1.05;
+          font-weight: 400;
+          color: var(--color-obsidian, #101010);
+          letter-spacing: -0.02em;
+          margin: 0 0 18px 0;
+        }
+
+        /* Supporting Title */
+        .about-supporting-title {
+          font-family: var(--font-serif);
+          font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+          font-style: italic;
+          color: var(--color-obsidian, #101010);
+          line-height: 1.35;
+          margin: 0 0 16px 0;
+        }
+
+        /* Description */
+        .about-description-text {
+          font-family: var(--font-sans);
+          font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+          line-height: 1.75;
+          color: var(--color-obsidian-muted, #4A4844);
+          max-width: 460px;
+          margin: 0 0 28px 0;
+        }
+
+        /* Signature Flourish */
+        .about-signature-wrap {
+          display: inline-flex;
+          flex-direction: column;
+          align-items: flex-start;
+          margin-bottom: clamp(32px, 4vw, 48px);
+        }
+
+        .about-signature-text {
+          font-family: var(--font-script, 'Caveat', cursive);
+          font-size: clamp(2.2rem, 3.2vw, 2.75rem);
+          line-height: 1;
+          color: var(--color-obsidian, #101010);
+          transform: rotate(-3deg);
+          letter-spacing: 0.02em;
+          font-weight: 500;
+        }
+
+        .about-signature-stroke {
+          margin-top: 4px;
+          margin-left: 8px;
+        }
+
+        /* Studio Metadata Grid */
+        .about-studio-meta-grid {
+          display: flex;
+          align-items: center;
+          gap: clamp(16px, 2.5vw, 32px);
+          padding-top: clamp(20px, 2.5vw, 28px);
+          border-top: 1px solid var(--color-nude, #E3DBCC);
+          width: 100%;
+          max-width: 520px;
+        }
+
+        @media (max-width: 560px) {
+          .about-studio-meta-grid {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          }
+          .about-meta-divider {
+            display: none !important;
+          }
+        }
+
+        .about-meta-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .about-meta-label {
+          font-family: var(--font-sans);
+          font-size: 0.65rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--color-obsidian-light, #7A7770);
+          font-weight: 600;
+        }
+
+        .about-meta-val {
+          font-family: var(--font-sans);
+          font-size: 0.85rem;
+          letter-spacing: 0.04em;
+          color: var(--color-obsidian, #101010);
+          font-weight: 500;
+        }
+
+        .about-meta-divider {
+          width: 1px;
+          height: 32px;
+          background-color: var(--color-nude, #E3DBCC);
+        }
+
+        /* Desktop Side Folio Indicator */
+        .about-side-folio {
+          display: none;
+        }
+
+        @media (min-width: 1200px) {
+          .about-side-folio {
+            position: absolute;
+            right: clamp(24px, 4vw, 56px);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-sans);
+            font-size: 0.625rem;
+            letter-spacing: 0.2em;
+            color: var(--color-obsidian-light, #7A7770);
+            font-weight: 600;
+            user-select: none;
+          }
+
+          .about-folio-line {
+            width: 1px;
+            height: 48px;
+            background-color: var(--color-nude, #E3DBCC);
+            margin-top: 4px;
+          }
+        }
+      `}} />
     </section>
   );
 }
+
