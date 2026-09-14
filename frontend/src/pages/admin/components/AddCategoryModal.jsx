@@ -1,8 +1,104 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { 
+  X, Upload, Image as ImageIcon, Type, Link2, 
+  PenLine, Quote, Camera, MapPin, ArrowRight
+} from 'lucide-react';
 import { createCategory } from '../../../utils/categoryManager';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import '../AdminDashboard.css';
+
+/* ── Inline style objects (guarantees spacing regardless of Tailwind) ── */
+const styles = {
+  overlay: {
+    position: 'fixed', inset: 0, zIndex: 50,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: 24,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    backdropFilter: 'blur(4px)',
+    overflowY: 'auto',
+  },
+  modal: {
+    width: '100%', maxWidth: 580,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    border: '1px solid #E8E2D8',
+    boxShadow: '0 25px 60px rgba(0,0,0,0.15)',
+    overflow: 'hidden',
+    margin: '24px 0',
+  },
+  header: {
+    display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+    padding: '28px 32px 16px 32px',
+  },
+  closeBtn: {
+    width: 36, height: 36, borderRadius: '50%', border: 'none',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: 'transparent', color: '#8E887E', cursor: 'pointer',
+    flexShrink: 0, marginLeft: 12,
+    transition: 'all 0.2s',
+  },
+  formBody: {
+    padding: '0 32px 28px 32px',
+  },
+  label: {
+    display: 'block', fontSize: 10.5, fontWeight: 700,
+    color: '#44403C', textTransform: 'uppercase',
+    letterSpacing: '0.1em', marginBottom: 8,
+  },
+  inputRow: {
+    display: 'flex', alignItems: 'center',
+    width: '100%', height: 48, borderRadius: 12,
+    border: '1px solid #E0DAD0', backgroundColor: '#F7F5F1',
+    padding: '0 16px', gap: 14,
+    transition: 'all 0.2s',
+  },
+  iconBadge: {
+    width: 32, height: 32, borderRadius: 8,
+    backgroundColor: '#EBE6DD', display: 'flex',
+    alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0, color: '#6B6560',
+  },
+  input: {
+    flex: 1, minWidth: 0, height: '100%',
+    background: 'transparent', border: 'none', outline: 'none',
+    fontSize: 13, color: '#1C1917', fontFamily: 'inherit',
+  },
+  fieldGap: { marginBottom: 18 },
+  twoCol: {
+    display: 'grid', gridTemplateColumns: '1fr 1fr',
+    gap: 20, marginBottom: 18,
+  },
+  footer: {
+    display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+    gap: 12, paddingTop: 18,
+    borderTop: '1px solid #EBE6DD',
+  },
+  cancelBtn: {
+    padding: '0 20px', height: 40, borderRadius: 10,
+    border: 'none', background: 'transparent',
+    fontSize: 13, fontWeight: 500, color: '#5C5852',
+    cursor: 'pointer', transition: 'all 0.2s',
+  },
+  submitBtn: {
+    padding: '0 22px', height: 40, borderRadius: 10,
+    border: 'none', backgroundColor: '#1C1917',
+    fontSize: 13, fontWeight: 500, color: '#fff',
+    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+    transition: 'all 0.2s',
+  },
+  uploadArea: {
+    border: '2px dashed #DDD8CD', borderRadius: 14,
+    textAlign: 'center', cursor: 'pointer',
+    padding: '32px 24px', backgroundColor: 'rgba(250,248,245,0.6)',
+    transition: 'all 0.2s',
+  },
+  uploadAreaWithPreview: {
+    border: '2px dashed #C5BFAF', borderRadius: 14,
+    textAlign: 'center', cursor: 'pointer',
+    padding: 16, backgroundColor: '#FAF8F5',
+    transition: 'all 0.2s',
+  },
+};
 
 export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
   const { getAuthHeaders } = useAdminAuth();
@@ -14,7 +110,6 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
   const [medium, setMedium] = useState('');
   const [location, setLocation] = useState('');
   
-  // Cover photo state ("category ka photo")
   const [coverFile, setCoverFile] = useState(null);
   const [coverPreview, setCoverPreview] = useState('');
   const [directCoverUrl, setDirectCoverUrl] = useState('');
@@ -29,8 +124,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
     const val = e.target.value;
     setName(val);
     const generatedSlug = val
-      .toLowerCase()
-      .trim()
+      .toLowerCase().trim()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)+/g, '');
     setSlug(generatedSlug);
@@ -38,18 +132,10 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
 
   useEffect(() => {
     if (!isOpen) {
-      setName('');
-      setSlug('');
-      setTagline('');
-      setQuote('');
-      setMedium('');
-      setLocation('');
-      setCoverFile(null);
-      setCoverPreview('');
-      setDirectCoverUrl('');
-      setUseDirectUrl(false);
-      setError('');
-      setSubmitting(false);
+      setName(''); setSlug(''); setTagline(''); setQuote('');
+      setMedium(''); setLocation('');
+      setCoverFile(null); setCoverPreview(''); setDirectCoverUrl('');
+      setUseDirectUrl(false); setError(''); setSubmitting(false);
     }
   }, [isOpen]);
 
@@ -58,39 +144,21 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file (JPG, PNG, WEBP).');
-      return;
+      setError('Please select a valid image file (JPG, PNG, WEBP).'); return;
     }
-
-    setCoverFile(file);
-    setError('');
-
+    setCoverFile(file); setError('');
     const reader = new FileReader();
-    reader.onload = (event) => {
-      setCoverPreview(event.target.result);
-    };
+    reader.onload = (ev) => setCoverPreview(ev.target.result);
     reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    if (!name.trim()) {
-      setError('Please enter a category title.');
-      return;
-    }
-
+    e.preventDefault(); setError('');
+    if (!name.trim()) { setError('Please enter a category title.'); return; }
     const effectiveCover = coverFile ? coverPreview : directCoverUrl.trim();
-    if (!effectiveCover) {
-      setError('Please upload a category cover photo or enter an image URL.');
-      return;
-    }
-
+    if (!effectiveCover) { setError('Please upload a cover photo or enter an image URL.'); return; }
     setSubmitting(true);
-
     try {
       let payload;
       if (coverFile) {
@@ -107,256 +175,188 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
           name: name.trim(),
           slug: slug.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
           coverImage: directCoverUrl.trim(),
-          tagline: tagline.trim(),
-          quote: quote.trim(),
-          medium: medium.trim(),
-          location: location.trim(),
+          tagline: tagline.trim(), quote: quote.trim(),
+          medium: medium.trim(), location: location.trim(),
         };
       }
-
       const created = await createCategory(payload, getAuthHeaders());
-      if (onSuccess) {
-        onSuccess(created);
-      }
+      if (onSuccess) onSuccess(created);
       onClose();
     } catch (err) {
       console.error('Failed to create category:', err);
       setError(err.message || 'Failed to create category.');
-    } finally {
-      setSubmitting(false);
-    }
+    } finally { setSubmitting(false); }
   };
 
-  return (
+  /* ── Reusable input field component ── */
+  const InputField = ({ icon: Icon, placeholder, value, onChange, type = 'text', required = false }) => (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in overflow-y-auto"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !submitting) onClose();
-      }}
+      style={styles.inputRow}
+      onFocus={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#1C1917'; }}
+      onBlur={(e) => { e.currentTarget.style.backgroundColor = '#F7F5F1'; e.currentTarget.style.borderColor = '#E0DAD0'; }}
     >
-      <div
-        className="w-full max-w-[560px] bg-white rounded-2xl border border-[#E8E2D6] shadow-2xl overflow-hidden my-8"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#E8E2D6]">
+      <div style={styles.iconBadge}>
+        <Icon size={14} />
+      </div>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        required={required}
+        style={styles.input}
+      />
+    </div>
+  );
+
+  return (
+    <div style={styles.overlay} onClick={(e) => { if (e.target === e.currentTarget && !submitting) onClose(); }}>
+      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+
+        {/* ─── Header ─── */}
+        <div style={styles.header}>
           <div>
-            <span className="admin-eyebrow block text-[10px] tracking-[0.2em] text-[#7A756D] uppercase font-semibold">
+            <div style={{ fontSize: 10, letterSpacing: '0.2em', color: '#8E887E', textTransform: 'uppercase', fontWeight: 600, marginBottom: 4 }}>
               COLLECTION SETUP
-            </span>
-            <h3 className="font-serif text-[22px] text-[#181818] font-normal mt-0.5">
+            </div>
+            <h3 style={{ fontSize: 26, color: '#1C1917', fontWeight: 400, lineHeight: 1.2, margin: 0, fontFamily: "'Playfair Display', Georgia, serif" }}>
               Add New Category
             </h3>
+            <p style={{ fontSize: 13, color: '#8E887E', marginTop: 6, marginBottom: 0 }}>
+              Create a new collection category to organize your work beautifully.
+            </p>
           </div>
           <button
-            type="button"
-            onClick={onClose}
-            disabled={submitting}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-[#8E887E] hover:text-[#181818] hover:bg-[#F0EAE0] transition-colors cursor-pointer"
+            type="button" onClick={onClose} disabled={submitting}
+            style={styles.closeBtn}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F0EBE3'; e.currentTarget.style.color = '#1C1917'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#8E887E'; }}
+            aria-label="Close"
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        {/* ─── Form ─── */}
+        <form onSubmit={handleSubmit} style={styles.formBody}>
+
+          {/* Error */}
           {error && (
-            <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-[12px] rounded-lg">
+            <div style={{ marginBottom: 16, padding: 12, backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#B91C1C', fontSize: 12, borderRadius: 10 }}>
               {error}
             </div>
           )}
 
-          {/* 1. Category Cover Photo ("category ka photo") */}
-          <div>
-            <label className="block text-[12px] font-medium text-[#181818] uppercase tracking-[0.08em] mb-2">
-              Category Cover Photo <span className="text-red-500">*</span>
-            </label>
-
+          {/* ── 1. Cover Photo Upload ── */}
+          <div style={styles.fieldGap}>
             {!useDirectUrl ? (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className={`relative border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-colors ${
-                  coverPreview
-                    ? 'border-[#181818] bg-[#FAF8F5]'
-                    : 'border-[#E8E2D6] hover:border-[#181818] bg-[#FAF8F5]/50'
-                }`}
+                style={coverPreview ? styles.uploadAreaWithPreview : styles.uploadArea}
+                onMouseEnter={(e) => { if (!coverPreview) e.currentTarget.style.borderColor = '#AAA49A'; }}
+                onMouseLeave={(e) => { if (!coverPreview) e.currentTarget.style.borderColor = '#DDD8CD'; }}
               >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/avif"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={handleFileChange} style={{ display: 'none' }} />
 
                 {coverPreview ? (
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="relative w-full h-[180px] rounded-lg overflow-hidden border border-[#E8E2D6] bg-black/5">
-                      <img
-                        src={coverPreview}
-                        alt="Category Cover Preview"
-                        className="w-full h-full object-cover"
-                      />
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: '100%', height: 160, borderRadius: 10, overflow: 'hidden', border: '1px solid #E8E2D6' }}>
+                      <img src={coverPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </div>
-                    <span className="text-[12px] text-[#181818] font-medium hover:underline">
-                      Click to choose a different photo
+                    <span style={{ fontSize: 12, color: '#5C5852', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <Upload size={12} /> Click to choose a different photo
                     </span>
                   </div>
                 ) : (
-                  <div className="py-6 flex flex-col items-center gap-2">
-                    <div className="w-11 h-11 rounded-full bg-[#EFEAE2] flex items-center justify-center text-[#181818]">
-                      <Upload size={18} />
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: '#EBE6DD', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6B6560', marginBottom: 12 }}>
+                      <ImageIcon size={18} strokeWidth={1.5} />
                     </div>
-                    <span className="text-[13px] font-medium text-[#181818]">
-                      Upload Category Cover Photo
-                    </span>
-                    <span className="text-[11px] text-[#8E887E]">
-                      JPG, PNG, or WEBP (featured on public collection ribbon)
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1C1917' }}>Upload Category Cover Photo</span>
+                    <span style={{ fontSize: 11, color: '#8E887E', marginTop: 4 }}>
+                      JPG, PNG, or WEBP&nbsp;&nbsp;(featured on public collection ribbon)
                     </span>
                   </div>
                 )}
               </div>
             ) : (
               <div>
-                <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/..."
-                  value={directCoverUrl}
-                  onChange={(e) => setDirectCoverUrl(e.target.value)}
-                  className="w-full h-[42px] px-3.5 border border-[#E8E2D6] rounded-lg text-[13px] text-[#181818] bg-white outline-none focus:border-[#181818]"
-                />
+                <InputField icon={Link2} placeholder="https://images.unsplash.com/..." value={directCoverUrl} onChange={(e) => setDirectCoverUrl(e.target.value)} type="url" />
                 {directCoverUrl && (
-                  <div className="mt-2.5 h-[140px] rounded-lg overflow-hidden border border-[#E8E2D6]">
-                    <img
-                      src={directCoverUrl}
-                      alt="Cover Preview"
-                      className="w-full h-full object-cover"
-                      onError={() => setError('Invalid image URL')}
-                    />
+                  <div style={{ marginTop: 12, height: 140, borderRadius: 10, overflow: 'hidden', border: '1px solid #E8E2D6' }}>
+                    <img src={directCoverUrl} alt="Cover Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => setError('Invalid image URL')} />
                   </div>
                 )}
               </div>
             )}
 
             <button
-              type="button"
-              onClick={() => setUseDirectUrl(!useDirectUrl)}
-              className="text-[11px] text-[#8E887E] hover:text-[#181818] mt-2 underline cursor-pointer"
+              type="button" onClick={() => setUseDirectUrl(!useDirectUrl)}
+              style={{ marginTop: 10, fontSize: 11.5, color: '#7A756D', background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, padding: 0 }}
             >
-              {useDirectUrl ? '← Upload photo file instead' : 'Or enter an image URL directly →'}
+              <Link2 size={11} />
+              <span style={{ textDecoration: 'underline', textUnderlineOffset: 2 }}>
+                {useDirectUrl ? 'Upload photo file instead' : 'Or enter an image URL directly →'}
+              </span>
             </button>
           </div>
 
-          {/* 2. Category Name & Slug */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* ── 2. Category Title + URL Slug ── */}
+          <div style={styles.twoCol}>
             <div>
-              <label className="block text-[12px] font-medium text-[#181818] uppercase tracking-[0.08em] mb-1.5">
-                Category Title <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Maternity, Fashion"
-                value={name}
-                onChange={handleNameChange}
-                required
-                className="w-full h-[42px] px-3.5 border border-[#E8E2D6] rounded-lg text-[13px] text-[#181818] bg-white outline-none focus:border-[#181818]"
-              />
+              <label style={styles.label}>Category Title <span style={{ color: '#EF4444' }}>*</span></label>
+              <InputField icon={Type} placeholder="e.g. Maternity, Fashion" value={name} onChange={handleNameChange} required />
             </div>
-
             <div>
-              <label className="block text-[12px] font-medium text-[#181818] uppercase tracking-[0.08em] mb-1.5">
-                URL Slug
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. maternity"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value.toLowerCase())}
-                className="w-full h-[42px] px-3.5 border border-[#E8E2D6] rounded-lg text-[13px] text-[#181818] bg-white outline-none focus:border-[#181818]"
-              />
+              <label style={styles.label}>URL Slug</label>
+              <InputField icon={Link2} placeholder="e.g. maternity" value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase())} />
             </div>
           </div>
 
-          {/* 3. Tagline & Philosophy */}
-          <div>
-            <label className="block text-[12px] font-medium text-[#181818] uppercase tracking-[0.08em] mb-1.5">
-              Tagline (Short Summary)
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Intimate moments and joyous new beginnings."
-              value={tagline}
-              onChange={(e) => setTagline(e.target.value)}
-              className="w-full h-[42px] px-3.5 border border-[#E8E2D6] rounded-lg text-[13px] text-[#181818] bg-white outline-none focus:border-[#181818]"
-            />
+          {/* ── 3. Tagline ── */}
+          <div style={styles.fieldGap}>
+            <label style={styles.label}>Tagline (Short Summary)</label>
+            <InputField icon={PenLine} placeholder="e.g. Intimate moments and joyous new beginnings." value={tagline} onChange={(e) => setTagline(e.target.value)} />
           </div>
 
-          <div>
-            <label className="block text-[12px] font-medium text-[#181818] uppercase tracking-[0.08em] mb-1.5">
-              Quote / Editorial Note
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Life celebrated in every quiet frame."
-              value={quote}
-              onChange={(e) => setQuote(e.target.value)}
-              className="w-full h-[42px] px-3.5 border border-[#E8E2D6] rounded-lg text-[13px] text-[#181818] bg-white outline-none focus:border-[#181818]"
-            />
+          {/* ── 4. Quote ── */}
+          <div style={styles.fieldGap}>
+            <label style={styles.label}>Quote / Editorial Note</label>
+            <InputField icon={Quote} placeholder="e.g. Life celebrated in every quiet frame." value={quote} onChange={(e) => setQuote(e.target.value)} />
           </div>
 
-          {/* 4. Medium & Location (Optional) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* ── 5. Medium + Location ── */}
+          <div style={{ ...styles.twoCol, marginBottom: 24 }}>
             <div>
-              <label className="block text-[12px] font-medium text-[#181818] uppercase tracking-[0.08em] mb-1.5">
-                Medium / Gear (Optional)
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Leica M11 · 35mm Summilux"
-                value={medium}
-                onChange={(e) => setMedium(e.target.value)}
-                className="w-full h-[42px] px-3.5 border border-[#E8E2D6] rounded-lg text-[13px] text-[#181818] bg-white outline-none focus:border-[#181818]"
-              />
+              <label style={styles.label}>Medium / Gear (Optional)</label>
+              <InputField icon={Camera} placeholder="e.g. Leica M11 · 35mm Summilux" value={medium} onChange={(e) => setMedium(e.target.value)} />
             </div>
-
             <div>
-              <label className="block text-[12px] font-medium text-[#181818] uppercase tracking-[0.08em] mb-1.5">
-                Location (Optional)
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Mumbai & Private Studios"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full h-[42px] px-3.5 border border-[#E8E2D6] rounded-lg text-[13px] text-[#181818] bg-white outline-none focus:border-[#181818]"
-              />
+              <label style={styles.label}>Location (Optional)</label>
+              <InputField icon={MapPin} placeholder="e.g. Mumbai & Private Studios" value={location} onChange={(e) => setLocation(e.target.value)} />
             </div>
           </div>
 
-          {/* Footer Actions */}
-          <div className="pt-4 border-t border-[#E8E2D6] flex items-center justify-end gap-3">
+          {/* ── Footer ── */}
+          <div style={styles.footer}>
             <button
-              type="button"
-              onClick={onClose}
-              disabled={submitting}
-              className="px-4 h-[38px] rounded-lg border border-[#E8E2D6] text-[#5C5852] hover:text-[#181818] hover:bg-[#FAF8F5] text-[12px] font-medium transition-colors cursor-pointer"
+              type="button" onClick={onClose} disabled={submitting}
+              style={styles.cancelBtn}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F0EBE3'; e.currentTarget.style.color = '#1C1917'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#5C5852'; }}
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="px-5 h-[38px] rounded-lg bg-[#101010] text-white hover:bg-[#252525] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-            >
+            <button type="submit" disabled={submitting} style={{ ...styles.submitBtn, opacity: submitting ? 0.5 : 1 }}>
               {submitting ? (
                 <>
-                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Creating...</span>
+                  <span style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.6s linear infinite', display: 'inline-block' }} />
+                  <span>Adding…</span>
                 </>
               ) : (
                 <>
-                  <Sparkles size={14} />
-                  <span>Create Category</span>
+                  <span>Add Category</span>
+                  <ArrowRight size={14} />
                 </>
               )}
             </button>
