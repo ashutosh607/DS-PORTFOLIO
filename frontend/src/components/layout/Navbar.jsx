@@ -33,7 +33,7 @@ export default function Navbar({ onOpenInquiry }) {
   const socialItems = [
     { label: 'Instagram', link: 'https://instagram.com' },
     { label: 'WhatsApp', link: 'https://wa.me/919876543210' },
-    { label: 'Inquiries', link: 'mailto:hello@ravenandlens.com' },
+    { label: 'Inquiries', link: 'mailto:contact@dsphotography.com' },
   ];
 
   useEffect(() => {
@@ -126,37 +126,9 @@ export default function Navbar({ onOpenInquiry }) {
         >
           <Logo
             variant="dark"
-            height={scrolled ? 34 : 38}
+            height={scrolled ? 36 : 42}
             withText={false}
           />
-          <div className="flex flex-col text-left">
-            <span
-              style={{
-                fontFamily: 'var(--font-serif)',
-                fontSize: '1.05rem',
-                letterSpacing: '0.14em',
-                fontWeight: 500,
-                lineHeight: 1.1,
-                color: '#1E1B18',
-                textTransform: 'uppercase',
-              }}
-            >
-              RAVEN &amp; LENS
-            </span>
-            <span
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.55rem',
-                letterSpacing: '0.28em',
-                fontWeight: 600,
-                color: '#7A6E5D',
-                textTransform: 'uppercase',
-                marginTop: '1px',
-              }}
-            >
-              PHOTOGRAPHY
-            </span>
-          </div>
         </a>
 
         {/* Desktop Navigation Links */}

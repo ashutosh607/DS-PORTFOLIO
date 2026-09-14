@@ -1,5 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
+import Logo from './Logo';
 import './StaggeredMenu.css';
 
 export const StaggeredMenu = ({
@@ -437,20 +438,7 @@ export const StaggeredMenu = ({
                 height={32}
               />
             ) : (
-              <div className="flex flex-col text-left">
-                <span
-                  style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontSize: '0.95rem',
-                    letterSpacing: '0.14em',
-                    fontWeight: 500,
-                    color: '#1E1B18',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  RAVEN &amp; LENS
-                </span>
-              </div>
+              <Logo variant="dark" height={30} withText={false} />
             )}
           </div>
         )}

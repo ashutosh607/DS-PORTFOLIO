@@ -366,7 +366,7 @@ export default function CommissionSummaryCard({
           &ldquo;We photograph people not as they pose for the mirror, but as they exist within the quiet gravity of a memory.&rdquo;
         </blockquote>
         <div className="font-sans text-[10px] font-semibold tracking-[0.2em] text-[#7A7770] uppercase">
-          JULIAN &amp; CLARA RAVEN — CREATIVE DIRECTORS
+          DS PHOTOGRAPHY &amp; FILMS — CREATIVE DIRECTORS
         </div>
       </div>
     </div>
