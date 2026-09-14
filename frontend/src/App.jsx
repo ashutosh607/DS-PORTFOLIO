@@ -7,6 +7,9 @@ import ServicesPage from './pages/services/ServicesPage';
 import Footer from './components/layout/Footer';
 import InquiryModal from './components/modals/InquiryModal';
 import { PageTransitionProvider } from './components/common/PageTransition';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import NotFoundPage from './pages/error/NotFoundPage';
+import ErrorPage from './pages/error/ErrorPage';
 
 // Admin Panel imports
 import { AdminAuthProvider } from './pages/admin/context/AdminAuthContext';
@@ -34,6 +37,14 @@ export default function App() {
   const location = useLocation();
 
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isErrorOrNotFoundRoute =
+    location.pathname === '/error' ||
+    (!isAdminRoute &&
+      location.pathname !== '/' &&
+      !location.pathname.startsWith('/collections') &&
+      location.pathname !== '/services');
+
+  const showPublicChrome = !isAdminRoute && !isErrorOrNotFoundRoute;
 
   const handleOpenInquiry = (tier = '') => {
     setSelectedTier(tier);
@@ -46,61 +57,69 @@ export default function App() {
   };
 
   return (
-    <AdminAuthProvider>
-      <PageTransitionProvider>
-        <div className="portfolio-app-root">
-          {/* Auto scroll to top on navigation */}
-          <ScrollToTop />
+    <ErrorBoundary>
+      <AdminAuthProvider>
+        <PageTransitionProvider>
+          <div className="portfolio-app-root">
+            {/* Auto scroll to top on navigation */}
+            <ScrollToTop />
 
-          {/* 1. Minimal luxury navigation (only on public site) */}
-          {!isAdminRoute && <Navbar onOpenInquiry={() => handleOpenInquiry()} />}
+            {/* 1. Minimal luxury navigation (only on public site) */}
+            {showPublicChrome && <Navbar onOpenInquiry={() => handleOpenInquiry()} />}
 
-          {/* Multi-route content: Public + Admin routes */}
-          <Routes>
-            {/* Public Portfolio Routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route
-              path="/collections"
-              element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
-            />
-            <Route
-              path="/collections/:categorySlug"
-              element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
-            />
-            <Route path="/services" element={<ServicesPage />} />
+            {/* Multi-route content: Public + Admin routes */}
+            <Routes>
+              {/* Public Portfolio Routes */}
+              <Route path="/" element={<HomePage />} />
+              <Route
+                path="/collections"
+                element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
+              />
+              <Route
+                path="/collections/:categorySlug"
+                element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
+              />
+              <Route path="/services" element={<ServicesPage />} />
 
-            {/* Admin Authentication */}
-            <Route path="/admin/login" element={<AdminLoginPage />} />
+              {/* Dedicated Error Testing Route */}
+              <Route path="/error" element={<ErrorPage />} />
 
-            {/* Protected Admin Panel */}
-            <Route
-              path="/admin"
-              element={
-                <AdminProtectedRoute>
-                  <AdminLayout />
-                </AdminProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboardPage />} />
-              <Route path="collections" element={<AdminCollectionsPage />} />
-              <Route path="collections/:category" element={<AdminCollectionsPage />} />
-            </Route>
-          </Routes>
+              {/* Admin Authentication */}
+              <Route path="/admin/login" element={<AdminLoginPage />} />
 
-          {/* Minimal footer with CET studio time and social directory (only on public site) */}
-          {!isAdminRoute && <Footer onOpenInquiry={() => handleOpenInquiry()} />}
+              {/* Protected Admin Panel */}
+              <Route
+                path="/admin"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLayout />
+                  </AdminProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="dashboard" element={<AdminDashboardPage />} />
+                <Route path="collections" element={<AdminCollectionsPage />} />
+                <Route path="collections/:category" element={<AdminCollectionsPage />} />
+              </Route>
 
-          {/* Interactive Consultation / Inquiry Modal (only on public site) */}
-          {!isAdminRoute && (
-            <InquiryModal
-              isOpen={inquiryModalOpen}
-              onClose={handleCloseInquiry}
-              prefillTier={selectedTier}
-            />
-          )}
-        </div>
-      </PageTransitionProvider>
-    </AdminAuthProvider>
+              {/* 404 Page Not Found Route */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+
+            {/* Minimal footer with CET studio time and social directory (only on public site) */}
+            {showPublicChrome && <Footer onOpenInquiry={() => handleOpenInquiry()} />}
+
+            {/* Interactive Consultation / Inquiry Modal (only on public site) */}
+            {showPublicChrome && (
+              <InquiryModal
+                isOpen={inquiryModalOpen}
+                onClose={handleCloseInquiry}
+                prefillTier={selectedTier}
+              />
+            )}
+          </div>
+        </PageTransitionProvider>
+      </AdminAuthProvider>
+    </ErrorBoundary>
   );
 }

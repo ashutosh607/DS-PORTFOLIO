@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import Logo from '../layout/Logo';
 
 // Global Transition Context
 const TransitionContext = createContext({
@@ -32,7 +33,7 @@ export function PageTransitionProvider({ children }) {
     if (path === '/collections') return 'COLLECTIONS';
     if (path === '/services') return 'SERVICES';
     const clean = path.replace('/', '').toUpperCase();
-    return clean || 'RAVEN & LENS';
+    return clean || 'PORTFOLIO';
   };
 
   const navigateWithTransition = (to, customTitle) => {
@@ -130,8 +131,13 @@ export function PageTransitionProvider({ children }) {
 
           {/* Top Brand Tag */}
           <div className="relative z-10 w-full flex justify-between items-center max-w-[1280px] text-xs font-mono tracking-[0.25em] text-[#7A6E5D] uppercase select-none">
-            <span>RAVEN &amp; LENS</span>
-            <span>EDITION 2026</span>
+            <div className="flex items-center gap-3">
+              <Logo variant="dark" height={32} withText={false} />
+              <span className="font-serif tracking-[0.16em] text-[13px] text-[#1E1B18] font-medium hidden sm:inline">
+                DS PHOTOGRAPHY &amp; FILMS
+              </span>
+            </div>
+            <span className="text-[11px] tracking-[0.2em] text-[#7A6E5D]">EDITION 2026</span>
           </div>
 
           {/* Center Destination Title: RIGHT -> LEFT movement */}
@@ -175,7 +181,7 @@ export function PageTransitionProvider({ children }) {
           {/* Bottom Watermark */}
           <div className="relative z-10 w-full flex justify-between items-center max-w-[1280px] text-[10px] sm:text-xs font-mono tracking-[0.22em] text-[#8C8070] uppercase select-none">
             <span>FINE ART PHOTOGRAPHY &amp; CINEMA</span>
-            <span>STUDIO FOLIO</span>
+            <span>DS STUDIO FOLIO</span>
           </div>
         </motion.div>
       )}

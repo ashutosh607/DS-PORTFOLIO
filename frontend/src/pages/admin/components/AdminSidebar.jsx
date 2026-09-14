@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { Home, Folder, ExternalLink, User, LogOut } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import Logo from '../../../components/layout/Logo';
 import '../AdminDashboard.css';
 
 export default function AdminSidebar() {
@@ -23,14 +24,17 @@ export default function AdminSidebar() {
     <>
       {/* Mobile Top Bar */}
       <div className="lg:hidden flex items-center justify-between px-5 py-3.5 bg-[#FAF8F5] border-b border-[#E8E2D6] sticky top-0 z-40">
-        <div>
-          <span className="block text-[12px] tracking-[0.18em] text-[#181818] uppercase font-semibold">
-            STUDIO ADMIN
-          </span>
-          <span className="block text-[9px] tracking-[0.2em] text-[#7A756D] uppercase mt-0.5 font-medium">
-            DS PHOTOGRAPHY &amp; FILMS
-          </span>
-        </div>
+        <Link to="/admin/dashboard" className="flex items-center gap-2.5 no-underline">
+          <Logo variant="dark" height={28} withText={false} />
+          <div>
+            <span className="block text-[11px] tracking-[0.18em] text-[#181818] uppercase font-semibold">
+              STUDIO ADMIN
+            </span>
+            <span className="block text-[8.5px] tracking-[0.2em] text-[#7A756D] uppercase mt-0.5 font-medium">
+              DS PHOTOGRAPHY &amp; FILMS
+            </span>
+          </div>
+        </Link>
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -57,14 +61,17 @@ export default function AdminSidebar() {
       >
         {/* Brand Area */}
         <div>
-          <div className="mb-9 px-2">
-            <span className="block text-[13px] tracking-[0.22em] text-[#181818] uppercase font-semibold leading-tight">
-              STUDIO ADMIN
-            </span>
-            <span className="block text-[9px] tracking-[0.2em] text-[#7A756D] uppercase mt-2 font-medium">
-              DS PHOTOGRAPHY &amp; FILMS
-            </span>
-          </div>
+          <Link to="/admin/dashboard" className="mb-8 px-2 flex items-center gap-3 no-underline group block">
+            <Logo variant="dark" height={36} withText={false} />
+            <div>
+              <span className="block text-[12px] tracking-[0.22em] text-[#181818] uppercase font-semibold leading-tight group-hover:text-[#42392F] transition-colors">
+                STUDIO ADMIN
+              </span>
+              <span className="block text-[8.5px] tracking-[0.2em] text-[#7A756D] uppercase mt-1.5 font-medium">
+                DS PHOTOGRAPHY &amp; FILMS
+              </span>
+            </div>
+          </Link>
 
           {/* Navigation Links */}
           <nav className="space-y-1.5">

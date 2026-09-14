@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Camera } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAdminAuth } from './context/AdminAuthContext';
+import Logo from '../../components/layout/Logo';
 import './AdminLogin.css';
 
 export default function AdminLoginPage() {
@@ -58,11 +59,11 @@ export default function AdminLoginPage() {
     >
       {/* ─── Top Navigation ─── */}
       <header className="admin-login-header">
-        <Link to="/" className="admin-login-brand">
-          <Camera className="admin-login-brand-icon" strokeWidth={1.3} />
+        <Link to="/" className="admin-login-brand" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+          <Logo variant="dark" height={36} withText={false} />
           <div className="admin-login-brand-name">
-            <span className="admin-login-brand-title">Frame &amp; Feel</span>
-            <span className="admin-login-brand-sub">PHOTOGRAPHY</span>
+            <span className="admin-login-brand-title">DS Photography &amp; Films</span>
+            <span className="admin-login-brand-sub">STUDIO ADMIN</span>
           </div>
         </Link>
 
