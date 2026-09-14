@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { CATEGORIES as DEFAULT_CATEGORIES } from './data/collectionsData';
 import { useCategories } from '../../utils/categoryManager';
 import CollectionsHero from './components/CollectionsHero';
@@ -8,6 +8,10 @@ import CollectionsGallery from './components/CollectionsGallery';
 
 export default function CollectionsPage({ onOpenInquiry }) {
   const { categorySlug } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryCategory = searchParams.get('category');
+  const queryId = searchParams.get('id');
+
   const { categories: rawCategories } = useCategories();
   const baseCategories = (rawCategories && rawCategories.length > 0) ? rawCategories : DEFAULT_CATEGORIES;
   const [activeCategoryId, setActiveCategoryId] = useState('01');
@@ -15,21 +19,44 @@ export default function CollectionsPage({ onOpenInquiry }) {
   const categoriesRibbonRef = useRef(null);
   const galleryRevealRef = useRef(null);
 
-  // Sync with URL category slug (e.g. /collections/weddings)
+  // Sync with URL query string (e.g. /collections?category=weddings&id=...) or path param (/collections/weddings)
   useEffect(() => {
-    if (categorySlug) {
+    if (queryId) {
+      const matchedById = baseCategories.find((c) => c.id === queryId);
+      if (matchedById) {
+        setActiveCategoryId(matchedById.id);
+        return;
+      }
+    }
+    const targetSlug = queryCategory || categorySlug;
+    if (targetSlug) {
       const matched = baseCategories.find(
         (c) =>
-          c.slug?.toLowerCase() === categorySlug.toLowerCase() ||
-          c.name?.toLowerCase() === categorySlug.toLowerCase()
+          c.slug?.toLowerCase() === targetSlug.toLowerCase() ||
+          c.name?.toLowerCase() === targetSlug.toLowerCase()
       );
       if (matched) {
         setActiveCategoryId(matched.id);
+        return;
       }
-    } else if (baseCategories.length > 0 && !baseCategories.some((c) => c.id === activeCategoryId)) {
+    }
+    if (baseCategories.length > 0 && !baseCategories.some((c) => c.id === activeCategoryId)) {
       setActiveCategoryId(baseCategories[0].id);
     }
-  }, [categorySlug, baseCategories]);
+  }, [categorySlug, queryCategory, queryId, baseCategories]);
+
+  // Ensure professional query URL (?category=...&id=...) is set on initial load
+  useEffect(() => {
+    if (baseCategories.length > 0 && !searchParams.get('category') && !searchParams.get('id')) {
+      const current = baseCategories.find((c) => c.id === activeCategoryId) || baseCategories[0];
+      if (current) {
+        setSearchParams(
+          { category: current.slug || current.name.toLowerCase(), id: current.id },
+          { replace: true }
+        );
+      }
+    }
+  }, [baseCategories, activeCategoryId, searchParams, setSearchParams]);
 
   // Fetch dynamic collection media from backend API
   useEffect(() => {
@@ -144,6 +171,13 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
   const handleSelectCategory = (id) => {
     setActiveCategoryId(id);
+    const cat = baseCategories.find((c) => c.id === id);
+    if (cat) {
+      setSearchParams(
+        { category: cat.slug || cat.name.toLowerCase(), id: cat.id },
+        { replace: true }
+      );
+    }
     if (galleryRevealRef.current) {
       setTimeout(() => {
         galleryRevealRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });

@@ -66,23 +66,7 @@ export default function CollectionsGallery({
               }}
             >
               <div>
-                <div className="flex items-center gap-4 mb-2">
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-serif)',
-                      fontSize: '1.25rem',
-                      color: '#101010',
-                      fontWeight: 400,
-                    }}
-                  >
-                    {activeCategory.id}
-                  </span>
-                  <span
-                    className="h-[1px] bg-[#D1C8B8]"
-                    style={{
-                      width: 'clamp(36px, 5vw, 64px)',
-                    }}
-                  />
+                <div className="flex items-center gap-3 mb-2">
                   <h2
                     style={{
                       fontFamily: 'var(--font-serif)',
@@ -156,13 +140,10 @@ export default function CollectionsGallery({
                   {/* Gradient Overlay at Bottom */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,16,16,0.85)] via-[rgba(16,16,16,0.2)] to-transparent pointer-events-none" />
 
-                  {/* Bottom Metadata Overlay inside Master Frame */}
+                  {/* Bottom Metadata Overlay inside Master Frame (Random ID removed) */}
                   <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex items-end justify-between text-white pointer-events-none">
                     {/* Left: Frame Badge & Progress */}
                     <div className="flex items-center gap-2.5 bg-[rgba(16,16,16,0.7)] backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20">
-                      <span className="w-4.5 h-4.5 rounded-full border border-white/40 flex items-center justify-center font-mono text-[0.55rem] text-white">
-                        {activeCategory.id}
-                      </span>
                       <span className="font-mono text-[0.62rem] tracking-[0.16em] text-white/95">
                         {displayIndex < 10 ? `0${displayIndex}` : displayIndex} /{' '}
                         {totalCount < 10 ? `0${totalCount}` : totalCount}

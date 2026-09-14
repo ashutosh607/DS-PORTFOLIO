@@ -32,7 +32,7 @@ export default function CollectionsModal({
             <div className="p-6 sm:p-8 border-b border-[#E0D8CA] flex items-center justify-between">
               <div>
                 <span className="font-mono text-[0.65rem] tracking-[0.22em] text-[#8A857D] uppercase">
-                  Archival Contact Sheet · {activeCategory.id}
+                  Archival Contact Sheet
                 </span>
                 <h3
                   style={{

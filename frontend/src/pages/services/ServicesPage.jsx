@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { COLLECTIONS, CATEGORIES } from './data/servicesData';
 import CollectionTierCard from './components/CollectionTierCard';
 import AtelierStandards from './components/AtelierStandards';
@@ -11,7 +11,12 @@ import ConfirmationScreen from './components/ConfirmationScreen';
 import { handleWhatsAppSubmit } from '../../utils/whatsapp';
 
 export default function ServicesPage() {
-  const [stage, setStage] = useState(1); // 1 = Collections, 2 = Booking Form, 3 = Confirmation
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryCategory = searchParams.get('category');
+  const queryTier = searchParams.get('tier') || searchParams.get('id');
+  const queryStep = searchParams.get('step') || searchParams.get('action');
+
+  const [stage, setStage] = useState(queryStep === 'book' ? 2 : 1); // 1 = Collections, 2 = Booking Form, 3 = Confirmation
   const [selectedCategoryId, setSelectedCategoryId] = useState('wedding');
   const [selectedCollectionId, setSelectedCollectionId] = useState('signature');
   const [compareMatrixOpen, setCompareMatrixOpen] = useState(false);
@@ -19,6 +24,42 @@ export default function ServicesPage() {
   const [inquiryId, setInquiryId] = useState('RL-2025-D98');
 
   const location = useLocation();
+
+  // Sync state from URL query parameters
+  useEffect(() => {
+    if (queryCategory) {
+      const matchedCat = CATEGORIES.find(
+        (c) => c.id.toLowerCase() === queryCategory.toLowerCase()
+      );
+      if (matchedCat) {
+        setSelectedCategoryId(matchedCat.id);
+        updateFormData({
+          eventType: matchedCat.label === 'WEDDING' ? 'Wedding' : matchedCat.label,
+        });
+      }
+    }
+    if (queryTier) {
+      const matchedCol = COLLECTIONS.find(
+        (c) => c.id.toLowerCase() === queryTier.toLowerCase()
+      );
+      if (matchedCol) {
+        setSelectedCollectionId(matchedCol.id);
+      }
+    }
+    if (queryStep === 'book' || location.hash === '#book') {
+      setStage(2);
+    }
+  }, [queryCategory, queryTier, queryStep, location.hash]);
+
+  // Ensure professional query URL on initial load if none set
+  useEffect(() => {
+    if (!searchParams.get('category')) {
+      setSearchParams(
+        { category: selectedCategoryId, tier: selectedCollectionId },
+        { replace: true }
+      );
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -43,12 +84,16 @@ export default function ServicesPage() {
 
     const handleOpenBooking = () => {
       setStage(2);
+      setSearchParams(
+        { category: selectedCategoryId, tier: selectedCollectionId, step: 'book' },
+        { replace: true }
+      );
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.addEventListener('open-booking-form', handleOpenBooking);
     return () => window.removeEventListener('open-booking-form', handleOpenBooking);
-  }, [location]);
+  }, [location, selectedCategoryId, selectedCollectionId, setSearchParams]);
 
   const updateFormData = (fields) => {
     setFormData((prev) => ({ ...prev, ...fields }));
@@ -66,9 +111,14 @@ export default function ServicesPage() {
     const categoryCols = COLLECTIONS.filter((c) => c.category === categoryId);
     const signatureOrFirst =
       categoryCols.find((c) => c.highlight || c.isAtelierChoice) || categoryCols[0];
+    const newTier = signatureOrFirst ? signatureOrFirst.id : selectedCollectionId;
     if (signatureOrFirst) {
       setSelectedCollectionId(signatureOrFirst.id);
     }
+    setSearchParams(
+      { category: categoryId, tier: newTier },
+      { replace: true }
+    );
   };
 
   const filteredCollections = COLLECTIONS.filter(
@@ -86,12 +136,25 @@ export default function ServicesPage() {
     setSelectedCollectionId(collectionId);
     if (proceed) {
       setStage(2);
+      setSearchParams(
+        { category: selectedCategoryId, tier: collectionId, step: 'book' },
+        { replace: true }
+      );
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setSearchParams(
+        { category: selectedCategoryId, tier: collectionId },
+        { replace: true }
+      );
     }
   };
 
   const handleBackToCollections = () => {
     setStage(1);
+    setSearchParams(
+      { category: selectedCategoryId, tier: selectedCollectionId },
+      { replace: true }
+    );
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
