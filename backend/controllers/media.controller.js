@@ -44,14 +44,21 @@ const getMediaByCategory = asyncHandler(async (req, res) => {
  * @access  Protected (Admin)
  */
 const createMedia = asyncHandler(async (req, res) => {
-  const { category, title, caption, meta } = req.body;
-  let type = req.body.type || "photo";
+  const normalizedType = (req.body.type || "photo").toLowerCase().trim();
+  if (!["photo", "video"].includes(normalizedType)) {
+    throw new ApiError(400, "Invalid media type: must be 'photo' or 'video'");
+  }
+  let type = normalizedType;
 
   if (!category || !category.trim()) {
     throw new ApiError(400, "Collection category is required");
   }
 
   const normalizedCategory = category.toLowerCase().trim();
+  if (!/^[a-z0-9-]+$/.test(normalizedCategory)) {
+    throw new ApiError(400, "Invalid category slug format");
+  }
+
   let mediaUrl = req.body.url ? req.body.url.trim() : null;
   let publicId = "";
 
@@ -116,8 +123,15 @@ const updateMedia = asyncHandler(async (req, res) => {
 
   let mediaUrl = url ? url.trim() : (existingMedia ? existingMedia.url : "");
   let publicId = existingMedia ? existingMedia.publicId : "";
-  let mediaType = type || (existingMedia ? existingMedia.type : "photo");
+  let mediaType = type ? type.toLowerCase().trim() : (existingMedia ? existingMedia.type : "photo");
+  if (type && !["photo", "video"].includes(mediaType)) {
+    throw new ApiError(400, "Invalid media type: must be 'photo' or 'video'");
+  }
+
   const targetCategory = (category || existingMedia?.category || "weddings").toLowerCase().trim();
+  if (category && !/^[a-z0-9-]+$/.test(targetCategory)) {
+    throw new ApiError(400, "Invalid category slug format");
+  }
 
   // 1. Handle uploaded file if present
   if (req.file) {

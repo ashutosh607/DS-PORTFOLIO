@@ -40,7 +40,12 @@ export default function DeleteCategoryModal({ isOpen, onClose, onSuccess, catego
       }}
     >
       <div
-        className="w-full max-w-[480px] bg-[#FAF8F5] rounded-[24px] border border-[#E8E2D6] shadow-2xl p-7 relative overflow-hidden"
+        className="w-full max-w-[480px] rounded-[24px] shadow-2xl relative overflow-hidden"
+        style={{
+          backgroundColor: '#FAF8F5',
+          border: '1px solid #E8E2D6',
+          padding: '36px 32px',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -67,13 +72,13 @@ export default function DeleteCategoryModal({ isOpen, onClose, onSuccess, catego
         </h3>
 
         {/* Message */}
-        <p className="text-[13px] text-[#57534E] mt-2 leading-relaxed">
+        <p style={{ fontSize: '13px', color: '#57534E', marginTop: '10px', lineHeight: 1.7, padding: '0 4px' }}>
           Are you sure you want to delete this category? This will remove{' '}
-          <strong className="text-[#1C1917]">{category.name}</strong> from your collection categories.
+          <strong style={{ color: '#1C1917' }}>{category.name}</strong> from your collection categories.
         </p>
 
         {/* Category Preview Tag */}
-        <div className="mt-4 p-3 bg-white border border-[#E0D9CE] rounded-xl flex items-center gap-3">
+        <div style={{ marginTop: '18px', padding: '14px 16px', backgroundColor: '#fff', border: '1px solid #E0D9CE', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '14px' }}>
           <img
             src={category.coverImage || category.featured?.image}
             alt={category.name}
@@ -96,12 +101,14 @@ export default function DeleteCategoryModal({ isOpen, onClose, onSuccess, catego
         )}
 
         {/* Action Buttons */}
-        <div className="mt-6 flex items-center justify-end gap-3">
+        <div style={{ marginTop: '28px', paddingTop: '24px', borderTop: '1px solid rgba(232, 226, 214, 0.6)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '14px' }}>
           <button
             type="button"
             onClick={onClose}
             disabled={isDeleting}
-            className="px-5 py-2.5 rounded-xl bg-[#EFEAE2] hover:bg-[#E5DFD5] text-[#44403C] hover:text-[#1C1917] text-[13px] font-medium transition-colors cursor-pointer border-none"
+            style={{ padding: '10px 22px', borderRadius: '12px', backgroundColor: '#EFEAE2', color: '#44403C', fontSize: '13px', fontWeight: 500, cursor: isDeleting ? 'not-allowed' : 'pointer', border: 'none', transition: 'background-color 0.2s' }}
+            onMouseEnter={(e) => { if (!isDeleting) e.target.style.backgroundColor = '#E5DFD5'; }}
+            onMouseLeave={(e) => { e.target.style.backgroundColor = '#EFEAE2'; }}
           >
             Cancel
           </button>
@@ -109,7 +116,9 @@ export default function DeleteCategoryModal({ isOpen, onClose, onSuccess, catego
             type="button"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-[13px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            style={{ padding: '10px 22px', borderRadius: '12px', backgroundColor: '#B91C1C', color: '#FFFFFF', fontSize: '13px', fontWeight: 500, cursor: isDeleting ? 'not-allowed' : 'pointer', border: 'none', transition: 'background-color 0.2s', display: 'flex', alignItems: 'center', gap: '8px', opacity: isDeleting ? 0.5 : 1, boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }}
+            onMouseEnter={(e) => { if (!isDeleting) e.target.style.backgroundColor = '#991B1B'; }}
+            onMouseLeave={(e) => { e.target.style.backgroundColor = '#B91C1C'; }}
           >
             {isDeleting ? (
               <>

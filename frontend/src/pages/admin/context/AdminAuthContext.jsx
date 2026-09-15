@@ -77,7 +77,16 @@ export function AdminAuthProvider({ children }) {
     return data.data;
   };
 
-  const logout = async () => {
+  const [sessionNotice, setSessionNotice] = useState('');
+
+  // Auto-logout after 30 minutes of inactivity (industry standard)
+  const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+
+  const updateActivity = () => {
+    localStorage.setItem('ds_admin_last_activity', Date.now().toString());
+  };
+
+  const logout = async (reason) => {
     try {
       await fetch('/api/admin/logout', {
         method: 'POST',
@@ -89,8 +98,51 @@ export function AdminAuthProvider({ children }) {
       setAdminUser(null);
       setToken('');
       localStorage.removeItem('ds_admin_jwt');
+      localStorage.removeItem('ds_admin_last_activity');
+
+      if (reason === 'timeout') {
+        sessionStorage.setItem(
+          'ds_admin_logout_reason',
+          'Your session expired due to 30 minutes of inactivity. Please sign in again.'
+        );
+        window.location.href = '/admin/login?reason=timeout';
+      }
     }
   };
+
+  // Inactivity tracking effect
+  useEffect(() => {
+    if (!adminUser) return;
+
+    updateActivity();
+
+    // Throttled activity listener
+    let lastRecorded = Date.now();
+    const handleUserActivity = () => {
+      const now = Date.now();
+      if (now - lastRecorded > 10000) {
+        // Record at most once every 10 seconds to avoid overhead
+        lastRecorded = now;
+        updateActivity();
+      }
+    };
+
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+    events.forEach((evt) => window.addEventListener(evt, handleUserActivity, { passive: true }));
+
+    // Periodic check every 15 seconds
+    const interval = setInterval(() => {
+      const lastActive = Number(localStorage.getItem('ds_admin_last_activity') || Date.now());
+      if (Date.now() - lastActive >= INACTIVITY_TIMEOUT_MS) {
+        logout('timeout');
+      }
+    }, 15000);
+
+    return () => {
+      events.forEach((evt) => window.removeEventListener(evt, handleUserActivity));
+      clearInterval(interval);
+    };
+  }, [adminUser]);
 
   const getAuthHeaders = () => {
     const headers = {};
@@ -107,6 +159,7 @@ export function AdminAuthProvider({ children }) {
     login,
     logout,
     getAuthHeaders,
+    sessionNotice,
   };
 
   return (

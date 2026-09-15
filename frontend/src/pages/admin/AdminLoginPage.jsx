@@ -24,6 +24,17 @@ export default function AdminLoginPage() {
     }
   }, [isAuthenticated, navigate, location]);
 
+  // Detect session timeout notice
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const reason = params.get('reason');
+    const storedReason = sessionStorage.getItem('ds_admin_logout_reason');
+    if (reason === 'timeout' || storedReason) {
+      setError(storedReason || 'Your session expired due to 30 minutes of inactivity. Please sign in again.');
+      sessionStorage.removeItem('ds_admin_logout_reason');
+    }
+  }, [location.search]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

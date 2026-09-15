@@ -117,6 +117,11 @@ const createCategory = asyncHandler(async (req, res) => {
       .replace(/(^-|-$)+/g, "");
   }
 
+  // Validate slug format
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    throw new ApiError(400, "Invalid slug format: lowercase alphanumeric characters and hyphens only");
+  }
+
   // Check if category slug already exists
   const existing = await Category.findOne({ slug });
   if (existing) {
@@ -218,6 +223,9 @@ const updateCategory = asyncHandler(async (req, res) => {
   if (req.body.slug !== undefined) {
     const newSlug = req.body.slug.toLowerCase().trim();
     if (newSlug && newSlug !== category.slug) {
+      if (!/^[a-z0-9-]+$/.test(newSlug)) {
+        throw new ApiError(400, "Invalid slug format: lowercase alphanumeric characters and hyphens only");
+      }
       const duplicate = await Category.findOne({ slug: newSlug, _id: { $ne: category._id } });
       if (duplicate) {
         throw new ApiError(400, `Category slug "${newSlug}" already exists`);

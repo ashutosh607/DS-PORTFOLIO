@@ -34,9 +34,21 @@ const uploadOnCloudinary = async (localFilePath, folder = "ds_portfolio") => {
     }
 
     // 2. Safe Local Storage Fallback:
-    // Move from public/temp to public/uploads/...
-    const sanitizedFolder = folder.replace(/[^a-zA-Z0-9_\-\/]/g, "");
-    const uploadsDir = path.resolve(__dirname, "../public/uploads", sanitizedFolder);
+    // Sanitize folder to strictly alphanumeric, dashes, and single slashes without any traversal (..)
+    const sanitizedFolder = folder
+      .split("/")
+      .map((segment) => segment.replace(/[^a-zA-Z0-9_\-]/g, ""))
+      .filter(Boolean)
+      .join("/");
+
+    const uploadsBase = path.resolve(__dirname, "../public/uploads");
+    const uploadsDir = path.resolve(uploadsBase, sanitizedFolder || "ds_portfolio");
+
+    // Ensure uploadsDir stays strictly within uploadsBase (no path traversal)
+    if (!uploadsDir.startsWith(uploadsBase)) {
+      throw new Error("Invalid destination directory path");
+    }
+
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
@@ -47,7 +59,7 @@ const uploadOnCloudinary = async (localFilePath, folder = "ds_portfolio") => {
     // Rename (move) file to public/uploads
     fs.renameSync(localFilePath, destinationPath);
 
-    const relativeUrl = `/uploads/${sanitizedFolder}/${filename}`;
+    const relativeUrl = `/uploads/${sanitizedFolder || "ds_portfolio"}/${filename}`;
     const ext = path.extname(filename).toLowerCase();
     const isVideo = [".mp4", ".mov", ".webm", ".avi", ".mkv"].includes(ext);
 
@@ -80,21 +92,27 @@ const uploadOnCloudinary = async (localFilePath, folder = "ds_portfolio") => {
  */
 const deleteFromCloudinary = async (publicId, resourceType = "image") => {
   try {
-    if (!publicId) return null;
+    if (!publicId || typeof publicId !== "string") return null;
 
-    // Local file cleanup
+    // Local file cleanup with path traversal prevention
     if (publicId.startsWith("local_")) {
       const publicUploads = path.resolve(__dirname, "../public/uploads");
-      const targetFilename = publicId.replace(/^local_\d+_/, "");
+      const rawTargetFilename = publicId.replace(/^local_\d+_/, "");
+      const targetFilename = path.basename(rawTargetFilename).replace(/[^a-zA-Z0-9_.\-]/g, "");
+
+      if (!targetFilename) return { result: "invalid_id" };
 
       const removeMatching = (dir) => {
         if (!fs.existsSync(dir)) return;
         const entries = fs.readdirSync(dir);
         for (const entry of entries) {
-          const fullPath = path.join(dir, entry);
+          const fullPath = path.resolve(dir, entry);
+          // Boundary check: ensure fullPath is strictly inside publicUploads
+          if (!fullPath.startsWith(publicUploads)) continue;
+
           if (fs.statSync(fullPath).isDirectory()) {
             removeMatching(fullPath);
-          } else if (entry === targetFilename || entry.endsWith(targetFilename)) {
+          } else if (entry === targetFilename) {
             try {
               fs.unlinkSync(fullPath);
             } catch (e) {

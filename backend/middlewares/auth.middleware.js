@@ -17,7 +17,10 @@ const verifyAdmin = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const secret = process.env.JWT_SECRET || "ds_portfolio_atelier_secret_jwt_key_2026";
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new ApiError(500, "JWT_SECRET configuration is missing on the server");
+    }
     const decoded = jwt.verify(token, secret);
 
     if (decoded.role !== "admin") {

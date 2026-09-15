@@ -4,7 +4,18 @@ const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
 
-const JWT_SECRET = process.env.JWT_SECRET || "ds_portfolio_atelier_secret_jwt_key_2026";
+const bcrypt = require("bcryptjs");
+
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new ApiError(500, "JWT_SECRET configuration is missing on the server");
+  }
+  return secret;
+};
+
+// Constant dummy hash for constant-time comparison when email not found
+const DUMMY_HASH = "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012345";
 
 /**
  * @route   POST /api/admin/login
@@ -14,36 +25,43 @@ const JWT_SECRET = process.env.JWT_SECRET || "ds_portfolio_atelier_secret_jwt_ke
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    throw new ApiError(400, "Email and password are required");
+  if (!email || !password || typeof email !== "string" || typeof password !== "string") {
+    throw new ApiError(400, "Valid email and password strings are required");
   }
 
   const normalizedEmail = email.trim().toLowerCase();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(normalizedEmail)) {
+    throw new ApiError(400, "Invalid email address format");
+  }
 
   // Find admin document in MongoDB Atlas
   const admin = await Admin.findOne({ email: normalizedEmail });
 
-  if (!admin) {
+  // Mitigate user enumeration via uniform timing
+  let isPasswordValid = false;
+  if (admin) {
+    isPasswordValid = await admin.isPasswordCorrect(password);
+  } else {
+    // Perform dummy bcrypt comparison to ensure uniform response time
+    await bcrypt.compare(password, DUMMY_HASH).catch(() => {});
+  }
+
+  if (!admin || !isPasswordValid) {
     throw new ApiError(401, "Invalid administrator credentials");
   }
 
-  // Compare candidate password with bcrypt hash in database
-  const isPasswordValid = await admin.isPasswordCorrect(password);
-
-  if (!isPasswordValid) {
-    throw new ApiError(401, "Invalid administrator credentials");
-  }
-
-  // Generate 7-day JWT session token
+  // Generate 4-hour JWT session token
+  const tokenExpiry = process.env.JWT_EXPIRES_IN || "4h";
   const token = jwt.sign(
     {
       id: admin._id,
       email: admin.email,
       role: admin.role || "admin",
     },
-    JWT_SECRET,
+    getJwtSecret(),
     {
-      expiresIn: "7d",
+      expiresIn: tokenExpiry,
     }
   );
 
@@ -51,7 +69,7 @@ const login = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 4 * 60 * 60 * 1000, // 4 hours
     path: "/",
   };
 
