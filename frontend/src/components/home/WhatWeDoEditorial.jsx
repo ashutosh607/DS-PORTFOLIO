@@ -1,13 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
-import { Volume2, VolumeX, Play, Pause, Sparkles } from 'lucide-react';
+
 
 /**
  * Editorial Photography Assets
  * Sourced directly from the atelier's curated collections and local media.
  */
 const MEDIA = {
-  video: '/videos/cinematic-film.mp4',
   beat1: {
     hero: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop',
     topRight: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop',
@@ -25,116 +24,12 @@ const MEDIA = {
   },
 };
 
-const DISCIPLINES = [
-  'WEDDINGS',
-  'PRE-WEDDINGS',
-  'PORTRAITS',
-  'EVENTS',
-  'FILMS',
-];
 
-/**
- * Editorial Video Card Component
- * Premium moving media vignette with subtle controls, soundwave, and hover micro-animations.
- */
-function EditorialVideoCard({ className = '', style = {}, isPlaying, isMuted, onTogglePlay, onToggleMute, videoRef }) {
-  const [isHovered, setIsHovered] = useState(false);
 
-  return (
-    <div
-      className={`relative overflow-hidden rounded-[10px] md:rounded-[12px] bg-[#101010] shadow-[0_20px_50px_-12px_rgba(16,14,12,0.3)] border border-[#E3DBCC]/30 transition-transform duration-500 ease-out group ${className}`}
-      style={{
-        ...style,
-        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Video Element */}
-      <video
-        ref={videoRef}
-        src={MEDIA.video}
-        muted={isMuted}
-        loop
-        playsInline
-        autoPlay
-        className="w-full h-full object-cover select-none pointer-events-none"
-      />
 
-      {/* Subtle Grain & Vignette Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
-
-      {/* Top Header Bar: FILM Label + Duration */}
-      <div className="absolute top-2.5 left-3 right-3 flex items-center justify-between pointer-events-none">
-        <span className="px-2 py-0.5 rounded-[4px] bg-white/20 backdrop-blur-md text-[0.6rem] font-mono tracking-[0.2em] text-[#FDFCF8] uppercase">
-          FILM
-        </span>
-        <span className="text-[0.6rem] font-mono tracking-[0.16em] text-white/80">
-          00:18
-        </span>
-      </div>
-
-      {/* Center Play/Pause Overlay Indicator on Hover */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <motion.div
-          animate={{
-            opacity: isHovered || !isPlaying ? 1 : 0,
-            scale: isHovered ? 1 : 0.9,
-          }}
-          transition={{ duration: 0.25 }}
-          className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-white border border-white/40 shadow-lg"
-        >
-          {isPlaying ? (
-            <Pause size={16} className="text-white fill-white" />
-          ) : (
-            <Play size={16} className="text-white fill-white ml-0.5" />
-          )}
-        </motion.div>
-      </div>
-
-      {/* Bottom Controls Bar */}
-      <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between">
-        {/* Play/Pause Button */}
-        <button
-          type="button"
-          onClick={onTogglePlay}
-          aria-label={isPlaying ? 'Pause film' : 'Play film'}
-          className="p-1.5 rounded-full bg-black/40 hover:bg-black/70 text-white/90 transition-colors backdrop-blur-sm cursor-pointer"
-        >
-          {isPlaying ? <Pause size={12} /> : <Play size={12} className="ml-0.5" />}
-        </button>
-
-        {/* Audio Mute/Unmute Toggle */}
-        <button
-          type="button"
-          onClick={onToggleMute}
-          aria-label={isMuted ? 'Unmute film' : 'Mute film'}
-          className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/40 hover:bg-black/70 text-white/90 transition-colors backdrop-blur-sm cursor-pointer"
-        >
-          {isMuted ? (
-            <VolumeX size={12} />
-          ) : (
-            <>
-              <Volume2 size={12} />
-              {/* Animated audio bar */}
-              <span className="flex items-end gap-0.5 h-2">
-                <span className="w-0.5 h-1.5 bg-white animate-pulse" />
-                <span className="w-0.5 h-2.5 bg-white animate-pulse delay-75" />
-                <span className="w-0.5 h-1 bg-white animate-pulse delay-150" />
-              </span>
-            </>
-          )}
-        </button>
-      </div>
-    </div>
-  );
-}
 
 export default function WhatWeDoEditorial() {
   const containerRef = useRef(null);
-  const videoRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
   const [activeBeat, setActiveBeat] = useState(1);
 
   // Bulletproof Scroll Progress MotionValue (strictly bounded between 0.0 and 1.0, NEVER NaN)
@@ -219,46 +114,7 @@ export default function WhatWeDoEditorial() {
     rawMouseY.set(0);
   };
 
-  // Video Autoplay / Viewport Visibility via IntersectionObserver
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!videoRef.current) return;
-        if (entry.isIntersecting) {
-          videoRef.current.play().catch(() => {});
-          setIsPlaying(true);
-        } else {
-          videoRef.current.pause();
-          setIsPlaying(false);
-        }
-      },
-      { threshold: 0.15 }
-    );
 
-    const currentEl = containerRef.current;
-    if (currentEl) observer.observe(currentEl);
-
-    return () => {
-      if (currentEl) observer.unobserve(currentEl);
-    };
-  }, []);
-
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current.play();
-      setIsPlaying(true);
-    } else {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const toggleMute = () => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = !videoRef.current.muted;
-    setIsMuted(videoRef.current.muted);
-  };
 
   // =========================================================================
   // STRICTLY ISOLATED 3 BEATS + 4TH EXIT HANDOVER
@@ -387,22 +243,7 @@ export default function WhatWeDoEditorial() {
   const b3BouquetX = useTransform(scrollYProgress, [0.66, 0.75, 1.0], [45, 0, -10]);
   const b3BouquetY = useTransform(scrollYProgress, [0.66, 0.75, 0.92, 1.0], [20, 0, 0, -30]);
 
-  // VIDEO FRAME (Smooth continuous presence, gracefully handing over on 4th transition)
-  const videoOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.10, 0.92, 1.0],
-    [0.7, 1, 1, 0.15]
-  );
-  const videoY = useTransform(
-    scrollYProgress,
-    [0, 0.33, 0.66, 0.92, 1.0],
-    [10, -5, 10, 0, -35]
-  );
-  const videoX = useTransform(
-    scrollYProgress,
-    [0, 0.33, 0.66, 1.0],
-    [0, -15, 15, 0]
-  );
+
 
   return (
     <section
@@ -562,7 +403,6 @@ export default function WhatWeDoEditorial() {
 
                 {/* Archival Note */}
                 <div className="mt-6 pt-5 border-t border-[#E3DBCC]/60 flex items-center gap-2 font-mono text-[0.62rem] tracking-[0.22em] uppercase text-[#7A7770]">
-                  <Sparkles size={13} className="text-[#101010]" />
                   <span>MASTER PROOF COLLECTION 2026</span>
                 </div>
               </motion.div>
@@ -643,10 +483,7 @@ export default function WhatWeDoEditorial() {
                   style={{ display: beat3MediaDisplay }}
                   className="absolute inset-0 flex items-center justify-center"
                 >
-                  {/* Subtle Sparkle Accent */}
-                  <div className="absolute right-12 top-10 text-[#101010]">
-                    <Sparkles size={22} className="opacity-70 animate-pulse" />
-                  </div>
+
 
                   {/* Flowing bottom contour line */}
                   <svg
@@ -837,21 +674,7 @@ export default function WhatWeDoEditorial() {
                   </div>
                 </motion.div>
 
-                {/* Discipline Column in Beat 02 (Far Right Metadata) */}
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-2 font-mono text-[0.6rem] tracking-[0.24em] text-[#7A7770] uppercase pointer-events-none select-none">
-                  {DISCIPLINES.map((disc, idx) => (
-                    <div key={disc} className="flex items-center gap-2">
-                      <span
-                        className={`w-1 h-1 rounded-full ${
-                          idx === 0 ? 'bg-[#101010] scale-125' : 'bg-[#E3DBCC]'
-                        }`}
-                      />
-                      <span className={idx === 0 ? 'text-[#101010] font-semibold' : 'opacity-70'}>
-                        {disc}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+
               </motion.div>
 
               {/* =============================================================
@@ -908,45 +731,10 @@ export default function WhatWeDoEditorial() {
                   </div>
                 </motion.div>
 
-                {/* Discipline Column in Beat 03 (Far Right Metadata) */}
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-2 font-mono text-[0.6rem] tracking-[0.24em] text-[#7A7770] uppercase pointer-events-none select-none">
-                  {DISCIPLINES.map((disc, idx) => (
-                    <div key={disc} className="flex items-center gap-2">
-                      <span
-                        className={`w-1 h-1 rounded-full ${
-                          idx === 4 ? 'bg-[#101010] scale-125' : 'bg-[#E3DBCC]'
-                        }`}
-                      />
-                      <span className={idx === 4 ? 'text-[#101010] font-semibold' : 'opacity-70'}>
-                        {disc}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+
               </motion.div>
 
-              {/* =============================================================
-                  REAL VIDEO CARD (Cinematic Moving Media Vignette)
-                  ============================================================= */}
-              <motion.div
-                style={{
-                  opacity: videoOpacity,
-                  y: videoY,
-                  x: videoX,
-                  translateX: mouseFloatX,
-                  translateY: mouseFloatY,
-                }}
-                className="absolute z-40 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-4 md:right-8 bottom-0 sm:bottom-3 w-[170px] sm:w-[210px] md:w-[240px] aspect-[16/10]"
-              >
-                <EditorialVideoCard
-                  videoRef={videoRef}
-                  isPlaying={isPlaying}
-                  isMuted={isMuted}
-                  onTogglePlay={togglePlay}
-                  onToggleMute={toggleMute}
-                  className="w-full h-full cursor-pointer"
-                />
-              </motion.div>
+
 
             </div>
 

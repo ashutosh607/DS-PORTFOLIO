@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { MapPin, CheckCircle2, X, Loader2, Sparkles } from 'lucide-react';
+import { MapPin, CheckCircle2, X, Loader2 } from 'lucide-react';
 
 const CURATED_DESTINATIONS = [
   { name: 'The Taj Mahal Palace, Mumbai', lat: 18.9217, lng: 72.8332 },
@@ -312,7 +312,6 @@ export default function LocationSearchInput({
       {/* Quick Curated Editorial Chips */}
       <div className="pt-1">
         <span className="text-[10.5px] uppercase tracking-[0.14em] text-[#8C8070] font-semibold flex items-center gap-1.5 mb-1.5 font-sans">
-          <Sparkles size={12} className="text-[#9E8B6E]" />
           <span>Curated Editorial Destinations:</span>
         </span>
         <div className="flex flex-wrap gap-1.5">

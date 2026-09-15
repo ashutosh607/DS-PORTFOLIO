@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Play, Image as ImageIcon } from 'lucide-react';
 
 export default function CollectionsGallery({
   activeCategory,
@@ -188,7 +188,6 @@ export default function CollectionsGallery({
                 {/* Scroll pane header */}
                 <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#E2DACD]/60 text-[#7A756D]">
                   <span className="font-mono text-[0.68rem] tracking-[0.18em] uppercase flex items-center gap-1.5 font-medium">
-                    <Sparkles size={12} className="text-[#101010]" />
                     <span>BROWSE COLLECTION</span>
                   </span>
                   <span className="font-mono text-[0.65rem] tracking-[0.12em] text-[#8C8578]">
