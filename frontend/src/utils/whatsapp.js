@@ -101,6 +101,14 @@ export const buildWhatsAppMessage = ({ formData = {}, selectedCollection = null 
   const duration = formData.duration?.trim() || 'Not provided';
   const location = formData.location?.trim() || 'Not provided';
 
+  // Google Maps link
+  let mapsLink = '';
+  if (formData.coordinates?.lat && formData.coordinates?.lng) {
+    mapsLink = `https://www.google.com/maps/search/?api=1&query=${formData.coordinates.lat},${formData.coordinates.lng}`;
+  } else if (formData.location && formData.location.trim()) {
+    mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formData.location.trim())}`;
+  }
+
   // Selected collection
   const rawCollectionTitle = selectedCollection?.title || 'Signature';
   const collectionName = formatTitleCase(rawCollectionTitle);
@@ -132,7 +140,7 @@ EVENT DETAILS
 Event: ${eventType}
 Date: ${eventDate}
 Duration: ${duration}
-Location: ${location}
+Location: ${location}${mapsLink ? `\nGoogle Maps: ${mapsLink}` : ''}
 
 ━━━━━━━━━━━━━━━━
 SELECTED COLLECTION
