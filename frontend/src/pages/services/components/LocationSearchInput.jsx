@@ -263,9 +263,8 @@ export default function LocationSearchInput({
                   type="button"
                   onClick={() => handleSelectPlace(item)}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`w-full text-left px-4 py-3 flex items-start gap-3 transition-colors cursor-pointer border-b border-[#E3DBCC]/30 last:border-none ${
-                    isHighlighted ? 'bg-[#EFEAE0]' : 'hover:bg-[#F5F1E8]'
-                  }`}
+                  className={`w-full text-left px-4 py-3 flex items-start gap-3 transition-colors cursor-pointer border-b border-[#E3DBCC]/30 last:border-none ${isHighlighted ? 'bg-[#EFEAE0]' : 'hover:bg-[#F5F1E8]'
+                    }`}
                 >
                   <div className="mt-0.5 w-6 h-6 rounded-full bg-[#E5DDD0] text-[#55493A] flex items-center justify-center shrink-0">
                     <MapPin size={13} />

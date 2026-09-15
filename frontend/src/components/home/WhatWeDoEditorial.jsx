@@ -1,769 +1,483 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
-
 
 /**
- * Editorial Photography Assets
- * Sourced directly from the atelier's curated collections and local media.
+ * PHASE 9 — PHOTO COUNT & ASSETS
+ * 7 Curated atelier photographs, all identically cropped to 3:4 aspect ratio.
  */
-const MEDIA = {
-  beat1: {
-    hero: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop',
-    topRight: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop',
-    bottomRight: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=800&auto=format&fit=crop',
-  },
-  beat2: {
-    center: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1000&auto=format&fit=crop',
-    topLeft: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=800&auto=format&fit=crop',
-    topRight: 'https://images.unsplash.com/photo-1502982720700-bfff97f2ecac?q=80&w=800&auto=format&fit=crop',
-    bottomRight: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop',
-  },
-  beat3: {
-    arch: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1400&auto=format&fit=crop',
-    bouquet: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=800&auto=format&fit=crop',
-  },
-};
+const PHOTOS = [
+  'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop', // 0: Veil & Monolith
+  'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000&auto=format&fit=crop', // 1: Coastal Promenade
+  'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1000&auto=format&fit=crop', // 2: Fine Lace Study
+  'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1000&auto=format&fit=crop', // 3: Intimate Gaze
+  'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=1000&auto=format&fit=crop', // 4: Meadow Embrace
+  'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000&auto=format&fit=crop', // 5: Terrace Ceremony
+  'https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1000&auto=format&fit=crop', // 6: Artisanal Bouquet
+];
 
+/**
+ * REFINED EDITORIAL RESTING POSITIONS
+ * Proportionally scaled for refined, smaller card dimensions.
+ * Creates an exquisite, airy, balanced layout with ample negative space.
+ */
+const DESKTOP_RESTING = [
+  { x: -290, y: -120, rotate: -3.0 }, // 0: Top-Left
+  { x: 280,  y: -130, rotate: 2.5 },  // 1: Top-Right
+  { x: -170, y: 55,   rotate: 1.5 },  // 2: Center-Left
+  { x: 165,  y: 65,   rotate: -2.0 }, // 3: Center-Right
+  { x: -350, y: 130,  rotate: -3.5 }, // 4: Far-Left Lower
+  { x: 345,  y: 120,  rotate: 3.0 },  // 5: Far-Right Lower
+  { x: 0,    y: -15,  rotate: -0.5 }, // 6: Center Finale
+];
 
+const MOBILE_RESTING = [
+  { x: -75, y: -155, rotate: -2.5 }, // 0: Upper-Left
+  { x: 75,  y: -145, rotate: 2.5 },  // 1: Upper-Right
+  { x: -70, y: -35,  rotate: 1.5 },  // 2: Mid-Left
+  { x: 70,  y: -25,  rotate: -1.5 }, // 3: Mid-Right
+  { x: -75, y: 85,   rotate: -2.5 }, // 4: Lower-Left
+  { x: 75,  y: 95,   rotate: 2.5 },  // 5: Lower-Right
+  { x: 0,   y: 190,  rotate: 0.0 },  // 6: Bottom Center
+];
 
-
+/**
+ * QUINTIC SMOOTHERSTEP EASING
+ * First and second derivatives are zero at both ends (zero jerk / silky start & deceleration).
+ */
+function smootherStep(t) {
+  const c = Math.max(0, Math.min(1, t));
+  return c * c * c * (c * (c * 6 - 15) + 10);
+}
 
 export default function WhatWeDoEditorial() {
   const containerRef = useRef(null);
-  const [activeBeat, setActiveBeat] = useState(1);
+  const targetProgressRef = useRef(0);
+  const currentProgressRef = useRef(0);
+  const rafIdRef = useRef(null);
 
-  // Bulletproof Scroll Progress MotionValue (strictly bounded between 0.0 and 1.0, NEVER NaN)
-  const scrollYProgress = useMotionValue(0);
+  // Mouse Parallax coordinates (normalized -0.5 to 0.5)
+  const targetMouseRef = useRef({ x: 0, y: 0 });
+  const currentMouseRef = useRef({ x: 0, y: 0 });
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false
+  );
+
+  // Viewport & Reduced Motion Detection
   useEffect(() => {
-    let ticking = false;
+    const checkViewport = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    const updateScrollProgress = () => {
+    const handleMotionChange = (e) => setPrefersReducedMotion(e.matches);
+    if (motionQuery.addEventListener) {
+      motionQuery.addEventListener('change', handleMotionChange);
+    }
+
+    window.addEventListener('resize', checkViewport, { passive: true });
+    return () => {
+      window.removeEventListener('resize', checkViewport);
+      if (motionQuery.removeEventListener) {
+        motionQuery.removeEventListener('change', handleMotionChange);
+      }
+    };
+  }, []);
+
+  // Smooth LERP Scrubbed Scroll & Mouse Parallax Loop
+  useEffect(() => {
+    let isRunning = true;
+
+    const updateTargetProgress = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const totalScroll = rect.height - window.innerHeight;
       if (totalScroll <= 0) {
-        scrollYProgress.set(0);
-        return;
+        targetProgressRef.current = 0;
+      } else {
+        const currentScroll = -rect.top;
+        const progress = Math.max(0, Math.min(1, currentScroll / totalScroll));
+        targetProgressRef.current = progress;
       }
-      // Distance scrolled past the section's top entry
-      const currentScroll = -rect.top;
-      const progress = Math.max(0, Math.min(1, currentScroll / totalScroll));
-      scrollYProgress.set(progress);
     };
 
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          updateScrollProgress();
-          ticking = false;
+    const loop = () => {
+      if (!isRunning) return;
+
+      // Scroll Damping: 0.07 provides silky-smooth, calm momentum
+      const scrollDiff = targetProgressRef.current - currentProgressRef.current;
+      if (Math.abs(scrollDiff) > 0.00008) {
+        currentProgressRef.current += scrollDiff * 0.07;
+        setScrollProgress(currentProgressRef.current);
+      }
+
+      // Mouse Parallax Damping: 0.05 creates slow, dreamlike responsiveness
+      const mouseDiffX = targetMouseRef.current.x - currentMouseRef.current.x;
+      const mouseDiffY = targetMouseRef.current.y - currentMouseRef.current.y;
+      if (Math.abs(mouseDiffX) > 0.0005 || Math.abs(mouseDiffY) > 0.0005) {
+        currentMouseRef.current.x += mouseDiffX * 0.05;
+        currentMouseRef.current.y += mouseDiffY * 0.05;
+        setMouseOffset({
+          x: currentMouseRef.current.x,
+          y: currentMouseRef.current.y,
         });
-        ticking = true;
       }
+
+      rafIdRef.current = requestAnimationFrame(loop);
     };
 
-    // Initial calculation
-    updateScrollProgress();
+    updateTargetProgress();
+    currentProgressRef.current = targetProgressRef.current;
+    setScrollProgress(targetProgressRef.current);
 
+    rafIdRef.current = requestAnimationFrame(loop);
+
+    const handleScroll = () => updateTargetProgress();
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll, { passive: true });
 
     return () => {
+      isRunning = false;
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, [scrollYProgress]);
-
-  // Track Active Beat for Counter (01, 02, 03)
-  useEffect(() => {
-    const unsubscribe = scrollYProgress.on('change', (v) => {
-      if (v < 0.33) {
-        setActiveBeat(1);
-      } else if (v < 0.66) {
-        setActiveBeat(2);
-      } else {
-        setActiveBeat(3);
-      }
-    });
-    return () => unsubscribe();
-  }, [scrollYProgress]);
-
-  // Mouse Parallax Springs (±7px subtle floating)
-  const rawMouseX = useSpring(0, { stiffness: 45, damping: 20 });
-  const rawMouseY = useSpring(0, { stiffness: 45, damping: 20 });
-
-  const mouseHeroX = useTransform(rawMouseX, [-0.5, 0.5], [-7, 7]);
-  const mouseHeroY = useTransform(rawMouseY, [-0.5, 0.5], [-4, 4]);
-
-  const mouseFloatX = useTransform(rawMouseX, [-0.5, 0.5], [-14, 14]);
-  const mouseFloatY = useTransform(rawMouseY, [-0.5, 0.5], [-10, 10]);
-
-  const mouseDecoX = useTransform(rawMouseX, [-0.5, 0.5], [-4, 4]);
-  const mouseDecoY = useTransform(rawMouseY, [-0.5, 0.5], [-3, 3]);
+  }, []);
 
   const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    rawMouseX.set(x);
-    rawMouseY.set(y);
+    if (isMobile) return;
+    const { clientX, clientY } = e;
+    const normX = clientX / window.innerWidth - 0.5;
+    const normY = clientY / window.innerHeight - 0.5;
+    targetMouseRef.current = { x: normX, y: normY };
   };
 
   const handleMouseLeave = () => {
-    rawMouseX.set(0);
-    rawMouseY.set(0);
+    targetMouseRef.current = { x: 0, y: 0 };
   };
 
+  const restingPositions = isMobile ? MOBILE_RESTING : DESKTOP_RESTING;
 
+  // PHASE 8 — ACCESSIBILITY: Reduced Motion fallback
+  if (prefersReducedMotion) {
+    return (
+      <section
+        id="what-we-do"
+        className="w-full bg-[#FDFCF8] py-20 px-6 sm:px-12 flex items-center justify-center min-h-screen"
+      >
+        <div className="max-w-[1200px] w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-center justify-center">
+          {PHOTOS.map((src, idx) => (
+            <div
+              key={idx}
+              className="aspect-[3/4] bg-[#F3F0E9] p-2 border-[1.5px] border-[#101010] shadow-[0_12px_28px_-8px_rgba(16,14,12,0.16)] rounded-[2px]"
+            >
+              <div className="w-full h-full overflow-hidden border border-[#E3DBCC]">
+                <img
+                  src={src}
+                  alt={`Editorial Print ${idx + 1}`}
+                  className="w-full h-full object-cover select-none"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   // =========================================================================
-  // STRICTLY ISOLATED 3 BEATS + 4TH EXIT HANDOVER
+  // SEQUENTIAL DECK REVEAL TIMELINE (CALM, DELIBERATE EDITORIAL PACE)
+  // Total cards = 7.
+  // Pause at center = 0.035
+  // Move to resting spot = 0.095 (generous, slow travel distance)
+  // Each card cycle = 0.035 + 0.095 = 0.130
+  // 7 cards * 0.130 = 0.910
+  // Final Hold: 0.910 -> 1.000 (generous stillness before release into next section)
   // =========================================================================
+  const PAUSE_DURATION = 0.035;
+  const MOVE_DURATION = 0.095;
+  const CARD_CYCLE = PAUSE_DURATION + MOVE_DURATION; // 0.13
 
-  // BEAT 01: Strictly active from 0.0 to 0.33, completely hidden above 0.33
-  const beat1TextOpacity = useTransform(scrollYProgress, [0, 0.22, 0.31], [1, 1, 0]);
-  const beat1TextY = useTransform(scrollYProgress, [0, 0.22, 0.31], [0, 0, -28]);
-  const beat1Display = useTransform(scrollYProgress, (v) => (v <= 0.33 ? 'flex' : 'none'));
-  const beat1MediaDisplay = useTransform(scrollYProgress, (v) => (v <= 0.33 ? 'block' : 'none'));
-
-  const b1HeroOpacity = useTransform(scrollYProgress, [0, 0.24, 0.32], [1, 1, 0]);
-  const b1HeroScale = useTransform(scrollYProgress, [0, 0.32], [0.98, 1.03]);
-  const b1HeroY = useTransform(scrollYProgress, [0, 0.32], [20, -30]);
-
-  const b1TopRightOpacity = useTransform(scrollYProgress, [0, 0.22, 0.31], [1, 1, 0]);
-  const b1TopRightX = useTransform(scrollYProgress, [0, 0.31], [0, 45]);
-  const b1TopRightRotate = useTransform(scrollYProgress, [0, 0.31], [1.5, 5]);
-
-  const b1BottomRightOpacity = useTransform(scrollYProgress, [0, 0.22, 0.31], [1, 1, 0]);
-  const b1BottomRightY = useTransform(scrollYProgress, [0, 0.31], [0, 40]);
-  const b1BottomRightRotate = useTransform(scrollYProgress, [0, 0.31], [-2, -5]);
-
-  // BEAT 02: Strictly active from 0.29 to 0.67, completely hidden before 0.29 and after 0.67
-  const beat2TextOpacity = useTransform(
-    scrollYProgress,
-    [0.31, 0.38, 0.58, 0.65],
-    [0, 1, 1, 0]
-  );
-  const beat2TextY = useTransform(
-    scrollYProgress,
-    [0.31, 0.38, 0.58, 0.65],
-    [28, 0, 0, -28]
-  );
-  const beat2Display = useTransform(
-    scrollYProgress,
-    (v) => (v > 0.29 && v < 0.67 ? 'flex' : 'none')
-  );
-  const beat2MediaDisplay = useTransform(
-    scrollYProgress,
-    (v) => (v > 0.29 && v < 0.67 ? 'block' : 'none')
+  // Current active cards dealt count for subtle archival indicator
+  const activeCount = Math.min(
+    7,
+    Math.max(1, Math.floor(scrollProgress / CARD_CYCLE) + 1)
   );
 
-  const b2CenterOpacity = useTransform(
-    scrollYProgress,
-    [0.31, 0.38, 0.58, 0.65],
-    [0, 1, 1, 0]
-  );
-  const b2CenterScale = useTransform(
-    scrollYProgress,
-    [0.31, 0.40, 0.55, 0.65],
-    [0.88, 1.03, 1.0, 0.88]
-  );
-  const b2CenterRotate = useTransform(
-    scrollYProgress,
-    [0.31, 0.40, 0.65],
-    [-6, -2, 2]
-  );
-  const b2CenterY = useTransform(
-    scrollYProgress,
-    [0.31, 0.40, 0.65],
-    [40, 0, -35]
-  );
-
-  const b2TopLeftOpacity = useTransform(
-    scrollYProgress,
-    [0.32, 0.39, 0.58, 0.65],
-    [0, 1, 1, 0]
-  );
-  const b2TopLeftX = useTransform(scrollYProgress, [0.32, 0.40, 0.65], [-50, 0, 25]);
-  const b2TopLeftRotate = useTransform(scrollYProgress, [0.32, 0.40, 0.65], [-12, -7, -4]);
-
-  const b2TopRightOpacity = useTransform(
-    scrollYProgress,
-    [0.32, 0.39, 0.58, 0.65],
-    [0, 1, 1, 0]
-  );
-  const b2TopRightX = useTransform(scrollYProgress, [0.32, 0.40, 0.65], [50, 0, -20]);
-  const b2TopRightRotate = useTransform(scrollYProgress, [0.32, 0.40, 0.65], [10, 5, 2]);
-
-  const b2BottomRightOpacity = useTransform(
-    scrollYProgress,
-    [0.33, 0.40, 0.58, 0.65],
-    [0, 1, 1, 0]
-  );
-  const b2BottomRightY = useTransform(scrollYProgress, [0.33, 0.40, 0.65], [50, 0, -25]);
-  const b2BottomRightRotate = useTransform(scrollYProgress, [0.33, 0.40, 0.65], [6, 2, 0]);
-
-  // BEAT 03 & 4TH TRANSITION (Seamless Handover into About Section)
-  // Enters smoothly at 0.64, dominates, then at 0.92-1.0 glides gracefully into the next section!
-  const beat3TextOpacity = useTransform(
-    scrollYProgress,
-    [0.64, 0.71, 0.92, 1.0],
-    [0, 1, 1, 0.15]
-  );
-  const beat3TextY = useTransform(
-    scrollYProgress,
-    [0.64, 0.71, 0.92, 1.0],
-    [28, 0, 0, -35]
-  );
-  const beat3Display = useTransform(scrollYProgress, (v) => (v >= 0.63 ? 'flex' : 'none'));
-  const beat3MediaDisplay = useTransform(scrollYProgress, (v) => (v >= 0.63 ? 'block' : 'none'));
-
-  const b3ArchOpacity = useTransform(
-    scrollYProgress,
-    [0.64, 0.71, 0.92, 1.0],
-    [0, 1, 1, 0.15]
-  );
-  const b3ArchScale = useTransform(
-    scrollYProgress,
-    [0.64, 0.72, 0.92, 1.0],
-    [0.93, 1.0, 1.0, 0.96]
-  );
-  const b3ArchY = useTransform(
-    scrollYProgress,
-    [0.64, 0.72, 0.92, 1.0],
-    [40, 0, 0, -40]
-  );
-
-  const b3BouquetOpacity = useTransform(
-    scrollYProgress,
-    [0.66, 0.73, 0.92, 1.0],
-    [0, 1, 1, 0.15]
-  );
-  const b3BouquetRotate = useTransform(scrollYProgress, [0.66, 0.75, 1.0], [-8, -4, -2]);
-  const b3BouquetX = useTransform(scrollYProgress, [0.66, 0.75, 1.0], [45, 0, -10]);
-  const b3BouquetY = useTransform(scrollYProgress, [0.66, 0.75, 0.92, 1.0], [20, 0, 0, -30]);
-
-
+  // Cinematic End-of-Section Defocus Blur (engages from 0.925 -> 1.000)
+  const BLUR_START = 0.925;
+  const endBlurProgress = scrollProgress >= BLUR_START
+    ? smootherStep((scrollProgress - BLUR_START) / (1 - BLUR_START))
+    : 0;
+  const stageBlur = endBlurProgress * 16; // 0px to 16px soft lens defocus
+  const stageOpacity = 1 - endBlurProgress * 0.85; // 1.0 to 0.15 dreamy dissolve
+  const stageScale = 1 - endBlurProgress * 0.04; // subtle 1.0 to 0.96 scale breath
 
   return (
     <section
       id="what-we-do"
       ref={containerRef}
-      className="relative w-full bg-[#FDFCF8] text-[#101010] selection:bg-[#101010] selection:text-[#FDFCF8]"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="relative w-full bg-[#FDFCF8] select-none"
       style={{
-        // 340vh height allows all 3 beats + 4th transition to unfold with generous breathing room
-        minHeight: '340vh',
+        // 650vh pinned scroll distance allows cards to glide slowly and majestically
+        height: '650vh',
       }}
     >
-      {/* =====================================================================
-          PINNED 100VH STAGE (Sticky viewport for scrubbed animation)
-          ===================================================================== */}
+      {/* Keyframes for subtle organic floating drift once in resting position */}
+      <style>{`
+        @keyframes editorialDrift {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-4px) rotate(0.4deg);
+          }
+        }
+        @keyframes editorialDriftAlt {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-5px) rotate(-0.4deg);
+          }
+        }
+      `}</style>
+
+      {/* Pinned 100vh Sticky Stage with End Defocus Blur */}
       <div
-        className="sticky top-0 h-screen w-full flex items-center overflow-hidden"
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        className="sticky top-0 h-screen w-full flex flex-col justify-between items-center overflow-hidden px-4 sm:px-8 py-6 sm:py-8 will-change-transform"
+        style={{
+          filter: stageBlur > 0.1 ? `blur(${stageBlur.toFixed(1)}px)` : 'none',
+          opacity: stageOpacity,
+          transform: stageScale < 0.999 ? `scale(${stageScale.toFixed(3)})` : 'none',
+          transition: 'filter 0.12s ease-out, opacity 0.12s ease-out',
+        }}
       >
-        {/* Subtle Ambient Editorial Grid */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-25"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(227, 219, 204, 0.25) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(227, 219, 204, 0.25) 1px, transparent 1px)
-            `,
-            backgroundSize: '100px 100px',
-          }}
-        />
+        
+        {/* =================================================================
+            TOP ARCHIVAL HEADER BAR: Dynamic Print Counter & Minimal Mark
+            ================================================================= */}
+        <div className="w-full max-w-[1300px] flex items-center justify-between pointer-events-none z-30">
+          <div className="flex items-center gap-3 font-mono text-[0.6rem] sm:text-[0.66rem] tracking-[0.24em] text-[#7A7770] uppercase">
+            <span className="w-6 sm:w-10 h-[1px] bg-[#E3DBCC]" />
+            <span className="text-[#101010] font-medium tracking-[0.28em]">WHAT WE DO</span>
+            <span className="w-6 sm:w-10 h-[1px] bg-[#E3DBCC]" />
+          </div>
 
-        {/* Content Container */}
-        <div className="container relative z-10 mx-auto px-6 sm:px-10 md:px-14 lg:px-16 max-w-[1440px] h-full flex flex-col justify-between py-8 md:py-12">
+          {/* Dynamic Card Deal Odometer Counter */}
+          <div className="flex items-center gap-2 font-mono text-[0.62rem] sm:text-[0.68rem] tracking-[0.22em] text-[#7A7770] uppercase">
+            <span className="text-[#101010] font-semibold text-xs tracking-[0.24em] transition-all duration-300">
+              0{activeCount}
+            </span>
+            <span className="w-3 h-[1px] bg-[#101010]/30" />
+            <span>07 ARCHIVE</span>
+          </div>
+        </div>
+
+        {/* =================================================================
+            CENTRAL DECK STAGE CONTAINER
+            ================================================================= */}
+        <div className="relative w-full max-w-[1300px] h-[480px] sm:h-[560px] md:h-[620px] flex items-center justify-center flex-1 my-auto">
           
-          {/* =================================================================
-              TOP MINIMAL HEADER BAR (Editorial label & Studio Mark)
-              ================================================================= */}
-          <div className="w-full flex items-center justify-between pointer-events-none">
-            {/* Eyebrow Label with Hairline Accents */}
-            <div className="flex items-center gap-3 font-mono text-[0.68rem] tracking-[0.26em] uppercase text-[#7A7770]">
-              <span className="w-6 sm:w-10 h-[1px] bg-[#E3DBCC]" />
-              <span className="text-[#101010] font-medium">WHAT WE DO</span>
-              <span className="w-6 sm:w-10 h-[1px] bg-[#E3DBCC]" />
-            </div>
+          {/* Deck Physical Stack Base / Mat Outline with subtle pulsing glow */}
+          <div
+            className="absolute w-[120px] sm:w-[170px] md:w-[190px] aspect-[3/4] rounded-[2px] bg-[#E3DBCC]/25 border border-[#E3DBCC]/60 pointer-events-none -z-10 shadow-[0_8px_24px_-8px_rgba(16,14,12,0.08)]"
+            style={{
+              transform: `translate3d(${mouseOffset.x * 4}px, ${mouseOffset.y * 3}px, 0)`,
+              transition: 'transform 0.2s ease-out',
+            }}
+          />
 
-            {/* Subtle Studio Catalog Coordinate */}
-            <div className="hidden sm:flex items-center gap-3 font-mono text-[0.62rem] tracking-[0.2em] uppercase text-[#7A7770]">
-              <span>DS STUDIO FOLIO</span>
-              <span className="w-1 h-1 rounded-full bg-[#E3DBCC]" />
-              <span>EST. 2026</span>
-            </div>
-          </div>
+          {/* Cards 0 through 6 */}
+          {PHOTOS.map((src, i) => {
+            const startCycle = i * CARD_CYCLE;
+            const startMove = startCycle + PAUSE_DURATION;
+            const endMove = startCycle + CARD_CYCLE;
+            const targetPos = restingPositions[i] || { x: 0, y: 0, rotate: 0 };
 
-          {/* =================================================================
-              MAIN 2-COLUMN STAGE (Left: Kinetic Typography · Right: Dynamic Media)
-              ================================================================= */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center flex-1 my-auto">
-            
-            {/* ---------------------------------------------------------------
-                LEFT COLUMN: MONUMENTAL EDITORIAL STATEMENTS (Strictly Isolated)
-                --------------------------------------------------------------- */}
-            <div className="lg:col-span-5 relative min-h-[220px] sm:min-h-[260px] lg:min-h-[360px] flex flex-col justify-center">
-              
-              {/* BEAT 01 STATEMENT */}
-              <motion.div
+            let currentX = 0;
+            let currentY = 0;
+            let currentRotate = 0;
+            let currentOpacity = 0;
+            let currentScale = 1;
+            let currentShadow = '0 14px 32px -10px rgba(16,14,12,0.18)';
+            let isMoving = false;
+            let isResting = false;
+            let zIndex = 20 + i;
+
+            if (i === 0) {
+              // Card 0: Top card of the deck (visible right at entry)
+              currentOpacity = 1;
+
+              if (scrollProgress < startMove) {
+                currentX = 0;
+                currentY = 0;
+                currentRotate = 0;
+                currentScale = 1;
+                zIndex = 50; // Focused top card
+              } else if (scrollProgress <= endMove) {
+                isMoving = true;
+                const rawT = (scrollProgress - startMove) / MOVE_DURATION;
+                const easedT = smootherStep(rawT);
+                currentX = targetPos.x * easedT;
+                currentY = targetPos.y * easedT;
+                currentRotate = targetPos.rotate * easedT;
+
+                // 3D Lift Arc: subtle scale lift up to 1.05 and deep elevation shadow mid-flight
+                const liftArc = Math.sin(rawT * Math.PI);
+                currentScale = 1 + liftArc * 0.055;
+                currentShadow = `0 ${14 + liftArc * 24}px ${32 + liftArc * 28}px -${10 + liftArc * 6}px rgba(16,14,12,${0.18 + liftArc * 0.16})`;
+                zIndex = 45;
+              } else {
+                isResting = true;
+                currentX = targetPos.x;
+                currentY = targetPos.y;
+                currentRotate = targetPos.rotate;
+                currentScale = 1;
+                zIndex = 10 + i;
+              }
+            } else {
+              // Cards 1 through 6:
+              const predStartMove = (i - 1) * CARD_CYCLE + PAUSE_DURATION;
+
+              if (scrollProgress < predStartMove) {
+                currentOpacity = 0;
+                currentX = 0;
+                currentY = 0;
+                currentRotate = 0;
+              } else if (scrollProgress < startMove) {
+                // Smoothly appears at center beneath the departing card
+                const fadeWindow = 0.02;
+                currentOpacity = scrollProgress < predStartMove + fadeWindow
+                  ? (scrollProgress - predStartMove) / fadeWindow
+                  : 1;
+                currentX = 0;
+                currentY = 0;
+                currentRotate = 0;
+                currentScale = 1;
+                zIndex = 50; // Current focal deck card
+              } else if (scrollProgress <= endMove) {
+                isMoving = true;
+                currentOpacity = 1;
+                const rawT = (scrollProgress - startMove) / MOVE_DURATION;
+                const easedT = smootherStep(rawT);
+                currentX = targetPos.x * easedT;
+                currentY = targetPos.y * easedT;
+                currentRotate = targetPos.rotate * easedT;
+
+                // 3D Lift Arc mid-flight
+                const liftArc = Math.sin(rawT * Math.PI);
+                currentScale = 1 + liftArc * 0.055;
+                currentShadow = `0 ${14 + liftArc * 24}px ${32 + liftArc * 28}px -${10 + liftArc * 6}px rgba(16,14,12,${0.18 + liftArc * 0.16})`;
+                zIndex = 45;
+              } else {
+                isResting = true;
+                currentOpacity = 1;
+                currentX = targetPos.x;
+                currentY = targetPos.y;
+                currentRotate = targetPos.rotate;
+                currentScale = 1;
+                zIndex = 10 + i;
+              }
+            }
+
+            // Subtle layered mouse parallax offset (deeper for outer cards)
+            const parallaxWeight = isMobile ? 0 : 8 + i * 2;
+            const parallaxX = mouseOffset.x * parallaxWeight;
+            const parallaxY = mouseOffset.y * (parallaxWeight * 0.7);
+
+            // Hover state boosts
+            const isHovered = hoveredIndex === i && isResting;
+            const finalScale = isHovered ? currentScale * 1.045 : currentScale;
+            const finalZIndex = isHovered ? 60 : zIndex;
+
+            // Idle floating animation selection
+            const floatAnimation = isResting && !isHovered
+              ? `${i % 2 === 0 ? 'editorialDrift' : 'editorialDriftAlt'} ${5.5 + (i * 0.6)}s ease-in-out infinite`
+              : 'none';
+
+            return (
+              <div
+                key={i}
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                className="absolute w-[120px] sm:w-[170px] md:w-[190px] aspect-[3/4] bg-[#F3F0E9] p-1.5 sm:p-2 border-[1.5px] border-[#101010] rounded-[2px] will-change-transform group cursor-pointer"
                 style={{
-                  opacity: beat1TextOpacity,
-                  y: beat1TextY,
-                  display: beat1Display,
+                  transform: `translate3d(${currentX + parallaxX}px, ${currentY + parallaxY}px, 0) rotate(${currentRotate}deg) scale(${finalScale})`,
+                  opacity: currentOpacity,
+                  boxShadow: isHovered
+                    ? '0 26px 54px -14px rgba(16,14,12,0.28)'
+                    : currentShadow,
+                  zIndex: finalZIndex,
+                  transition: isMoving ? 'none' : 'box-shadow 0.3s ease-out, transform 0.25s ease-out',
                 }}
-                className="absolute inset-0 flex-col justify-center pointer-events-none"
               >
-                <h2
-                  className="font-serif text-[clamp(2.4rem,4.8vw,4.4rem)] font-normal leading-[1.04] tracking-[-0.025em] text-[#101010] mb-4 sm:mb-6"
-                  style={{ fontFamily: 'var(--font-serif)' }}
+                {/* Inner Breathing/Floating Drift Wrapper */}
+                <div
+                  className="w-full h-full relative"
+                  style={{ animation: floatAnimation }}
                 >
-                  We capture
-                  <br />
-                  <span className="italic font-light">the real,</span> the raw,
-                  <br />
-                  the in-between.
-                </h2>
-                <p className="font-sans text-[clamp(0.95rem,1.2vw,1.15rem)] text-[#4A4844] leading-relaxed font-light max-w-sm">
-                  Not just moments, but the emotions behind them.
-                </p>
+                  {/* Inner Ivory Mat Border & Archival Photograph */}
+                  <div className="w-full h-full overflow-hidden border border-[#E3DBCC] rounded-[1px] bg-[#E3DBCC]/20 relative">
+                    <img
+                      src={src}
+                      alt={`Atelier Portfolio Print ${i + 1}`}
+                      className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-700 ease-out group-hover:scale-105"
+                      loading={i <= 1 ? 'eager' : 'lazy'}
+                      draggable={false}
+                    />
 
-                {/* Handwritten Stamp Note */}
-                <div className="mt-6 sm:mt-8 inline-block select-none">
-                  <div
-                    className="font-script text-[1.4rem] sm:text-[1.65rem] text-[#7A7770] leading-tight transform -rotate-[7deg] origin-left"
-                    style={{ fontFamily: 'var(--font-script)' }}
-                  >
-                    Real People
-                    <br />
-                    Real Moments
-                    <br />
-                    <span className="text-[#101010]">Timeless</span>
+                    {/* Subtle Vignette on Hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none" />
+                  </div>
+
+                  {/* Subtle Minimal Archival Plate Watermark on Hover */}
+                  <div className="absolute bottom-1 left-1.5 right-1.5 flex items-center justify-between text-[0.45rem] font-mono tracking-widest text-white/90 uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    <span>PLATE 0{i + 1}</span>
+                    <span>ATELIER PROOF</span>
                   </div>
                 </div>
-              </motion.div>
-
-              {/* BEAT 02 STATEMENT */}
-              <motion.div
-                style={{
-                  opacity: beat2TextOpacity,
-                  y: beat2TextY,
-                  display: beat2Display,
-                }}
-                className="absolute inset-0 flex-col justify-center pointer-events-none"
-              >
-                <h2
-                  className="font-serif text-[clamp(2.4rem,4.8vw,4.4rem)] font-normal leading-[1.04] tracking-[-0.025em] text-[#101010] mb-4 sm:mb-6"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  Every moment
-                  <br />
-                  has a story.
-                  <br />
-                  <span className="italic font-light">We just frame it.</span>
-                </h2>
-                <p className="font-sans text-[clamp(0.95rem,1.2vw,1.15rem)] text-[#4A4844] leading-relaxed font-light max-w-sm">
-                  From grand celebrations to quiet, intimate moments — we turn memories into timeless visuals.
-                </p>
-
-                {/* Editorial Discipline Tags in Beat 02 */}
-                <div className="mt-6 pt-5 border-t border-[#E3DBCC]/60 flex flex-wrap gap-2 sm:gap-3 text-[0.62rem] font-mono tracking-[0.2em] uppercase text-[#7A7770]">
-                  <span>WEDDINGS</span>
-                  <span>·</span>
-                  <span>PRE-WEDDINGS</span>
-                  <span>·</span>
-                  <span>PORTRAITS</span>
-                </div>
-              </motion.div>
-
-              {/* BEAT 03 STATEMENT */}
-              <motion.div
-                style={{
-                  opacity: beat3TextOpacity,
-                  y: beat3TextY,
-                  display: beat3Display,
-                }}
-                className="absolute inset-0 flex-col justify-center pointer-events-none"
-              >
-                <h2
-                  className="font-serif text-[clamp(2.4rem,4.8vw,4.4rem)] font-normal leading-[1.04] tracking-[-0.025em] text-[#101010] mb-4 sm:mb-6"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  More than
-                  <br />
-                  <span className="italic font-light">photos,</span>
-                  <br />
-                  it’s a feeling.
-                </h2>
-                <p className="font-sans text-[clamp(0.95rem,1.2vw,1.15rem)] text-[#4A4844] leading-relaxed font-light max-w-sm">
-                  Thoughtful frames. Honest emotions. Timeless stories.
-                </p>
-
-                {/* Archival Note */}
-                <div className="mt-6 pt-5 border-t border-[#E3DBCC]/60 flex items-center gap-2 font-mono text-[0.62rem] tracking-[0.22em] uppercase text-[#7A7770]">
-                  <span>MASTER PROOF COLLECTION 2026</span>
-                </div>
-              </motion.div>
-
-            </div>
-
-            {/* ---------------------------------------------------------------
-                RIGHT COLUMN: ANIMATED PHYSICAL MEDIA STAGE
-                --------------------------------------------------------------- */}
-            <div className="lg:col-span-7 relative h-[380px] sm:h-[460px] md:h-[520px] lg:h-[560px] flex items-center justify-center">
-              
-              {/* =============================================================
-                  BACKGROUND DECORATIVE SKETCHES & CURVES
-                  ============================================================= */}
-              <motion.div
-                style={{
-                  x: mouseDecoX,
-                  y: mouseDecoY,
-                }}
-                className="absolute inset-0 pointer-events-none flex items-center justify-center"
-              >
-                {/* Beat 01: Soft background circular arc */}
-                <motion.div
-                  style={{ display: beat1MediaDisplay }}
-                  className="w-full h-full flex items-center justify-center"
-                >
-                  <svg
-                    className="w-[340px] sm:w-[480px] lg:w-[560px] h-auto text-[#E3DBCC]/50"
-                    viewBox="0 0 500 500"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="250"
-                      cy="250"
-                      r="220"
-                      stroke="currentColor"
-                      strokeWidth="1"
-                      strokeDasharray="4 6"
-                    />
-                  </svg>
-                </motion.div>
-
-                {/* Beat 02: Handwritten Arrow & Cross-stitch diagonal line */}
-                <motion.div
-                  style={{ display: beat2MediaDisplay }}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  {/* Diagonal Line with stitch marks */}
-                  <svg
-                    className="absolute right-6 top-16 w-36 h-36 text-[#7A7770]/60 hidden sm:block"
-                    viewBox="0 0 100 100"
-                    fill="none"
-                  >
-                    <line x1="10" y1="90" x2="90" y2="10" stroke="currentColor" strokeWidth="0.8" />
-                    <circle cx="50" cy="50" r="2.5" fill="currentColor" />
-                    <line x1="45" y1="45" x2="55" y2="55" stroke="currentColor" strokeWidth="0.8" />
-                  </svg>
-
-                  {/* Tiny Handwritten Arrow Sketch pointing towards center */}
-                  <svg
-                    className="absolute left-10 bottom-16 w-14 h-14 text-[#101010]/70"
-                    viewBox="0 0 50 50"
-                    fill="none"
-                  >
-                    <path
-                      d="M10 15 C 18 30, 32 35, 42 22 M 34 18 L 42 22 L 38 30"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </motion.div>
-
-                {/* Beat 03: Sparkle ✦ and organic contour around the Arch */}
-                <motion.div
-                  style={{ display: beat3MediaDisplay }}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-
-
-                  {/* Flowing bottom contour line */}
-                  <svg
-                    className="absolute bottom-6 left-12 w-64 h-24 text-[#E3DBCC]"
-                    viewBox="0 0 200 60"
-                    fill="none"
-                  >
-                    <path
-                      d="M10 50 Q 80 10, 140 35 T 190 20"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </motion.div>
-              </motion.div>
-
-              {/* =============================================================
-                  BEAT 01: ARRIVAL COMPOSITION (Hidden when activeBeat > 1)
-                  ============================================================= */}
-              <motion.div
-                style={{
-                  display: beat1MediaDisplay,
-                }}
-                className="absolute inset-0"
-              >
-                {/* Photo 1: Hero Bride with Veil in Backlight */}
-                <motion.div
-                  style={{
-                    opacity: b1HeroOpacity,
-                    scale: b1HeroScale,
-                    y: b1HeroY,
-                    translateX: mouseHeroX,
-                    translateY: mouseHeroY,
-                  }}
-                  className="absolute z-10 left-4 sm:left-10 lg:left-12 top-6 sm:top-8 w-[200px] sm:w-[250px] md:w-[280px] lg:w-[310px] aspect-[4/5] bg-[#F3F0E9] p-2 sm:p-2.5 shadow-[0_24px_50px_-16px_rgba(16,14,12,0.18)] border border-[#E3DBCC]"
-                >
-                  <div className="w-full h-full overflow-hidden">
-                    <img
-                      src={MEDIA.beat1.hero}
-                      alt="Atelier Bridal Master Proof"
-                      className="w-full h-full object-cover select-none transition-transform duration-700 hover:scale-105"
-                      loading="eager"
-                    />
-                  </div>
-                  <div className="mt-1.5 flex items-center justify-between text-[0.55rem] font-mono tracking-widest text-[#7A7770] uppercase">
-                    <span>Plate 01 · Veil</span>
-                    <span>35mm Analog</span>
-                  </div>
-                </motion.div>
-
-                {/* Photo 2: Coastal Sunset Couple Silhouette (Top Right) */}
-                <motion.div
-                  style={{
-                    opacity: b1TopRightOpacity,
-                    x: b1TopRightX,
-                    rotate: b1TopRightRotate,
-                    translateX: mouseFloatX,
-                    translateY: mouseFloatY,
-                  }}
-                  className="absolute z-20 right-4 sm:right-10 lg:right-14 top-4 sm:top-6 w-[150px] sm:w-[190px] md:w-[220px] aspect-[4/3] bg-[#F3F0E9] p-2 shadow-[0_16px_36px_-12px_rgba(16,14,12,0.14)] border border-[#E3DBCC]"
-                >
-                  <div className="w-full h-full overflow-hidden">
-                    <img
-                      src={MEDIA.beat1.topRight}
-                      alt="Coastal Sunset Promenade"
-                      className="w-full h-full object-cover select-none transition-transform duration-700 hover:scale-105"
-                    />
-                  </div>
-                </motion.div>
-
-                {/* Photo 3: Bridal Lace Details (Bottom Right Overlap) */}
-                <motion.div
-                  style={{
-                    opacity: b1BottomRightOpacity,
-                    y: b1BottomRightY,
-                    rotate: b1BottomRightRotate,
-                    translateX: mouseFloatX,
-                    translateY: mouseFloatY,
-                  }}
-                  className="absolute z-30 right-10 sm:right-20 lg:right-24 bottom-6 sm:bottom-10 w-[140px] sm:w-[175px] md:w-[200px] aspect-[4/5] bg-[#101010] p-2 shadow-[0_20px_45px_-10px_rgba(16,14,12,0.25)] border border-[#E3DBCC]/40"
-                >
-                  <div className="w-full h-full overflow-hidden">
-                    <img
-                      src={MEDIA.beat1.bottomRight}
-                      alt="Bridal Lace Detail"
-                      className="w-full h-full object-cover select-none transition-transform duration-700 hover:scale-105"
-                    />
-                  </div>
-                  <div className="mt-1 flex items-center justify-between text-[0.5rem] font-mono tracking-widest text-[#FDFCF8]/70 uppercase">
-                    <span>Close Study</span>
-                    <span>50mm F/1.2</span>
-                  </div>
-                </motion.div>
-              </motion.div>
-
-              {/* =============================================================
-                  BEAT 02: REARRANGED & TRANSFORMATION COMPOSITION (Hidden outside Beat 2)
-                  ============================================================= */}
-              <motion.div
-                style={{
-                  display: beat2MediaDisplay,
-                }}
-                className="absolute inset-0"
-              >
-                {/* Photo 4: Central Intimate Portrait of Bride & Groom */}
-                <motion.div
-                  style={{
-                    opacity: b2CenterOpacity,
-                    scale: b2CenterScale,
-                    rotate: b2CenterRotate,
-                    y: b2CenterY,
-                    translateX: mouseHeroX,
-                    translateY: mouseHeroY,
-                  }}
-                  className="absolute z-30 left-1/2 -translate-x-1/2 top-8 sm:top-10 w-[210px] sm:w-[270px] md:w-[310px] aspect-[4/5] bg-[#F3F0E9] p-2.5 sm:p-3 shadow-[0_28px_60px_-16px_rgba(16,14,12,0.22)] border border-[#E3DBCC]"
-                >
-                  <div className="w-full h-full overflow-hidden">
-                    <img
-                      src={MEDIA.beat2.center}
-                      alt="Intimate Dual Portrait"
-                      className="w-full h-full object-cover select-none transition-transform duration-700 hover:scale-105"
-                    />
-                  </div>
-                  <div className="mt-1.5 flex items-center justify-between text-[0.55rem] font-mono tracking-widest text-[#7A7770] uppercase">
-                    <span>Frame 02 · Intimate Gaze</span>
-                    <span>Lake Como</span>
-                  </div>
-                </motion.div>
-
-                {/* Photo 5: Romantic Embrace (Top Left Tilted) */}
-                <motion.div
-                  style={{
-                    opacity: b2TopLeftOpacity,
-                    x: b2TopLeftX,
-                    rotate: b2TopLeftRotate,
-                    translateX: mouseFloatX,
-                    translateY: mouseFloatY,
-                  }}
-                  className="absolute z-10 left-2 sm:left-6 top-8 sm:top-12 w-[130px] sm:w-[170px] aspect-[4/3] bg-[#F3F0E9] p-1.5 shadow-[0_16px_32px_-10px_rgba(16,14,12,0.12)] border border-[#E3DBCC]"
-                >
-                  <div className="w-full h-full overflow-hidden">
-                    <img
-                      src={MEDIA.beat2.topLeft}
-                      alt="Romantic Embrace"
-                      className="w-full h-full object-cover select-none"
-                    />
-                  </div>
-                </motion.div>
-
-                {/* Photo 6: Photographer Behind Lens (Top Right Tilted) */}
-                <motion.div
-                  style={{
-                    opacity: b2TopRightOpacity,
-                    x: b2TopRightX,
-                    rotate: b2TopRightRotate,
-                    translateX: mouseFloatX,
-                    translateY: mouseFloatY,
-                  }}
-                  className="absolute z-20 right-2 sm:right-8 top-6 sm:top-10 w-[140px] sm:w-[180px] aspect-square bg-[#101010] p-1.5 shadow-[0_18px_36px_-10px_rgba(16,14,12,0.18)] border border-[#E3DBCC]/30"
-                >
-                  <div className="w-full h-full overflow-hidden">
-                    <img
-                      src={MEDIA.beat2.topRight}
-                      alt="Atelier Behind Lens"
-                      className="w-full h-full object-cover select-none"
-                    />
-                  </div>
-                </motion.div>
-
-                {/* Photo 7: Mountain Sunset Landscape (Bottom Right) */}
-                <motion.div
-                  style={{
-                    opacity: b2BottomRightOpacity,
-                    y: b2BottomRightY,
-                    rotate: b2BottomRightRotate,
-                    translateX: mouseFloatX,
-                    translateY: mouseFloatY,
-                  }}
-                  className="absolute z-20 right-6 sm:right-16 bottom-4 sm:bottom-8 w-[150px] sm:w-[200px] aspect-[16/10] bg-[#F3F0E9] p-1.5 shadow-[0_16px_36px_-12px_rgba(16,14,12,0.14)] border border-[#E3DBCC]"
-                >
-                  <div className="w-full h-full overflow-hidden">
-                    <img
-                      src={MEDIA.beat2.bottomRight}
-                      alt="Alpine Sunset Atmosphere"
-                      className="w-full h-full object-cover select-none"
-                    />
-                  </div>
-                </motion.div>
-
-
-              </motion.div>
-
-              {/* =============================================================
-                  BEAT 03: FINAL MONUMENTAL ARCH COMPOSITION (Hidden before Beat 3)
-                  ============================================================= */}
-              <motion.div
-                style={{
-                  display: beat3MediaDisplay,
-                }}
-                className="absolute inset-0"
-              >
-                {/* Photo 8: French Arch-Top Frame (Sunset Silhouette with Veil) */}
-                <motion.div
-                  style={{
-                    opacity: b3ArchOpacity,
-                    scale: b3ArchScale,
-                    y: b3ArchY,
-                    translateX: mouseHeroX,
-                    translateY: mouseHeroY,
-                  }}
-                  className="absolute z-20 left-6 sm:left-14 lg:left-20 top-2 sm:top-4 w-[220px] sm:w-[280px] md:w-[320px] lg:w-[350px] aspect-[4/5] bg-[#F3F0E9] p-2.5 sm:p-3 shadow-[0_30px_70px_-16px_rgba(16,14,12,0.22)] border border-[#E3DBCC] rounded-t-[180px] sm:rounded-t-[240px] md:rounded-t-[280px]"
-                >
-                  <div className="w-full h-full overflow-hidden rounded-t-[172px] sm:rounded-t-[232px] md:rounded-t-[272px]">
-                    <img
-                      src={MEDIA.beat3.arch}
-                      alt="Twilight Terrace Ceremony"
-                      className="w-full h-full object-cover select-none transition-transform duration-700 hover:scale-105"
-                    />
-                  </div>
-                </motion.div>
-
-                {/* Photo 9: Overlapping Bridal Floral Bouquet (Bottom Right) */}
-                <motion.div
-                  style={{
-                    opacity: b3BouquetOpacity,
-                    rotate: b3BouquetRotate,
-                    x: b3BouquetX,
-                    y: b3BouquetY,
-                    translateX: mouseFloatX,
-                    translateY: mouseFloatY,
-                  }}
-                  className="absolute z-30 right-8 sm:right-16 lg:right-20 bottom-4 sm:bottom-8 w-[150px] sm:w-[190px] md:w-[220px] aspect-[4/5] bg-[#101010] p-2 sm:p-2.5 shadow-[0_24px_50px_-12px_rgba(16,14,12,0.28)] border border-[#E3DBCC]/40"
-                >
-                  <div className="w-full h-full overflow-hidden">
-                    <img
-                      src={MEDIA.beat3.bouquet}
-                      alt="Bridal Floral Composition"
-                      className="w-full h-full object-cover select-none transition-transform duration-700 hover:scale-105"
-                    />
-                  </div>
-                  <div className="mt-1 flex items-center justify-between text-[0.52rem] font-mono tracking-widest text-[#FDFCF8]/70 uppercase">
-                    <span>Floral Study</span>
-                    <span>Archival Plate</span>
-                  </div>
-                </motion.div>
-
-
-              </motion.div>
-
-
-
-            </div>
-
-          </div>
-
-          {/* =================================================================
-              BOTTOM INTERACTION BAR (Scroll Prompt Left · Beat Counter Right)
-              ================================================================= */}
-          <div className="w-full flex items-center justify-between pt-4 border-t border-[#E3DBCC]/60 font-mono text-[0.65rem] tracking-[0.22em] text-[#7A7770] uppercase select-none">
-            
-            {/* Scroll Indicator Prompt */}
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-[#101010] animate-pulse" />
-              <span className="text-[#101010] font-medium">| SCROLL</span>
-              <span className="inline-block animate-bounce">↓</span>
-            </div>
-
-            {/* Cinematic Beat Counter (01 — 03, 02 — 03, 03 — 03) */}
-            <div className="flex items-center gap-3">
-              <span className="text-[#101010] font-semibold text-xs tracking-[0.24em]">
-                0{activeBeat}
-              </span>
-              <span className="w-6 sm:w-10 h-[1px] bg-[#101010]/40" />
-              <span className="text-[#7A7770]">03</span>
-            </div>
-
-          </div>
+              </div>
+            );
+          })}
 
         </div>
+
+        {/* =================================================================
+            BOTTOM ARCHIVAL FOOTER: Hairline Progress & Status
+            ================================================================= */}
+        <div className="w-full max-w-[1300px] flex flex-col gap-2 pointer-events-none z-30">
+          {/* Hairline Scrub Progress Line */}
+          <div className="w-full h-[1px] bg-[#E3DBCC]/60 relative overflow-hidden">
+            <div
+              className="absolute top-0 left-0 h-full bg-[#101010] transition-all duration-150 ease-out"
+              style={{ width: `${Math.round(scrollProgress * 100)}%` }}
+            />
+          </div>
+
+          <div className="w-full flex items-center justify-between font-mono text-[0.58rem] sm:text-[0.64rem] tracking-[0.22em] text-[#7A7770] uppercase">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#101010] animate-pulse" />
+              <span className="text-[#101010] font-medium">SCROLL ARCHIVE</span>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-1.5">
+              <span>FINE ART 35MM COLLECTION</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
   );

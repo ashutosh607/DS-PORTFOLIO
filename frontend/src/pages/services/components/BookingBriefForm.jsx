@@ -36,8 +36,8 @@ export default function BookingBriefForm({
     categoryCollections && categoryCollections.length > 0
       ? categoryCollections
       : COLLECTIONS.filter((c) => c.category === selectedCategory).length > 0
-      ? COLLECTIONS.filter((c) => c.category === selectedCategory)
-      : COLLECTIONS.slice(0, 3);
+        ? COLLECTIONS.filter((c) => c.category === selectedCategory)
+        : COLLECTIONS.slice(0, 3);
 
   const handleToggleDiscipline = (id) => {
     const current = formData.disciplines || ['fine-art-photo', 'archival-album'];

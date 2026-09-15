@@ -178,7 +178,7 @@ export default function ServicesPage() {
           ...formData,
           createdAt: new Date().toISOString(),
         }),
-      }).catch(() => {});
+      }).catch(() => { });
     } catch {
       // Resilience
     }
@@ -221,9 +221,8 @@ export default function ServicesPage() {
                 setStage(1);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 ${
-                stage === 1 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
-              }`}
+              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 ${stage === 1 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
+                }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${stage === 1 ? 'bg-[#101010]' : 'bg-[#C5B9A5]'}`} />
               <span>01 CHOOSE COLLECTION</span>
@@ -237,9 +236,8 @@ export default function ServicesPage() {
                 setStage(2);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 ${
-                stage === 2 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
-              }`}
+              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 ${stage === 2 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
+                }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${stage === 2 ? 'bg-[#101010]' : 'bg-transparent'}`} />
               <span>02 BOOK YOUR SLOT</span>
@@ -321,11 +319,10 @@ export default function ServicesPage() {
                         key={cat.id}
                         type="button"
                         onClick={() => handleCategorySelect(cat.id)}
-                        className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer pb-1.5 border-b ${
-                          isCatSelected
+                        className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer pb-1.5 border-b ${isCatSelected
                             ? 'text-[#101010] font-semibold border-[#101010]'
                             : 'text-[#7A7770] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
-                        }`}
+                          }`}
                       >
                         {cat.label}
                       </button>
