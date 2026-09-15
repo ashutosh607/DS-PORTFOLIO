@@ -7,6 +7,7 @@ import {
   COLLECTIONS,
 } from '../data/servicesData';
 import { handleWhatsAppSubmit } from '../../../utils/whatsapp';
+import LocationSearchInput from './LocationSearchInput';
 
 export default function BookingBriefForm({
   formData,
@@ -489,30 +490,19 @@ export default function BookingBriefForm({
           >
             LOCATION, CITY, &amp; VENUE NAME *
           </label>
-          <input
-            id="booking-field-location"
-            type="text"
+          <LocationSearchInput
             value={formData.location || ''}
-            onChange={(e) => {
-              updateFormData({ location: e.target.value });
+            coordinates={formData.coordinates}
+            onChangeLocation={(data) => {
+              updateFormData({
+                location: data.location,
+                coordinates: data.coordinates,
+                venue: data.venue,
+              });
               if (errors.location) setErrors((prev) => ({ ...prev, location: null }));
             }}
-            placeholder="e.g., Villa Balbiano, Lake Como, Italy or Umaid Bhawan, Jodhpur"
-            style={{
-              width: '100%',
-              height: '50px',
-              padding: '0 16px',
-              border: '1px solid #E3DBCC',
-              borderRadius: '8px',
-              background: '#FDFCF8',
-              fontSize: '15px',
-              color: '#101010',
-            }}
-            className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
+            error={errors.location}
           />
-          {errors.location && (
-            <p className="font-sans text-xs text-[#992E2E] mt-1.5">{errors.location}</p>
-          )}
         </div>
       </section>
 
