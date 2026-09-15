@@ -81,20 +81,7 @@ export function PageTransitionProvider({ children }) {
         isTransitioning: phase !== 'idle',
       }}
     >
-      {/* 1. Destination Page Wrapper with subtle RIGHT -> LEFT entrance */}
-      <motion.div
-        key={location.pathname}
-        initial={{ x: 40, opacity: 0, filter: 'blur(6px)' }}
-        animate={{ x: 0, opacity: 1, filter: 'blur(0px)' }}
-        transition={{
-          duration: 0.75,
-          ease: [0.16, 1, 0.3, 1],
-          delay: 0.1,
-        }}
-        className="w-full"
-      >
-        {children}
-      </motion.div>
+      {children}
 
       {/* 2. Full-Screen Cream Editorial Curtain Overlay */}
       {phase !== 'idle' && (

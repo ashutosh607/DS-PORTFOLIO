@@ -91,17 +91,20 @@ export default function Navbar({ onOpenInquiry }) {
 
   return (
     <header
+      id="site-navbar"
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
+        width: '100%',
         zIndex: 1000,
-        transition: 'all 0.35s ease',
-        backgroundColor: scrolled ? 'rgba(253, 252, 248, 0.94)' : 'rgba(253, 252, 248, 0.82)',
+        transition: 'background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease',
+        backgroundColor: scrolled ? 'rgba(253, 252, 248, 0.96)' : 'rgba(253, 252, 248, 0.84)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderBottom: scrolled ? '1px solid var(--color-nude)' : '1px solid transparent',
+        boxShadow: scrolled ? '0 4px 20px -4px rgba(20, 18, 15, 0.08)' : 'none',
         padding: scrolled ? '0.75rem 0' : '1.1rem 0',
       }}
     >
