@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { COLLECTIONS, CATEGORIES } from './data/servicesData';
+import { COLLECTIONS, CATEGORIES as DEFAULT_CATEGORIES } from './data/servicesData';
+import { useCategories } from '../../utils/categoryManager';
 import CollectionTierCard from './components/CollectionTierCard';
 import AtelierStandards from './components/AtelierStandards';
 import CompareMatrixModal from './components/CompareMatrixModal';
@@ -17,6 +18,49 @@ export default function ServicesPage() {
   const queryTier = searchParams.get('tier') || searchParams.get('id');
   const queryStep = searchParams.get('step') || searchParams.get('action');
 
+  const { categories: dynamicCategories } = useCategories();
+  const [backendCategories, setBackendCategories] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((json) => {
+        if (Array.isArray(json.data) && json.data.length > 0) {
+          setBackendCategories(json.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Merge default categories with custom dynamic collection categories
+  const categories = React.useMemo(() => {
+    const base = [
+      { id: 'wedding', label: 'WEDDING' },
+      { id: 'pre-wedding', label: 'PRE-WEDDING' },
+      { id: 'birthday', label: 'BIRTHDAY' },
+      { id: 'portrait', label: 'PORTRAIT' },
+      { id: 'event', label: 'EVENT' },
+      { id: 'commercial', label: 'COMMERCIAL' },
+    ];
+    const sourcePool = [...(dynamicCategories || []), ...(backendCategories || [])];
+    if (sourcePool.length === 0) return base;
+
+    const list = [...base];
+    sourcePool.forEach((cat) => {
+      const slug = (cat.slug || cat.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
+      const exists = list.some(
+        (c) => c.id === slug || c.id === slug.replace(/s$/, '') || `${c.id}s` === slug
+      );
+      if (!exists && slug) {
+        list.push({
+          id: slug,
+          label: (cat.name || slug).toUpperCase(),
+        });
+      }
+    });
+    return list;
+  }, [dynamicCategories, backendCategories]);
+
   const [stage, setStage] = useState(queryStep === 'book' ? 2 : 1); // 1 = Collections, 2 = Booking Form, 3 = Confirmation
   const [selectedCategoryId, setSelectedCategoryId] = useState('wedding');
   const [selectedCollectionId, setSelectedCollectionId] = useState('signature');
@@ -29,8 +73,12 @@ export default function ServicesPage() {
   // Sync state from URL query parameters
   useEffect(() => {
     if (queryCategory) {
-      const matchedCat = CATEGORIES.find(
-        (c) => c.id.toLowerCase() === queryCategory.toLowerCase()
+      const normalizedQuery = queryCategory.toLowerCase();
+      const matchedCat = categories.find(
+        (c) =>
+          c.id.toLowerCase() === normalizedQuery ||
+          c.id.toLowerCase() === normalizedQuery.replace(/s$/, '') ||
+          `${c.id.toLowerCase()}s` === normalizedQuery
       );
       if (matchedCat) {
         setSelectedCategoryId(matchedCat.id);
@@ -50,7 +98,7 @@ export default function ServicesPage() {
     if (queryStep === 'book' || location.hash === '#book') {
       setStage(2);
     }
-  }, [queryCategory, queryTier, queryStep, location.hash]);
+  }, [queryCategory, queryTier, queryStep, location.hash, categories]);
 
   // Ensure professional query URL on initial load if none set
   useEffect(() => {
@@ -75,6 +123,38 @@ export default function ServicesPage() {
     message: '',
     source: 'Instagram',
   });
+
+  // Dynamic services state fetched from backend MongoDB
+  const [dynamicServices, setDynamicServices] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
+  // Fetch dynamic services when active category changes
+  useEffect(() => {
+    let isCancelled = false;
+    const fetchServices = async () => {
+      try {
+        setLoadingServices(true);
+        const res = await fetch(`/api/services?category=${selectedCategoryId}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (!isCancelled && Array.isArray(json.data) && json.data.length > 0) {
+            setDynamicServices(json.data);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load dynamic services:', err);
+      } finally {
+        if (!isCancelled) {
+          setLoadingServices(false);
+        }
+      }
+    };
+
+    fetchServices();
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedCategoryId]);
 
   // Listen for Navbar "Book a Session" event or URL hash #book
   useEffect(() => {
@@ -102,7 +182,7 @@ export default function ServicesPage() {
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategoryId(categoryId);
-    const matched = CATEGORIES.find((c) => c.id === categoryId);
+    const matched = categories.find((c) => c.id === categoryId);
     if (matched) {
       updateFormData({
         eventType: matched.label === 'WEDDING' ? 'Wedding' : matched.label,
@@ -112,26 +192,78 @@ export default function ServicesPage() {
     const categoryCols = COLLECTIONS.filter((c) => c.category === categoryId);
     const signatureOrFirst =
       categoryCols.find((c) => c.highlight || c.isAtelierChoice) || categoryCols[0];
-    const newTier = signatureOrFirst ? signatureOrFirst.id : selectedCollectionId;
-    if (signatureOrFirst) {
-      setSelectedCollectionId(signatureOrFirst.id);
-    }
+    const newTier = signatureOrFirst ? signatureOrFirst.id : 'signature';
+    setSelectedCollectionId(newTier);
     setSearchParams(
       { category: categoryId, tier: newTier },
       { replace: true }
     );
   };
 
-  const filteredCollections = COLLECTIONS.filter(
+  const activeCategoryObj =
+    categories.find((c) => c.id === selectedCategoryId) ||
+    categories[0];
+
+  // Normalize dynamic services or fallback to static collections
+  const normalizedDynamicList = dynamicServices
+    .filter((s) => s.isActive !== false)
+    .map((s, idx) => ({
+      ...s,
+      id: s.tier || s._id,
+      _id: s._id,
+      title: s.eyebrow || s.title || 'Collection',
+      subtitle: s.subtitle,
+      folio: s.folioLabel || `Folio 0${idx + 1}`,
+      folioLabel: s.folioLabel || `Folio 0${idx + 1}`,
+      tag: s.badge || (s.isRecommended ? '★ Atelier Choice' : 'THE COLLECTION'),
+      badge: s.badge,
+      image: s.imageUrl || s.image,
+      imageUrl: s.imageUrl || s.image,
+      imageLabel: s.imageTag || 'Archive Specimen',
+      imageBadge: s.badge,
+      price:
+        typeof s.price === 'number'
+          ? `₹${s.price.toLocaleString('en-IN')}`
+          : s.price || 'Price to be added',
+      numericPrice: typeof s.price === 'number' ? s.price : null,
+      priceNote: s.priceNote,
+      description: s.description,
+      deliverables: s.deliverables || [],
+      curationHighlights: s.deliverables || [],
+      isAtelierChoice: s.isRecommended,
+      highlight: s.isRecommended,
+      category: s.category,
+    }));
+
+  const filteredStaticCollections = COLLECTIONS.filter(
     (c) => c.category === selectedCategoryId
   );
+
   const activeCollections =
-    filteredCollections.length > 0 ? filteredCollections : COLLECTIONS.slice(0, 3);
+    normalizedDynamicList.length > 0
+      ? normalizedDynamicList
+      : filteredStaticCollections;
 
   const selectedCollection =
-    COLLECTIONS.find((c) => c.id === selectedCollectionId) ||
+    activeCollections.find(
+      (c) => c.id === selectedCollectionId || c._id === selectedCollectionId
+    ) ||
     activeCollections.find((c) => c.highlight || c.isAtelierChoice) ||
-    activeCollections[0];
+    activeCollections[0] || {
+      id: `${selectedCategoryId}-custom-suite`,
+      title: `${activeCategoryObj?.label || 'Custom'} Bespoke Suite`,
+      subtitle: 'Tailored Archival Commission',
+      price: 'Price on Request',
+      image: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop',
+      imageLabel: 'Archive Specimen',
+      deliverables: [
+        'Dedicated Creative Director & Principal Master',
+        'Custom Pacing & Bespoke Itinerary Direction',
+        'Medium Format Analog Film & Digital Masters',
+        'Handcrafted Archival Presentation Folio',
+      ],
+      description: `Bespoke commissioned suite curated specifically for ${activeCategoryObj?.label?.toLowerCase() || 'custom'} celebrations.`,
+    };
 
   const handleSelectAndBook = (collectionId, proceed = false) => {
     setSelectedCollectionId(collectionId);
@@ -312,7 +444,7 @@ export default function ServicesPage() {
               {/* Category Navigation with 55px top / 45px bottom margin and thin underline */}
               <div style={{ marginTop: '55px', marginBottom: '45px' }} className="w-full overflow-x-auto no-scrollbar">
                 <div className="flex items-center justify-center min-w-max gap-6 sm:gap-9 px-4">
-                  {CATEGORIES.map((cat) => {
+                  {categories.map((cat) => {
                     const isCatSelected = selectedCategoryId === cat.id;
                     return (
                       <button
@@ -331,7 +463,7 @@ export default function ServicesPage() {
                 </div>
               </div>
 
-              {/* 3 Collection Cards Grid with smooth Framer Motion transition */}
+              {/* 3 Collection Cards Grid or Custom Bespoke Notice with smooth Framer Motion transition */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={selectedCategoryId}
@@ -341,14 +473,51 @@ export default function ServicesPage() {
                   transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                   className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[clamp(28px,3vw,56px)] items-stretch"
                 >
-                  {activeCollections.map((col) => (
-                    <CollectionTierCard
-                      key={col.id}
-                      collection={col}
-                      isSelected={selectedCollectionId === col.id}
-                      onSelectAndBook={handleSelectAndBook}
-                    />
-                  ))}
+                  {activeCollections.length > 0 ? (
+                    activeCollections.map((col) => (
+                      <CollectionTierCard
+                        key={col.id || col._id}
+                        collection={col}
+                        isSelected={selectedCollectionId === col.id || selectedCollectionId === col._id}
+                        onSelectAndBook={handleSelectAndBook}
+                      />
+                    ))
+                  ) : (
+                    <div className="col-span-full py-16 px-8 text-center rounded-2xl border border-[#E3DBCC] bg-[#FAF8F5]">
+                      <span className="font-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] text-[#7A7770] uppercase block mb-3">
+                        ATELIER BESPOKE COMMISSIONS
+                      </span>
+                      <h3
+                        style={{
+                          fontFamily: 'var(--font-serif)',
+                          fontSize: 'clamp(2rem, 3.2vw, 2.6rem)',
+                          color: '#101010',
+                          fontWeight: 400,
+                          lineHeight: 1.15,
+                          marginBottom: '14px',
+                        }}
+                      >
+                        Bespoke {activeCategoryObj?.label || 'Custom'} Suites
+                      </h3>
+                      <p className="font-serif italic text-sm sm:text-base text-[#7A7770] max-w-xl mx-auto mb-8 leading-relaxed">
+                        Every commission in this discipline is uniquely structured around your timeline, aesthetic intention, and archival vision. Direct atelier scheduling is open.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStage(2);
+                          setSearchParams(
+                            { category: selectedCategoryId, step: 'book' },
+                            { replace: true }
+                          );
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#101010] text-[#FDFCF8] rounded-full text-xs font-sans font-medium tracking-[0.16em] uppercase hover:bg-[#2A2825] transition-all cursor-pointer shadow-sm"
+                      >
+                        <span>COMMISSION A CUSTOM BRIEF →</span>
+                      </button>
+                    </div>
+                  )}
                 </motion.div>
               </AnimatePresence>
 

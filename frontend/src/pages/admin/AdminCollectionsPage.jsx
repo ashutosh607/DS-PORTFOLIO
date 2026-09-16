@@ -474,8 +474,17 @@ export default function AdminCollectionsPage() {
             </div>
           </div>
 
-          {/* Edit & Delete Category Actions */}
+          {/* Services, Edit & Delete Category Actions */}
           <div className="flex items-center gap-2.5 shrink-0">
+            <Link
+              to={`/admin/services/${currentCategoryObj.slug}`}
+              className="h-[34px] px-3.5 rounded-lg border border-[#181818] bg-[#181818] text-[#FAF8F5] hover:bg-[#333] text-[12px] font-medium flex items-center gap-1.5 transition-colors no-underline cursor-pointer"
+              title={`Manage services and packages for ${currentCategoryObj.name}`}
+            >
+              <Sparkles size={13} className="text-[#C2A378]" />
+              <span>Services ({currentCategoryObj.name})</span>
+            </Link>
+
             <button
               type="button"
               onClick={() => setEditCategoryTarget(currentCategoryObj)}

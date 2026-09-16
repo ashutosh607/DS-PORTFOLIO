@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
-import { Home, Folder, ExternalLink, User, LogOut } from 'lucide-react';
+import { Home, Folder, Sparkles, ExternalLink, User, LogOut } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import Logo from '../../../components/layout/Logo';
 import '../AdminDashboard.css';
@@ -18,6 +18,7 @@ export default function AdminSidebar() {
   const navItems = [
     { label: 'Dashboard', path: '/admin/dashboard', icon: Home },
     { label: 'Collections', path: '/admin/collections', icon: Folder },
+    { label: 'Services', path: '/admin/services', icon: Sparkles },
   ];
 
   return (

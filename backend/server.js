@@ -17,6 +17,7 @@ const uploadRouter = require("./routes/upload.route");
 const adminRouter = require("./routes/admin.route");
 const mediaRouter = require("./routes/media.route");
 const categoryRouter = require("./routes/category.route");
+const serviceRouter = require("./routes/service.route");
 
 const helmet = require("helmet");
 const { globalLimiter } = require("./middlewares/rateLimiter.middleware");
@@ -117,6 +118,7 @@ app.use("/api/v1/upload", uploadRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/media", mediaRouter);
 app.use("/api/categories", categoryRouter);
+app.use("/api/services", serviceRouter);
 
 // Catch-all 404 handler for undefined routes
 app.use((req, res, next) => {

@@ -223,9 +223,19 @@ export default function AdminDashboardPage() {
                 <p className="meta">
                   {cat.photosCount} Photos · {cat.videosCount} Videos
                 </p>
-                <span className="manage-link">
-                  Manage media <ArrowRight size={11} strokeWidth={2} />
-                </span>
+                <div className="flex items-center gap-3 mt-2">
+                  <span className="manage-link">
+                    Media <ArrowRight size={11} strokeWidth={2} />
+                  </span>
+                  <span className="text-[#D4CCC0]">•</span>
+                  <Link
+                    to={`/admin/services/${cat.slug}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="manage-link text-[#5C5549] hover:text-[#181818]"
+                  >
+                    Services <ArrowRight size={11} strokeWidth={2} />
+                  </Link>
+                </div>
               </div>
             </div>
           ))}

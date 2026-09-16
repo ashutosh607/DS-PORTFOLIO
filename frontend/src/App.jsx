@@ -18,6 +18,7 @@ import AdminLayout from './pages/admin/AdminLayout';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminCollectionsPage from './pages/admin/AdminCollectionsPage';
+import AdminServicesPage from './pages/admin/AdminServicesPage';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -100,6 +101,8 @@ export default function App() {
                 <Route path="dashboard" element={<AdminDashboardPage />} />
                 <Route path="collections" element={<AdminCollectionsPage />} />
                 <Route path="collections/:category" element={<AdminCollectionsPage />} />
+                <Route path="services" element={<AdminServicesPage />} />
+                <Route path="services/:category" element={<AdminServicesPage />} />
               </Route>
 
               {/* 404 Page Not Found Route */}
