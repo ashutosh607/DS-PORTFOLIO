@@ -30,13 +30,13 @@ const DESKTOP_RESTING = [
 ];
 
 const MOBILE_RESTING = [
-  { x: -75, y: -155, rotate: -2.5 }, // 0: Upper-Left
-  { x: 75,  y: -145, rotate: 2.5 },  // 1: Upper-Right
-  { x: -70, y: -35,  rotate: 1.5 },  // 2: Mid-Left
-  { x: 70,  y: -25,  rotate: -1.5 }, // 3: Mid-Right
-  { x: -75, y: 85,   rotate: -2.5 }, // 4: Lower-Left
-  { x: 75,  y: 95,   rotate: 2.5 },  // 5: Lower-Right
-  { x: 0,   y: 190,  rotate: 0.0 },  // 6: Bottom Center
+  { x: -62, y: -70, rotate: -2.5 }, // 0: Upper-Left
+  { x: 62,  y: -60, rotate: 2.5 },  // 1: Upper-Right
+  { x: -60, y: 0,   rotate: 1.5 },  // 2: Mid-Left
+  { x: 60,  y: 10,  rotate: -1.5 }, // 3: Mid-Right
+  { x: -62, y: 70,  rotate: -2.5 }, // 4: Lower-Left
+  { x: 62,  y: 80,  rotate: 2.5 },  // 5: Lower-Right
+  { x: 0,   y: 105, rotate: 0.0 },  // 6: Bottom Center
 ];
 
 /**
@@ -46,6 +46,121 @@ const MOBILE_RESTING = [
 function smootherStep(t) {
   const c = Math.max(0, Math.min(1, t));
   return c * c * c * (c * (c * 6 - 15) + 10);
+}
+
+/**
+ * EDITORIAL SCROLL BEATS (Zero-Overlap Phased Typography)
+ * Each beat defines strictly segregated start, peak, and end scroll windows.
+ * Guaranteed buffer gaps ensure one beat completely fades out before the next begins.
+ */
+const EDITORIAL_BEATS = [
+  {
+    id: 1,
+    // Phase 1: Active during cards 0 & 1 dealing (progress 0.00 to 0.34)
+    start: 0.00,
+    peakStart: 0.04,
+    peakEnd: 0.28,
+    end: 0.34,
+    left: {
+      eyebrow: '01 · VISION',
+      title: 'We capture the real,',
+      italic: 'the unscripted.',
+      subtitle: 'Honest emotion suspended between quiet breaths.',
+    },
+    right: {
+      eyebrow: 'ATELIER CRAFT',
+      title: 'Natural ambient light,',
+      italic: 'held in time.',
+      subtitle: 'Photographed in 35mm & medium format stillness.',
+    },
+  },
+  {
+    id: 2,
+    // Phase 2: Active during cards 2 & 3 dealing (progress 0.32 to 0.68)
+    start: 0.32,
+    peakStart: 0.38,
+    peakEnd: 0.62,
+    end: 0.68,
+    left: {
+      eyebrow: '02 · DISCIPLINE',
+      title: 'Every single frame holds an',
+      italic: 'enduring story.',
+      subtitle: 'Moments that outlast fleeting fashion and trend.',
+    },
+    right: {
+      eyebrow: 'ARCHIVAL STANDARD',
+      title: 'Fine art monographs in',
+      italic: 'silver & tone.',
+      subtitle: 'Pure fiber prints crafted with museum longevity.',
+    },
+  },
+  {
+    id: 3,
+    // Phase 3: Active during cards 4, 5 & 6 dealing (progress 0.66 to 1.00)
+    start: 0.66,
+    peakStart: 0.72,
+    peakEnd: 0.94,
+    end: 1.00,
+    left: {
+      eyebrow: '03 · ESSENCE',
+      title: 'Framed in light,',
+      italic: 'held in memory.',
+      subtitle: 'Artistic direction rooted in timeless presence.',
+    },
+    right: {
+      eyebrow: 'FOLIO ARCHIVE',
+      title: 'Your legacy in silver',
+      italic: '& shadow.',
+      subtitle: 'Curated proofs ready for bespoke presentation.',
+    },
+  },
+];
+
+/**
+ * Calculates optical lens blur-to-real transition values strictly tied to scroll progress.
+ * Returns { opacity, blur, y, visible }
+ */
+function calculateBeatStyle(progress, start, peakStart, peakEnd, end) {
+  if (progress < start || progress > end) {
+    return {
+      opacity: 0,
+      blur: 16,
+      y: 18,
+      visible: false,
+    };
+  }
+
+  // Smooth lens entry: blur slides from 16px down to 0px, opacity 0 to 1
+  if (progress < peakStart) {
+    const t = (progress - start) / (peakStart - start);
+    const eased = smootherStep(t);
+    return {
+      opacity: eased,
+      blur: (1 - eased) * 16,
+      y: (1 - eased) * 18,
+      visible: true,
+    };
+  }
+
+  // Peak clarity: pin-sharp, perfectly legible
+  if (progress <= peakEnd) {
+    return {
+      opacity: 1,
+      blur: 0,
+      y: 0,
+      visible: true,
+    };
+  }
+
+  // Soft dissolution exit: blurs out to 14px as opacity drops to 0
+  const t = (progress - peakEnd) / (end - peakEnd);
+  const eased = smootherStep(t);
+  return {
+    opacity: 1 - eased,
+    blur: eased * 14,
+    y: -eased * 14,
+    visible: true,
+  };
 }
 
 export default function WhatWeDoEditorial() {
@@ -256,7 +371,7 @@ export default function WhatWeDoEditorial() {
 
       {/* Pinned 100vh Sticky Stage with End Defocus Blur */}
       <div
-        className="sticky top-0 h-screen w-full flex flex-col justify-between items-center overflow-hidden px-4 sm:px-8 py-6 sm:py-8 will-change-transform"
+        className="sticky top-0 h-screen w-full flex flex-col justify-between items-center overflow-hidden px-4 sm:px-8 pt-[86px] sm:pt-8 pb-5 sm:pb-8 will-change-transform"
         style={{
           filter: stageBlur > 0.1 ? `blur(${stageBlur.toFixed(1)}px)` : 'none',
           opacity: stageOpacity,
@@ -268,7 +383,7 @@ export default function WhatWeDoEditorial() {
         {/* =================================================================
             TOP ARCHIVAL HEADER BAR: Dynamic Print Counter & Minimal Mark
             ================================================================= */}
-        <div className="w-full max-w-[1300px] flex items-center justify-between pointer-events-none z-30">
+        <div className="w-full max-w-[1400px] flex items-center justify-between pointer-events-none z-30">
           <div className="flex items-center gap-3 font-mono text-[0.6rem] sm:text-[0.66rem] tracking-[0.24em] text-[#7A7770] uppercase">
             <span className="w-6 sm:w-10 h-[1px] bg-[#E3DBCC]" />
             <span className="text-[#101010] font-medium tracking-[0.28em]">WHAT WE DO</span>
@@ -286,13 +401,51 @@ export default function WhatWeDoEditorial() {
         </div>
 
         {/* =================================================================
+            MOBILE TOP EDITORIAL TEXT (BLUR-TO-REAL SCROLL DRIVEN)
+            ================================================================= */}
+        <div className="md:hidden w-full max-w-[360px] px-3 text-center pointer-events-none select-none z-20 relative min-h-[92px] flex items-center justify-center mt-3 mb-1 translate-y-[58px]">
+          {EDITORIAL_BEATS.map((beat) => {
+            const style = calculateBeatStyle(scrollProgress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
+            if (!style.visible) return null;
+
+            return (
+              <div
+                key={`mobile-top-${beat.id}`}
+                className="absolute inset-0 flex flex-col items-center justify-center transition-none will-change-[transform,opacity,filter]"
+                style={{
+                  opacity: style.opacity,
+                  filter: style.blur > 0.05 ? `blur(${style.blur.toFixed(1)}px)` : 'none',
+                  transform: `translateY(${style.y.toFixed(1)}px)`,
+                }}
+              >
+                <div className="flex items-center gap-2 font-mono text-[0.6rem] sm:text-[0.62rem] tracking-[0.26em] text-[#7A7770] font-semibold uppercase mb-1">
+                  <span className="w-3 h-[1px] bg-[#E3DBCC]" />
+                  <span>{beat.left.eyebrow}</span>
+                  <span className="w-3 h-[1px] bg-[#E3DBCC]" />
+                </div>
+                <h4
+                  className="font-serif text-[clamp(1.3rem,4.8vw,1.65rem)] font-normal text-[#101010] leading-[1.18] tracking-[-0.02em]"
+                  style={{ fontFamily: 'var(--font-serif)' }}
+                >
+                  {beat.left.title}{' '}
+                  <span className="italic font-light text-[#101010]">{beat.left.italic}</span>
+                </h4>
+                <p className="font-sans text-[clamp(0.76rem,2.6vw,0.88rem)] text-[#4A4844] font-normal leading-snug tracking-wide mt-1 max-w-[310px]">
+                  {beat.left.subtitle}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* =================================================================
             CENTRAL DECK STAGE CONTAINER
             ================================================================= */}
-        <div className="relative w-full max-w-[1300px] h-[480px] sm:h-[560px] md:h-[620px] flex items-center justify-center flex-1 my-auto">
+        <div className="relative w-full max-w-[1400px] h-[300px] sm:h-[460px] md:h-[620px] flex items-center justify-center flex-1 my-auto">
           
           {/* Deck Physical Stack Base / Mat Outline with subtle pulsing glow */}
           <div
-            className="absolute w-[120px] sm:w-[170px] md:w-[190px] aspect-[3/4] rounded-[2px] bg-[#E3DBCC]/25 border border-[#E3DBCC]/60 pointer-events-none -z-10 shadow-[0_8px_24px_-8px_rgba(16,14,12,0.08)]"
+            className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-[2px] bg-[#E3DBCC]/25 border border-[#E3DBCC]/60 pointer-events-none -z-10 shadow-[0_8px_24px_-8px_rgba(16,14,12,0.08)]"
             style={{
               transform: `translate3d(${mouseOffset.x * 4}px, ${mouseOffset.y * 3}px, 0)`,
               transition: 'transform 0.2s ease-out',
@@ -412,7 +565,7 @@ export default function WhatWeDoEditorial() {
                 key={i}
                 onMouseEnter={() => setHoveredIndex(i)}
                 onMouseLeave={() => setHoveredIndex(null)}
-                className="absolute w-[120px] sm:w-[170px] md:w-[190px] aspect-[3/4] bg-[#F3F0E9] p-1.5 sm:p-2 border-[1.5px] border-[#101010] rounded-[2px] will-change-transform group cursor-pointer"
+                className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] bg-[#F3F0E9] p-1.5 sm:p-2 border-[1.5px] border-[#101010] rounded-[2px] will-change-transform group cursor-pointer"
                 style={{
                   transform: `translate3d(${currentX + parallaxX}px, ${currentY + parallaxY}px, 0) rotate(${currentRotate}deg) scale(${finalScale})`,
                   opacity: currentOpacity,
@@ -452,12 +605,126 @@ export default function WhatWeDoEditorial() {
             );
           })}
 
+          {/* =================================================================
+              LEFT EDITORIAL TYPOGRAPHY FLANK (BLUR-TO-REAL SCROLL DRIVEN)
+              ================================================================= */}
+          <div className="hidden md:block absolute left-2 lg:left-6 xl:left-10 top-1/2 -translate-y-1/2 z-20 pointer-events-none select-none max-w-[210px] lg:max-w-[260px] xl:max-w-[280px] text-left">
+            {EDITORIAL_BEATS.map((beat) => {
+              const style = calculateBeatStyle(scrollProgress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
+              if (!style.visible) return null;
+
+              return (
+                <div
+                  key={`left-${beat.id}`}
+                  className="transition-none will-change-[transform,opacity,filter]"
+                  style={{
+                    opacity: style.opacity,
+                    filter: style.blur > 0.05 ? `blur(${style.blur.toFixed(1)}px)` : 'none',
+                    transform: `translateY(${style.y.toFixed(1)}px)`,
+                  }}
+                >
+                  <div className="flex items-center gap-2 font-mono text-[0.58rem] sm:text-[0.62rem] tracking-[0.24em] text-[#7A7770] uppercase mb-2">
+                    <span className="w-4 h-[1px] bg-[#E3DBCC]" />
+                    <span>{beat.left.eyebrow}</span>
+                  </div>
+                  <h3
+                    className="font-serif text-[clamp(1.35rem,2.1vw,1.95rem)] font-normal text-[#101010] leading-[1.12] tracking-[-0.02em]"
+                    style={{ fontFamily: 'var(--font-serif)' }}
+                  >
+                    {beat.left.title}
+                    <br />
+                    <span className="italic font-light text-[#101010]">{beat.left.italic}</span>
+                  </h3>
+                  <p className="font-sans text-[clamp(0.72rem,0.9vw,0.84rem)] text-[#7A7770] leading-relaxed mt-2.5 font-light">
+                    {beat.left.subtitle}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* =================================================================
+              RIGHT EDITORIAL TYPOGRAPHY FLANK (BLUR-TO-REAL SCROLL DRIVEN)
+              ================================================================= */}
+          <div className="hidden md:block absolute right-2 lg:right-6 xl:right-10 top-1/2 -translate-y-1/2 z-20 pointer-events-none select-none max-w-[210px] lg:max-w-[260px] xl:max-w-[280px] text-right">
+            {EDITORIAL_BEATS.map((beat) => {
+              const style = calculateBeatStyle(scrollProgress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
+              if (!style.visible) return null;
+
+              return (
+                <div
+                  key={`right-${beat.id}`}
+                  className="transition-none will-change-[transform,opacity,filter]"
+                  style={{
+                    opacity: style.opacity,
+                    filter: style.blur > 0.05 ? `blur(${style.blur.toFixed(1)}px)` : 'none',
+                    transform: `translateY(${style.y.toFixed(1)}px)`,
+                  }}
+                >
+                  <div className="flex items-center justify-end gap-2 font-mono text-[0.58rem] sm:text-[0.62rem] tracking-[0.24em] text-[#7A7770] uppercase mb-2">
+                    <span>{beat.right.eyebrow}</span>
+                    <span className="w-4 h-[1px] bg-[#E3DBCC]" />
+                  </div>
+                  <h3
+                    className="font-serif text-[clamp(1.35rem,2.1vw,1.95rem)] font-normal text-[#101010] leading-[1.12] tracking-[-0.02em]"
+                    style={{ fontFamily: 'var(--font-serif)' }}
+                  >
+                    {beat.right.title}
+                    <br />
+                    <span className="italic font-light text-[#101010]">{beat.right.italic}</span>
+                  </h3>
+                  <p className="font-sans text-[clamp(0.72rem,0.9vw,0.84rem)] text-[#7A7770] leading-relaxed mt-2.5 font-light ml-auto">
+                    {beat.right.subtitle}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+
+        {/* =================================================================
+            MOBILE BOTTOM EDITORIAL TEXT (BLUR-TO-REAL SCROLL DRIVEN)
+            ================================================================= */}
+        <div className="md:hidden w-full max-w-[360px] px-3 text-center pointer-events-none select-none z-20 relative min-h-[92px] flex items-center justify-center mt-1 mb-8 -translate-y-[58px]">
+          {EDITORIAL_BEATS.map((beat) => {
+            const style = calculateBeatStyle(scrollProgress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
+            if (!style.visible) return null;
+
+            return (
+              <div
+                key={`mobile-bottom-${beat.id}`}
+                className="absolute inset-0 flex flex-col items-center justify-center transition-none will-change-[transform,opacity,filter]"
+                style={{
+                  opacity: style.opacity,
+                  filter: style.blur > 0.05 ? `blur(${style.blur.toFixed(1)}px)` : 'none',
+                  transform: `translateY(${-style.y.toFixed(1)}px)`,
+                }}
+              >
+                <h4
+                  className="font-serif text-[clamp(1.25rem,4.5vw,1.6rem)] font-normal text-[#101010] leading-[1.18] tracking-[-0.02em]"
+                  style={{ fontFamily: 'var(--font-serif)' }}
+                >
+                  {beat.right.title}{' '}
+                  <span className="italic font-light text-[#101010]">{beat.right.italic}</span>
+                </h4>
+                <div className="flex items-center gap-2 font-mono text-[0.58rem] sm:text-[0.62rem] tracking-[0.24em] text-[#7A7770] font-semibold uppercase mt-1">
+                  <span className="w-3 h-[1px] bg-[#E3DBCC]" />
+                  <span>{beat.right.eyebrow}</span>
+                  <span className="w-3 h-[1px] bg-[#E3DBCC]" />
+                </div>
+                <p className="font-sans text-[clamp(0.74rem,2.5vw,0.86rem)] text-[#4A4844] font-normal leading-snug tracking-wide mt-1 max-w-[310px]">
+                  {beat.right.subtitle}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
         {/* =================================================================
             BOTTOM ARCHIVAL FOOTER: Hairline Progress & Status
             ================================================================= */}
-        <div className="w-full max-w-[1300px] flex flex-col gap-2 pointer-events-none z-30">
+        <div className="w-full max-w-[1400px] flex flex-col gap-2 pointer-events-none z-30 -translate-y-[40px] md:translate-y-0">
           {/* Hairline Scrub Progress Line */}
           <div className="w-full h-[1px] bg-[#E3DBCC]/60 relative overflow-hidden">
             <div
