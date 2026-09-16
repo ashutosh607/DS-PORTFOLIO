@@ -37,31 +37,31 @@
   box-sizing: border-box;
 }
 
-/* --- Main Workspace (Generous Top Padding & Spacious Gap from Sidebar) --- */
+/* --- Main Workspace (Generous Spacing & Balanced Padding for Luxury Cards) --- */
 .admin-main-workspace {
   flex: 1;
   min-width: 0;
   overflow-y: auto;
   background-color: #FAF8F5;
-  padding: 56px 64px 80px 64px; /* 56px TOP padding, 64px LEFT gap from sidebar, 64px RIGHT padding */
+  padding: 56px 56px 96px 56px;
   box-sizing: border-box;
 }
 
 @media (max-width: 1280px) {
   .admin-main-workspace {
-    padding: 48px 44px 68px 48px;
+    padding: 44px 36px 72px 36px;
   }
 }
 
 @media (max-width: 1024px) {
   .admin-main-workspace {
-    padding: 36px 24px 48px 24px;
+    padding: 36px 20px 56px 20px;
   }
 }
 
 .admin-content-inner {
   width: 100%;
-  max-width: 1360px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
@@ -70,8 +70,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 16px;
-  border-radius: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
   font-size: 13px;
   font-weight: 400;
   color: #5C5852;
@@ -87,7 +87,7 @@
 }
 
 .admin-sidebar-nav-item.active {
-  background-color: #EBE6DE;
+  background-color: #EDE6DC;
   color: #181818;
   font-weight: 500;
 }
