@@ -23,19 +23,37 @@ export default function CommissionSummaryCard({
     'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop';
 
   return (
-    <div className="space-y-8">
-      {/* Commission Summary Card */}
+    <div
+      data-testid="commission-sidebar-wrapper"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '24px',
+      }}
+    >
+      {/* Commission Summary Card (At least 24px padding on all sides) */}
       <div
+        data-testid="commission-summary-card"
         style={{
           padding: '28px',
           border: '1px solid #E3DBCC',
           borderRadius: '16px',
           background: '#FDFCF8',
+          boxSizing: 'border-box',
         }}
         className="shadow-[0_4px_24px_-8px_rgba(16,16,16,0.04)]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 mb-6 border-b border-[#E3DBCC]">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingBottom: '16px',
+            marginBottom: '24px',
+            borderBottom: '1px solid #E3DBCC',
+          }}
+        >
           <div className="flex items-center gap-2">
             <svg
               className="w-4 h-4 text-[#7A7770]"
@@ -60,17 +78,18 @@ export default function CommissionSummaryCard({
           </span>
         </div>
 
-        {/* Image (Strictly 4:3, 10px radius, with 24px bottom space) */}
+        {/* Image (At least 20px gap below before first info row) */}
         <div
+          data-testid="sidebar-photo-container"
           style={{
             width: '100%',
             aspectRatio: '4 / 3',
             borderRadius: '10px',
-            marginBottom: '24px',
+            marginBottom: '20px',
             overflow: 'hidden',
             border: '1px solid #E3DBCC',
           }}
-          className="relative bg-[#F3F0E9]"
+          className="relative bg-[#F3EFE6]"
         >
           <img
             src={cardImage}
@@ -89,15 +108,17 @@ export default function CommissionSummaryCard({
           </div>
         </div>
 
-        {/* Summary Information Rows */}
-        <div>
+        {/* Summary Information Rows (At least 16px padding above and below each divider line) */}
+        <div data-testid="sidebar-info-rows">
           {/* Row 1: Selected Suite */}
           <div
+            data-testid="sidebar-info-row-0"
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'baseline',
-              padding: '12px 0',
+              paddingTop: '16px',
+              paddingBottom: '16px',
               borderBottom: '1px solid #E3DBCC',
             }}
           >
@@ -127,11 +148,13 @@ export default function CommissionSummaryCard({
 
           {/* Row 2: Event Horizon */}
           <div
+            data-testid="sidebar-info-row-1"
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'baseline',
-              padding: '12px 0',
+              paddingTop: '16px',
+              paddingBottom: '16px',
               borderBottom: '1px solid #E3DBCC',
             }}
           >
@@ -161,11 +184,13 @@ export default function CommissionSummaryCard({
 
           {/* Row 3: Coverage Schedule */}
           <div
+            data-testid="sidebar-info-row-2"
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'baseline',
-              padding: '12px 0',
+              paddingTop: '16px',
+              paddingBottom: '16px',
               borderBottom: '1px solid #E3DBCC',
             }}
           >
@@ -195,11 +220,13 @@ export default function CommissionSummaryCard({
 
           {/* Row 4: Primary Location */}
           <div
+            data-testid="sidebar-info-row-3"
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'baseline',
-              padding: '12px 0',
+              paddingTop: '16px',
+              paddingBottom: '16px',
               borderBottom: '1px solid #E3DBCC',
             }}
           >
@@ -231,11 +258,13 @@ export default function CommissionSummaryCard({
 
           {/* Row 5: Studio Investment */}
           <div
+            data-testid="sidebar-info-row-4"
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'baseline',
-              padding: '12px 0',
+              paddingTop: '16px',
+              paddingBottom: '16px',
               borderBottom: '1px solid #E3DBCC',
             }}
           >
@@ -268,8 +297,8 @@ export default function CommissionSummaryCard({
           </div>
         </div>
 
-        {/* INCLUDED IN THIS CURATION (mt-28px, mb-16px) */}
-        <div style={{ marginTop: '28px', marginBottom: '16px' }}>
+        {/* INCLUDED IN THIS CURATION */}
+        <div style={{ marginTop: '24px', marginBottom: '24px' }}>
           <span
             style={{
               fontSize: '11px',
@@ -311,14 +340,17 @@ export default function CommissionSummaryCard({
           </ul>
         </div>
 
-        {/* 48-HOUR PROVISIONAL HOLD (mt-28px, p-18px 20px, bg #F3F0E9) */}
+        {/* 48-HOUR PROVISIONAL HOLD (24px internal padding, 24px margin above and below) */}
         <div
+          data-testid="provisional-hold-box"
           style={{
-            marginTop: '28px',
-            padding: '18px 20px',
+            marginTop: '24px',
+            marginBottom: '24px',
+            padding: '24px',
             border: '1px solid #E3DBCC',
             borderRadius: '12px',
             background: '#F3F0E9',
+            boxSizing: 'border-box',
           }}
         >
           <div className="flex items-start gap-2.5">
@@ -333,7 +365,18 @@ export default function CommissionSummaryCard({
         </div>
 
         {/* Switch Suite Button */}
-        <div className="flex items-center justify-between pt-5 mt-5 border-t border-[#E3DBCC] text-xs font-sans">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingTop: '20px',
+            marginTop: '20px',
+            borderTop: '1px solid #E3DBCC',
+            fontSize: '12px',
+          }}
+          className="font-sans"
+        >
           <button
             type="button"
             onClick={onScrollToCollections}
@@ -349,13 +392,15 @@ export default function CommissionSummaryCard({
         </div>
       </div>
 
-      {/* Quote Card */}
+      {/* Quote Card (24px internal padding, 24px space above) */}
       <div
+        data-testid="sidebar-quote-card"
         style={{
           padding: '24px',
           border: '1px solid #E3DBCC',
           borderRadius: '16px',
           background: '#FDFCF8',
+          boxSizing: 'border-box',
         }}
         className="shadow-[0_2px_16px_-6px_rgba(16,16,16,0.03)]"
       >

@@ -199,6 +199,8 @@ export default function LocationSearchInput({
           style={{
             width: '100%',
             height: '52px',
+            paddingTop: '14px',
+            paddingBottom: '14px',
             paddingLeft: '44px',
             paddingRight: query ? '80px' : '40px',
             border: error ? '1px solid #992E2E' : '1px solid #E3DBCC',
@@ -208,6 +210,7 @@ export default function LocationSearchInput({
             color: '#101010',
             fontFamily: 'var(--font-sans)',
             boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+            boxSizing: 'border-box',
           }}
           className="outline-none transition-all duration-200 focus:border-[#101010] focus:shadow-sm placeholder-[#A59C8F]"
           autoComplete="off"

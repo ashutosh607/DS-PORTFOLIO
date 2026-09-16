@@ -102,16 +102,18 @@ export default function BookingBriefForm({
     >
       {/* =========================================================
           SECTION 01: YOUR DETAILS
+          - 64px vertical space between end of section & next heading
           ========================================================= */}
       <section
+        data-testid="form-section-01"
         style={{
-          paddingBottom: '40px',
-          marginBottom: '40px',
+          paddingBottom: '32px',
+          marginBottom: '64px',
           borderBottom: '1px solid #E3DBCC',
         }}
       >
-        {/* Section Header */}
-        <div style={{ marginBottom: '28px' }}>
+        {/* Section Header: 24px gap below before first field */}
+        <div style={{ marginBottom: '24px' }}>
           <div className="flex items-baseline justify-between gap-4">
             <h3
               style={{
@@ -138,12 +140,12 @@ export default function BookingBriefForm({
           </div>
         </div>
 
-        {/* Full Name */}
-        <div style={{ marginBottom: '24px' }}>
+        {/* Full Name: 8px label->input, 28px bottom margin */}
+        <div style={{ marginBottom: '28px' }}>
           <label
             style={{
               display: 'block',
-              marginBottom: '9px',
+              marginBottom: '8px',
               fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -165,13 +167,14 @@ export default function BookingBriefForm({
             placeholder="e.g., Katherine Bell & Henri Dubois"
             style={{
               width: '100%',
-              height: '50px',
-              padding: '0 16px',
+              minHeight: '52px',
+              padding: '14px 16px',
               border: '1px solid #E3DBCC',
               borderRadius: '8px',
               background: '#FDFCF8',
               fontSize: '15px',
               color: '#101010',
+              boxSizing: 'border-box',
             }}
             className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
           />
@@ -180,19 +183,19 @@ export default function BookingBriefForm({
           )}
         </div>
 
-        {/* Email & Phone Two-Field Row (20px gap) */}
+        {/* Email & Phone Two-Field Row (24px horizontal gap, 52px matching height) */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '20px',
+            gap: '24px',
           }}
         >
           <div>
             <label
               style={{
                 display: 'block',
-                marginBottom: '9px',
+                marginBottom: '8px',
                 fontSize: '11px',
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
@@ -214,13 +217,14 @@ export default function BookingBriefForm({
               placeholder="atelier@domain.com"
               style={{
                 width: '100%',
-                height: '50px',
-                padding: '0 16px',
+                minHeight: '52px',
+                padding: '14px 16px',
                 border: '1px solid #E3DBCC',
                 borderRadius: '8px',
                 background: '#FDFCF8',
                 fontSize: '15px',
                 color: '#101010',
+                boxSizing: 'border-box',
               }}
               className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
             />
@@ -233,7 +237,7 @@ export default function BookingBriefForm({
             <label
               style={{
                 display: 'block',
-                marginBottom: '9px',
+                marginBottom: '8px',
                 fontSize: '11px',
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
@@ -249,13 +253,14 @@ export default function BookingBriefForm({
                 value={formData.countryCode || '+91'}
                 onChange={(e) => updateFormData({ countryCode: e.target.value })}
                 style={{
-                  height: '50px',
-                  padding: '0 12px',
+                  minHeight: '52px',
+                  padding: '14px 12px',
                   border: '1px solid #E3DBCC',
                   borderRadius: '8px',
                   background: '#FDFCF8',
                   fontSize: '14px',
                   color: '#101010',
+                  boxSizing: 'border-box',
                 }}
                 className="outline-none transition-colors focus:border-[#101010] shrink-0 cursor-pointer"
               >
@@ -277,13 +282,14 @@ export default function BookingBriefForm({
                 placeholder="98765 43210"
                 style={{
                   width: '100%',
-                  height: '50px',
-                  padding: '0 16px',
+                  minHeight: '52px',
+                  padding: '14px 16px',
                   border: '1px solid #E3DBCC',
                   borderRadius: '8px',
                   background: '#FDFCF8',
                   fontSize: '15px',
                   color: '#101010',
+                  boxSizing: 'border-box',
                 }}
                 className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
               />
@@ -297,16 +303,18 @@ export default function BookingBriefForm({
 
       {/* =========================================================
           SECTION 02: YOUR EVENT
+          - 64px vertical space between end of section & next heading
           ========================================================= */}
       <section
+        data-testid="form-section-02"
         style={{
-          paddingBottom: '40px',
-          marginBottom: '40px',
+          paddingBottom: '32px',
+          marginBottom: '64px',
           borderBottom: '1px solid #E3DBCC',
         }}
       >
-        {/* Section Header */}
-        <div style={{ marginBottom: '28px' }}>
+        {/* Section Header: 24px gap below before first field */}
+        <div style={{ marginBottom: '24px' }}>
           <div className="flex items-baseline justify-between gap-4">
             <h3
               style={{
@@ -333,12 +341,12 @@ export default function BookingBriefForm({
           </div>
         </div>
 
-        {/* Celebration Type Selectable Pills */}
-        <div style={{ marginBottom: '24px' }}>
+        {/* Celebration Type Selectable Pills: 12px gap, 12px x 20px padding, 28px bottom */}
+        <div style={{ marginBottom: '28px' }}>
           <label
             style={{
               display: 'block',
-              marginBottom: '9px',
+              marginBottom: '8px',
               fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -349,7 +357,13 @@ export default function BookingBriefForm({
           >
             TYPE OF CELEBRATION / ASSIGNMENT
           </label>
-          <div className="flex flex-wrap gap-2.5">
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '12px',
+            }}
+          >
             {celebrationTypes.map((type) => {
               const isSelected = (formData.eventType || 'Wedding') === type;
               return (
@@ -358,8 +372,8 @@ export default function BookingBriefForm({
                   type="button"
                   onClick={() => updateFormData({ eventType: type })}
                   style={{
-                    padding: '12px 18px',
-                    minHeight: '44px',
+                    padding: '12px 20px',
+                    minHeight: '46px',
                     borderRadius: '999px',
                     border: isSelected ? '1px solid #101010' : '1px solid #E3DBCC',
                     background: isSelected ? '#101010' : '#FDFCF8',
@@ -368,6 +382,7 @@ export default function BookingBriefForm({
                     cursor: 'pointer',
                     fontFamily: 'var(--font-sans)',
                     transition: 'all 200ms ease',
+                    boxSizing: 'border-box',
                   }}
                   className="hover:-translate-y-0.5 shadow-2xs"
                 >
@@ -378,20 +393,20 @@ export default function BookingBriefForm({
           </div>
         </div>
 
-        {/* Target Event Date + Duration Two-Field Row (20px gap) */}
+        {/* Target Event Date + Duration Two-Field Row (24px gap, 28px bottom margin) */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '20px',
-            marginBottom: '24px',
+            gap: '24px',
+            marginBottom: '28px',
           }}
         >
           <div>
             <label
               style={{
                 display: 'block',
-                marginBottom: '9px',
+                marginBottom: '8px',
                 fontSize: '11px',
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
@@ -412,14 +427,15 @@ export default function BookingBriefForm({
               }}
               style={{
                 width: '100%',
-                height: '50px',
-                padding: '0 16px',
+                minHeight: '52px',
+                padding: '14px 16px',
                 border: '1px solid #E3DBCC',
                 borderRadius: '8px',
                 background: '#FDFCF8',
                 fontSize: '15px',
                 color: '#101010',
                 fontFamily: 'monospace',
+                boxSizing: 'border-box',
               }}
               className="outline-none transition-colors focus:border-[#101010] cursor-pointer"
             />
@@ -432,7 +448,7 @@ export default function BookingBriefForm({
             <label
               style={{
                 display: 'block',
-                marginBottom: '9px',
+                marginBottom: '8px',
                 fontSize: '11px',
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
@@ -443,7 +459,12 @@ export default function BookingBriefForm({
             >
               DURATION
             </label>
-            <div className="flex gap-2">
+            <div
+              style={{
+                display: 'flex',
+                gap: '12px',
+              }}
+            >
               {DURATION_OPTIONS.map((dur) => {
                 const isSelected = (formData.duration || '2 Days') === dur;
                 return (
@@ -453,7 +474,8 @@ export default function BookingBriefForm({
                     onClick={() => updateFormData({ duration: dur })}
                     style={{
                       flex: 1,
-                      height: '50px',
+                      minHeight: '52px',
+                      padding: '12px 16px',
                       borderRadius: '8px',
                       border: isSelected ? '1px solid #101010' : '1px solid #E3DBCC',
                       background: isSelected ? '#101010' : '#FDFCF8',
@@ -464,6 +486,7 @@ export default function BookingBriefForm({
                       cursor: 'pointer',
                       fontFamily: 'var(--font-sans)',
                       transition: 'all 200ms ease',
+                      boxSizing: 'border-box',
                     }}
                   >
                     {dur}
@@ -474,12 +497,12 @@ export default function BookingBriefForm({
           </div>
         </div>
 
-        {/* Location & Venue */}
-        <div style={{ marginBottom: '0' }}>
+        {/* Location & Venue: 8px label->input */}
+        <div>
           <label
             style={{
               display: 'block',
-              marginBottom: '9px',
+              marginBottom: '8px',
               fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -508,16 +531,18 @@ export default function BookingBriefForm({
 
       {/* =========================================================
           SECTION 03: YOUR PREFERENCES
+          - 64px vertical space between end of section & next heading
           ========================================================= */}
       <section
+        data-testid="form-section-03"
         style={{
-          paddingBottom: '40px',
-          marginBottom: '40px',
+          paddingBottom: '32px',
+          marginBottom: '64px',
           borderBottom: '1px solid #E3DBCC',
         }}
       >
-        {/* Section Header */}
-        <div style={{ marginBottom: '28px' }}>
+        {/* Section Header: 24px gap below before first field */}
+        <div style={{ marginBottom: '24px' }}>
           <div className="flex items-baseline justify-between gap-4">
             <h3
               style={{
@@ -544,12 +569,12 @@ export default function BookingBriefForm({
           </div>
         </div>
 
-        {/* 10. COLLECTION / PLAN SELECTION CARDS */}
-        <div style={{ marginBottom: '32px' }}>
+        {/* COLLECTION SUITE CARDS: 32px padding, 20px gap, 28px bottom */}
+        <div style={{ marginBottom: '28px' }}>
           <label
             style={{
               display: 'block',
-              marginBottom: '12px',
+              marginBottom: '8px',
               fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -561,30 +586,41 @@ export default function BookingBriefForm({
             SELECT COLLECTION SUITE
           </label>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '20px',
+            }}
+          >
             {availableTiers.map((tier) => {
               const isChosen = selectedCollection?.id === tier.id;
               return (
                 <div
                   key={tier.id}
+                  data-testid={`collection-suite-card-${tier.id}`}
                   onClick={() => onSelectCollection && onSelectCollection(tier.id)}
                   style={{
-                    padding: '22px',
-                    minHeight: '120px',
+                    padding: '32px',
+                    minHeight: '140px',
                     border: isChosen ? '1.5px solid #101010' : '1px solid #E3DBCC',
                     borderRadius: '12px',
                     background: isChosen ? '#F3F0E9' : '#FDFCF8',
                     cursor: 'pointer',
                     transition: 'all 200ms ease',
+                    boxSizing: 'border-box',
                   }}
                   className="flex flex-col justify-between hover:shadow-xs group"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="block font-serif text-lg font-medium text-[#101010] uppercase">
+                      <span
+                        style={{ marginBottom: '8px' }}
+                        className="block font-serif text-lg font-medium text-[#101010] uppercase"
+                      >
                         {tier.title}
                       </span>
-                      <span className="block font-sans text-xs text-[#7A7770] mt-0.5">
+                      <span className="block font-sans text-xs text-[#7A7770]">
                         {tier.folio || tier.tag}
                       </span>
                     </div>
@@ -602,7 +638,14 @@ export default function BookingBriefForm({
                     />
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-[#E3DBCC]/60 flex items-baseline justify-between">
+                  <div
+                    style={{
+                      marginTop: '16px',
+                      paddingTop: '16px',
+                      borderTop: '1px solid rgba(227, 219, 204, 0.6)',
+                    }}
+                    className="flex items-baseline justify-between"
+                  >
                     <span className="font-serif text-[15px] font-semibold text-[#101010]">
                       {tier.price}
                     </span>
@@ -618,12 +661,12 @@ export default function BookingBriefForm({
           </div>
         </div>
 
-        {/* 11. CREATIVE DISCIPLINES CARDS (2-column grid, 16px gap, 22px padding) */}
+        {/* CREATIVE DISCIPLINES CARDS: 32px padding, 20px gap */}
         <div>
           <label
             style={{
               display: 'block',
-              marginBottom: '12px',
+              marginBottom: '8px',
               fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -639,7 +682,7 @@ export default function BookingBriefForm({
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '16px',
+              gap: '20px',
             }}
           >
             {CREATIVE_DISCIPLINES.map((disc) => {
@@ -647,20 +690,21 @@ export default function BookingBriefForm({
               return (
                 <div
                   key={disc.id}
+                  data-testid={`creative-discipline-card-${disc.id}`}
                   onClick={() => handleToggleDiscipline(disc.id)}
                   style={{
-                    padding: '22px',
-                    minHeight: '130px',
+                    padding: '32px',
+                    minHeight: '140px',
                     border: checked ? '1.5px solid #101010' : '1px solid #E3DBCC',
                     borderRadius: '12px',
                     background: checked ? '#FAF8F5' : '#FDFCF8',
                     cursor: 'pointer',
                     transition: 'all 200ms ease',
+                    boxSizing: 'border-box',
                   }}
                   className="flex flex-col justify-between hover:shadow-xs"
                 >
                   <div className="flex items-start gap-4">
-                    {/* Checkbox (20px x 20px with >= 16px space to text) */}
                     <div
                       style={{
                         width: '20px',
@@ -684,7 +728,7 @@ export default function BookingBriefForm({
                       <h4
                         style={{
                           fontSize: '21px',
-                          marginBottom: '10px',
+                          marginBottom: '8px',
                           fontFamily: 'var(--font-serif)',
                           color: '#101010',
                           lineHeight: 1.15,
@@ -699,6 +743,7 @@ export default function BookingBriefForm({
                           fontSize: '12.5px',
                           color: '#7A7770',
                           fontFamily: 'var(--font-sans)',
+                          margin: 0,
                         }}
                       >
                         {disc.subtitle}
@@ -706,15 +751,21 @@ export default function BookingBriefForm({
                     </div>
                   </div>
 
-                  {/* Status Badge positioned naturally inside card */}
-                  <div className="mt-4 pt-2.5 border-t border-[#E3DBCC]/40 flex justify-end">
+                  <div
+                    style={{
+                      marginTop: '16px',
+                      paddingTop: '16px',
+                      borderTop: '1px solid rgba(227, 219, 204, 0.4)',
+                    }}
+                    className="flex justify-end"
+                  >
                     <span
                       style={{
                         fontSize: '10px',
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
                         fontWeight: 600,
-                        padding: '3px 8px',
+                        padding: '4px 10px',
                         borderRadius: '4px',
                         fontFamily: 'var(--font-sans)',
                         background: disc.isIncluded ? '#EDE4D6' : '#F3F0E9',
@@ -733,16 +784,18 @@ export default function BookingBriefForm({
 
       {/* =========================================================
           SECTION 04: YOUR VISION
+          - 64px vertical space between end of section & next heading
           ========================================================= */}
       <section
+        data-testid="form-section-04"
         style={{
-          paddingBottom: '40px',
-          marginBottom: '40px',
+          paddingBottom: '32px',
+          marginBottom: '64px',
           borderBottom: '1px solid #E3DBCC',
         }}
       >
-        {/* Section Header */}
-        <div style={{ marginBottom: '28px' }}>
+        {/* Section Header: 24px gap below before textarea */}
+        <div style={{ marginBottom: '24px' }}>
           <div className="flex items-baseline justify-between gap-4">
             <h3
               style={{
@@ -773,7 +826,7 @@ export default function BookingBriefForm({
           <label
             style={{
               display: 'block',
-              marginBottom: '9px',
+              marginBottom: '8px',
               fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -792,13 +845,14 @@ export default function BookingBriefForm({
             style={{
               width: '100%',
               minHeight: '150px',
-              padding: '18px',
+              padding: '16px 18px',
               border: '1px solid #E3DBCC',
               borderRadius: '10px',
               background: '#FDFCF8',
               fontSize: '14px',
               lineHeight: 1.6,
               color: '#101010',
+              boxSizing: 'border-box',
             }}
             className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
           />
@@ -807,16 +861,18 @@ export default function BookingBriefForm({
 
       {/* =========================================================
           SECTION 05: HOW DID YOU FIND US?
+          - 64px vertical space between end of section & submit row
           ========================================================= */}
       <section
+        data-testid="form-section-05"
         style={{
-          paddingBottom: '40px',
-          marginBottom: '40px',
+          paddingBottom: '32px',
+          marginBottom: '64px',
           borderBottom: '1px solid #E3DBCC',
         }}
       >
-        {/* Section Header */}
-        <div style={{ marginBottom: '28px' }}>
+        {/* Section Header: 24px gap below before pills */}
+        <div style={{ marginBottom: '24px' }}>
           <div className="flex items-baseline justify-between gap-4">
             <h3
               style={{
@@ -843,7 +899,14 @@ export default function BookingBriefForm({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2.5">
+        {/* Provenance Pills: 12px gap, 12px x 20px padding */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '12px',
+          }}
+        >
           {PROVENANCE_OPTIONS.map((item) => {
             const isSelected = (formData.source || 'Instagram') === item;
             return (
@@ -852,15 +915,16 @@ export default function BookingBriefForm({
                 type="button"
                 onClick={() => updateFormData({ source: item })}
                 style={{
-                  padding: '10px 16px',
+                  padding: '12px 20px',
                   borderRadius: '999px',
                   border: isSelected ? '1px solid #101010' : '1px solid #E3DBCC',
                   background: isSelected ? '#101010' : '#FDFCF8',
                   color: isSelected ? '#FDFCF8' : '#101010',
-                  fontSize: '12.5px',
+                  fontSize: '13px',
                   cursor: 'pointer',
                   fontFamily: 'var(--font-sans)',
                   transition: 'all 200ms ease',
+                  boxSizing: 'border-box',
                 }}
                 className="hover:-translate-y-0.5 shadow-2xs"
               >
@@ -872,9 +936,20 @@ export default function BookingBriefForm({
       </section>
 
       {/* =========================================================
-          14. SUBMIT / WHATSAPP BUTTON (Never disappears, large premium CTA)
+          BOTTOM SUBMIT ROW
+          - 24px space between Return link, Submit button, and explanatory text
           ========================================================= */}
-      <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div
+        data-testid="bottom-submit-row"
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '24px',
+          paddingTop: '8px',
+        }}
+      >
         <button
           type="button"
           onClick={onScrollToCollections}
@@ -890,8 +965,8 @@ export default function BookingBriefForm({
             disabled={isSubmitting}
             style={{
               minWidth: '280px',
-              height: '54px',
-              padding: '0 28px',
+              minHeight: '54px',
+              padding: '14px 28px',
               borderRadius: '999px',
               background: '#101010',
               color: '#FDFCF8',
@@ -906,6 +981,7 @@ export default function BookingBriefForm({
               justifyContent: 'center',
               gap: '12px',
               transition: 'all 250ms ease',
+              boxSizing: 'border-box',
             }}
             className="w-full sm:w-auto hover:-translate-y-0.5 hover:bg-[#262422] shadow-md group"
           >
@@ -916,8 +992,9 @@ export default function BookingBriefForm({
           </button>
 
           <p
+            data-testid="submit-explanatory-text"
             style={{
-              marginTop: '14px',
+              marginTop: '24px',
               fontSize: '12px',
               color: '#7A7770',
               fontFamily: 'var(--font-sans)',

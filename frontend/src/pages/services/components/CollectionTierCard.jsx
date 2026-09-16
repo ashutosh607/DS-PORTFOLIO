@@ -1,20 +1,60 @@
 import React from 'react';
 
+// Helper function to condense full-sentence deliverables into clean 3-4 word phrases
+const condenseDeliverable = (item) => {
+  if (!item || typeof item !== 'string') return '';
+  const text = item.trim();
+
+  const editorialMap = {
+    'Lead principal photographer + associate': 'Principal & Associate Lead',
+    '35mm analog film rolls (Portra 400 & HP5)': '35mm Analog Film Rolls',
+    '35mm analog film rolls (Portra 400)': '35mm Analog Film Rolls',
+    'Private online proofing gallery & print release': 'Private Proofing Gallery',
+    'Archival master proofing gallery & print release': 'Archival Master Gallery',
+    'Archival USB folio in Belgian linen': 'Belgian Linen Folio',
+    'Archival presentation folio in Belgian linen': 'Belgian Linen Folio',
+    'Creative director + 2 master associates': 'Creative Director + Associates',
+    '120 Medium Format & 35mm analog film': 'Medium Format & 35mm Film',
+    'Handcrafted 12x12 Italian leather heirloom album': 'Handcrafted Heirloom Album',
+    'Drone & aerial architectural context': 'Aerial & Architectural Capture',
+    'Priority 3-week archival digital proof delivery': 'Priority Proof Delivery',
+    'Full atelier team (Principal, Cinema, Aerial)': 'Complete Atelier Team',
+    'Unlimited 35mm & 120 analog negatives (Paris lab)': 'Unlimited Analog Negatives',
+    'Bespoke 14x14 heirloom album + 2 parent albums': 'Three Heirloom Albums',
+    'Pre-wedding editorial session in Europe': 'Destination Editorial Session',
+    'Worldwide travel & accommodation covered': 'Travel Inclusive Worldwide',
+    '4 hours directed golden-hour session': '4-Hour Directed Session',
+    '2 rolls 35mm fine-grain film (Portra 400)': '35mm Fine-Grain Film',
+    '120+ hand-retouched high-res master frames': 'Hand-Retouched Master Frames',
+    'Online private gallery with download rights': 'Online Private Gallery',
+    'Full-day multi-venue creative direction': 'Multi-Venue Direction',
+    'Dual capture: 120 Medium format & Super 8mm cinema': 'Medium Format & Super 8mm',
+    '250+ master color-graded monograph frames': 'Color-Graded Monograph Frames',
+    '2-minute 4K analog video teaser with score': '4K Analog Teaser Reel',
+    'Handmade 10x10 linen preview guestbook': 'Handmade Linen Guestbook',
+  };
+
+  if (editorialMap[text]) return editorialMap[text];
+
+  const cleaned = text.replace(/\(.*?\)/g, '').replace(/&.*$/, '').trim();
+  const words = cleaned.split(/\s+/).filter(Boolean);
+  return words.slice(0, 4).join(' ');
+};
+
 export default function CollectionTierCard({
   collection,
   isSelected,
   onSelectAndBook,
 }) {
   const cardId = collection.id || collection.tier || collection._id;
-  const isSignature =
+  const isRecommended =
     collection.highlight ||
     collection.isAtelierChoice ||
     collection.isRecommended ||
     (collection.tier && collection.tier.toLowerCase() === 'signature') ||
     (collection.id && collection.id.toLowerCase().includes('signature'));
 
-  // Deliverables fallback
-  const deliverablesList =
+  const rawDeliverables =
     collection.deliverables && collection.deliverables.length > 0
       ? collection.deliverables
       : [
@@ -24,192 +64,253 @@ export default function CollectionTierCard({
           'Archival presentation folio in Belgian linen',
         ];
 
+  // Uniform 4 concise items per card for flawless structural consistency
+  const condensedDeliverables = rawDeliverables
+    .map(condenseDeliverable)
+    .filter(Boolean)
+    .slice(0, 4);
+
   const title = collection.title || collection.eyebrow || 'Collection';
   const subtitle = collection.subtitle || '';
-  const shortDescription = collection.description || subtitle;
   const imageSrc = collection.image || collection.imageUrl;
   const imageLabel = collection.imageLabel || collection.imageTag || 'Archive Specimen';
-  const folioLabel = collection.folio || collection.folioLabel || 'Folio';
 
-  // Format price
-  let displayPrice = collection.price;
+  // Format real price value
+  let displayPrice = '';
   if (typeof collection.price === 'number') {
     displayPrice = `₹${collection.price.toLocaleString('en-IN')}`;
-  } else if (!collection.price && collection.price !== 0) {
-    displayPrice = 'Price to be added';
+  } else if (
+    typeof collection.price === 'string' &&
+    collection.price.trim() !== '' &&
+    !collection.price.toLowerCase().includes('to be added') &&
+    !collection.price.toLowerCase().includes('tbd')
+  ) {
+    displayPrice = collection.price.trim();
+  } else if (collection.numericPrice) {
+    displayPrice = `₹${collection.numericPrice.toLocaleString('en-IN')}`;
+  } else {
+    displayPrice = 'Price on request';
   }
+
+  const descriptionLine =
+    collection.priceNote || 'Archival proofing & master curation included';
 
   const handleClick = (e) => {
     e.preventDefault();
     if (isSelected) {
-      // Already selected: continue to Stage 02 booking
       onSelectAndBook(cardId, true);
     } else {
-      // Select this collection while remaining in Stage 01
       onSelectAndBook(cardId, false);
     }
   };
 
   return (
     <div
-      className={`group relative h-full flex flex-col justify-between rounded-2xl p-7 sm:p-9 lg:p-10 transition-all duration-300 ease-out ${
+      style={{
+        padding: '32px',
+        boxSizing: 'border-box',
+      }}
+      className={`group relative h-full flex flex-col justify-between rounded-2xl transition-all duration-300 ease-out ${
         isSelected
-          ? 'bg-[#FAF8F5] border border-[#101010] shadow-[0_8px_30px_-6px_rgba(16,16,16,0.09)] -translate-y-1'
-          : isSignature
-          ? 'bg-[#FAF8F5] border border-[#D5CBB9] shadow-[0_4px_24px_-8px_rgba(16,16,16,0.04)] hover:border-[#101010]/50 hover:-translate-y-1 hover:shadow-[0_12px_32px_-8px_rgba(16,16,16,0.07)]'
-          : 'bg-[#FDFCF8] border border-[#E3DBCC] shadow-[0_2px_18px_-6px_rgba(16,16,16,0.03)] hover:border-[#C5B7A4] hover:-translate-y-1 hover:shadow-[0_12px_32px_-8px_rgba(16,16,16,0.06)]'
+          ? 'bg-[#FAF8F5] border-2 border-[#101010] shadow-[0_8px_32px_-6px_rgba(16,16,16,0.12)] -translate-y-1'
+          : isRecommended
+          ? 'bg-[#FAF8F5] border border-[#D5CBB9] shadow-[0_4px_24px_-6px_rgba(16,16,16,0.05)] hover:border-[#101010]/50 hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.08)]'
+          : 'bg-[#FDFCF8] border border-[#E3DBCC] shadow-[0_2px_20px_-6px_rgba(16,16,16,0.04)] hover:border-[#C5B7A4] hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.07)]'
       }`}
     >
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         {/* =========================================================
-            LINE 1: EYEBROW & FOLIO / BADGE (No clipping, flex header)
+            1. TOP LABEL LINE (8px gap below before title)
             ========================================================= */}
-        <div className="flex items-center justify-between gap-3 mb-5">
-          <div className="min-w-0 flex-1">
-            {isSelected ? (
-              <span className="text-[9.5px] font-sans font-semibold tracking-[0.22em] uppercase text-[#101010] flex items-center gap-1.5 truncate">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#101010] shrink-0" />
-                <span className="truncate">SELECTED COLLECTION</span>
-              </span>
-            ) : isSignature ? (
-              <span className="text-[9.5px] font-sans font-semibold tracking-[0.22em] uppercase text-[#7A7770] flex items-center gap-1 truncate">
-                <span className="text-[#C2A378]">★</span>
-                <span className="truncate">{collection.badge || 'Atelier Choice'}</span>
-              </span>
-            ) : (
-              <span className="font-sans text-[9.5px] font-semibold tracking-[0.22em] text-[#7A7770] uppercase block truncate">
-                {collection.tag || collection.badge || 'ATELIER SUITE'}
-              </span>
-            )}
-          </div>
-
-          <span
-            className={`text-[9.5px] font-sans tracking-wider px-3 py-1 rounded-full shrink-0 whitespace-nowrap transition-colors ${
-              isSelected
-                ? 'bg-[#101010] text-[#FDFCF8]'
-                : 'bg-[#F3F0E9] text-[#7A7770]'
-            }`}
-          >
-            {folioLabel}
-          </span>
+        <div
+          data-testid="top-label-container"
+          style={{ marginBottom: '8px' }}
+          className="flex items-center min-h-[16px]"
+        >
+          {isSelected ? (
+            <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#101010] uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#101010] shrink-0" />
+              <span>Selected Collection</span>
+            </span>
+          ) : isRecommended ? (
+            <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase flex items-center gap-1.5">
+              <span className="text-[#C2A378]">★</span>
+              <span>Recommended</span>
+            </span>
+          ) : (
+            <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase">
+              The Collection
+            </span>
+          )}
         </div>
 
         {/* =========================================================
-            LINE 2: COLLECTION TITLE
+            2. TITLE (8px gap below before subtitle)
             ========================================================= */}
         <h3
+          data-testid="title-element"
           style={{
             fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(1.65rem, 1.85vw, 1.95rem)',
-            letterSpacing: '0.04em',
+            fontSize: 'clamp(1.5rem, 1.75vw, 1.9rem)',
+            letterSpacing: '0.03em',
             lineHeight: 1.15,
             fontWeight: 400,
             color: 'var(--color-obsidian)',
             textTransform: 'uppercase',
-            marginBottom: '14px',
+            marginBottom: '8px',
           }}
+          className="truncate"
+          title={title}
         >
           {title}
         </h3>
 
         {/* =========================================================
-            LINE 3: ITALIC SUBTITLE
+            3. SUBTITLE (24px gap below before photo)
             ========================================================= */}
-        {subtitle && (
-          <p className="font-serif italic text-xs sm:text-[13.5px] text-[#7A7770] leading-relaxed mb-6 sm:mb-7">
-            {subtitle}
-          </p>
-        )}
+        <p
+          data-testid="subtitle-element"
+          style={{
+            marginBottom: '24px',
+          }}
+          className="font-serif italic text-xs sm:text-[13px] text-[#7A7770] leading-relaxed truncate"
+        >
+          {subtitle || 'Archival commission suite'}
+        </p>
 
         {/* =========================================================
-            LINE 4: PHOTOGRAPHY AREA
+            4. PHOTO (24px gap below before "Commission Investment")
             ========================================================= */}
         {imageSrc && (
-          <div className="w-full px-1 sm:px-2 lg:px-3 my-6 sm:my-8">
-            <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#F3F0E9] border border-[#E3DBCC]/80 shadow-[0_4px_16px_rgba(16,16,16,0.04)]">
+          <div
+            data-testid="photo-container"
+            style={{
+              marginBottom: '24px',
+              width: '100%',
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                aspectRatio: '4 / 3',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                position: 'relative',
+                backgroundColor: '#F3EFE6',
+                border: '1px solid rgba(227, 219, 204, 0.8)',
+                boxShadow: '0 2px 12px rgba(16, 16, 16, 0.04)',
+              }}
+            >
               <img
                 src={imageSrc}
                 alt={title}
-                className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                }}
+                className="filter brightness-[0.98] contrast-[1.02] transition-transform duration-500 ease-out group-hover:scale-[1.02]"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent pointer-events-none" />
 
-              <div className="absolute bottom-3 left-3.5 flex items-center gap-1.5 text-white/95 text-[9.5px] font-sans font-medium tracking-wide drop-shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/90 shrink-0" />
+              {/* Subtle archive specimen tag */}
+              <div className="absolute bottom-2.5 left-3 flex items-center gap-1.5 text-white/90 text-[9px] font-sans font-normal tracking-wider drop-shadow-xs pointer-events-none">
+                <span className="w-1 h-1 rounded-full bg-white/80 shrink-0" />
                 <span className="truncate max-w-[180px]">{imageLabel}</span>
               </div>
-
-              {collection.imageBadge && (
-                <div className="absolute bottom-3 right-3.5 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-xs text-white text-[8px] font-sans tracking-wider uppercase drop-shadow-sm shrink-0">
-                  {collection.imageBadge}
-                </div>
-              )}
             </div>
           </div>
         )}
 
         {/* =========================================================
-            LINE 5: COMMISSION INVESTMENT LABEL
+            5. "COMMISSION INVESTMENT" LABEL (8px gap below before price)
             ========================================================= */}
-        <span className="block font-sans text-[9px] font-semibold tracking-[0.24em] text-[#7A7770] uppercase mb-3">
-          COMMISSION INVESTMENT
+        <span
+          data-testid="commission-investment-label"
+          style={{
+            display: 'block',
+            marginBottom: '8px',
+          }}
+          className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase"
+        >
+          Commission Investment
         </span>
 
         {/* =========================================================
-            LINE 6: PRICE
+            6. PRICE (12px gap below before description line)
             ========================================================= */}
         <div
+          data-testid="price-element"
           style={{
             fontFamily: 'var(--font-serif)',
             fontSize: '1.55rem',
             color: 'var(--color-obsidian)',
             lineHeight: 1.15,
             fontWeight: 400,
-            marginBottom: '8px',
+            marginBottom: '12px',
           }}
         >
           {displayPrice}
         </div>
 
         {/* =========================================================
-            LINE 7: PRICE NOTE
+            7. DESCRIPTION LINE
             ========================================================= */}
-        {collection.priceNote && (
-          <p className="font-sans text-[11px] text-[#7A7770] leading-snug mb-5 sm:mb-6">
-            {collection.priceNote}
-          </p>
-        )}
+        <p
+          data-testid="description-line"
+          style={{
+            lineHeight: '1.5',
+          }}
+          className="font-sans text-[11px] text-[#7A7770] break-words"
+        >
+          {descriptionLine}
+        </p>
 
         {/* =========================================================
-            LINE 8: SHORT DESCRIPTION
+            8. "INCLUDED DELIVERABLES" SECTION
+            - 24px gap from description line to "Included Deliverables" label
+            - 12px gap below header before first item
+            - 10px gap between items with line-height >= 1.6
             ========================================================= */}
-        {shortDescription && (
-          <p className="font-serif italic text-xs sm:text-[13.5px] text-[#55534E] leading-[1.75] mb-8 sm:mb-9">
-            {shortDescription}
-          </p>
-        )}
-
-        {/* =========================================================
-            SUBTLE DIVIDER ABOVE DELIVERABLES
-            ========================================================= */}
-        <div className="border-t border-[#E3DBCC]/70 pt-7 sm:pt-8">
-          {/* Deliverables heading */}
-          <span className="block font-sans text-[9px] font-semibold tracking-[0.24em] text-[#7A7770] uppercase mb-4 sm:mb-5">
-            {collection.deliverablesHeading ||
-              collection.privilegesLabel ||
-              (isSignature ? 'INCLUDED ATELIER PRIVILEGES' : 'INCLUDED DELIVERABLES')}
+        <div
+          data-testid="deliverables-section"
+          style={{
+            borderTop: '1px solid rgba(227, 219, 204, 0.7)',
+            marginTop: '12px',
+            paddingTop: '12px',
+          }}
+        >
+          <span
+            data-testid="deliverables-heading"
+            style={{
+              display: 'block',
+              marginBottom: '12px',
+            }}
+            className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase"
+          >
+            Included Deliverables
           </span>
 
-          {/* Deliverable bullets (no truncation, natural spacing) */}
-          <div className="space-y-3.5 sm:space-y-4">
-            {deliverablesList.map((item, idx) => (
+          <div
+            data-testid="deliverables-list"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+            }}
+          >
+            {condensedDeliverables.map((item, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-3 text-xs font-sans text-[#3E3C38] leading-[1.65]"
+                data-testid={`deliverable-item-${idx}`}
+                style={{
+                  lineHeight: '1.6',
+                }}
+                className="font-sans text-[12.5px] text-[#3E3C38] tracking-[0.01em]"
               >
-                <span className="text-[#C5B9A5] text-xs shrink-0 mt-0.5">•</span>
-                <span className="break-words">{item}</span>
+                {item}
               </div>
             ))}
           </div>
@@ -217,9 +318,16 @@ export default function CollectionTierCard({
       </div>
 
       {/* =========================================================
-          LINE 11: CTA BUTTON (Pushed to absolute bottom across all cards)
+          9. CTA BUTTON
+          - 24px gap above button from last item
+          - Card has 32px bottom padding (>= 24px)
           ========================================================= */}
-      <div className="mt-auto pt-9 sm:pt-11">
+      <div
+        data-testid="button-wrapper"
+        style={{
+          marginTop: '24px',
+        }}
+      >
         <button
           type="button"
           onClick={handleClick}
@@ -231,14 +339,14 @@ export default function CollectionTierCard({
         >
           {isSelected ? (
             <>
-              <span>SELECTED · CONTINUE TO BOOKING</span>
+              <span>Selected · Continue to Booking</span>
               <span className="transition-transform duration-300 ease-out group-hover/btn:translate-x-1">
                 →
               </span>
             </>
           ) : (
             <>
-              <span>SELECT &amp; BOOK</span>
+              <span>Select &amp; Book</span>
               <span className="transition-transform duration-300 ease-out group-hover/btn:translate-x-1">
                 →
               </span>
