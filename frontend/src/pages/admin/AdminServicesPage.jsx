@@ -401,8 +401,8 @@ export default function AdminServicesPage() {
     });
   }, [services, searchQuery]);
 
- return (
-  <div className="w-full pb-16">
+  return (
+    <div className="w-full pb-16">
 
       {/* =========================================================
           TOAST
@@ -554,11 +554,10 @@ export default function AdminServicesPage() {
             return (
               <div
                 key={cat.id}
-                className={`p-4 rounded-[16px] border transition-all ${
-                  isCurrent
+                className={`p-4 rounded-[16px] border transition-all ${isCurrent
                     ? 'border-[#181818] bg-[#FAF8F4] shadow-2xs'
                     : 'border-[#EAE4DA] bg-[#FCFAF7] hover:border-[#D0C7B9]'
-                } flex flex-col justify-between gap-3`}
+                  } flex flex-col justify-between gap-3`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -636,11 +635,10 @@ export default function AdminServicesPage() {
                   key={cat.id}
                   type="button"
                   onClick={() => handleCategorySelect(cat.id)}
-                  className={`relative h-[64px] flex items-center gap-2 shrink-0 text-[9.5px] uppercase tracking-[0.22em] transition-all duration-300 cursor-pointer ${
-                    isActive
+                  className={`relative h-[64px] flex items-center gap-2 shrink-0 text-[9.5px] uppercase tracking-[0.22em] transition-all duration-300 cursor-pointer ${isActive
                       ? "text-[#181818] font-bold"
                       : "text-[#918A80] font-medium hover:text-[#181818]"
-                  }`}
+                    }`}
                   style={{
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
                   }}
@@ -835,13 +833,12 @@ export default function AdminServicesPage() {
             return (
               <div
                 key={service._id || service.id}
-                className={`relative rounded-[26px] transition-all duration-300 ${
-                  isDragging
+                className={`relative rounded-[26px] transition-all duration-300 ${isDragging
                     ? "opacity-40 scale-[0.985]"
                     : isOver
-                    ? "ring-1 ring-[#9E8159] scale-[1.005]"
-                    : "hover:-translate-y-[3px]"
-                }`}
+                      ? "ring-1 ring-[#9E8159] scale-[1.005]"
+                      : "hover:-translate-y-[3px]"
+                  }`}
               >
 
                 <CollectionTierCard
