@@ -14,11 +14,11 @@ import {
   Layers,
   ArrowRight,
   Search,
+  AlertTriangle,
 } from 'lucide-react';
 import { useAdminAuth } from './context/AdminAuthContext';
 import { useCategories } from '../../utils/categoryManager';
 import AddEditServiceModal from './components/AddEditServiceModal';
-import DeleteConfirmModal from './components/DeleteConfirmModal';
 import AddCategoryModal from './components/AddCategoryModal';
 import CollectionTierCard from '../services/components/CollectionTierCard';
 import './AdminDashboard.css';
@@ -90,12 +90,15 @@ export default function AdminServicesPage() {
 
   const [activeCategory, setActiveCategory] = useState(categoryParam || 'wedding');
   const [services, setServices] = useState([]);
+  const [allServices, setAllServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isReordering, setIsReordering] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalLockCategory, setModalLockCategory] = useState(false);
+  const [modalTargetCategory, setModalTargetCategory] = useState(activeCategory);
   const [addCategoryModalOpen, setAddCategoryModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -104,6 +107,65 @@ export default function AdminServicesPage() {
   // Drag and drop state
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  // Canonical category matcher
+  const toCanonicalKey = (str) =>
+    (str || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]/g, '')
+      .replace(/s$/, '');
+
+  // Fetch all services across all categories to compute service counts and track publication
+  const fetchAllServices = async () => {
+    try {
+      const res = await fetch('/api/services?includeInactive=true');
+      if (res.ok) {
+        const json = await res.json();
+        setAllServices(json.data || []);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch all services:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllServices();
+  }, []);
+
+  // Compute number of services per category
+  const serviceCountsByCategory = React.useMemo(() => {
+    const counts = {};
+    categoriesList.forEach((cat) => {
+      counts[cat.id] = 0;
+    });
+    allServices.forEach((s) => {
+      const sKey = toCanonicalKey(s.category);
+      const match = categoriesList.find((c) => toCanonicalKey(c.id) === sKey);
+      if (match) {
+        counts[match.id] = (counts[match.id] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [allServices, categoriesList]);
+
+  // Check if delete target is the last remaining service in its category
+  const isLastServiceInCat = React.useMemo(() => {
+    if (!deleteTarget) return false;
+    const catKey = toCanonicalKey(deleteTarget.category || activeCategory);
+    const servicesInCat = allServices.filter(
+      (s) => toCanonicalKey(s.category) === catKey
+    );
+    return servicesInCat.length <= 1;
+  }, [deleteTarget, allServices, activeCategory]);
+
+  // Category name for delete target
+  const deleteTargetCatName = React.useMemo(() => {
+    if (!deleteTarget) return '';
+    const catKey = toCanonicalKey(deleteTarget.category || activeCategory);
+    const matched = categoriesList.find((c) => toCanonicalKey(c.id) === catKey);
+    return matched ? matched.label : (deleteTarget.category || activeCategory);
+  }, [deleteTarget, categoriesList, activeCategory]);
 
   // Sync category param
   useEffect(() => {
@@ -126,7 +188,7 @@ export default function AdminServicesPage() {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/services?category=${activeCategory}`);
+      const res = await fetch(`/api/services?category=${activeCategory}&includeInactive=true`);
       if (res.ok) {
         const json = await res.json();
         setServices(json.data || []);
@@ -259,6 +321,7 @@ export default function AdminServicesPage() {
 
       if (res.ok) {
         setServices((prev) => prev.filter((s) => s._id !== deleteTarget._id));
+        setAllServices((prev) => prev.filter((s) => s._id !== deleteTarget._id));
         setDeleteTarget(null);
         showToast('Service tier deleted successfully.');
       }
@@ -271,6 +334,7 @@ export default function AdminServicesPage() {
 
   const handleModalSuccess = (savedService) => {
     const savedCat = (savedService?.category || '').toLowerCase().trim();
+    fetchAllServices();
     if (editTarget) {
       // Edit
       setServices((prev) =>
@@ -279,7 +343,7 @@ export default function AdminServicesPage() {
       showToast('Service tier updated successfully.');
     } else {
       // Add
-      if (savedCat === activeCategory.toLowerCase().trim()) {
+      if (toCanonicalKey(savedCat) === toCanonicalKey(activeCategory)) {
         setServices((prev) => [...prev, savedService]);
       } else {
         // Automatically switch to the category that the package was created under
@@ -289,6 +353,25 @@ export default function AdminServicesPage() {
     }
     setModalOpen(false);
     setEditTarget(null);
+  };
+
+  // Enforced category creation flow: automatically open Add New Service form locked to new category
+  const handleCategoryCreated = (newCat) => {
+    setAddCategoryModalOpen(false);
+    if (refreshCategories) {
+      refreshCategories();
+    }
+    fetchAllServices();
+    const newSlug = (newCat?.slug || newCat?.name || '').toLowerCase().trim();
+    if (newSlug) {
+      handleCategorySelect(newSlug);
+      // Immediately open Add New Service modal pre-selected and locked to this new category
+      setEditTarget(null);
+      setModalTargetCategory(newSlug);
+      setModalLockCategory(true);
+      setModalOpen(true);
+      showToast(`Category "${newCat?.name || newSlug}" created! Add its first service package to publish it.`);
+    }
   };
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -391,57 +474,170 @@ export default function AdminServicesPage() {
           {/* =====================================================
               ACTION AREA
           ===================================================== */}
-          <div className="flex items-center xl:pb-1">
-
-            {/* ADD PACKAGE */}
+          <div className="flex flex-wrap items-center gap-3 xl:pb-1">
+            {/* ADD CATEGORY */}
             <button
               type="button"
-              onClick={() => {
-                setEditTarget(null);
-                setModalOpen(true);
-              }}
-              className="h-12 inline-flex items-center gap-2.5 px-6 rounded-full bg-[#181818] text-[#FAF8F5] hover:bg-[#303030] transition-all duration-300 cursor-pointer"
+              onClick={() => setAddCategoryModalOpen(true)}
+              className="h-12 inline-flex items-center gap-2 px-5 rounded-full border border-[#DCD5C9] bg-white text-[#181818] hover:bg-[#FAF8F5] transition-all duration-300 cursor-pointer shadow-2xs"
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}
             >
               <Plus size={14} />
-
               <span className="text-[9.5px] uppercase tracking-[0.18em] font-semibold">
-                Add Package
+                Add Category
               </span>
             </button>
 
+            {/* ADD SERVICE (GENERAL ENTRY POINT) */}
+            <button
+              type="button"
+              onClick={() => {
+                setEditTarget(null);
+                setModalTargetCategory(activeCategory);
+                setModalLockCategory(false);
+                setModalOpen(true);
+              }}
+              className="h-12 inline-flex items-center gap-2.5 px-6 rounded-full bg-[#181818] text-[#FAF8F5] hover:bg-[#303030] transition-all duration-300 cursor-pointer shadow-sm"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+              }}
+            >
+              <Plus size={14} />
+              <span className="text-[9.5px] uppercase tracking-[0.18em] font-semibold">
+                Add Service
+              </span>
+            </button>
           </div>
         </div>
       </section>
 
+      {/* =========================================================
+          CATEGORIES DIRECTORY & PUBLICATION STATUS AREA
+      ========================================================= */}
+      <section className="mb-10 p-6 sm:p-8 rounded-[24px] border border-[#E8E2D6] bg-white shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#EAE4DA]">
+          <div>
+            <div className="flex items-center gap-2.5 mb-1.5">
+              <Layers size={17} className="text-[#8C8070]" />
+              <h2
+                className="text-[20px] sm:text-[23px] text-[#181818] font-normal tracking-[-0.01em]"
+                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+              >
+                Categories &amp; Live Publication
+              </h2>
+            </div>
+            <p className="text-[12px] text-[#7A7367]">
+              Only categories with at least one active service appear on the public site. Empty categories remain safely unpublished.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setAddCategoryModalOpen(true)}
+              className="h-9 px-4 inline-flex items-center gap-1.5 rounded-full border border-[#DCD5C9] bg-[#FAF8F5] hover:bg-white text-[#181818] text-[9.5px] uppercase tracking-[0.16em] font-semibold transition-all cursor-pointer"
+            >
+              <Plus size={12} />
+              <span>New Category</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Categories Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
+          {categoriesList.map((cat) => {
+            const count = serviceCountsByCategory[cat.id] || 0;
+            const isZero = count === 0;
+            const isCurrent = toCanonicalKey(activeCategory) === toCanonicalKey(cat.id);
+
+            return (
+              <div
+                key={cat.id}
+                className={`p-4 rounded-[16px] border transition-all ${
+                  isCurrent
+                    ? 'border-[#181818] bg-[#FAF8F4] shadow-2xs'
+                    : 'border-[#EAE4DA] bg-[#FCFAF7] hover:border-[#D0C7B9]'
+                } flex flex-col justify-between gap-3`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13.5px] font-semibold text-[#181818]">
+                        {cat.label}
+                      </span>
+                      {isCurrent && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#181818]" />
+                      )}
+                    </div>
+                    <span className="text-[11px] text-[#8C857A] mt-0.5 block font-mono">
+                      {count} {count === 1 ? 'service package' : 'service packages'}
+                    </span>
+                  </div>
+
+                  {isZero ? (
+                    <span className="px-2.5 py-1 rounded-full bg-[#FFF5E6] border border-[#F2D7B2] text-[#9E6319] text-[9px] uppercase tracking-[0.12em] font-semibold shrink-0">
+                      Not published — add a service
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-full bg-[#EBF7EE] border border-[#C5E8CE] text-[#1E7438] text-[9px] uppercase tracking-[0.12em] font-semibold shrink-0">
+                      Published Live
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between pt-2.5 border-t border-[#EAE4DA]/70">
+                  <button
+                    type="button"
+                    onClick={() => handleCategorySelect(cat.id)}
+                    className="text-[9.5px] uppercase tracking-[0.14em] font-semibold text-[#7A7367] hover:text-[#181818] transition-colors cursor-pointer"
+                  >
+                    View Packages →
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditTarget(null);
+                      setModalTargetCategory(cat.id);
+                      setModalLockCategory(true);
+                      setModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1 text-[9.5px] uppercase tracking-[0.14em] font-semibold text-[#181818] hover:text-[#9E8159] transition-colors cursor-pointer"
+                  >
+                    <Plus size={11} />
+                    <span>Add Service</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* =========================================================
           CATEGORY BAR
       ========================================================= */}
       <section className="border-y border-[#E7E1D7]">
-
         <div className="flex items-center min-h-[64px] overflow-x-auto no-scrollbar">
-
           {/* DRAG HANDLE */}
           <div className="flex items-center justify-center w-10 shrink-0 text-[#B7B0A6]">
             <GripVertical size={14} />
           </div>
 
-
           {/* CATEGORIES */}
-          <div className="flex items-center gap-x-8 sm:gap-x-11 h-full">
-
+          <div className="flex items-center gap-x-6 sm:gap-x-9 h-full">
             {categoriesList.map((cat) => {
-              const isActive = activeCategory === cat.id;
+              const isActive = toCanonicalKey(activeCategory) === toCanonicalKey(cat.id);
+              const count = serviceCountsByCategory[cat.id] || 0;
 
               return (
                 <button
                   key={cat.id}
                   type="button"
                   onClick={() => handleCategorySelect(cat.id)}
-                  className={`relative h-[64px] flex items-center shrink-0 text-[9.5px] uppercase tracking-[0.22em] transition-all duration-300 cursor-pointer ${
+                  className={`relative h-[64px] flex items-center gap-2 shrink-0 text-[9.5px] uppercase tracking-[0.22em] transition-all duration-300 cursor-pointer ${
                     isActive
                       ? "text-[#181818] font-bold"
                       : "text-[#918A80] font-medium hover:text-[#181818]"
@@ -450,7 +646,16 @@ export default function AdminServicesPage() {
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
                   }}
                 >
-                  {cat.label}
+                  <span>{cat.label}</span>
+                  {count === 0 ? (
+                    <span className="px-1.5 py-0.5 rounded-full text-[8px] tracking-normal bg-[#FFF3E0] text-[#B2620A] border border-[#F5D4A6]">
+                      0
+                    </span>
+                  ) : (
+                    <span className="text-[8.5px] opacity-60">
+                      ({count})
+                    </span>
+                  )}
 
                   {isActive && (
                     <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#181818]" />
@@ -458,7 +663,6 @@ export default function AdminServicesPage() {
                 </button>
               );
             })}
-
 
             {/* NEW CATEGORY */}
             <button
@@ -472,7 +676,6 @@ export default function AdminServicesPage() {
             >
               + New Category
             </button>
-
           </div>
         </div>
       </section>
@@ -598,6 +801,8 @@ export default function AdminServicesPage() {
                 type="button"
                 onClick={() => {
                   setEditTarget(null);
+                  setModalTargetCategory(activeCategory);
+                  setModalLockCategory(true);
                   setModalOpen(true);
                 }}
                 className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#181818] text-[#FAF8F5] text-[9.5px] uppercase tracking-[0.18em] font-semibold hover:bg-[#2A2A2A] transition-all cursor-pointer"
@@ -708,47 +913,139 @@ export default function AdminServicesPage() {
         onClose={() => {
           setModalOpen(false);
           setEditTarget(null);
+          setModalLockCategory(false);
         }}
         onSuccess={handleModalSuccess}
         initialData={editTarget}
         serviceToEdit={editTarget}
-        category={activeCategory}
-        initialCategory={activeCategory}
+        category={modalTargetCategory || activeCategory}
+        initialCategory={modalTargetCategory || activeCategory}
         availableCategories={categoriesList}
+        lockCategory={modalLockCategory}
       />
 
-      <DeleteConfirmModal
-        isOpen={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDeleteConfirm}
-        isDeleting={isDeleting}
-        mediaItem={
-          deleteTarget
-            ? {
-                title: `${deleteTarget.eyebrow} — ${deleteTarget.subtitle} (${deleteTarget.tier})`,
-              }
-            : null
-        }
-      />
+      {/* Delete Confirmation Modal with Courtesy Warning for Last Service */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-5 sm:p-7">
+          <div
+            onClick={() => !isDeleting && setDeleteTarget(null)}
+            className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+          />
+
+          <div
+            className="relative z-10 w-full max-w-md rounded-[24px] shadow-2xl text-center overflow-hidden bg-[#FAF8F5] border border-[#E3DBCC] p-7 sm:p-9"
+          >
+            {isLastServiceInCat ? (
+              <>
+                <div
+                  className="w-14 h-14 rounded-full mx-auto mb-5 flex items-center justify-center bg-[#FEF3C7] border border-[#FCD34D] text-[#B45309]"
+                >
+                  <AlertTriangle size={24} />
+                </div>
+
+                <h3
+                  className="text-[24px] sm:text-[26px] text-[#181818] font-normal leading-[1.2] mb-3"
+                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                >
+                  Delete Last Service in {deleteTargetCatName}?
+                </h3>
+
+                {/* Courtesy warning banner */}
+                <div className="mb-5 p-4 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] text-left">
+                  <p
+                    className="text-[12.5px] leading-[1.65] text-[#92400E] font-medium"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  >
+                    This is the last service in <strong className="font-semibold text-[#78350F]">{deleteTargetCatName}</strong> — deleting it will remove this category from the site until a new service is added.
+                  </p>
+                </div>
+
+                {deleteTarget && (
+                  <div className="py-2.5 px-4 mb-6 rounded-lg bg-[#EFEAE1] font-mono text-[11.5px] text-[#55493A] truncate">
+                    {deleteTarget.eyebrow || deleteTarget.title || 'Package'} — {deleteTarget.subtitle} ({deleteTarget.tier})
+                  </div>
+                )}
+
+                <div className="pt-5 border-t border-[#E3DBCC]/60 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    disabled={isDeleting}
+                    onClick={() => setDeleteTarget(null)}
+                    className="px-5 py-2.5 rounded-full border border-[#D5CEC2] text-[#55493A] text-[11px] uppercase tracking-[0.14em] font-medium hover:bg-[#EFEAE1] transition-all cursor-pointer"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  >
+                    Keep Service
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isDeleting}
+                    onClick={handleDeleteConfirm}
+                    className="px-6 py-2.5 rounded-full bg-[#B91C1C] hover:bg-[#991B1B] text-white text-[11px] uppercase tracking-[0.14em] font-semibold transition-all cursor-pointer disabled:opacity-50"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  >
+                    {isDeleting ? 'Deleting...' : 'Delete Service'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div
+                  className="w-14 h-14 rounded-full mx-auto mb-5 flex items-center justify-center bg-[#FEE2E2] border border-[#FECACA] text-[#DC2626] font-bold text-xl"
+                >
+                  !
+                </div>
+
+                <h3
+                  className="text-[24px] sm:text-[26px] text-[#181818] font-normal leading-[1.2] mb-3"
+                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                >
+                  Delete Service Package?
+                </h3>
+
+                <p
+                  className="text-[13px] text-[#7A7770] leading-[1.7] mb-5 px-2"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                >
+                  This action cannot be undone. This tier will be permanently removed from your service catalog.
+                </p>
+
+                {deleteTarget && (
+                  <div className="py-2.5 px-4 mb-6 rounded-lg bg-[#EFEAE1] font-mono text-[11.5px] text-[#55493A] truncate">
+                    {deleteTarget.eyebrow || deleteTarget.title || 'Package'} — {deleteTarget.subtitle} ({deleteTarget.tier})
+                  </div>
+                )}
+
+                <div className="pt-5 border-t border-[#E3DBCC]/60 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    disabled={isDeleting}
+                    onClick={() => setDeleteTarget(null)}
+                    className="px-5 py-2.5 rounded-full border border-[#D5CEC2] text-[#55493A] text-[11px] uppercase tracking-[0.14em] font-medium hover:bg-[#EFEAE1] transition-all cursor-pointer"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isDeleting}
+                    onClick={handleDeleteConfirm}
+                    className="px-6 py-2.5 rounded-full bg-[#B91C1C] hover:bg-[#991B1B] text-white text-[11px] uppercase tracking-[0.14em] font-semibold transition-all cursor-pointer disabled:opacity-50"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  >
+                    {isDeleting ? 'Deleting...' : 'Delete Package'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <AddCategoryModal
         isOpen={addCategoryModalOpen}
         onClose={() => setAddCategoryModalOpen(false)}
-        onCategoryCreated={(newCat) => {
-          setAddCategoryModalOpen(false);
-
-          if (refreshCategories) {
-            refreshCategories();
-          }
-
-          if (newCat?.slug) {
-            handleCategorySelect(newCat.slug);
-          }
-
-          showToast(
-            `Collection category "${newCat?.name || ""}" created! You can now add packages for it.`
-          );
-        }}
+        onSuccess={handleCategoryCreated}
+        onCategoryCreated={handleCategoryCreated}
       />
 
     </div>

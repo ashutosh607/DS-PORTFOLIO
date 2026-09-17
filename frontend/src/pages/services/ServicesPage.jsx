@@ -20,6 +20,16 @@ export default function ServicesPage() {
 
   const { categories: dynamicCategories } = useCategories();
   const [backendCategories, setBackendCategories] = useState([]);
+  const [allActiveServices, setAllActiveServices] = useState([]);
+  const [servicesLoaded, setServicesLoaded] = useState(false);
+
+  // Canonical category matcher
+  const toCanonicalKey = (str) =>
+    (str || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]/g, '')
+      .replace(/s$/, '');
 
   useEffect(() => {
     fetch('/api/categories')
@@ -32,8 +42,36 @@ export default function ServicesPage() {
       .catch(() => {});
   }, []);
 
-  // Merge default categories with custom dynamic collection categories
-  const categories = React.useMemo(() => {
+  // Fetch all active services to determine which categories are published
+  const fetchAllServices = React.useCallback(async () => {
+    try {
+      const res = await fetch('/api/services');
+      if (res.ok) {
+        const json = await res.json();
+        if (Array.isArray(json.data)) {
+          setAllActiveServices(json.data.filter((s) => s.isActive !== false));
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to load active services:', err);
+    } finally {
+      setServicesLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllServices();
+    // Live revalidation when window receives focus or page visibility changes
+    window.addEventListener('focus', fetchAllServices);
+    window.addEventListener('visibilitychange', fetchAllServices);
+    return () => {
+      window.removeEventListener('focus', fetchAllServices);
+      window.removeEventListener('visibilitychange', fetchAllServices);
+    };
+  }, [fetchAllServices]);
+
+  // Base pool of candidate categories
+  const candidateCategories = React.useMemo(() => {
     const base = [
       { id: 'wedding', label: 'WEDDING' },
       { id: 'pre-wedding', label: 'PRE-WEDDING' },
@@ -48,10 +86,12 @@ export default function ServicesPage() {
     const list = [...base];
     sourcePool.forEach((cat) => {
       const slug = (cat.slug || cat.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
+      if (!slug) return;
+      const key = toCanonicalKey(slug);
       const exists = list.some(
-        (c) => c.id === slug || c.id === slug.replace(/s$/, '') || `${c.id}s` === slug
+        (c) => toCanonicalKey(c.id) === key || toCanonicalKey(c.label) === key
       );
-      if (!exists && slug) {
+      if (!exists) {
         list.push({
           id: slug,
           label: (cat.name || slug).toUpperCase(),
@@ -60,6 +100,29 @@ export default function ServicesPage() {
     });
     return list;
   }, [dynamicCategories, backendCategories]);
+
+  // CORE RULE: A category with 0 services must NEVER show publicly.
+  // Perform an explicit length/count check (> 0) on associated active services.
+  const categories = React.useMemo(() => {
+    const servicePool =
+      servicesLoaded && allActiveServices.length > 0
+        ? allActiveServices
+        : !servicesLoaded
+        ? COLLECTIONS
+        : allActiveServices;
+
+    return candidateCategories.filter((cat) => {
+      const catKey = toCanonicalKey(cat.id);
+      const catLabelKey = toCanonicalKey(cat.label);
+      const matchingServices = servicePool.filter((s) => {
+        if (s.isActive === false) return false;
+        const sCat = toCanonicalKey(s.category);
+        return sCat === catKey || sCat === catLabelKey;
+      });
+      // Strict length check: must have at least one active service
+      return Array.isArray(matchingServices) && matchingServices.length > 0;
+    });
+  }, [candidateCategories, allActiveServices, servicesLoaded]);
 
   const [stage, setStage] = useState(queryStep === 'book' ? 2 : 1); // 1 = Collections, 2 = Booking Form, 3 = Confirmation
   const [selectedCategoryId, setSelectedCategoryId] = useState('wedding');
@@ -100,6 +163,27 @@ export default function ServicesPage() {
     }
   }, [queryCategory, queryTier, queryStep, location.hash, categories]);
 
+  // Auto-fallback if currently selected category has 0 services and is not in categories
+  useEffect(() => {
+    if (categories.length > 0) {
+      const isCurrentValid = categories.some(
+        (c) => toCanonicalKey(c.id) === toCanonicalKey(selectedCategoryId)
+      );
+      if (!isCurrentValid) {
+        const fallbackCat = categories[0].id;
+        setSelectedCategoryId(fallbackCat);
+        setSearchParams(
+          (prev) => {
+            const updated = new URLSearchParams(prev);
+            updated.set('category', fallbackCat);
+            return updated;
+          },
+          { replace: true }
+        );
+      }
+    }
+  }, [categories, selectedCategoryId, setSearchParams]);
+
   // Ensure professional query URL on initial load if none set
   useEffect(() => {
     if (!searchParams.get('category')) {
@@ -137,7 +221,7 @@ export default function ServicesPage() {
         const res = await fetch(`/api/services?category=${selectedCategoryId}`);
         if (res.ok) {
           const json = await res.json();
-          if (!isCancelled && Array.isArray(json.data) && json.data.length > 0) {
+          if (!isCancelled && Array.isArray(json.data)) {
             setDynamicServices(json.data);
           }
         }
@@ -236,13 +320,15 @@ export default function ServicesPage() {
     }));
 
   const filteredStaticCollections = COLLECTIONS.filter(
-    (c) => c.category === selectedCategoryId
+    (c) => toCanonicalKey(c.category) === toCanonicalKey(selectedCategoryId)
   );
 
   const activeCollections =
     normalizedDynamicList.length > 0
       ? normalizedDynamicList
-      : filteredStaticCollections;
+      : allActiveServices.length === 0
+      ? filteredStaticCollections
+      : [];
 
   const selectedCollection =
     activeCollections.find(
@@ -482,42 +568,12 @@ export default function ServicesPage() {
                         onSelectAndBook={handleSelectAndBook}
                       />
                     ))
-                  ) : (
-                    <div className="col-span-full py-16 px-8 text-center rounded-2xl border border-[#E3DBCC] bg-[#FAF8F5]">
-                      <span className="font-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] text-[#7A7770] uppercase block mb-3">
-                        ATELIER BESPOKE COMMISSIONS
-                      </span>
-                      <h3
-                        style={{
-                          fontFamily: 'var(--font-serif)',
-                          fontSize: 'clamp(2rem, 3.2vw, 2.6rem)',
-                          color: '#101010',
-                          fontWeight: 400,
-                          lineHeight: 1.15,
-                          marginBottom: '14px',
-                        }}
-                      >
-                        Bespoke {activeCategoryObj?.label || 'Custom'} Suites
-                      </h3>
-                      <p className="font-serif italic text-sm sm:text-base text-[#7A7770] max-w-xl mx-auto mb-8 leading-relaxed">
-                        Every commission in this discipline is uniquely structured around your timeline, aesthetic intention, and archival vision. Direct atelier scheduling is open.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setStage(2);
-                          setSearchParams(
-                            { category: selectedCategoryId, step: 'book' },
-                            { replace: true }
-                          );
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#101010] text-[#FDFCF8] rounded-full text-xs font-sans font-medium tracking-[0.16em] uppercase hover:bg-[#2A2825] transition-all cursor-pointer shadow-sm"
-                      >
-                        <span>COMMISSION A CUSTOM BRIEF →</span>
-                      </button>
+                  ) : loadingServices ? (
+                    <div className="col-span-full py-20 text-center">
+                      <div className="w-6 h-6 border-2 border-[#101010] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                      <p className="text-[10px] tracking-[0.2em] uppercase text-[#7A7770]">Loading Collections...</p>
                     </div>
-                  )}
+                  ) : null}
                 </motion.div>
               </AnimatePresence>
 

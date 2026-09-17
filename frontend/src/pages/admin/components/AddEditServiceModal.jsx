@@ -34,6 +34,7 @@ export default function AddEditServiceModal({
   serviceToEdit,
   initialData,
   availableCategories = [],
+  lockCategory = false,
   onSuccess,
 }) {
   const effectiveCategory = (categoryProp || initialCategory || 'wedding').toLowerCase().trim();
@@ -248,14 +249,27 @@ export default function AddEditServiceModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 bg-black/45 backdrop-blur-sm overflow-y-auto">
-      {/* Modal Container */}
-      <div className="relative w-full max-w-[1040px] max-h-[90vh] bg-[#FCFAF7] rounded-[26px] border border-[#E4DED3] shadow-[0_28px_80px_rgba(0,0,0,0.22)] overflow-hidden flex flex-col my-auto">
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 bg-black/45 backdrop-blur-sm">
+      {/* Modal Container (Form wrapper to enable standard submit from footer) */}
+      <form
+        onSubmit={handleSubmit}
+        className="relative w-full max-w-[1040px] max-h-[90vh] bg-[#FCFAF7] rounded-[26px] border border-[#E4DED3] shadow-[0_28px_80px_rgba(0,0,0,0.22)] overflow-hidden flex flex-col my-auto"
+      >
         {/* =====================================================
-            MODAL HEADER
+            REGION 1: FIXED MODAL HEADER (Non-scrolling)
+            - At least 32px padding on left/right (clamp(24px, 4vw, 36px))
+            - At least 24px padding at the very top of modal
+            - At least 16px between subtitle line and divider below it
            ===================================================== */}
-        <div className="shrink-0 px-8 sm:px-10 py-6 sm:py-7 border-b border-[#EAE4DA] bg-[#FCFAF7]">
+        <header
+          className="shrink-0 border-b border-[#EAE4DA] bg-[#FCFAF7]"
+          style={{
+            paddingTop: '24px',
+            paddingBottom: '24px',
+            paddingLeft: 'clamp(24px, 4vw, 36px)',
+            paddingRight: 'clamp(24px, 4vw, 36px)',
+          }}
+        >
           <div className="flex items-start justify-between gap-6">
             <div className="flex items-center gap-4">
               {/* Icon Badge */}
@@ -273,7 +287,7 @@ export default function AddEditServiceModal({
                       fontSize: 'clamp(26px, 3vw, 32px)',
                     }}
                   >
-                    {isEditMode ? 'Edit Service Package' : 'Add New Service Package'}
+                    {isEditMode ? 'Edit Service Package' : 'Add New Service'}
                   </h2>
 
                   <span className="px-3 py-0.5 rounded-full bg-[#EDE6DC] border border-[#DDD5C9] text-[#786E64] text-[9.5px] uppercase tracking-[0.16em] font-semibold">
@@ -281,7 +295,7 @@ export default function AddEditServiceModal({
                   </span>
                 </div>
 
-                <p className="text-[12.5px] text-[#7C766C] mt-1 font-sans leading-normal">
+                <p className="text-[12.5px] text-[#7C766C] mt-1.5 font-sans leading-normal">
                   Configure the visual identity, pricing, deliverables and presentation of this collection.
                 </p>
               </div>
@@ -297,12 +311,25 @@ export default function AddEditServiceModal({
               <X size={16} />
             </button>
           </div>
-        </div>
+        </header>
 
         {/* =====================================================
-            MODAL SCROLLABLE BODY
+            REGION 2: SCROLLABLE MIDDLE CONTENT
+            - Only part that scrolls internally
+            - Exactly identical left/right padding (clamp(24px, 4vw, 36px))
+            - At least 40px vertical space between sections (space-y-10)
+            - At least 20px between section heading and first field row (mb-5)
+            - Generous bottom padding to ensure clearance above footer
            ===================================================== */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-8 sm:px-10 py-8 space-y-9">
+        <div
+          className="flex-1 min-h-0 overflow-y-auto space-y-10"
+          style={{
+            paddingTop: '32px',
+            paddingBottom: '48px',
+            paddingLeft: 'clamp(24px, 4vw, 36px)',
+            paddingRight: 'clamp(24px, 4vw, 36px)',
+          }}
+        >
           {/* Error Message */}
           {error && (
             <div className="p-4 rounded-[14px] bg-[#FFF3F0] border border-[#F3C4BA] text-xs text-[#C53030] leading-relaxed">
@@ -333,45 +360,58 @@ export default function AddEditServiceModal({
               </span>
             </div>
 
-            <div className="space-y-4">
-              {/* Row 1: Category & Tier Name */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-6">
+              {/* Row 1: Category & Tier Name (>= 24px horizontal gap) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="text-[9.5px] font-semibold tracking-[0.18em] text-[#6E675D] uppercase block mb-2">
                     Category *
                   </label>
-                  <select
-                    value={isCustomCategory ? '__custom__' : category}
-                    onChange={(e) => {
-                      if (e.target.value === '__custom__') {
-                        setIsCustomCategory(true);
-                      } else {
-                        setIsCustomCategory(false);
-                        setCategory(e.target.value);
-                      }
-                    }}
-                    className="w-full h-12 px-4 rounded-[14px] border border-[#DCD5C9] bg-[#FAF8F5] focus:bg-white text-[12.5px] text-[#181818] outline-none focus:border-[#181818] transition-all cursor-pointer"
-                  >
-                    {categoriesOptions.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.label}
-                      </option>
-                    ))}
-                    <option value="__custom__">+ Custom Collection Category...</option>
-                  </select>
+                  {lockCategory ? (
+                    <div className="w-full h-12 px-4 rounded-[14px] border border-[#DCD5C9] bg-[#F1ECE3] flex items-center justify-between text-[12.5px] text-[#181818] select-none">
+                      <span className="font-medium">
+                        {categoriesOptions.find((c) => c.id === category)?.label || category.charAt(0).toUpperCase() + category.slice(1)}
+                      </span>
+                      <span className="text-[9.5px] uppercase tracking-[0.14em] font-semibold text-[#8C857A]">
+                        Category Locked
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <select
+                        value={isCustomCategory ? '__custom__' : category}
+                        onChange={(e) => {
+                          if (e.target.value === '__custom__') {
+                            setIsCustomCategory(true);
+                          } else {
+                            setIsCustomCategory(false);
+                            setCategory(e.target.value);
+                          }
+                        }}
+                        className="w-full h-12 px-4 rounded-[14px] border border-[#DCD5C9] bg-[#FAF8F5] focus:bg-white text-[12.5px] text-[#181818] outline-none focus:border-[#181818] transition-all cursor-pointer"
+                      >
+                        {categoriesOptions.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.label}
+                          </option>
+                        ))}
+                        <option value="__custom__">+ Custom Collection Category...</option>
+                      </select>
 
-                  {isCustomCategory && (
-                    <input
-                      type="text"
-                      value={customCategoryInput}
-                      onChange={(e) => {
-                        setCustomCategoryInput(e.target.value);
-                        setCategory(e.target.value.toLowerCase().trim());
-                      }}
-                      placeholder="Enter new category (e.g. Maternity)"
-                      required
-                      className="w-full h-11 px-4 mt-2.5 rounded-[12px] border border-[#DCD5C9] bg-white text-[12px] text-[#181818] outline-none focus:border-[#181818]"
-                    />
+                      {isCustomCategory && (
+                        <input
+                          type="text"
+                          value={customCategoryInput}
+                          onChange={(e) => {
+                            setCustomCategoryInput(e.target.value);
+                            setCategory(e.target.value.toLowerCase().trim());
+                          }}
+                          placeholder="Enter new category (e.g. Maternity)"
+                          required
+                          className="w-full h-11 px-4 mt-2.5 rounded-[12px] border border-[#DCD5C9] bg-white text-[12px] text-[#181818] outline-none focus:border-[#181818]"
+                        />
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -390,8 +430,8 @@ export default function AddEditServiceModal({
                 </div>
               </div>
 
-              {/* Row 2: Eyebrow Tag & Folio Label */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Row 2: Eyebrow Tag & Folio Label (>= 24px horizontal gap) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="text-[9.5px] font-semibold tracking-[0.18em] text-[#6E675D] uppercase block mb-2">
                     Eyebrow Tag
@@ -436,7 +476,7 @@ export default function AddEditServiceModal({
           </section>
 
           {/* ═══════════════════════════════════════════════════
-              02 — COVER PHOTOGRAPH (3-Column Layout as in Screenshot)
+              02 — COVER PHOTOGRAPH (3-Column Layout, visually top-aligned, >= 24px gap)
              ═══════════════════════════════════════════════════ */}
           <section>
             <div className="flex items-center justify-between mb-5">
@@ -458,7 +498,7 @@ export default function AddEditServiceModal({
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
               {/* Item 1: Upload Photograph Box */}
               <div
                 onClick={() => fileInputRef.current?.click()}
@@ -504,7 +544,7 @@ export default function AddEditServiceModal({
               {/* Item 3: URL and Badge Tag Inputs */}
               <div className="flex flex-col justify-between gap-3 h-[148px]">
                 <div>
-                  <label className="text-[9.5px] font-semibold tracking-[0.18em] text-[#6E675D] uppercase block mb-1">
+                  <label className="text-[9.5px] font-semibold tracking-[0.18em] text-[#6E675D] uppercase block mb-1.5">
                     IMAGE URL
                   </label>
                   <input
@@ -520,7 +560,7 @@ export default function AddEditServiceModal({
                 </div>
 
                 <div>
-                  <label className="text-[9.5px] font-semibold tracking-[0.18em] text-[#6E675D] uppercase block mb-1">
+                  <label className="text-[9.5px] font-semibold tracking-[0.18em] text-[#6E675D] uppercase block mb-1.5">
                     IMAGE BADGE TAG
                   </label>
                   <input
@@ -536,7 +576,7 @@ export default function AddEditServiceModal({
           </section>
 
           {/* ═══════════════════════════════════════════════════
-              03 — INVESTMENT
+              03 — INVESTMENT (At least 20px heading margin, 24px gaps, clean below-scroll spacing)
              ═══════════════════════════════════════════════════ */}
           <section>
             <div className="flex items-center justify-between mb-5">
@@ -558,7 +598,7 @@ export default function AddEditServiceModal({
               </span>
             </div>
 
-            <div className="rounded-[18px] border border-[#E6DFD4] bg-[#F6F2EC] p-5 sm:p-6 space-y-4">
+            <div className="rounded-[18px] border border-[#E6DFD4] bg-[#F6F2EC] p-5 sm:p-6 space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <label className="text-[9.5px] font-semibold tracking-[0.18em] text-[#6E675D] uppercase">
                   PACKAGE PRICING
@@ -574,7 +614,7 @@ export default function AddEditServiceModal({
                 </label>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-end">
                 {!isPriceToBeAdded ? (
                   <div>
                     <div className="flex rounded-[12px] border border-[#DDD6C8] bg-white overflow-hidden focus-within:border-[#181818] transition-colors h-11">
@@ -729,7 +769,7 @@ export default function AddEditServiceModal({
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <label className="flex items-start gap-3.5 p-5 rounded-[16px] border border-[#E2DBD0] bg-[#F7F4EF] hover:bg-white transition-all cursor-pointer">
                 <input
                   type="checkbox"
@@ -766,45 +806,59 @@ export default function AddEditServiceModal({
               </label>
             </div>
           </section>
+        </div>
 
-          {/* ═══════════════════════════════════════════════════
-              STICKY MODAL FOOTER
-             ═══════════════════════════════════════════════════ */}
-          <div className="sticky bottom-0 -mx-8 sm:-mx-10 -mb-8 px-8 sm:px-10 py-5 bg-[#FCFAF7]/95 backdrop-blur-md border-t border-[#EAE4DA] flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4 z-20">
-            <p className="text-[11px] text-[#8C857A]">
-              {isEditMode
-                ? 'Changes will update the existing collection live.'
-                : 'Your collection package will appear in this service category.'}
-            </p>
+        {/* =====================================================
+            REGION 3: FIXED MODAL FOOTER
+            - Always sits below scrollable area, never overlaps
+            - Exactly identical left/right padding (clamp(24px, 4vw, 36px))
+            - At least 24px padding at very bottom of modal below buttons
+            - At least 16px gap between helper text and buttons (gap-4)
+            - At least 12px gap between Cancel and Save buttons (gap-3)
+            - Both buttons fully visible and never clipped (shrink-0 whitespace-nowrap)
+           ===================================================== */}
+        <footer
+          className="shrink-0 bg-[#FCFAF7] border-t border-[#EAE4DA] flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4"
+          style={{
+            paddingTop: '20px',
+            paddingBottom: '24px',
+            paddingLeft: 'clamp(24px, 4vw, 36px)',
+            paddingRight: 'clamp(24px, 4vw, 36px)',
+          }}
+        >
+          <p className="text-[11px] text-[#8C857A]">
+            {isEditMode
+              ? 'Changes will update the existing collection live.'
+              : 'Your collection package will appear in this service category.'}
+          </p>
 
-            <div className="flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={submitting}
-                className="h-11 px-6 rounded-full text-[11px] uppercase tracking-[0.14em] font-semibold text-[#7A7367] hover:text-[#181818] hover:bg-[#EFEAE2] transition-colors cursor-pointer disabled:opacity-50"
-              >
-                Cancel
-              </button>
+          <div className="flex items-center justify-end gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={submitting}
+              className="h-11 px-6 rounded-full text-[11px] uppercase tracking-[0.14em] font-semibold text-[#7A7367] hover:text-[#181818] hover:bg-[#EFEAE2] transition-colors cursor-pointer disabled:opacity-50 shrink-0 whitespace-nowrap"
+            >
+              Cancel
+            </button>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="h-11 px-7 rounded-full bg-[#181818] hover:bg-[#2F2C28] text-[#FAF8F5] text-[11px] uppercase tracking-[0.16em] font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
-              >
-                {submitting ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <span>{isEditMode ? 'Save Changes' : 'Create Package'}</span>
-                )}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="h-11 px-7 rounded-full bg-[#181818] hover:bg-[#2F2C28] text-[#FAF8F5] text-[11px] uppercase tracking-[0.16em] font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50 shrink-0 whitespace-nowrap"
+            >
+              {submitting ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <span>{isEditMode ? 'Save Changes' : 'Create Service'}</span>
+              )}
+            </button>
           </div>
-        </form>
-      </div>
+        </footer>
+      </form>
     </div>
   );
 }
