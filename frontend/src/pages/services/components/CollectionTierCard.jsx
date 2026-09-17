@@ -1,4 +1,5 @@
 import React from 'react';
+import { GripVertical, Eye, EyeOff, Pencil, Trash2 } from 'lucide-react';
 
 // Helper function to condense full-sentence deliverables into clean 3-4 word phrases
 const condenseDeliverable = (item) => {
@@ -45,6 +46,14 @@ export default function CollectionTierCard({
   collection,
   isSelected,
   onSelectAndBook,
+  isAdmin = false,
+  index = 0,
+  onEdit,
+  onDelete,
+  onToggleActive,
+  dragProps = {},
+  isDragging = false,
+  isOver = false,
 }) {
   const cardId = collection.id || collection.tier || collection._id;
   const isRecommended =
@@ -58,11 +67,11 @@ export default function CollectionTierCard({
     collection.deliverables && collection.deliverables.length > 0
       ? collection.deliverables
       : [
-          'Lead principal photographer + associate',
-          'Archival master proofing gallery & print release',
-          '35mm analog film rolls (Portra 400)',
-          'Archival presentation folio in Belgian linen',
-        ];
+        'Lead principal photographer + associate',
+        'Archival master proofing gallery & print release',
+        '35mm analog film rolls (Portra 400)',
+        'Archival presentation folio in Belgian linen',
+      ];
 
   // Uniform 4 concise items per card for flawless structural consistency
   const condensedDeliverables = rawDeliverables
@@ -106,16 +115,23 @@ export default function CollectionTierCard({
 
   return (
     <div
+      {...(isAdmin ? dragProps : {})}
       style={{
         padding: '32px',
         boxSizing: 'border-box',
       }}
       className={`group relative h-full flex flex-col justify-between rounded-2xl transition-all duration-300 ease-out ${
-        isSelected
+        isDragging
+          ? 'opacity-40 border-[#101010] shadow-lg'
+          : isOver
+          ? 'border-[#9E8159] shadow-md bg-[#FAF6F0]'
+          : isSelected
           ? 'bg-[#FAF8F5] border-2 border-[#101010] shadow-[0_8px_32px_-6px_rgba(16,16,16,0.12)] -translate-y-1'
           : isRecommended
           ? 'bg-[#FAF8F5] border border-[#D5CBB9] shadow-[0_4px_24px_-6px_rgba(16,16,16,0.05)] hover:border-[#101010]/50 hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.08)]'
           : 'bg-[#FDFCF8] border border-[#E3DBCC] shadow-[0_2px_20px_-6px_rgba(16,16,16,0.04)] hover:border-[#C5B7A4] hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.07)]'
+      } ${isAdmin ? 'cursor-grab active:cursor-grabbing' : ''} ${
+        collection.isActive === false ? 'opacity-70' : ''
       }`}
     >
       <div className="flex-1 flex flex-col">
@@ -125,22 +141,58 @@ export default function CollectionTierCard({
         <div
           data-testid="top-label-container"
           style={{ marginBottom: '8px' }}
-          className="flex items-center min-h-[16px]"
+          className="flex items-center justify-between min-h-[16px]"
         >
-          {isSelected ? (
-            <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#101010] uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#101010] shrink-0" />
-              <span>Selected Collection</span>
-            </span>
-          ) : isRecommended ? (
-            <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase flex items-center gap-1.5">
-              <span className="text-[#C2A378]">★</span>
-              <span>Recommended</span>
-            </span>
-          ) : (
-            <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase">
-              The Collection
-            </span>
+          <div className="flex items-center gap-1.5">
+            {isAdmin && <GripVertical size={13} className="text-[#A39E93] shrink-0" />}
+            {isSelected ? (
+              <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#101010] uppercase flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#101010] shrink-0" />
+                <span>Selected Collection</span>
+              </span>
+            ) : isRecommended ? (
+              <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase flex items-center gap-1.5">
+                <span className="text-[#C2A378]">★</span>
+                <span>Recommended</span>
+              </span>
+            ) : (
+              <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase">
+                {collection.tier || 'The Collection'}
+              </span>
+            )}
+          </div>
+
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#7A7770]">
+                Folio 0{index + 1}
+              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onToggleActive) onToggleActive(collection, e);
+                }}
+                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] uppercase tracking-[0.14em] font-medium transition-colors cursor-pointer ${
+                  collection.isActive !== false
+                    ? 'bg-[#101010] text-[#FDFCF8] hover:bg-[#2A2825]'
+                    : 'bg-red-800/80 text-white hover:bg-red-700'
+                }`}
+                title={collection.isActive !== false ? 'Visible on public site' : 'Hidden draft'}
+              >
+                {collection.isActive !== false ? (
+                  <>
+                    <Eye size={9} />
+                    <span>Active</span>
+                  </>
+                ) : (
+                  <>
+                    <EyeOff size={9} />
+                    <span>Draft</span>
+                  </>
+                )}
+              </button>
+            </div>
           )}
         </div>
 
@@ -318,42 +370,108 @@ export default function CollectionTierCard({
       </div>
 
       {/* =========================================================
-          9. CTA BUTTON
+          9. CTA BUTTON OR ADMIN ACTIONS
           - 24px gap above button from last item
           - Card has 32px bottom padding (>= 24px)
           ========================================================= */}
-      <div
-        data-testid="button-wrapper"
-        style={{
-          marginTop: '24px',
-        }}
-      >
-        <button
-          type="button"
-          onClick={handleClick}
-          className={`w-full py-3.5 px-6 rounded-full font-sans text-xs font-medium uppercase tracking-[0.14em] transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer group/btn ${
-            isSelected
-              ? 'bg-[#101010] text-[#FDFCF8] border border-[#101010] shadow-[0_4px_14px_rgba(16,16,16,0.14)] hover:bg-[#2A2825]'
-              : 'bg-[#FAF7F2] hover:bg-[#F3EFE6] text-[#101010] border border-[#E3DBCC] hover:border-[#C5B7A4]'
-          }`}
+      {isAdmin ? (
+        <div
+          data-testid="admin-actions-wrapper"
+          style={{
+            marginTop: '24px',
+            paddingTop: '16px',
+            borderTop: '1px solid rgba(227, 219, 204, 0.7)',
+          }}
+          className="flex items-center justify-between gap-3"
         >
-          {isSelected ? (
-            <>
-              <span>Selected · Continue to Booking</span>
-              <span className="transition-transform duration-300 ease-out group-hover/btn:translate-x-1">
-                →
-              </span>
-            </>
-          ) : (
-            <>
-              <span>Select &amp; Book</span>
-              <span className="transition-transform duration-300 ease-out group-hover/btn:translate-x-1">
-                →
-              </span>
-            </>
-          )}
-        </button>
-      </div>
+          <span className="font-mono text-[10.5px] tracking-[0.16em] uppercase text-[#7A7770] font-medium">
+            ORDER #{index + 1}
+          </span>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onEdit) onEdit(collection);
+              }}
+              className="inline-flex items-center gap-1.5 py-2 px-4 rounded-full border border-[#E3DBCC] bg-[#FAF7F2] hover:bg-[#F3EFE6] text-[11px] uppercase tracking-[0.14em] font-medium text-[#101010] transition-colors cursor-pointer"
+            >
+              <Pencil size={11} />
+              <span>Edit</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onDelete) onDelete(collection);
+              }}
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-800 transition-colors cursor-pointer"
+              title="Delete package"
+            >
+              <Trash2 size={12} />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div
+          data-testid="button-wrapper"
+          style={{
+            marginTop: '24px',
+          }}
+        >
+          <button
+            type="button"
+            onClick={handleClick}
+            className={`w-full py-3.5 px-6 rounded-full font-sans text-xs font-medium uppercase tracking-[0.14em]
+      transition-all duration-300 flex items-center justify-center gap-2.5
+      cursor-pointer group/btn
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-[#101010]/30 focus-visible:ring-offset-2
+      active:scale-[0.98]
+      ${isSelected
+                ? `
+            bg-[#101010]
+            text-[#FDFCF8]
+            border-2 border-[#101010]
+            shadow-[0_6px_20px_rgba(16,16,16,0.20)]
+            ring-1 ring-[#101010]/10
+            hover:bg-[#242220]
+            hover:border-[#242220]
+            hover:shadow-[0_8px_24px_rgba(16,16,16,0.24)]
+          `
+                : `
+            bg-[#FAF7F2]
+            text-[#101010]
+            border border-[#E3DBCC]
+            hover:bg-[#F3EFE6]
+            hover:border-[#B9AA96]
+            hover:shadow-[0_4px_14px_rgba(16,16,16,0.08)]
+          `
+              }`}
+          >
+            {isSelected ? (
+              <>
+                <span className="text-[#FDFCF8] text-black">
+                  Selected · Continue to Booking →
+                </span>
+
+                <span className="transition-transform duration-300 ease-out group-hover/btn:translate-x-1">
+                  →
+                </span>
+              </>
+            ) : (
+              <>
+                <span>Select &amp; Book</span>
+
+                <span className="transition-transform duration-300 ease-out group-hover/btn:translate-x-1">
+                  →
+                </span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
