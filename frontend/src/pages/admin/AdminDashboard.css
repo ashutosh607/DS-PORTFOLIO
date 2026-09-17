@@ -19,7 +19,7 @@
   }
 }
 
-/* --- Sidebar Shell (Generous top padding, clean margins) --- */
+/* --- Sidebar Shell (Mobile: Fixed drawer out of document flow; Desktop: Sticky sidebar) --- */
 .admin-sidebar-shell {
   width: 260px;
   min-width: 260px;
@@ -29,19 +29,31 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100vh;
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 40;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
   overflow-y: auto;
   padding: 48px 22px 36px 26px;
   box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .admin-sidebar-shell {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    z-index: 40;
+    transform: none !important;
+  }
 }
 
 /* --- Main Workspace (Generous Spacing & Balanced Padding for Luxury Cards) --- */
 .admin-main-workspace {
   flex: 1;
   min-width: 0;
-  overflow-y: auto;
+  overflow-y: visible;
   background-color: #FAF8F5;
   padding: 56px 56px 96px 56px;
   box-sizing: border-box;

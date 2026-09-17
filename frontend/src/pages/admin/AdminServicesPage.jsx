@@ -402,8 +402,7 @@ export default function AdminServicesPage() {
   }, [services, searchQuery]);
 
  return (
-  <div className="w-full min-h-screen bg-[#FAF9F6] pb-24">
-    <div className="w-full max-w-[1680px] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
+  <div className="w-full pb-16">
 
       {/* =========================================================
           TOAST
@@ -427,7 +426,7 @@ export default function AdminServicesPage() {
       {/* =========================================================
           HERO / PAGE HEADER
       ========================================================= */}
-      <section className="pt-10 sm:pt-14 lg:pt-16 pb-12 lg:pb-16">
+      <section className="pb-12 lg:pb-14">
 
         <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-10 xl:gap-16">
 
@@ -1049,6 +1048,5 @@ export default function AdminServicesPage() {
       />
 
     </div>
-  </div>
   );
 }
