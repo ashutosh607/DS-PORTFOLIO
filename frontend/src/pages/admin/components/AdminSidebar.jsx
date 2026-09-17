@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
-import { Home, Folder, Sparkles, ExternalLink, User, LogOut } from 'lucide-react';
+import { Home, Folder, SlidersHorizontal, ExternalLink, User, LogOut } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import Logo from '../../../components/layout/Logo';
 import '../AdminDashboard.css';
@@ -18,7 +18,7 @@ export default function AdminSidebar() {
   const navItems = [
     { label: 'Dashboard', path: '/admin/dashboard', icon: Home },
     { label: 'Collections', path: '/admin/collections', icon: Folder },
-    { label: 'Services', path: '/admin/services', icon: Sparkles },
+    { label: 'Services', path: '/admin/services', icon: SlidersHorizontal },
   ];
 
   return (
@@ -107,22 +107,22 @@ export default function AdminSidebar() {
         </div>
 
         {/* Bottom User Info & Logout */}
-        <div className="pt-6 border-t border-[#E8E2D6] space-y-1">
-          {/* User Email */}
-          <div className="flex items-center gap-2.5 px-3 py-2 text-[#6E6960]">
-            <User size={15} strokeWidth={1.5} className="text-[#8E887E] shrink-0" />
-              <span className="text-[12px] truncate" title={adminUser?.email}>
-                {adminUser?.email || 'Administrator'}
-              </span>
+        <div className="pt-5 border-t border-[#E8E2D6] space-y-1">
+          <div className="flex items-center gap-2.5 px-2 py-1">
+            <div className="w-7 h-7 rounded-full bg-[#E5DDD0] text-[#181818] text-[11px] font-bold flex items-center justify-center shrink-0">
+              AS
+            </div>
+            <span className="text-[12px] text-[#5C5852] truncate font-medium" title={adminUser?.email}>
+              {adminUser?.email || 'ashutoshkadam507...'}
+            </span>
           </div>
 
-          {/* Logout */}
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] text-[#6E6960] hover:text-[#181818] hover:bg-[#F0EAE0] text-[12px] transition-colors cursor-pointer text-left font-normal"
+            className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-[8px] text-[#7A756D] hover:text-[#181818] hover:bg-[#EFEAE2] text-[12px] transition-colors cursor-pointer text-left font-medium"
           >
-            <LogOut size={15} strokeWidth={1.5} className="text-[#8E887E] shrink-0" />
+            <LogOut size={14} strokeWidth={1.5} className="shrink-0" />
             <span>Logout</span>
           </button>
         </div>

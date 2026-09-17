@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Plus,
@@ -15,27 +15,74 @@ import {
   ArrowRight,
   Search,
   AlertTriangle,
+  LayoutGrid,
+  Sun,
+  Bell,
+  ChevronDown,
+  MoreHorizontal,
+  Gem,
+  Heart,
+  Cake,
+  User,
+  Calendar,
+  Briefcase,
+  Baby,
 } from 'lucide-react';
 import { useAdminAuth } from './context/AdminAuthContext';
 import { useCategories } from '../../utils/categoryManager';
 import AddEditServiceModal from './components/AddEditServiceModal';
 import AddCategoryModal from './components/AddCategoryModal';
+import EditCategoryModal from './components/EditCategoryModal';
 import CollectionTierCard from '../services/components/CollectionTierCard';
+import driedBotanical from '../../assets/dried-botanical.jpg';
 import './AdminDashboard.css';
 
 const DEFAULT_CATEGORIES = [
-  { id: 'wedding', label: 'Weddings' },
-  { id: 'pre-wedding', label: 'Pre-Wedding' },
-  { id: 'birthday', label: 'Birthdays' },
-  { id: 'portrait', label: 'Portraits' },
-  { id: 'event', label: 'Events' },
-  { id: 'commercial', label: 'Commercial' },
+  { id: 'wedding', label: 'Weddings', slug: 'weddings' },
+  { id: 'pre-wedding', label: 'Pre-Wedding', slug: 'pre-wedding' },
+  { id: 'birthday', label: 'Birthdays', slug: 'birthdays' },
+  { id: 'portrait', label: 'Portraits', slug: 'portraits' },
+  { id: 'event', label: 'Events', slug: 'events' },
+  { id: 'commercial', label: 'Commercial', slug: 'commercial' },
+  { id: 'baby', label: 'Baby', slug: 'baby' },
+  { id: 'maternity', label: 'Maternity', slug: 'maternity' },
 ];
+
+// Curated thumbnail images matching the editorial aesthetic
+const CATEGORY_THUMBNAILS = {
+  wedding: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=400&auto=format&fit=crop',
+  weddings: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=400&auto=format&fit=crop',
+  'pre-wedding': 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=400&auto=format&fit=crop',
+  birthday: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=400&auto=format&fit=crop',
+  birthdays: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=400&auto=format&fit=crop',
+  portrait: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop',
+  portraits: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop',
+  event: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=400&auto=format&fit=crop',
+  events: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=400&auto=format&fit=crop',
+  commercial: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=400&auto=format&fit=crop',
+  baby: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?q=80&w=400&auto=format&fit=crop',
+  maternity: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=400&auto=format&fit=crop',
+};
+
+const CATEGORY_ICONS = {
+  wedding: Gem,
+  weddings: Gem,
+  'pre-wedding': Heart,
+  birthday: Cake,
+  birthdays: Cake,
+  portrait: User,
+  portraits: User,
+  event: Calendar,
+  events: Calendar,
+  commercial: Briefcase,
+  baby: Baby,
+  maternity: Sparkles,
+};
 
 export default function AdminServicesPage() {
   const { category: categoryParam } = useParams();
   const navigate = useNavigate();
-  const { getAuthHeaders } = useAdminAuth();
+  const { adminUser, getAuthHeaders } = useAdminAuth();
   const { categories: dynamicCategories, refresh: refreshCategories } = useCategories();
   const [backendCategories, setBackendCategories] = useState([]);
 
@@ -88,21 +135,30 @@ export default function AdminServicesPage() {
     return base;
   }, [dynamicCategories, backendCategories]);
 
-  const [activeCategory, setActiveCategory] = useState(categoryParam || 'wedding');
+  const [activeCategory, setActiveCategory] = useState(categoryParam || 'all');
   const [services, setServices] = useState([]);
   const [allServices, setAllServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isReordering, setIsReordering] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Modal states
+  // Modal & menu states
   const [modalOpen, setModalOpen] = useState(false);
   const [modalLockCategory, setModalLockCategory] = useState(false);
-  const [modalTargetCategory, setModalTargetCategory] = useState(activeCategory);
+  const [modalTargetCategory, setModalTargetCategory] = useState(activeCategory === 'all' ? 'wedding' : activeCategory);
   const [addCategoryModalOpen, setAddCategoryModalOpen] = useState(false);
+  const [editCategoryTarget, setEditCategoryTarget] = useState(null);
+  const [categoryMenuOpenId, setCategoryMenuOpenId] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Close more menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setCategoryMenuOpenId(null);
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
 
   // Drag and drop state
   const [draggedIndex, setDraggedIndex] = useState(null);
@@ -149,6 +205,19 @@ export default function AdminServicesPage() {
     return counts;
   }, [allServices, categoriesList]);
 
+  // Compute live publication status (has at least 1 active service)
+  const categoryLiveStatus = React.useMemo(() => {
+    const status = {};
+    categoriesList.forEach((cat) => {
+      const sKey = toCanonicalKey(cat.id);
+      const hasLive = allServices.some(
+        (s) => toCanonicalKey(s.category) === sKey && s.isActive !== false
+      );
+      status[cat.id] = hasLive;
+    });
+    return status;
+  }, [allServices, categoriesList]);
+
   // Check if delete target is the last remaining service in its category
   const isLastServiceInCat = React.useMemo(() => {
     if (!deleteTarget) return false;
@@ -171,6 +240,10 @@ export default function AdminServicesPage() {
   useEffect(() => {
     if (categoryParam) {
       const normalizedParam = categoryParam.toLowerCase();
+      if (normalizedParam === 'all') {
+        setActiveCategory('all');
+        return;
+      }
       const matched = categoriesList.find(
         (c) => c.id === normalizedParam || c.id === normalizedParam.replace(/s$/, '')
       );
@@ -180,15 +253,19 @@ export default function AdminServicesPage() {
         setActiveCategory(normalizedParam);
       }
     } else {
-      setActiveCategory('wedding');
+      setActiveCategory('all');
     }
   }, [categoryParam, categoriesList]);
 
-  // Fetch services for active category
+  // Fetch services for active category (or all if activeCategory === 'all')
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/services?category=${activeCategory}&includeInactive=true`);
+      const url =
+        activeCategory === 'all'
+          ? '/api/services?includeInactive=true'
+          : `/api/services?category=${activeCategory}&includeInactive=true`;
+      const res = await fetch(url);
       if (res.ok) {
         const json = await res.json();
         setServices(json.data || []);
@@ -215,7 +292,11 @@ export default function AdminServicesPage() {
 
   const handleCategorySelect = (catId) => {
     setActiveCategory(catId);
-    navigate(`/admin/services/${catId}`);
+    if (catId === 'all') {
+      navigate('/admin/services');
+    } else {
+      navigate(`/admin/services/${catId}`);
+    }
   };
 
   // Toggle active status
@@ -424,88 +505,95 @@ export default function AdminServicesPage() {
 
 
       {/* =========================================================
-          HERO / PAGE HEADER
+          TOP ACTION BAR (Sun, Bell with red dot, AS profile)
       ========================================================= */}
-      <section className="pb-12 lg:pb-14">
+      <div className="flex items-center justify-end gap-5 pb-8 pt-1">
+        <button
+          type="button"
+          className="text-[#6E675E] hover:text-[#181818] transition p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
+          title="Toggle Theme"
+        >
+          <Sun size={18} />
+        </button>
 
-        <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-10 xl:gap-16">
+        <button
+          type="button"
+          className="relative text-[#6E675E] hover:text-[#181818] transition p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
+          title="Notifications"
+        >
+          <Bell size={18} />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E53E3E] ring-2 ring-[#FAF8F5]" />
+        </button>
 
+        <div className="flex items-center gap-2 pl-2 cursor-pointer select-none">
+          <div className="w-7 h-7 rounded-full bg-[#DCD5C9] text-[#2C2925] text-[11px] font-semibold flex items-center justify-center">
+            {adminUser?.name ? adminUser.name.slice(0, 2).toUpperCase() : 'AS'}
+          </div>
+          <span
+            className="text-[12.5px] font-medium text-[#2C2925]"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+          >
+            {adminUser?.name || 'Ashutosh'}
+          </span>
+          <ChevronDown size={13} className="text-[#888]" />
+        </div>
+      </div>
+
+      {/* =========================================================
+          HERO / PAGE HEADER WITH BOTANICAL BRANCH
+      ========================================================= */}
+      <section className="relative pb-10 lg:pb-12">
+        {/* Background dried botanical illustration */}
+        <div className="absolute top-[-35px] right-[-20px] w-[340px] sm:w-[420px] lg:w-[480px] h-[220px] sm:h-[260px] pointer-events-none select-none opacity-35 mix-blend-multiply overflow-hidden z-0">
+          <img
+            src={driedBotanical}
+            alt=""
+            className="w-full h-full object-contain object-top-right filter contrast-105"
+          />
+        </div>
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           {/* LEFT CONTENT */}
-          <div className="max-w-[720px]">
-
-            <div className="flex items-center gap-3 mb-6">
-              <span className="w-9 h-px bg-[#B6A58D]" />
-
+          <div className="max-w-[680px]">
+            <div className="flex items-center gap-3 mb-5">
+              <span className="w-8 h-px bg-[#B6A58D]" />
               <span
-                className="text-[9px] uppercase tracking-[0.3em] text-[#9A9287] font-semibold"
-                style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                }}
+                className="text-[9.5px] uppercase tracking-[0.28em] text-[#9A9287] font-semibold"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
                 Studio Administration
               </span>
             </div>
 
             <h1
-              className="text-[#181818] font-normal leading-[0.88] tracking-[-0.045em]"
+              className="text-[#181818] font-normal leading-[0.92] tracking-[-0.04em]"
               style={{
-                fontFamily:
-                  "'Cormorant Garamond', 'Cormorant', Georgia, serif",
-                fontSize: "clamp(58px, 7vw, 92px)",
+                fontFamily: "'Cormorant Garamond', 'Cormorant', Georgia, serif",
+                fontSize: "clamp(54px, 6.8vw, 88px)",
               }}
             >
               Management
             </h1>
 
             <p
-              className="mt-7 max-w-[650px] text-[13px] sm:text-[14px] text-[#777168] leading-[1.9]"
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
+              className="mt-5 max-w-[620px] text-[13px] sm:text-[13.5px] text-[#777168] leading-[1.85]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
-              Curate and configure service packages, deliverables, pricing
-              guidelines, and presentation order across all photographic
-              disciplines.
+              Curate and configure service packages, deliverables, pricing guidelines, and presentation order across all photographic disciplines.
             </p>
           </div>
 
-
-          {/* =====================================================
-              ACTION AREA
-          ===================================================== */}
-          <div className="flex flex-wrap items-center gap-3 xl:pb-1">
-            {/* ADD CATEGORY */}
+          {/* RIGHT ACTION: SINGLE OBSIDIAN BUTTON "+ ADD CATEGORY" */}
+          <div className="shrink-0 pb-1">
             <button
               type="button"
               onClick={() => setAddCategoryModalOpen(true)}
-              className="h-12 inline-flex items-center gap-2 px-5 rounded-full border border-[#DCD5C9] bg-white text-[#181818] hover:bg-[#FAF8F5] transition-all duration-300 cursor-pointer shadow-2xs"
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
+              className="h-11 px-6 rounded-full bg-[#181818] text-white hover:bg-[#2C2C2C] transition-all duration-300 cursor-pointer shadow-xs flex items-center gap-2"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
               <Plus size={14} />
-              <span className="text-[9.5px] uppercase tracking-[0.18em] font-semibold">
+              <span className="text-[10px] uppercase tracking-[0.18em] font-semibold">
                 Add Category
-              </span>
-            </button>
-
-            {/* ADD SERVICE (GENERAL ENTRY POINT) */}
-            <button
-              type="button"
-              onClick={() => {
-                setEditTarget(null);
-                setModalTargetCategory(activeCategory);
-                setModalLockCategory(false);
-                setModalOpen(true);
-              }}
-              className="h-12 inline-flex items-center gap-2.5 px-6 rounded-full bg-[#181818] text-[#FAF8F5] hover:bg-[#303030] transition-all duration-300 cursor-pointer shadow-sm"
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              <Plus size={14} />
-              <span className="text-[9.5px] uppercase tracking-[0.18em] font-semibold">
-                Add Service
               </span>
             </button>
           </div>
@@ -513,85 +601,129 @@ export default function AdminServicesPage() {
       </section>
 
       {/* =========================================================
-          CATEGORIES DIRECTORY & PUBLICATION STATUS AREA
+          CATEGORIES & LIVE PUBLICATION CARD
       ========================================================= */}
-      <section className="mb-10 p-6 sm:p-8 rounded-[24px] border border-[#E8E2D6] bg-white shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#EAE4DA]">
-          <div>
-            <div className="flex items-center gap-2.5 mb-1.5">
-              <Layers size={17} className="text-[#8C8070]" />
-              <h2
-                className="text-[20px] sm:text-[23px] text-[#181818] font-normal tracking-[-0.01em]"
-                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-              >
-                Categories &amp; Live Publication
-              </h2>
-            </div>
-            <p className="text-[12px] text-[#7A7367]">
-              Only categories with at least one active service appear on the public site. Empty categories remain safely unpublished.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              type="button"
-              onClick={() => setAddCategoryModalOpen(true)}
-              className="h-9 px-4 inline-flex items-center gap-1.5 rounded-full border border-[#DCD5C9] bg-[#FAF8F5] hover:bg-white text-[#181818] text-[9.5px] uppercase tracking-[0.16em] font-semibold transition-all cursor-pointer"
+      <section className="mb-8 p-6 sm:p-7 rounded-[24px] border border-[#E8E2D6] bg-white shadow-xs">
+        <div className="pb-5 border-b border-[#EAE4DA]">
+          <div className="flex items-center gap-2.5 mb-1.5">
+            <LayoutGrid size={20} className="text-[#181818]" />
+            <h2
+              className="text-[22px] sm:text-[25px] text-[#181818] font-normal tracking-[-0.015em]"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
             >
-              <Plus size={12} />
-              <span>New Category</span>
-            </button>
+              Categories &amp; Live Publication
+            </h2>
           </div>
+          <p
+            className="text-[12px] text-[#7A7367]"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+          >
+            Only categories with at least one active service appear on the public site. Empty categories remain safely unpublished.
+          </p>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
+        {/* 4-COLUMN CATEGORIES GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
           {categoriesList.map((cat) => {
             const count = serviceCountsByCategory[cat.id] || 0;
-            const isZero = count === 0;
-            const isCurrent = toCanonicalKey(activeCategory) === toCanonicalKey(cat.id);
+            const isLive = count > 0 && (categoryLiveStatus[cat.id] ?? true);
+            const thumb =
+              CATEGORY_THUMBNAILS[cat.id] ||
+              CATEGORY_THUMBNAILS[cat.slug] ||
+              CATEGORY_THUMBNAILS.wedding;
+            const isCurrent = activeCategory === cat.id;
 
             return (
               <div
                 key={cat.id}
-                className={`p-4 rounded-[16px] border transition-all ${isCurrent
-                    ? 'border-[#181818] bg-[#FAF8F4] shadow-2xs'
-                    : 'border-[#EAE4DA] bg-[#FCFAF7] hover:border-[#D0C7B9]'
-                  } flex flex-col justify-between gap-3`}
+                className={`p-4 rounded-[18px] border transition-all duration-200 bg-[#FCFAF7] flex flex-col justify-between gap-4 ${
+                  isCurrent
+                    ? 'border-[#181818] shadow-2xs'
+                    : 'border-[#EAE4DA] hover:border-[#D5CDC0]'
+                }`}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[13.5px] font-semibold text-[#181818]">
+                {/* TOP ROW: Thumbnail + Details + More Options */}
+                <div className="flex items-start justify-between gap-2.5">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <img
+                      src={thumb}
+                      alt={cat.label}
+                      className="w-14 h-14 rounded-[12px] object-cover shrink-0 border border-[#ECE5DB] shadow-2xs"
+                    />
+                    <div className="min-w-0">
+                      <h3 className="text-[14px] font-semibold text-[#181818] tracking-[-0.01em] truncate leading-snug">
                         {cat.label}
+                      </h3>
+                      <span className="text-[11px] text-[#8C857A] block mt-0.5">
+                        {count} {count === 1 ? 'service package' : 'service packages'}
                       </span>
-                      {isCurrent && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#181818]" />
+                      {isLive ? (
+                        <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-[#EBF7EE] text-[#1E7438] text-[8.5px] uppercase tracking-[0.08em] font-semibold border border-[#C5E8CE]">
+                          Published Live
+                        </span>
+                      ) : (
+                        <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-[#FFF4E5] text-[#A36015] text-[7.5px] sm:text-[8px] uppercase tracking-[0.05em] font-semibold border border-[#F6DCB8]">
+                          Not published — add a service
+                        </span>
                       )}
                     </div>
-                    <span className="text-[11px] text-[#8C857A] mt-0.5 block font-mono">
-                      {count} {count === 1 ? 'service package' : 'service packages'}
-                    </span>
                   </div>
 
-                  {isZero ? (
-                    <span className="px-2.5 py-1 rounded-full bg-[#FFF5E6] border border-[#F2D7B2] text-[#9E6319] text-[9px] uppercase tracking-[0.12em] font-semibold shrink-0">
-                      Not published — add a service
-                    </span>
-                  ) : (
-                    <span className="px-2.5 py-1 rounded-full bg-[#EBF7EE] border border-[#C5E8CE] text-[#1E7438] text-[9px] uppercase tracking-[0.12em] font-semibold shrink-0">
-                      Published Live
-                    </span>
-                  )}
+                  <div className="relative shrink-0">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCategoryMenuOpenId(categoryMenuOpenId === cat.id ? null : cat.id);
+                      }}
+                      className="p-1 rounded-md text-[#8C857A] hover:text-[#181818] hover:bg-black/5 transition cursor-pointer"
+                      title="Category options"
+                    >
+                      <MoreHorizontal size={16} />
+                    </button>
+
+                    {categoryMenuOpenId === cat.id && (
+                      <div
+                        className="absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-[#EAE4DA] py-1 z-30"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCategoryMenuOpenId(null);
+                            setEditCategoryTarget(cat);
+                          }}
+                          className="w-full px-3 py-1.5 text-left text-[11px] text-[#181818] hover:bg-[#F7F5F0] flex items-center gap-2 cursor-pointer font-medium"
+                        >
+                          <Pencil size={12} /> Edit Category
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCategoryMenuOpenId(null);
+                            setEditTarget(null);
+                            setModalTargetCategory(cat.id);
+                            setModalLockCategory(true);
+                            setModalOpen(true);
+                          }}
+                          className="w-full px-3 py-1.5 text-left text-[11px] text-[#181818] hover:bg-[#F7F5F0] flex items-center gap-2 cursor-pointer font-medium"
+                        >
+                          <Plus size={12} /> Add Service
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2.5 border-t border-[#EAE4DA]/70">
+                {/* BOTTOM ROW: View Packages -> & + Add Service */}
+                <div className="flex items-center justify-between pt-3 border-t border-[#EAE4DA]/70">
                   <button
                     type="button"
                     onClick={() => handleCategorySelect(cat.id)}
-                    className="text-[9.5px] uppercase tracking-[0.14em] font-semibold text-[#7A7367] hover:text-[#181818] transition-colors cursor-pointer"
+                    className="text-[9px] uppercase tracking-[0.14em] font-semibold text-[#7A7367] hover:text-[#181818] transition-colors cursor-pointer flex items-center gap-1"
                   >
-                    View Packages →
+                    <span>View Packages</span>
+                    <ArrowRight size={10} />
                   </button>
 
                   <button
@@ -602,7 +734,7 @@ export default function AdminServicesPage() {
                       setModalLockCategory(true);
                       setModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-1 text-[9.5px] uppercase tracking-[0.14em] font-semibold text-[#181818] hover:text-[#9E8159] transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[9px] uppercase tracking-[0.14em] font-semibold text-[#181818] hover:text-[#9E8159] transition-colors cursor-pointer"
                   >
                     <Plus size={11} />
                     <span>Add Service</span>
@@ -615,104 +747,78 @@ export default function AdminServicesPage() {
       </section>
 
       {/* =========================================================
-          CATEGORY BAR
+          CATEGORY FILTER TABS BAR
       ========================================================= */}
-      <section className="border-y border-[#E7E1D7]">
-        <div className="flex items-center min-h-[64px] overflow-x-auto no-scrollbar">
-          {/* DRAG HANDLE */}
-          <div className="flex items-center justify-center w-10 shrink-0 text-[#B7B0A6]">
-            <GripVertical size={14} />
-          </div>
+      <section className="mb-4">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+          {/* All Categories pill */}
+          <button
+            type="button"
+            onClick={() => handleCategorySelect('all')}
+            className={`h-9 px-4 rounded-full inline-flex items-center gap-2 text-[11.5px] font-medium transition-all shrink-0 cursor-pointer ${
+              activeCategory === 'all'
+                ? 'bg-[#181818] text-white shadow-xs'
+                : 'bg-white border border-[#E4DDD3] text-[#554E45] hover:bg-[#FAF8F5]'
+            }`}
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+          >
+            <LayoutGrid size={14} />
+            <span>All Categories ({categoriesList.length})</span>
+          </button>
 
-          {/* CATEGORIES */}
-          <div className="flex items-center gap-x-6 sm:gap-x-9 h-full">
-            {categoriesList.map((cat) => {
-              const isActive = toCanonicalKey(activeCategory) === toCanonicalKey(cat.id);
-              const count = serviceCountsByCategory[cat.id] || 0;
+          <span className="h-5 w-px bg-[#D8D1C5] mx-1 shrink-0" />
 
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => handleCategorySelect(cat.id)}
-                  className={`relative h-[64px] flex items-center gap-2 shrink-0 text-[9.5px] uppercase tracking-[0.22em] transition-all duration-300 cursor-pointer ${isActive
-                      ? "text-[#181818] font-bold"
-                      : "text-[#918A80] font-medium hover:text-[#181818]"
-                    }`}
-                  style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  }}
-                >
-                  <span>{cat.label}</span>
-                  {count === 0 ? (
-                    <span className="px-1.5 py-0.5 rounded-full text-[8px] tracking-normal bg-[#FFF3E0] text-[#B2620A] border border-[#F5D4A6]">
-                      0
-                    </span>
-                  ) : (
-                    <span className="text-[8.5px] opacity-60">
-                      ({count})
-                    </span>
-                  )}
+          {categoriesList.map((cat) => {
+            const count = serviceCountsByCategory[cat.id] || 0;
+            const IconComponent = CATEGORY_ICONS[cat.id] || Sparkles;
+            const isActive = activeCategory === cat.id;
 
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#181818]" />
-                  )}
-                </button>
-              );
-            })}
-
-            {/* NEW CATEGORY */}
-            <button
-              type="button"
-              onClick={() => setAddCategoryModalOpen(true)}
-              className="h-[64px] shrink-0 flex items-center text-[9.5px] uppercase tracking-[0.22em] font-medium text-[#918A80] hover:text-[#181818] transition-colors cursor-pointer"
-              title="Add a new collection category to the studio"
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              + New Category
-            </button>
-          </div>
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => handleCategorySelect(cat.id)}
+                className={`h-9 px-4 rounded-full inline-flex items-center gap-2 text-[11.5px] font-medium transition-all shrink-0 cursor-pointer ${
+                  isActive
+                    ? 'bg-[#181818] text-white shadow-xs'
+                    : 'bg-white border border-[#E4DDD3] text-[#554E45] hover:bg-[#FAF8F5]'
+                }`}
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              >
+                <IconComponent size={13} className={isActive ? 'text-white' : 'text-[#7A7367]'} />
+                <span>
+                  {cat.label} ({count})
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
-
       {/* =========================================================
-          SECTION META
+          SECTION META / REORDER NOTIFICATION
       ========================================================= */}
-      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-8 lg:py-9">
+      <section className="mb-8">
+        <div className="p-3.5 px-4 rounded-[14px] bg-[#FCFAF7] border border-[#EAE4DA] flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <GripVertical size={13} className="text-[#B7B0A6]" />
+            <span
+              className="text-[11px] text-[#7A7367]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            >
+              Drag packages to rearrange their live display order.
+            </span>
+          </div>
 
-        <div className="flex items-center gap-2.5">
-
-          <GripVertical
-            size={13}
-            className="text-[#B7B0A6]"
-          />
-
-          <span
-            className="text-[10.5px] text-[#918A80] leading-relaxed"
-            style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-            }}
-          >
-            Drag packages to rearrange their live display order.
-          </span>
-
+          {isReordering && (
+            <span
+              className="text-[9.5px] uppercase tracking-[0.2em] text-[#9E8159] font-semibold animate-pulse"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            >
+              Saving order...
+            </span>
+          )}
         </div>
-
-
-        {isReordering && (
-          <span
-            className="text-[9.5px] uppercase tracking-[0.2em] text-[#9E8159] font-semibold animate-pulse"
-            style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-            }}
-          >
-            Saving order...
-          </span>
-        )}
-
       </section>
 
 
@@ -1043,6 +1149,20 @@ export default function AdminServicesPage() {
         onSuccess={handleCategoryCreated}
         onCategoryCreated={handleCategoryCreated}
       />
+
+      {editCategoryTarget && (
+        <EditCategoryModal
+          isOpen={!!editCategoryTarget}
+          onClose={() => setEditCategoryTarget(null)}
+          category={editCategoryTarget}
+          onSuccess={() => {
+            setEditCategoryTarget(null);
+            if (refreshCategories) refreshCategories();
+            fetchAllServices();
+            showToast('Category updated successfully.');
+          }}
+        />
+      )}
 
     </div>
   );

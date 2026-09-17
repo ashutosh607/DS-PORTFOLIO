@@ -99,9 +99,13 @@
 }
 
 .admin-sidebar-nav-item.active {
-  background-color: #EDE6DC;
-  color: #181818;
+  background-color: #181818;
+  color: #FFFFFF;
   font-weight: 500;
+}
+
+.admin-sidebar-nav-item.active svg {
+  color: #FFFFFF;
 }
 
 /* --- Base Card Shell --- */
