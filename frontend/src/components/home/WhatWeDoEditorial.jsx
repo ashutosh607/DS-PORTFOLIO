@@ -3,15 +3,16 @@ import React, { useRef, useState, useEffect } from 'react';
 /**
  * PHASE 9 — PHOTO COUNT & ASSETS
  * 7 Curated atelier photographs, all identically cropped to 3:4 aspect ratio.
+ * Sized to w=500 (optimal 2x retina for max 190px card display) to avoid GPU rasterization overhead.
  */
 const PHOTOS = [
-  'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop', // 0: Veil & Monolith
-  'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000&auto=format&fit=crop', // 1: Coastal Promenade
-  'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1000&auto=format&fit=crop', // 2: Fine Lace Study
-  'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1000&auto=format&fit=crop', // 3: Intimate Gaze
-  'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=1000&auto=format&fit=crop', // 4: Meadow Embrace
-  'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000&auto=format&fit=crop', // 5: Terrace Ceremony
-  'https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1000&auto=format&fit=crop', // 6: Artisanal Bouquet
+  'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=500&auto=format&fit=crop', // 0: Veil & Monolith
+  'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=500&auto=format&fit=crop', // 1: Coastal Promenade
+  'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=500&auto=format&fit=crop', // 2: Fine Lace Study
+  'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=500&auto=format&fit=crop', // 3: Intimate Gaze
+  'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=500&auto=format&fit=crop', // 4: Meadow Embrace
+  'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=500&auto=format&fit=crop', // 5: Terrace Ceremony
+  'https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=500&auto=format&fit=crop', // 6: Artisanal Bouquet
 ];
 
 /**
@@ -56,7 +57,6 @@ function smootherStep(t) {
 const EDITORIAL_BEATS = [
   {
     id: 1,
-    // Phase 1: Active during cards 0 & 1 dealing (progress 0.00 to 0.34)
     start: 0.00,
     peakStart: 0.04,
     peakEnd: 0.28,
@@ -76,7 +76,6 @@ const EDITORIAL_BEATS = [
   },
   {
     id: 2,
-    // Phase 2: Active during cards 2 & 3 dealing (progress 0.32 to 0.68)
     start: 0.32,
     peakStart: 0.38,
     peakEnd: 0.62,
@@ -96,7 +95,6 @@ const EDITORIAL_BEATS = [
   },
   {
     id: 3,
-    // Phase 3: Active during cards 4, 5 & 6 dealing (progress 0.66 to 1.00)
     start: 0.66,
     peakStart: 0.72,
     peakEnd: 0.94,
@@ -163,23 +161,39 @@ function calculateBeatStyle(progress, start, peakStart, peakEnd, end) {
   };
 }
 
+const PAUSE_DURATION = 0.035;
+const MOVE_DURATION = 0.095;
+const CARD_CYCLE = PAUSE_DURATION + MOVE_DURATION; // 0.13
+const BLUR_START = 0.925;
+
 export default function WhatWeDoEditorial() {
   const containerRef = useRef(null);
+  const stageRef = useRef(null);
+  const matRef = useRef(null);
+  const progressFillRef = useRef(null);
+  const counterRef = useRef(null);
+
+  // Direct element references for 60fps GPU mutations without React re-renders
+  const cardRefs = useRef([]);
+  const leftBeatRefs = useRef({});
+  const rightBeatRefs = useRef({});
+  const mobileTopBeatRefs = useRef({});
+  const mobileBottomBeatRefs = useRef({});
+
+  // Animation values & metrics
+  const cachedMetrics = useRef({ top: 0, height: 0, totalScroll: 0 });
+  const latestScrollY = useRef(0);
   const targetProgressRef = useRef(0);
   const currentProgressRef = useRef(0);
-  const rafIdRef = useRef(null);
+  const currentActiveCount = useRef(1);
 
   // Mouse Parallax coordinates (normalized -0.5 to 0.5)
   const targetMouseRef = useRef({ x: 0, y: 0 });
   const currentMouseRef = useRef({ x: 0, y: 0 });
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const rafIdRef = useRef(null);
+  const isMobileRef = useRef(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
 
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' ? window.innerWidth < 768 : false
-  );
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia
       ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -188,98 +202,262 @@ export default function WhatWeDoEditorial() {
 
   // Viewport & Reduced Motion Detection
   useEffect(() => {
-    const checkViewport = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-
     const handleMotionChange = (e) => setPrefersReducedMotion(e.matches);
     if (motionQuery.addEventListener) {
       motionQuery.addEventListener('change', handleMotionChange);
     }
-
-    window.addEventListener('resize', checkViewport, { passive: true });
     return () => {
-      window.removeEventListener('resize', checkViewport);
       if (motionQuery.removeEventListener) {
         motionQuery.removeEventListener('change', handleMotionChange);
       }
     };
   }, []);
 
-  // Smooth LERP Scrubbed Scroll & Mouse Parallax Loop
+  // Optimized rAF-driven scroll & mouse animation loop with direct DOM updates
   useEffect(() => {
+    if (prefersReducedMotion) return;
+
     let isRunning = true;
 
-    const updateTargetProgress = () => {
+    // Cache layout metrics once on mount/resize — NEVER on raw scroll events!
+    const measureLayout = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
-      const totalScroll = rect.height - window.innerHeight;
-      if (totalScroll <= 0) {
-        targetProgressRef.current = 0;
-      } else {
-        const currentScroll = -rect.top;
-        const progress = Math.max(0, Math.min(1, currentScroll / totalScroll));
-        targetProgressRef.current = progress;
-      }
+      const scrollY = window.scrollY || window.pageYOffset;
+      const top = rect.top + scrollY;
+      const height = rect.height;
+      const totalScroll = height - window.innerHeight;
+      cachedMetrics.current = { top, height, totalScroll };
+      latestScrollY.current = scrollY;
+      isMobileRef.current = window.innerWidth < 768;
     };
 
+    // Direct GPU DOM style updater: runs once per animation frame with zero React re-render overhead
+    const updateDOM = (progress, mouse) => {
+      const isMobile = isMobileRef.current;
+      const restingPositions = isMobile ? MOBILE_RESTING : DESKTOP_RESTING;
+
+      // 1. Stage Defocus & Dissolve at end of section
+      if (stageRef.current) {
+        const endBlur = progress >= BLUR_START
+          ? smootherStep((progress - BLUR_START) / (1 - BLUR_START))
+          : 0;
+        const stageOpacity = 1 - endBlur * 0.85;
+        const stageScale = 1 - endBlur * 0.04;
+        stageRef.current.style.opacity = stageOpacity;
+        stageRef.current.style.transform = stageScale < 0.999 ? `scale(${stageScale.toFixed(3)})` : 'none';
+      }
+
+      // 2. Mat Base Offset
+      if (matRef.current) {
+        matRef.current.style.transform = `translate3d(${mouse.x * 4}px, ${mouse.y * 3}px, 0)`;
+      }
+
+      // 3. Hairline Progress Bar (scaleX is pure GPU composited, zero layout reflow!)
+      if (progressFillRef.current) {
+        progressFillRef.current.style.transform = `scaleX(${progress})`;
+      }
+
+      // 4. Odometer Card Count
+      const activeCount = Math.min(7, Math.max(1, Math.floor(progress / CARD_CYCLE) + 1));
+      if (counterRef.current && currentActiveCount.current !== activeCount) {
+        currentActiveCount.current = activeCount;
+        counterRef.current.textContent = `0${activeCount}`;
+      }
+
+      // 5. Update 7 Cards
+      for (let i = 0; i < PHOTOS.length; i++) {
+        const cardEl = cardRefs.current[i];
+        if (!cardEl) continue;
+
+        const startCycle = i * CARD_CYCLE;
+        const startMove = startCycle + PAUSE_DURATION;
+        const endMove = startCycle + CARD_CYCLE;
+        const targetPos = restingPositions[i] || { x: 0, y: 0, rotate: 0 };
+
+        let currentX = 0;
+        let currentY = 0;
+        let currentRotate = 0;
+        let currentOpacity = 0;
+        let currentScale = 1;
+        let zIndex = 20 + i;
+
+        if (i === 0) {
+          currentOpacity = 1;
+          if (progress < startMove) {
+            currentX = 0;
+            currentY = 0;
+            currentRotate = 0;
+            currentScale = 1;
+            zIndex = 50;
+          } else if (progress <= endMove) {
+            const rawT = (progress - startMove) / MOVE_DURATION;
+            const easedT = smootherStep(rawT);
+            currentX = targetPos.x * easedT;
+            currentY = targetPos.y * easedT;
+            currentRotate = targetPos.rotate * easedT;
+            const liftArc = Math.sin(rawT * Math.PI);
+            currentScale = 1 + liftArc * 0.055;
+            zIndex = 45;
+          } else {
+            currentX = targetPos.x;
+            currentY = targetPos.y;
+            currentRotate = targetPos.rotate;
+            currentScale = 1;
+            zIndex = 10 + i;
+          }
+        } else {
+          const predStartMove = (i - 1) * CARD_CYCLE + PAUSE_DURATION;
+          if (progress < predStartMove) {
+            currentOpacity = 0;
+            currentX = 0;
+            currentY = 0;
+            currentRotate = 0;
+          } else if (progress < startMove) {
+            const fadeWindow = 0.02;
+            currentOpacity = progress < predStartMove + fadeWindow
+              ? (progress - predStartMove) / fadeWindow
+              : 1;
+            currentX = 0;
+            currentY = 0;
+            currentRotate = 0;
+            currentScale = 1;
+            zIndex = 50;
+          } else if (progress <= endMove) {
+            currentOpacity = 1;
+            const rawT = (progress - startMove) / MOVE_DURATION;
+            const easedT = smootherStep(rawT);
+            currentX = targetPos.x * easedT;
+            currentY = targetPos.y * easedT;
+            currentRotate = targetPos.rotate * easedT;
+            const liftArc = Math.sin(rawT * Math.PI);
+            currentScale = 1 + liftArc * 0.055;
+            zIndex = 45;
+          } else {
+            currentOpacity = 1;
+            currentX = targetPos.x;
+            currentY = targetPos.y;
+            currentRotate = targetPos.rotate;
+            currentScale = 1;
+            zIndex = 10 + i;
+          }
+        }
+
+        const parallaxWeight = isMobile ? 0 : 8 + i * 2;
+        const parallaxX = mouse.x * parallaxWeight;
+        const parallaxY = mouse.y * (parallaxWeight * 0.7);
+
+        cardEl.style.transform = `translate3d(${(currentX + parallaxX).toFixed(2)}px, ${(currentY + parallaxY).toFixed(2)}px, 0) rotate(${currentRotate.toFixed(2)}deg) scale(${currentScale.toFixed(3)})`;
+        cardEl.style.opacity = currentOpacity.toFixed(3);
+        cardEl.style.zIndex = zIndex;
+      }
+
+      // 6. Update Editorial Typography Beats (Desktop & Mobile)
+      EDITORIAL_BEATS.forEach((beat) => {
+        const beatStyle = calculateBeatStyle(progress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
+
+        const leftEl = leftBeatRefs.current[beat.id];
+        if (leftEl) {
+          leftEl.style.opacity = beatStyle.visible ? beatStyle.opacity.toFixed(3) : '0';
+          leftEl.style.transform = beatStyle.visible ? `translateY(${beatStyle.y.toFixed(1)}px)` : 'translateY(18px)';
+          leftEl.style.filter = beatStyle.visible && beatStyle.blur > 0.1 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
+        }
+
+        const rightEl = rightBeatRefs.current[beat.id];
+        if (rightEl) {
+          rightEl.style.opacity = beatStyle.visible ? beatStyle.opacity.toFixed(3) : '0';
+          rightEl.style.transform = beatStyle.visible ? `translateY(${beatStyle.y.toFixed(1)}px)` : 'translateY(18px)';
+          rightEl.style.filter = beatStyle.visible && beatStyle.blur > 0.1 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
+        }
+
+        const mobileTopEl = mobileTopBeatRefs.current[beat.id];
+        if (mobileTopEl) {
+          mobileTopEl.style.opacity = beatStyle.visible ? beatStyle.opacity.toFixed(3) : '0';
+          mobileTopEl.style.transform = beatStyle.visible ? `translateY(${beatStyle.y.toFixed(1)}px)` : 'translateY(18px)';
+          mobileTopEl.style.filter = beatStyle.visible && beatStyle.blur > 0.1 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
+        }
+
+        const mobileBottomEl = mobileBottomBeatRefs.current[beat.id];
+        if (mobileBottomEl) {
+          mobileBottomEl.style.opacity = beatStyle.visible ? beatStyle.opacity.toFixed(3) : '0';
+          mobileBottomEl.style.transform = beatStyle.visible ? `translateY(${-beatStyle.y.toFixed(1)}px)` : 'translateY(-18px)';
+          mobileBottomEl.style.filter = beatStyle.visible && beatStyle.blur > 0.1 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
+        }
+      });
+    };
+
+    // Smooth continuous animation frame loop
     const loop = () => {
       if (!isRunning) return;
 
-      // Scroll Damping: 0.07 provides silky-smooth, calm momentum
-      const scrollDiff = targetProgressRef.current - currentProgressRef.current;
-      if (Math.abs(scrollDiff) > 0.00008) {
-        currentProgressRef.current += scrollDiff * 0.07;
-        setScrollProgress(currentProgressRef.current);
+      const { top, totalScroll } = cachedMetrics.current;
+      if (totalScroll > 0) {
+        const currentScroll = latestScrollY.current - top;
+        const progress = Math.max(0, Math.min(1, currentScroll / totalScroll));
+        targetProgressRef.current = progress;
       }
 
-      // Mouse Parallax Damping: 0.05 creates slow, dreamlike responsiveness
+      // Responsive, fluid LERP damping (0.14 feels instantaneous yet silky smooth)
+      const scrollDiff = targetProgressRef.current - currentProgressRef.current;
+      if (Math.abs(scrollDiff) > 0.00004) {
+        currentProgressRef.current += scrollDiff * 0.14;
+      } else {
+        currentProgressRef.current = targetProgressRef.current;
+      }
+
+      // Mouse Parallax Damping (0.08)
       const mouseDiffX = targetMouseRef.current.x - currentMouseRef.current.x;
       const mouseDiffY = targetMouseRef.current.y - currentMouseRef.current.y;
-      if (Math.abs(mouseDiffX) > 0.0005 || Math.abs(mouseDiffY) > 0.0005) {
-        currentMouseRef.current.x += mouseDiffX * 0.05;
-        currentMouseRef.current.y += mouseDiffY * 0.05;
-        setMouseOffset({
-          x: currentMouseRef.current.x,
-          y: currentMouseRef.current.y,
-        });
+      if (Math.abs(mouseDiffX) > 0.0003 || Math.abs(mouseDiffY) > 0.0003) {
+        currentMouseRef.current.x += mouseDiffX * 0.08;
+        currentMouseRef.current.y += mouseDiffY * 0.08;
       }
+
+      // Mutate DOM elements directly for buttery-smooth 60fps-120fps motion
+      updateDOM(currentProgressRef.current, currentMouseRef.current);
 
       rafIdRef.current = requestAnimationFrame(loop);
     };
 
-    updateTargetProgress();
+    measureLayout();
     currentProgressRef.current = targetProgressRef.current;
-    setScrollProgress(targetProgressRef.current);
+    updateDOM(currentProgressRef.current, currentMouseRef.current);
 
     rafIdRef.current = requestAnimationFrame(loop);
 
-    const handleScroll = () => updateTargetProgress();
+    // Passive scroll handler: records position without ANY layout reading!
+    const handleScroll = () => {
+      latestScrollY.current = window.scrollY || window.pageYOffset;
+    };
+
+    const handleResize = () => {
+      measureLayout();
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
 
     return () => {
       isRunning = false;
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   const handleMouseMove = (e) => {
-    if (isMobile) return;
+    if (isMobileRef.current) return;
     const { clientX, clientY } = e;
-    const normX = clientX / window.innerWidth - 0.5;
-    const normY = clientY / window.innerHeight - 0.5;
-    targetMouseRef.current = { x: normX, y: normY };
+    targetMouseRef.current = {
+      x: clientX / window.innerWidth - 0.5,
+      y: clientY / window.innerHeight - 0.5,
+    };
   };
 
   const handleMouseLeave = () => {
     targetMouseRef.current = { x: 0, y: 0 };
   };
-
-  const restingPositions = isMobile ? MOBILE_RESTING : DESKTOP_RESTING;
 
   // PHASE 8 — ACCESSIBILITY: Reduced Motion fallback
   if (prefersReducedMotion) {
@@ -309,34 +487,6 @@ export default function WhatWeDoEditorial() {
     );
   }
 
-  // =========================================================================
-  // SEQUENTIAL DECK REVEAL TIMELINE (CALM, DELIBERATE EDITORIAL PACE)
-  // Total cards = 7.
-  // Pause at center = 0.035
-  // Move to resting spot = 0.095 (generous, slow travel distance)
-  // Each card cycle = 0.035 + 0.095 = 0.130
-  // 7 cards * 0.130 = 0.910
-  // Final Hold: 0.910 -> 1.000 (generous stillness before release into next section)
-  // =========================================================================
-  const PAUSE_DURATION = 0.035;
-  const MOVE_DURATION = 0.095;
-  const CARD_CYCLE = PAUSE_DURATION + MOVE_DURATION; // 0.13
-
-  // Current active cards dealt count for subtle archival indicator
-  const activeCount = Math.min(
-    7,
-    Math.max(1, Math.floor(scrollProgress / CARD_CYCLE) + 1)
-  );
-
-  // Cinematic End-of-Section Defocus Blur (engages from 0.925 -> 1.000)
-  const BLUR_START = 0.925;
-  const endBlurProgress = scrollProgress >= BLUR_START
-    ? smootherStep((scrollProgress - BLUR_START) / (1 - BLUR_START))
-    : 0;
-  const stageBlur = endBlurProgress * 16; // 0px to 16px soft lens defocus
-  const stageOpacity = 1 - endBlurProgress * 0.85; // 1.0 to 0.15 dreamy dissolve
-  const stageScale = 1 - endBlurProgress * 0.04; // subtle 1.0 to 0.96 scale breath
-
   return (
     <section
       id="what-we-do"
@@ -345,7 +495,6 @@ export default function WhatWeDoEditorial() {
       onMouseLeave={handleMouseLeave}
       className="relative w-full bg-[#FDFCF8] select-none"
       style={{
-        // 650vh pinned scroll distance allows cards to glide slowly and majestically
         height: '650vh',
       }}
     >
@@ -371,15 +520,12 @@ export default function WhatWeDoEditorial() {
 
       {/* Pinned 100vh Sticky Stage with End Defocus Blur */}
       <div
+        ref={stageRef}
         className="sticky top-0 h-screen w-full flex flex-col justify-between items-center overflow-hidden px-4 sm:px-8 pt-[86px] sm:pt-8 pb-5 sm:pb-8 will-change-transform"
         style={{
-          filter: stageBlur > 0.1 ? `blur(${stageBlur.toFixed(1)}px)` : 'none',
-          opacity: stageOpacity,
-          transform: stageScale < 0.999 ? `scale(${stageScale.toFixed(3)})` : 'none',
-          transition: 'filter 0.12s ease-out, opacity 0.12s ease-out',
+          transition: 'opacity 0.2s ease-out, transform 0.2s ease-out',
         }}
       >
-        
         {/* =================================================================
             TOP ARCHIVAL HEADER BAR: Dynamic Print Counter & Minimal Mark
             ================================================================= */}
@@ -392,8 +538,11 @@ export default function WhatWeDoEditorial() {
 
           {/* Dynamic Card Deal Odometer Counter */}
           <div className="flex items-center gap-2 font-mono text-[0.62rem] sm:text-[0.68rem] tracking-[0.22em] text-[#7A7770] uppercase">
-            <span className="text-[#101010] font-semibold text-xs tracking-[0.24em] transition-all duration-300">
-              0{activeCount}
+            <span
+              ref={counterRef}
+              className="text-[#101010] font-semibold text-xs tracking-[0.24em] transition-all duration-300"
+            >
+              01
             </span>
             <span className="w-3 h-[1px] bg-[#101010]/30" />
             <span>07 ARCHIVE</span>
@@ -404,176 +553,61 @@ export default function WhatWeDoEditorial() {
             MOBILE TOP EDITORIAL TEXT (BLUR-TO-REAL SCROLL DRIVEN)
             ================================================================= */}
         <div className="md:hidden w-full max-w-[360px] px-3 text-center pointer-events-none select-none z-20 relative min-h-[92px] flex items-center justify-center mt-3 mb-1 translate-y-[58px]">
-          {EDITORIAL_BEATS.map((beat) => {
-            const style = calculateBeatStyle(scrollProgress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
-            if (!style.visible) return null;
-
-            return (
-              <div
-                key={`mobile-top-${beat.id}`}
-                className="absolute inset-0 flex flex-col items-center justify-center transition-none will-change-[transform,opacity,filter]"
-                style={{
-                  opacity: style.opacity,
-                  filter: style.blur > 0.05 ? `blur(${style.blur.toFixed(1)}px)` : 'none',
-                  transform: `translateY(${style.y.toFixed(1)}px)`,
-                }}
-              >
-                <div className="flex items-center gap-2 font-mono text-[0.6rem] sm:text-[0.62rem] tracking-[0.26em] text-[#7A7770] font-semibold uppercase mb-1">
-                  <span className="w-3 h-[1px] bg-[#E3DBCC]" />
-                  <span>{beat.left.eyebrow}</span>
-                  <span className="w-3 h-[1px] bg-[#E3DBCC]" />
-                </div>
-                <h4
-                  className="font-serif text-[clamp(1.3rem,4.8vw,1.65rem)] font-normal text-[#101010] leading-[1.18] tracking-[-0.02em]"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  {beat.left.title}{' '}
-                  <span className="italic font-light text-[#101010]">{beat.left.italic}</span>
-                </h4>
-                <p className="font-sans text-[clamp(0.76rem,2.6vw,0.88rem)] text-[#4A4844] font-normal leading-snug tracking-wide mt-1 max-w-[310px]">
-                  {beat.left.subtitle}
-                </p>
+          {EDITORIAL_BEATS.map((beat) => (
+            <div
+              key={`mobile-top-${beat.id}`}
+              ref={(el) => (mobileTopBeatRefs.current[beat.id] = el)}
+              className="absolute inset-0 flex flex-col items-center justify-center transition-none will-change-[transform,opacity]"
+              style={{ opacity: 0 }}
+            >
+              <div className="flex items-center gap-2 font-mono text-[0.6rem] sm:text-[0.62rem] tracking-[0.26em] text-[#7A7770] font-semibold uppercase mb-1">
+                <span className="w-3 h-[1px] bg-[#E3DBCC]" />
+                <span>{beat.left.eyebrow}</span>
+                <span className="w-3 h-[1px] bg-[#E3DBCC]" />
               </div>
-            );
-          })}
+              <h4
+                className="font-serif text-[clamp(1.3rem,4.8vw,1.65rem)] font-normal text-[#101010] leading-[1.18] tracking-[-0.02em]"
+                style={{ fontFamily: 'var(--font-serif)' }}
+              >
+                {beat.left.title}{' '}
+                <span className="italic font-light text-[#101010]">{beat.left.italic}</span>
+              </h4>
+              <p className="font-sans text-[clamp(0.76rem,2.6vw,0.88rem)] text-[#4A4844] font-normal leading-snug tracking-wide mt-1 max-w-[310px]">
+                {beat.left.subtitle}
+              </p>
+            </div>
+          ))}
         </div>
 
         {/* =================================================================
             CENTRAL DECK STAGE CONTAINER
             ================================================================= */}
         <div className="relative w-full max-w-[1400px] h-[300px] sm:h-[460px] md:h-[620px] flex items-center justify-center flex-1 my-auto">
-          
-          {/* Deck Physical Stack Base / Mat Outline with subtle pulsing glow */}
+          {/* Deck Physical Stack Base / Mat Outline */}
           <div
-            className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-[2px] bg-[#E3DBCC]/25 border border-[#E3DBCC]/60 pointer-events-none -z-10 shadow-[0_8px_24px_-8px_rgba(16,14,12,0.08)]"
-            style={{
-              transform: `translate3d(${mouseOffset.x * 4}px, ${mouseOffset.y * 3}px, 0)`,
-              transition: 'transform 0.2s ease-out',
-            }}
+            ref={matRef}
+            className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-[2px] bg-[#E3DBCC]/25 border border-[#E3DBCC]/60 pointer-events-none -z-10 shadow-[0_8px_24px_-8px_rgba(16,14,12,0.08)] will-change-transform"
           />
 
           {/* Cards 0 through 6 */}
           {PHOTOS.map((src, i) => {
-            const startCycle = i * CARD_CYCLE;
-            const startMove = startCycle + PAUSE_DURATION;
-            const endMove = startCycle + CARD_CYCLE;
-            const targetPos = restingPositions[i] || { x: 0, y: 0, rotate: 0 };
-
-            let currentX = 0;
-            let currentY = 0;
-            let currentRotate = 0;
-            let currentOpacity = 0;
-            let currentScale = 1;
-            let currentShadow = '0 14px 32px -10px rgba(16,14,12,0.18)';
-            let isMoving = false;
-            let isResting = false;
-            let zIndex = 20 + i;
-
-            if (i === 0) {
-              // Card 0: Top card of the deck (visible right at entry)
-              currentOpacity = 1;
-
-              if (scrollProgress < startMove) {
-                currentX = 0;
-                currentY = 0;
-                currentRotate = 0;
-                currentScale = 1;
-                zIndex = 50; // Focused top card
-              } else if (scrollProgress <= endMove) {
-                isMoving = true;
-                const rawT = (scrollProgress - startMove) / MOVE_DURATION;
-                const easedT = smootherStep(rawT);
-                currentX = targetPos.x * easedT;
-                currentY = targetPos.y * easedT;
-                currentRotate = targetPos.rotate * easedT;
-
-                // 3D Lift Arc: subtle scale lift up to 1.05 and deep elevation shadow mid-flight
-                const liftArc = Math.sin(rawT * Math.PI);
-                currentScale = 1 + liftArc * 0.055;
-                currentShadow = `0 ${14 + liftArc * 24}px ${32 + liftArc * 28}px -${10 + liftArc * 6}px rgba(16,14,12,${0.18 + liftArc * 0.16})`;
-                zIndex = 45;
-              } else {
-                isResting = true;
-                currentX = targetPos.x;
-                currentY = targetPos.y;
-                currentRotate = targetPos.rotate;
-                currentScale = 1;
-                zIndex = 10 + i;
-              }
-            } else {
-              // Cards 1 through 6:
-              const predStartMove = (i - 1) * CARD_CYCLE + PAUSE_DURATION;
-
-              if (scrollProgress < predStartMove) {
-                currentOpacity = 0;
-                currentX = 0;
-                currentY = 0;
-                currentRotate = 0;
-              } else if (scrollProgress < startMove) {
-                // Smoothly appears at center beneath the departing card
-                const fadeWindow = 0.02;
-                currentOpacity = scrollProgress < predStartMove + fadeWindow
-                  ? (scrollProgress - predStartMove) / fadeWindow
-                  : 1;
-                currentX = 0;
-                currentY = 0;
-                currentRotate = 0;
-                currentScale = 1;
-                zIndex = 50; // Current focal deck card
-              } else if (scrollProgress <= endMove) {
-                isMoving = true;
-                currentOpacity = 1;
-                const rawT = (scrollProgress - startMove) / MOVE_DURATION;
-                const easedT = smootherStep(rawT);
-                currentX = targetPos.x * easedT;
-                currentY = targetPos.y * easedT;
-                currentRotate = targetPos.rotate * easedT;
-
-                // 3D Lift Arc mid-flight
-                const liftArc = Math.sin(rawT * Math.PI);
-                currentScale = 1 + liftArc * 0.055;
-                currentShadow = `0 ${14 + liftArc * 24}px ${32 + liftArc * 28}px -${10 + liftArc * 6}px rgba(16,14,12,${0.18 + liftArc * 0.16})`;
-                zIndex = 45;
-              } else {
-                isResting = true;
-                currentOpacity = 1;
-                currentX = targetPos.x;
-                currentY = targetPos.y;
-                currentRotate = targetPos.rotate;
-                currentScale = 1;
-                zIndex = 10 + i;
-              }
-            }
-
-            // Subtle layered mouse parallax offset (deeper for outer cards)
-            const parallaxWeight = isMobile ? 0 : 8 + i * 2;
-            const parallaxX = mouseOffset.x * parallaxWeight;
-            const parallaxY = mouseOffset.y * (parallaxWeight * 0.7);
-
-            // Hover state boosts
-            const isHovered = hoveredIndex === i && isResting;
-            const finalScale = isHovered ? currentScale * 1.045 : currentScale;
-            const finalZIndex = isHovered ? 60 : zIndex;
-
-            // Idle floating animation selection
-            const floatAnimation = isResting && !isHovered
-              ? `${i % 2 === 0 ? 'editorialDrift' : 'editorialDriftAlt'} ${5.5 + (i * 0.6)}s ease-in-out infinite`
-              : 'none';
+            const floatAnimation = `${i % 2 === 0 ? 'editorialDrift' : 'editorialDriftAlt'} ${5.5 + i * 0.6}s ease-in-out infinite`;
 
             return (
               <div
                 key={i}
-                onMouseEnter={() => setHoveredIndex(i)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] bg-[#F3F0E9] p-1.5 sm:p-2 border-[1.5px] border-[#101010] rounded-[2px] will-change-transform group cursor-pointer"
+                ref={(el) => (cardRefs.current[i] = el)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.zIndex = '65';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.zIndex = `${10 + i}`;
+                }}
+                className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] bg-[#F3F0E9] p-1.5 sm:p-2 border-[1.5px] border-[#101010] rounded-[2px] will-change-transform group cursor-pointer shadow-[0_14px_32px_-10px_rgba(16,14,12,0.18)] hover:shadow-[0_26px_54px_-14px_rgba(16,14,12,0.28)]"
                 style={{
-                  transform: `translate3d(${currentX + parallaxX}px, ${currentY + parallaxY}px, 0) rotate(${currentRotate}deg) scale(${finalScale})`,
-                  opacity: currentOpacity,
-                  boxShadow: isHovered
-                    ? '0 26px 54px -14px rgba(16,14,12,0.28)'
-                    : currentShadow,
-                  zIndex: finalZIndex,
-                  transition: isMoving ? 'none' : 'box-shadow 0.3s ease-out, transform 0.25s ease-out',
+                  opacity: i === 0 ? 1 : 0,
+                  transform: 'translate3d(0, 0, 0)',
+                  transition: 'box-shadow 0.3s ease-out',
                 }}
               >
                 {/* Inner Breathing/Floating Drift Wrapper */}
@@ -609,127 +643,103 @@ export default function WhatWeDoEditorial() {
               LEFT EDITORIAL TYPOGRAPHY FLANK (BLUR-TO-REAL SCROLL DRIVEN)
               ================================================================= */}
           <div className="hidden md:block absolute left-2 lg:left-6 xl:left-10 top-1/2 -translate-y-1/2 z-20 pointer-events-none select-none max-w-[210px] lg:max-w-[260px] xl:max-w-[280px] text-left">
-            {EDITORIAL_BEATS.map((beat) => {
-              const style = calculateBeatStyle(scrollProgress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
-              if (!style.visible) return null;
-
-              return (
-                <div
-                  key={`left-${beat.id}`}
-                  className="transition-none will-change-[transform,opacity,filter]"
-                  style={{
-                    opacity: style.opacity,
-                    filter: style.blur > 0.05 ? `blur(${style.blur.toFixed(1)}px)` : 'none',
-                    transform: `translateY(${style.y.toFixed(1)}px)`,
-                  }}
-                >
-                  <div className="flex items-center gap-2 font-mono text-[0.58rem] sm:text-[0.62rem] tracking-[0.24em] text-[#7A7770] uppercase mb-2">
-                    <span className="w-4 h-[1px] bg-[#E3DBCC]" />
-                    <span>{beat.left.eyebrow}</span>
-                  </div>
-                  <h3
-                    className="font-serif text-[clamp(1.35rem,2.1vw,1.95rem)] font-normal text-[#101010] leading-[1.12] tracking-[-0.02em]"
-                    style={{ fontFamily: 'var(--font-serif)' }}
-                  >
-                    {beat.left.title}
-                    <br />
-                    <span className="italic font-light text-[#101010]">{beat.left.italic}</span>
-                  </h3>
-                  <p className="font-sans text-[clamp(0.72rem,0.9vw,0.84rem)] text-[#7A7770] leading-relaxed mt-2.5 font-light">
-                    {beat.left.subtitle}
-                  </p>
+            {EDITORIAL_BEATS.map((beat) => (
+              <div
+                key={`left-${beat.id}`}
+                ref={(el) => (leftBeatRefs.current[beat.id] = el)}
+                className="transition-none will-change-[transform,opacity]"
+                style={{ opacity: 0 }}
+              >
+                <div className="flex items-center gap-2 font-mono text-[0.58rem] sm:text-[0.62rem] tracking-[0.24em] text-[#7A7770] uppercase mb-2">
+                  <span className="w-4 h-[1px] bg-[#E3DBCC]" />
+                  <span>{beat.left.eyebrow}</span>
                 </div>
-              );
-            })}
+                <h3
+                  className="font-serif text-[clamp(1.35rem,2.1vw,1.95rem)] font-normal text-[#101010] leading-[1.12] tracking-[-0.02em]"
+                  style={{ fontFamily: 'var(--font-serif)' }}
+                >
+                  {beat.left.title}
+                  <br />
+                  <span className="italic font-light text-[#101010]">{beat.left.italic}</span>
+                </h3>
+                <p className="font-sans text-[clamp(0.72rem,0.9vw,0.84rem)] text-[#7A7770] leading-relaxed mt-2.5 font-light">
+                  {beat.left.subtitle}
+                </p>
+              </div>
+            ))}
           </div>
 
           {/* =================================================================
               RIGHT EDITORIAL TYPOGRAPHY FLANK (BLUR-TO-REAL SCROLL DRIVEN)
               ================================================================= */}
           <div className="hidden md:block absolute right-2 lg:right-6 xl:right-10 top-1/2 -translate-y-1/2 z-20 pointer-events-none select-none max-w-[210px] lg:max-w-[260px] xl:max-w-[280px] text-right">
-            {EDITORIAL_BEATS.map((beat) => {
-              const style = calculateBeatStyle(scrollProgress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
-              if (!style.visible) return null;
-
-              return (
-                <div
-                  key={`right-${beat.id}`}
-                  className="transition-none will-change-[transform,opacity,filter]"
-                  style={{
-                    opacity: style.opacity,
-                    filter: style.blur > 0.05 ? `blur(${style.blur.toFixed(1)}px)` : 'none',
-                    transform: `translateY(${style.y.toFixed(1)}px)`,
-                  }}
-                >
-                  <div className="flex items-center justify-end gap-2 font-mono text-[0.58rem] sm:text-[0.62rem] tracking-[0.24em] text-[#7A7770] uppercase mb-2">
-                    <span>{beat.right.eyebrow}</span>
-                    <span className="w-4 h-[1px] bg-[#E3DBCC]" />
-                  </div>
-                  <h3
-                    className="font-serif text-[clamp(1.35rem,2.1vw,1.95rem)] font-normal text-[#101010] leading-[1.12] tracking-[-0.02em]"
-                    style={{ fontFamily: 'var(--font-serif)' }}
-                  >
-                    {beat.right.title}
-                    <br />
-                    <span className="italic font-light text-[#101010]">{beat.right.italic}</span>
-                  </h3>
-                  <p className="font-sans text-[clamp(0.72rem,0.9vw,0.84rem)] text-[#7A7770] leading-relaxed mt-2.5 font-light ml-auto">
-                    {beat.right.subtitle}
-                  </p>
+            {EDITORIAL_BEATS.map((beat) => (
+              <div
+                key={`right-${beat.id}`}
+                ref={(el) => (rightBeatRefs.current[beat.id] = el)}
+                className="transition-none will-change-[transform,opacity]"
+                style={{ opacity: 0 }}
+              >
+                <div className="flex items-center justify-end gap-2 font-mono text-[0.58rem] sm:text-[0.62rem] tracking-[0.24em] text-[#7A7770] uppercase mb-2">
+                  <span>{beat.right.eyebrow}</span>
+                  <span className="w-4 h-[1px] bg-[#E3DBCC]" />
                 </div>
-              );
-            })}
+                <h3
+                  className="font-serif text-[clamp(1.35rem,2.1vw,1.95rem)] font-normal text-[#101010] leading-[1.12] tracking-[-0.02em]"
+                  style={{ fontFamily: 'var(--font-serif)' }}
+                >
+                  {beat.right.title}
+                  <br />
+                  <span className="italic font-light text-[#101010]">{beat.right.italic}</span>
+                </h3>
+                <p className="font-sans text-[clamp(0.72rem,0.9vw,0.84rem)] text-[#7A7770] leading-relaxed mt-2.5 font-light ml-auto">
+                  {beat.right.subtitle}
+                </p>
+              </div>
+            ))}
           </div>
-
         </div>
 
         {/* =================================================================
             MOBILE BOTTOM EDITORIAL TEXT (BLUR-TO-REAL SCROLL DRIVEN)
             ================================================================= */}
         <div className="md:hidden w-full max-w-[360px] px-3 text-center pointer-events-none select-none z-20 relative min-h-[92px] flex items-center justify-center mt-1 mb-8 -translate-y-[58px]">
-          {EDITORIAL_BEATS.map((beat) => {
-            const style = calculateBeatStyle(scrollProgress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
-            if (!style.visible) return null;
-
-            return (
-              <div
-                key={`mobile-bottom-${beat.id}`}
-                className="absolute inset-0 flex flex-col items-center justify-center transition-none will-change-[transform,opacity,filter]"
-                style={{
-                  opacity: style.opacity,
-                  filter: style.blur > 0.05 ? `blur(${style.blur.toFixed(1)}px)` : 'none',
-                  transform: `translateY(${-style.y.toFixed(1)}px)`,
-                }}
+          {EDITORIAL_BEATS.map((beat) => (
+            <div
+              key={`mobile-bottom-${beat.id}`}
+              ref={(el) => (mobileBottomBeatRefs.current[beat.id] = el)}
+              className="absolute inset-0 flex flex-col items-center justify-center transition-none will-change-[transform,opacity]"
+              style={{ opacity: 0 }}
+            >
+              <h4
+                className="font-serif text-[clamp(1.25rem,4.5vw,1.6rem)] font-normal text-[#101010] leading-[1.18] tracking-[-0.02em]"
+                style={{ fontFamily: 'var(--font-serif)' }}
               >
-                <h4
-                  className="font-serif text-[clamp(1.25rem,4.5vw,1.6rem)] font-normal text-[#101010] leading-[1.18] tracking-[-0.02em]"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  {beat.right.title}{' '}
-                  <span className="italic font-light text-[#101010]">{beat.right.italic}</span>
-                </h4>
-                <div className="flex items-center gap-2 font-mono text-[0.58rem] sm:text-[0.62rem] tracking-[0.24em] text-[#7A7770] font-semibold uppercase mt-1">
-                  <span className="w-3 h-[1px] bg-[#E3DBCC]" />
-                  <span>{beat.right.eyebrow}</span>
-                  <span className="w-3 h-[1px] bg-[#E3DBCC]" />
-                </div>
-                <p className="font-sans text-[clamp(0.74rem,2.5vw,0.86rem)] text-[#4A4844] font-normal leading-snug tracking-wide mt-1 max-w-[310px]">
-                  {beat.right.subtitle}
-                </p>
+                {beat.right.title}{' '}
+                <span className="italic font-light text-[#101010]">{beat.right.italic}</span>
+              </h4>
+              <div className="flex items-center gap-2 font-mono text-[0.58rem] sm:text-[0.62rem] tracking-[0.26em] text-[#7A7770] font-semibold uppercase mt-1">
+                <span className="w-3 h-[1px] bg-[#E3DBCC]" />
+                <span>{beat.right.eyebrow}</span>
+                <span className="w-3 h-[1px] bg-[#E3DBCC]" />
               </div>
-            );
-          })}
+              <p className="font-sans text-[clamp(0.74rem,2.5vw,0.86rem)] text-[#4A4844] font-normal leading-snug tracking-wide mt-1 max-w-[310px]">
+                {beat.right.subtitle}
+              </p>
+            </div>
+          ))}
         </div>
 
         {/* =================================================================
             BOTTOM ARCHIVAL FOOTER: Hairline Progress & Status
             ================================================================= */}
         <div className="w-full max-w-[1400px] flex flex-col gap-2 pointer-events-none z-30 -translate-y-[40px] md:translate-y-0">
-          {/* Hairline Scrub Progress Line */}
+          {/* Hairline Scrub Progress Line with GPU ScaleX */}
           <div className="w-full h-[1px] bg-[#E3DBCC]/60 relative overflow-hidden">
             <div
-              className="absolute top-0 left-0 h-full bg-[#101010] transition-all duration-150 ease-out"
-              style={{ width: `${Math.round(scrollProgress * 100)}%` }}
+              ref={progressFillRef}
+              className="absolute top-0 left-0 h-full w-full bg-[#101010] origin-left will-change-transform"
+              style={{ transform: 'scaleX(0)' }}
             />
           </div>
 
@@ -744,7 +754,6 @@ export default function WhatWeDoEditorial() {
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );
