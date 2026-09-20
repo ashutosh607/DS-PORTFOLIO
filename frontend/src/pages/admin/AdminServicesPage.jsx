@@ -11,8 +11,6 @@ import {
   Search,
   AlertTriangle,
   LayoutGrid,
-  Bell,
-  ChevronDown,
   MoreVertical,
   Gem,
   Heart,
@@ -521,32 +519,7 @@ export default function AdminServicesPage() {
       )}
 
       {/* =========================================================
-          1. TOP ACTION BAR (Notification bell with red dot & AS Admin)
-      ========================================================= */}
-      <header className="h-14 border-b border-[#EAE4DA] flex items-center justify-end gap-5 mb-8">
-        <button
-          type="button"
-          className="relative text-[#7A7367] hover:text-[#181818] transition-colors p-2 rounded-full hover:bg-black/5 cursor-pointer"
-          title="Notifications"
-          aria-label="Notifications"
-        >
-          <Bell size={18} strokeWidth={1.75} />
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#E53E3E]" />
-        </button>
-
-        <div className="flex items-center gap-2.5 pl-2 select-none cursor-pointer group">
-          <div className="w-7 h-7 rounded-full bg-[#E5DDD0] text-[#181818] text-[11px] font-bold flex items-center justify-center shrink-0">
-            {adminUser?.name ? adminUser.name.slice(0, 2).toUpperCase() : 'AS'}
-          </div>
-          <span className="text-[13px] font-medium text-[#181818] group-hover:text-black transition-colors">
-            Admin
-          </span>
-          <ChevronDown size={14} className="text-[#7A7367] group-hover:text-[#181818] transition-colors" />
-        </div>
-      </header>
-
-      {/* =========================================================
-          2. HERO SECTION
+          HERO SECTION
       ========================================================= */}
       <section className="relative pb-8 mb-8 overflow-hidden">
         {/* Decorative dried botanical background graphic on right */}

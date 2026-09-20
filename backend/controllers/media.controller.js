@@ -1,3 +1,4 @@
+const fs = require("fs");
 const Media = require("../models/media.model");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
@@ -44,18 +45,28 @@ const getMediaByCategory = asyncHandler(async (req, res) => {
  * @access  Protected (Admin)
  */
 const createMedia = asyncHandler(async (req, res) => {
+  const { category, title, caption, meta } = req.body;
   const normalizedType = (req.body.type || "photo").toLowerCase().trim();
   if (!["photo", "video"].includes(normalizedType)) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+    }
     throw new ApiError(400, "Invalid media type: must be 'photo' or 'video'");
   }
   let type = normalizedType;
 
   if (!category || !category.trim()) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+    }
     throw new ApiError(400, "Collection category is required");
   }
 
   const normalizedCategory = category.toLowerCase().trim();
   if (!/^[a-z0-9-]+$/.test(normalizedCategory)) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+    }
     throw new ApiError(400, "Invalid category slug format");
   }
 

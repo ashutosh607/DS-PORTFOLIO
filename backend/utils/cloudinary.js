@@ -16,10 +16,18 @@ const uploadOnCloudinary = async (localFilePath, folder = "ds_portfolio") => {
     // 1. Try Cloudinary if real credentials are provided
     if (isCloudinaryConfigured) {
       try {
-        const response = await cloudinary.uploader.upload(localFilePath, {
-          resource_type: "auto",
+        const ext = path.extname(localFilePath).toLowerCase();
+        const isVideo = [".mp4", ".mov", ".webm", ".avi", ".mkv"].includes(ext);
+
+        const uploadOptions = {
+          resource_type: isVideo ? "video" : "auto",
           folder: folder,
-        });
+        };
+        if (isVideo) {
+          uploadOptions.chunk_size = 6000000;
+        }
+
+        const response = await cloudinary.uploader.upload(localFilePath, uploadOptions);
 
         // Clean up temporary upload file
         if (fs.existsSync(localFilePath)) {
