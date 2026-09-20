@@ -68,14 +68,14 @@ export default function AdminSidebar() {
               <span className="block text-[12px] tracking-[0.22em] text-[#181818] uppercase font-semibold leading-tight group-hover:text-[#42392F] transition-colors">
                 STUDIO ADMIN
               </span>
-              <span className="block text-[8.5px] tracking-[0.2em] text-[#7A756D] uppercase mt-1.5 font-medium">
+              <span className="block text-[8px] tracking-[0.12em] text-[#7A756D] uppercase mt-1 font-medium whitespace-nowrap">
                 DS PHOTOGRAPHY &amp; FILMS
               </span>
             </div>
           </Link>
 
           {/* Navigation Links */}
-          <nav className="space-y-1.5">
+          <nav className="space-y-3">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (

@@ -49,31 +49,19 @@
   }
 }
 
-/* --- Main Workspace (Generous Spacing & Balanced Padding for Luxury Cards) --- */
+/* --- Main Workspace (Spacious Clean Workspace) --- */
 .admin-main-workspace {
   flex: 1;
   min-width: 0;
   overflow-y: visible;
   background-color: #FAF8F5;
-  padding: 56px 56px 96px 56px;
+  padding: 0;
   box-sizing: border-box;
-}
-
-@media (max-width: 1280px) {
-  .admin-main-workspace {
-    padding: 44px 36px 72px 36px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .admin-main-workspace {
-    padding: 36px 20px 56px 20px;
-  }
 }
 
 .admin-content-inner {
   width: 100%;
-  max-width: 1440px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -82,8 +70,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 16px;
-  border-radius: 12px;
+  padding: 0 16px;
+  height: 44px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 400;
   color: #5C5852;
@@ -102,6 +91,7 @@
   background-color: #181818;
   color: #FFFFFF;
   font-weight: 500;
+  border-radius: 8px;
 }
 
 .admin-sidebar-nav-item.active svg {

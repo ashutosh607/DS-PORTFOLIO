@@ -1,5 +1,25 @@
 @import "tailwindcss";
 
+@theme {
+  --font-serif: 'Cormorant Garamond', Garamond, Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-ink: #181818;
+  --color-muted: #7A7367;
+  --color-border-subtle: #EAE4DA;
+  --color-accent: #9E8159;
+}
+
+/* ==========================================================================
+   Utility Font Shortcuts
+   ========================================================================== */
+.font-display {
+  font-family: 'Cormorant Garamond', Garamond, Georgia, serif;
+}
+
+.font-body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 /* ==========================================================================
    MAISON ÉDOUARD — Fine Art Photography Studio
    Design System & Editorial Foundation
@@ -48,83 +68,80 @@
   }
 }
 
-/* Reset & Box Sizing */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* Base Styles wrapped in @layer base to allow Tailwind utility overrides */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: var(--color-off-white);
-  color: var(--color-obsidian);
-}
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--color-off-white);
+    color: var(--color-obsidian);
+  }
 
-body {
-  font-family: var(--font-sans);
-  background-color: var(--color-off-white);
-  color: var(--color-obsidian);
-  line-height: 1.6;
-  overflow-x: clip;
-  width: 100%;
-}
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-off-white);
+    color: var(--color-obsidian);
+    line-height: 1.6;
+    overflow-x: clip;
+    width: 100%;
+  }
 
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-}
+  #root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+  }
 
-/* Selection */
-::selection {
-  background-color: var(--color-obsidian);
-  color: var(--color-off-white);
-}
+  ::selection {
+    background-color: var(--color-obsidian);
+    color: var(--color-off-white);
+  }
 
-/* Typography Hierarchy */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-serif);
-  font-weight: 400;
-  line-height: 1.15;
-  color: var(--color-obsidian);
-  letter-spacing: -0.02em;
-}
+  /* Typography Hierarchy - base defaults that yield to Tailwind utilities */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--color-obsidian);
+    letter-spacing: -0.02em;
+  }
 
-h1 {
-  font-size: clamp(2.75rem, 6.5vw, 5.5rem);
-}
+  p {
+    color: var(--color-obsidian-muted);
+    font-weight: 400;
+    line-height: 1.7;
+  }
 
-h2 {
-  font-size: clamp(2.25rem, 4.5vw, 3.75rem);
-}
+  button {
+    font-family: var(--font-sans);
+    cursor: pointer;
+    outline: none;
+    transition: var(--transition-smooth);
+  }
 
-h3 {
-  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
-}
-
-h4 {
-  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
-}
-
-p {
-  color: var(--color-obsidian-muted);
-  font-weight: 400;
-  font-size: 1.05rem;
-  line-height: 1.7;
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+  }
 }
 
 /* Editorial Serif Emphasis */
@@ -164,22 +181,6 @@ p {
   margin-right: auto;
   padding-left: clamp(24px, 5vw, 80px);
   padding-right: clamp(24px, 5vw, 80px);
-}
-
-/* Global Buttons & Interactive Links */
-button {
-  font-family: var(--font-sans);
-  cursor: pointer;
-  border: none;
-  background: none;
-  outline: none;
-  transition: var(--transition-smooth);
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-  transition: var(--transition-smooth);
 }
 
 /* Primary Button (Obsidian Fill) */
@@ -322,4 +323,4 @@ a {
 
 .animate-fade-in {
   animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+}

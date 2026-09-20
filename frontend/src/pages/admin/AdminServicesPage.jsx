@@ -1,25 +1,19 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Plus,
   Pencil,
-  Trash2,
   GripVertical,
   Sparkles,
   Eye,
-  EyeOff,
   CheckCircle2,
-  AlertCircle,
-  ExternalLink,
   Layers,
-  ArrowRight,
   Search,
   AlertTriangle,
   LayoutGrid,
-  Sun,
   Bell,
   ChevronDown,
-  MoreHorizontal,
+  MoreVertical,
   Gem,
   Heart,
   Cake,
@@ -62,6 +56,8 @@ const CATEGORY_THUMBNAILS = {
   commercial: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=400&auto=format&fit=crop',
   baby: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?q=80&w=400&auto=format&fit=crop',
   maternity: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=400&auto=format&fit=crop',
+  bab: 'https://images.unsplash.com/photo-1522771930-78848d9293e8?q=80&w=400&auto=format&fit=crop',
+  yagyat: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=400&auto=format&fit=crop',
 };
 
 const CATEGORY_ICONS = {
@@ -129,6 +125,7 @@ export default function AdminServicesPage() {
         base.push({
           id: slug,
           label: rawName.charAt(0).toUpperCase() + rawName.slice(1),
+          image: cat.image || cat.imageUrl,
         });
       }
     });
@@ -141,6 +138,10 @@ export default function AdminServicesPage() {
   const [loading, setLoading] = useState(true);
   const [isReordering, setIsReordering] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Search states: categorySearch for categories card, searchQuery for services
+  const [categorySearch, setCategorySearch] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Modal & menu states
   const [modalOpen, setModalOpen] = useState(false);
@@ -218,6 +219,13 @@ export default function AdminServicesPage() {
     return status;
   }, [allServices, categoriesList]);
 
+  // Filter categories by categorySearch input
+  const filteredCategoriesList = useMemo(() => {
+    if (!categorySearch.trim()) return categoriesList;
+    const q = categorySearch.toLowerCase().trim();
+    return categoriesList.filter((cat) => cat.label.toLowerCase().includes(q));
+  }, [categoriesList, categorySearch]);
+
   // Check if delete target is the last remaining service in its category
   const isLastServiceInCat = React.useMemo(() => {
     if (!deleteTarget) return false;
@@ -290,12 +298,28 @@ export default function AdminServicesPage() {
     }, 3500);
   };
 
-  const handleCategorySelect = (catId) => {
+  const packagesSectionRef = useRef(null);
+
+  const scrollToPackages = () => {
+    setTimeout(() => {
+      if (packagesSectionRef.current) {
+        packagesSectionRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    }, 60);
+  };
+
+  const handleCategorySelect = (catId, shouldScroll = false) => {
     setActiveCategory(catId);
     if (catId === 'all') {
       navigate('/admin/services');
     } else {
       navigate(`/admin/services/${catId}`);
+    }
+    if (shouldScroll) {
+      scrollToPackages();
     }
   };
 
@@ -303,7 +327,6 @@ export default function AdminServicesPage() {
   const handleToggleActive = async (service, e) => {
     e.stopPropagation();
     try {
-      const updated = { ...service, isActive: !service.isActive };
       const res = await fetch(`/api/services/${service._id}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
@@ -455,8 +478,6 @@ export default function AdminServicesPage() {
     }
   };
 
-  const [searchQuery, setSearchQuery] = useState('');
-
   const activeCategoryObj =
     categoriesList.find((c) => c.id === activeCategory) || {
       id: activeCategory,
@@ -483,7 +504,7 @@ export default function AdminServicesPage() {
   }, [services, searchQuery]);
 
   return (
-    <div className="w-full pb-16">
+    <div className="w-full max-w-[1400px] px-8 lg:px-12 py-8 bg-[#FAF8F5]">
 
       {/* =========================================================
           TOAST
@@ -492,282 +513,301 @@ export default function AdminServicesPage() {
         <div className="fixed bottom-7 right-7 z-50">
           <div className="flex items-center gap-3 px-5 py-3.5 bg-[#181818] text-[#FAF8F5] rounded-full shadow-[0_18px_50px_rgba(0,0,0,0.18)] border border-white/10">
             <CheckCircle2 size={15} className="text-[#C2A378]" />
-
-            <span
-              className="text-[11px] tracking-wide"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-            >
+            <span className="text-[11px] tracking-wide font-medium">
               {toastMessage}
             </span>
           </div>
         </div>
       )}
 
-
       {/* =========================================================
-          TOP ACTION BAR (Sun, Bell with red dot, AS profile)
+          1. TOP ACTION BAR (Notification bell with red dot & AS Admin)
       ========================================================= */}
-      <div className="flex items-center justify-end gap-5 pb-8 pt-1">
+      <header className="h-14 border-b border-[#EAE4DA] flex items-center justify-end gap-5 mb-8">
         <button
           type="button"
-          className="text-[#6E675E] hover:text-[#181818] transition p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
-          title="Toggle Theme"
-        >
-          <Sun size={18} />
-        </button>
-
-        <button
-          type="button"
-          className="relative text-[#6E675E] hover:text-[#181818] transition p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
+          className="relative text-[#7A7367] hover:text-[#181818] transition-colors p-2 rounded-full hover:bg-black/5 cursor-pointer"
           title="Notifications"
+          aria-label="Notifications"
         >
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E53E3E] ring-2 ring-[#FAF8F5]" />
+          <Bell size={18} strokeWidth={1.75} />
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#E53E3E]" />
         </button>
 
-        <div className="flex items-center gap-2 pl-2 cursor-pointer select-none">
-          <div className="w-7 h-7 rounded-full bg-[#DCD5C9] text-[#2C2925] text-[11px] font-semibold flex items-center justify-center">
+        <div className="flex items-center gap-2.5 pl-2 select-none cursor-pointer group">
+          <div className="w-7 h-7 rounded-full bg-[#E5DDD0] text-[#181818] text-[11px] font-bold flex items-center justify-center shrink-0">
             {adminUser?.name ? adminUser.name.slice(0, 2).toUpperCase() : 'AS'}
           </div>
-          <span
-            className="text-[12.5px] font-medium text-[#2C2925]"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-          >
-            {adminUser?.name || 'Ashutosh'}
+          <span className="text-[13px] font-medium text-[#181818] group-hover:text-black transition-colors">
+            Admin
           </span>
-          <ChevronDown size={13} className="text-[#888]" />
+          <ChevronDown size={14} className="text-[#7A7367] group-hover:text-[#181818] transition-colors" />
         </div>
-      </div>
+      </header>
 
       {/* =========================================================
-          HERO / PAGE HEADER WITH BOTANICAL BRANCH
+          2. HERO SECTION
       ========================================================= */}
-      <section className="relative pb-10 lg:pb-12">
-        {/* Background dried botanical illustration */}
-        <div className="absolute top-[-35px] right-[-20px] w-[340px] sm:w-[420px] lg:w-[480px] h-[220px] sm:h-[260px] pointer-events-none select-none opacity-35 mix-blend-multiply overflow-hidden z-0">
+      <section className="relative pb-8 mb-8 overflow-hidden">
+        {/* Decorative dried botanical background graphic on right */}
+        <div
+          className="absolute right-0 top-0 bottom-0 h-full w-[45%] max-w-[480px] pointer-events-none select-none z-0 overflow-hidden"
+          style={{
+            maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
+            WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
+          }}
+        >
           <img
             src={driedBotanical}
             alt=""
-            className="w-full h-full object-contain object-top-right filter contrast-105"
+            className="w-full h-full object-cover object-center opacity-40 mix-blend-multiply filter contrast-105"
           />
         </div>
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-          {/* LEFT CONTENT */}
-          <div className="max-w-[680px]">
-            <div className="flex items-center gap-3 mb-5">
-              <span className="w-8 h-px bg-[#B6A58D]" />
-              <span
-                className="text-[9.5px] uppercase tracking-[0.28em] text-[#9A9287] font-semibold"
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-              >
-                Studio Administration
-              </span>
-            </div>
-
-            <h1
-              className="text-[#181818] font-normal leading-[0.92] tracking-[-0.04em]"
-              style={{
-                fontFamily: "'Cormorant Garamond', 'Cormorant', Georgia, serif",
-                fontSize: "clamp(54px, 6.8vw, 88px)",
-              }}
-            >
+          <div className="max-w-[560px]">
+            <h1 className="font-display text-[#181818] font-medium text-5xl lg:text-6xl tracking-[-0.02em] leading-none">
               Management
             </h1>
-
-            <p
-              className="mt-5 max-w-[620px] text-[13px] sm:text-[13.5px] text-[#777168] leading-[1.85]"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-            >
+            <p className="mt-3 text-sm text-[#7A7367] leading-relaxed">
               Curate and configure service packages, deliverables, pricing guidelines, and presentation order across all photographic disciplines.
             </p>
           </div>
 
-          {/* RIGHT ACTION: SINGLE OBSIDIAN BUTTON "+ ADD CATEGORY" */}
           <div className="shrink-0 pb-1">
-            <button
-              type="button"
-              onClick={() => setAddCategoryModalOpen(true)}
-              className="h-11 px-6 rounded-full bg-[#181818] text-white hover:bg-[#2C2C2C] transition-all duration-300 cursor-pointer shadow-xs flex items-center gap-2"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-            >
-              <Plus size={14} />
-              <span className="text-[10px] uppercase tracking-[0.18em] font-semibold">
-                Add Category
-              </span>
-            </button>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#7A7367] font-medium">
+              CREATE&nbsp;&nbsp;/&nbsp;&nbsp;CAPTURE&nbsp;&nbsp;/&nbsp;&nbsp;DELIVER
+            </span>
           </div>
         </div>
       </section>
 
       {/* =========================================================
-          CATEGORIES & LIVE PUBLICATION CARD
+          3. CATEGORIES & LIVE PUBLICATION CARD
       ========================================================= */}
-      <section className="mb-8 p-6 sm:p-7 rounded-[24px] border border-[#E8E2D6] bg-white shadow-xs">
-        <div className="pb-5 border-b border-[#EAE4DA]">
-          <div className="flex items-center gap-2.5 mb-1.5">
-            <LayoutGrid size={20} className="text-[#181818]" />
-            <h2
-              className="text-[22px] sm:text-[25px] text-[#181818] font-normal tracking-[-0.015em]"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-            >
-              Categories &amp; Live Publication
-            </h2>
+      <section className="bg-white border border-[#EAE4DA] rounded-2xl p-6 lg:p-8 shadow-xs mb-8">
+        {/* Header Row: Title & Subtitle + Search & Add Category */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-3 mb-1">
+              <LayoutGrid size={22} className="text-[#181818] shrink-0" />
+              <h2 className="font-display text-3xl lg:text-[34px] font-normal text-[#181818] tracking-tight">
+                Categories &amp; Live Publication
+              </h2>
+            </div>
+            <p className="text-[13px] text-[#7A7367] font-light">
+              Only categories with at least one active service appear on the public site. Empty categories remain safely unpublished.
+            </p>
           </div>
-          <p
-            className="text-[12px] text-[#7A7367]"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-          >
-            Only categories with at least one active service appear on the public site. Empty categories remain safely unpublished.
-          </p>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Search Categories Input */}
+            <div className="relative">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9A9287]" />
+              <input
+                type="text"
+                value={categorySearch}
+                onChange={(e) => setCategorySearch(e.target.value)}
+                placeholder="Search categories..."
+                className="h-11 w-64 lg:w-72 pl-10 pr-4 rounded-lg border border-[#EAE4DA] bg-white text-[13px] text-[#181818] placeholder-[#9A9287] outline-none transition-colors focus:border-[#181818]"
+              />
+            </div>
+
+            {/* + Add Category Button */}
+            <button
+              type="button"
+              onClick={() => setAddCategoryModalOpen(true)}
+              className="h-11 px-5 rounded-lg bg-[#181818] hover:bg-[#2C2C2C] text-white text-[13px] font-medium shadow-xs transition-colors flex items-center gap-2 cursor-pointer shrink-0"
+            >
+              <Plus size={14} />
+              <span>Add Category</span>
+            </button>
+          </div>
         </div>
 
         {/* 4-COLUMN CATEGORIES GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
-          {categoriesList.map((cat) => {
-            const count = serviceCountsByCategory[cat.id] || 0;
-            const isLive = count > 0 && (categoryLiveStatus[cat.id] ?? true);
-            const thumb =
-              CATEGORY_THUMBNAILS[cat.id] ||
-              CATEGORY_THUMBNAILS[cat.slug] ||
-              CATEGORY_THUMBNAILS.wedding;
-            const isCurrent = activeCategory === cat.id;
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
+          {filteredCategoriesList.length === 0 ? (
+            <div className="col-span-full py-12 text-center bg-[#FAF8F5] rounded-xl border border-[#EAE4DA]">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mx-auto mb-3 text-[#7A7367] border border-[#EAE4DA]">
+                <LayoutGrid size={18} />
+              </div>
+              <p className="text-sm font-medium text-[#181818]">
+                No categories found
+              </p>
+              <p className="text-xs text-[#7A7367] mt-1">
+                Try adjusting your category search query
+              </p>
+            </div>
+          ) : (
+            filteredCategoriesList.map((cat) => {
+              const count = serviceCountsByCategory[cat.id] || 0;
+              const isLive = count > 0 && (categoryLiveStatus[cat.id] ?? true);
+              const thumb =
+                cat.image ||
+                CATEGORY_THUMBNAILS[cat.id] ||
+                CATEGORY_THUMBNAILS[cat.slug];
+              const isCurrent = activeCategory === cat.id;
+              const IconComponent = CATEGORY_ICONS[cat.id] || Sparkles;
 
-            return (
-              <div
-                key={cat.id}
-                className={`p-4 rounded-[18px] border transition-all duration-200 bg-[#FCFAF7] flex flex-col justify-between gap-4 ${
-                  isCurrent
-                    ? 'border-[#181818] shadow-2xs'
-                    : 'border-[#EAE4DA] hover:border-[#D5CDC0]'
-                }`}
-              >
-                {/* TOP ROW: Thumbnail + Details + More Options */}
-                <div className="flex items-start justify-between gap-2.5">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <img
-                      src={thumb}
-                      alt={cat.label}
-                      className="w-14 h-14 rounded-[12px] object-cover shrink-0 border border-[#ECE5DB] shadow-2xs"
-                    />
-                    <div className="min-w-0">
-                      <h3 className="text-[14px] font-semibold text-[#181818] tracking-[-0.01em] truncate leading-snug">
-                        {cat.label}
-                      </h3>
-                      <span className="text-[11px] text-[#8C857A] block mt-0.5">
-                        {count} {count === 1 ? 'service package' : 'service packages'}
-                      </span>
+              return (
+                <div
+                  key={cat.id}
+                  className={`bg-white border rounded-xl p-5 transition-all flex flex-col justify-between group ${
+                    isCurrent
+                      ? 'border-[#181818] shadow-xs'
+                      : 'border-[#EAE4DA] hover:border-[#D5CDC0]'
+                  }`}
+                >
+                  <div>
+                    {/* Top Row: Thumbnail + Details + 3-dot Menu */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div
+                        className="flex items-center gap-3.5 min-w-0 cursor-pointer flex-1"
+                        onClick={() => handleCategorySelect(cat.id, true)}
+                        title={`View ${cat.label} packages`}
+                      >
+                        {thumb ? (
+                          <img
+                            src={thumb}
+                            alt={cat.label}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                            className="w-14 h-14 rounded-lg object-cover shrink-0 border border-[#EAE4DA]"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-lg bg-[#F1ECE3] border border-[#EAE4DA] flex items-center justify-center shrink-0 text-[#7A7367]">
+                            <IconComponent size={22} strokeWidth={1.5} />
+                          </div>
+                        )}
+
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-display text-[21px] font-normal text-[#181818] leading-tight truncate group-hover:text-black transition-colors">
+                            {cat.label}
+                          </h3>
+                          <span className="text-[13px] text-[#7A7367] block mt-0.5 truncate">
+                            {count} {count === 1 ? 'service package' : 'service packages'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Three-dot vertical options menu */}
+                      <div className="relative shrink-0">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCategoryMenuOpenId(categoryMenuOpenId === cat.id ? null : cat.id);
+                          }}
+                          className="text-[#7A7367] hover:text-[#181818] p-1 rounded-md transition-colors cursor-pointer"
+                          title="Category options"
+                          aria-label="Category options"
+                        >
+                          <MoreVertical size={16} />
+                        </button>
+
+                        {categoryMenuOpenId === cat.id && (
+                          <div
+                            className="absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-[#EAE4DA] py-1 z-30"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCategoryMenuOpenId(null);
+                                setEditCategoryTarget(cat);
+                              }}
+                              className="w-full px-3 py-1.5 text-left text-[12px] text-[#181818] hover:bg-[#FAF8F5] flex items-center gap-2 cursor-pointer font-medium"
+                            >
+                              <Pencil size={12} /> Edit Category
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCategoryMenuOpenId(null);
+                                setEditTarget(null);
+                                setModalTargetCategory(cat.id);
+                                setModalLockCategory(true);
+                                setModalOpen(true);
+                              }}
+                              className="w-full px-3 py-1.5 text-left text-[12px] text-[#181818] hover:bg-[#FAF8F5] flex items-center gap-2 cursor-pointer font-medium"
+                            >
+                              <Plus size={12} /> Add Service
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Status Badge: Full-width row so it never clips or goes out of the box */}
+                    <div className="mt-3 flex items-center">
                       {isLive ? (
-                        <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-[#EBF7EE] text-[#1E7438] text-[8.5px] uppercase tracking-[0.08em] font-semibold border border-[#C5E8CE]">
-                          Published Live
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-semibold tracking-wider uppercase bg-[#EBF7EE] text-[#1E7438] border border-[#C5E8CE]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#1E7438] shrink-0" />
+                          PUBLISHED LIVE
                         </span>
                       ) : (
-                        <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-[#FFF4E5] text-[#A36015] text-[7.5px] sm:text-[8px] uppercase tracking-[0.05em] font-semibold border border-[#F6DCB8]">
-                          Not published — add a service
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-[#FFF4E5] text-[#A36015] border border-[#F6DCB8] max-w-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#A36015] shrink-0" />
+                          <span className="truncate">NOT PUBLISHED &ndash; ADD A SERVICE</span>
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="relative shrink-0">
+                  {/* Card Bottom Links: View Packages & Add Service */}
+                  <div className="border-t border-[#EAE4DA] pt-3 mt-4 flex items-center justify-between text-[13px]">
+                    <button
+                      type="button"
+                      onClick={() => handleCategorySelect(cat.id, true)}
+                      className="text-[#7A7367] hover:text-[#181818] flex items-center gap-1.5 transition-colors cursor-pointer text-[13px] font-normal"
+                    >
+                      <Eye size={14} className="text-[#7A7367]" />
+                      <span>View Packages</span>
+                    </button>
+
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setCategoryMenuOpenId(categoryMenuOpenId === cat.id ? null : cat.id);
+                        setEditTarget(null);
+                        setModalTargetCategory(cat.id);
+                        setModalLockCategory(true);
+                        setModalOpen(true);
                       }}
-                      className="p-1 rounded-md text-[#8C857A] hover:text-[#181818] hover:bg-black/5 transition cursor-pointer"
-                      title="Category options"
+                      className="text-[#181818] hover:text-[#9E8159] transition-colors cursor-pointer text-[13px] font-medium"
                     >
-                      <MoreHorizontal size={16} />
+                      + Add Service
                     </button>
-
-                    {categoryMenuOpenId === cat.id && (
-                      <div
-                        className="absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-[#EAE4DA] py-1 z-30"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setCategoryMenuOpenId(null);
-                            setEditCategoryTarget(cat);
-                          }}
-                          className="w-full px-3 py-1.5 text-left text-[11px] text-[#181818] hover:bg-[#F7F5F0] flex items-center gap-2 cursor-pointer font-medium"
-                        >
-                          <Pencil size={12} /> Edit Category
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setCategoryMenuOpenId(null);
-                            setEditTarget(null);
-                            setModalTargetCategory(cat.id);
-                            setModalLockCategory(true);
-                            setModalOpen(true);
-                          }}
-                          className="w-full px-3 py-1.5 text-left text-[11px] text-[#181818] hover:bg-[#F7F5F0] flex items-center gap-2 cursor-pointer font-medium"
-                        >
-                          <Plus size={12} /> Add Service
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
-
-                {/* BOTTOM ROW: View Packages -> & + Add Service */}
-                <div className="flex items-center justify-between pt-3 border-t border-[#EAE4DA]/70">
-                  <button
-                    type="button"
-                    onClick={() => handleCategorySelect(cat.id)}
-                    className="text-[9px] uppercase tracking-[0.14em] font-semibold text-[#7A7367] hover:text-[#181818] transition-colors cursor-pointer flex items-center gap-1"
-                  >
-                    <span>View Packages</span>
-                    <ArrowRight size={10} />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditTarget(null);
-                      setModalTargetCategory(cat.id);
-                      setModalLockCategory(true);
-                      setModalOpen(true);
-                    }}
-                    className="inline-flex items-center gap-1 text-[9px] uppercase tracking-[0.14em] font-semibold text-[#181818] hover:text-[#9E8159] transition-colors cursor-pointer"
-                  >
-                    <Plus size={11} />
-                    <span>Add Service</span>
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </section>
 
       {/* =========================================================
-          CATEGORY FILTER TABS BAR
+          4. FILTER BAR (ONE rounded container)
       ========================================================= */}
-      <section className="mb-4">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
-          {/* All Categories pill */}
+      <div className="bg-white border border-[#EAE4DA] rounded-xl px-3 py-2 flex items-center justify-between gap-3 shadow-xs mb-6 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+          {/* All Categories Pill */}
           <button
             type="button"
-            onClick={() => handleCategorySelect('all')}
-            className={`h-9 px-4 rounded-full inline-flex items-center gap-2 text-[11.5px] font-medium transition-all shrink-0 cursor-pointer ${
+            onClick={() => handleCategorySelect('all', true)}
+            className={`h-9 px-4 text-[13px] font-medium rounded-full inline-flex items-center gap-2 shrink-0 transition-all cursor-pointer ${
               activeCategory === 'all'
                 ? 'bg-[#181818] text-white shadow-xs'
-                : 'bg-white border border-[#E4DDD3] text-[#554E45] hover:bg-[#FAF8F5]'
+                : 'bg-transparent text-[#554E45] hover:bg-[#FAF8F5]'
             }`}
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             <LayoutGrid size={14} />
             <span>All Categories ({categoriesList.length})</span>
           </button>
 
-          <span className="h-5 w-px bg-[#D8D1C5] mx-1 shrink-0" />
-
+          {/* Individual Category Pills */}
           {categoriesList.map((cat) => {
             const count = serviceCountsByCategory[cat.id] || 0;
             const IconComponent = CATEGORY_ICONS[cat.id] || Sparkles;
@@ -777,13 +817,12 @@ export default function AdminServicesPage() {
               <button
                 key={cat.id}
                 type="button"
-                onClick={() => handleCategorySelect(cat.id)}
-                className={`h-9 px-4 rounded-full inline-flex items-center gap-2 text-[11.5px] font-medium transition-all shrink-0 cursor-pointer ${
+                onClick={() => handleCategorySelect(cat.id, true)}
+                className={`h-9 px-4 text-[13px] font-medium rounded-full inline-flex items-center gap-2 shrink-0 transition-all cursor-pointer ${
                   isActive
                     ? 'bg-[#181818] text-white shadow-xs'
-                    : 'bg-white border border-[#E4DDD3] text-[#554E45] hover:bg-[#FAF8F5]'
+                    : 'bg-transparent text-[#554E45] hover:bg-[#FAF8F5]'
                 }`}
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
                 <IconComponent size={13} className={isActive ? 'text-white' : 'text-[#7A7367]'} />
                 <span>
@@ -793,223 +832,158 @@ export default function AdminServicesPage() {
             );
           })}
         </div>
-      </section>
+
+        {/* Far Right: Showing X categories with Eye icon */}
+        <div className="hidden lg:flex items-center gap-1.5 text-[12px] text-[#7A7367] shrink-0 pl-3 border-l border-[#EAE4DA]">
+          <Eye size={14} className="text-[#7A7367]" />
+          <span>Showing {categoriesList.length} categories</span>
+        </div>
+      </div>
 
       {/* =========================================================
-          SECTION META / REORDER NOTIFICATION
+          5. REORDER HINT (Plain muted line when category selected & 2+ packages)
       ========================================================= */}
-      <section className="mb-8">
-        <div className="p-3.5 px-4 rounded-[14px] bg-[#FCFAF7] border border-[#EAE4DA] flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <GripVertical size={13} className="text-[#B7B0A6]" />
-            <span
-              className="text-[11px] text-[#7A7367]"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-            >
-              Drag packages to rearrange their live display order.
-            </span>
-          </div>
-
+      {activeCategory !== 'all' && filteredServices.length >= 2 && (
+        <div className="flex items-center gap-2 text-[12px] text-[#7A7367] mb-4">
+          <GripVertical size={13} className="text-[#A39E95]" />
+          <span>Drag packages to rearrange their live display order.</span>
           {isReordering && (
-            <span
-              className="text-[9.5px] uppercase tracking-[0.2em] text-[#9E8159] font-semibold animate-pulse"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-            >
-              Saving order...
-            </span>
+            <span className="text-[#9E8159] font-medium animate-pulse ml-2">Saving order...</span>
           )}
-        </div>
-      </section>
-
-
-      {/* =========================================================
-          CONTENT
-      ========================================================= */}
-
-      {loading ? (
-
-        /* =======================================================
-           LOADING
-        ======================================================= */
-        <div className="min-h-[480px] flex flex-col items-center justify-center">
-
-          <div className="w-7 h-7 border-2 border-[#181818] border-t-transparent rounded-full animate-spin mb-5" />
-
-          <p
-            className="text-[9.5px] uppercase tracking-[0.24em] text-[#918A80]"
-            style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-            }}
-          >
-            Loading {activeCategoryObj.label} Packages...
-          </p>
-
-        </div>
-
-      ) : filteredServices.length === 0 ? (
-
-        /* =======================================================
-           EMPTY STATE
-        ======================================================= */
-        <div className="min-h-[480px] flex items-center justify-center py-10">
-
-          <div className="w-full max-w-[680px] px-8 sm:px-14 lg:px-20 py-16 sm:py-20 text-center rounded-[28px] border border-dashed border-[#DDD5C9] bg-white/60">
-
-            <div className="w-[60px] h-[60px] mx-auto mb-7 rounded-full border border-[#E5DED3] bg-[#FAF8F4] flex items-center justify-center">
-              <Layers
-                size={25}
-                className="text-[#AAA197] stroke-[1.2]"
-              />
-            </div>
-
-            <h3
-              className="text-[28px] sm:text-[32px] text-[#181818] font-normal leading-[1.1] mb-4"
-              style={{
-                fontFamily:
-                  "'Cormorant Garamond', Georgia, serif",
-              }}
-            >
-              {searchQuery
-                ? `No packages match "${searchQuery}"`
-                : `No service packages found for ${activeCategoryObj.label}`}
-            </h3>
-
-            <p
-              className="max-w-[460px] mx-auto mb-8 text-[12px] text-[#8A8278] leading-[1.85]"
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              {searchQuery
-                ? "Try searching for a different keyword, category, or tier name."
-                : "Create your first package tier for this category to present transparent deliverables and luxury booking options."}
-            </p>
-
-            {searchQuery ? (
-
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="inline-flex items-center px-6 py-3 rounded-full bg-white border border-[#D8D1C5] text-[#181818] text-[9.5px] uppercase tracking-[0.18em] font-semibold hover:bg-[#F3EFE8] transition-all cursor-pointer"
-                style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                }}
-              >
-                Clear Search
-              </button>
-
-            ) : (
-
-              <button
-                type="button"
-                onClick={() => {
-                  setEditTarget(null);
-                  setModalTargetCategory(activeCategory);
-                  setModalLockCategory(true);
-                  setModalOpen(true);
-                }}
-                className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#181818] text-[#FAF8F5] text-[9.5px] uppercase tracking-[0.18em] font-semibold hover:bg-[#2A2A2A] transition-all cursor-pointer"
-                style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                }}
-              >
-                <Plus size={14} />
-                <span>
-                  Add First Package for {activeCategoryObj.label}
-                </span>
-              </button>
-
-            )}
-
-          </div>
-        </div>
-
-      ) : (
-
-        /* =======================================================
-           PACKAGE GRID
-        ======================================================= */
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-7 lg:gap-x-9 gap-y-9 lg:gap-y-11 items-stretch">
-
-          {filteredServices.map((service, index) => {
-
-            const isDragging = draggedIndex === index;
-            const isOver = dragOverIndex === index;
-
-            return (
-              <div
-                key={service._id || service.id}
-                className={`relative rounded-[26px] transition-all duration-300 ${isDragging
-                    ? "opacity-40 scale-[0.985]"
-                    : isOver
-                      ? "ring-1 ring-[#9E8159] scale-[1.005]"
-                      : "hover:-translate-y-[3px]"
-                  }`}
-              >
-
-                <CollectionTierCard
-                  collection={{
-                    ...service,
-                    id: service._id || service.tier,
-                    _id: service._id,
-                    title:
-                      service.eyebrow ||
-                      service.title ||
-                      "Collection",
-                    subtitle: service.subtitle,
-                    image: service.imageUrl || service.image,
-                    imageUrl:
-                      service.imageUrl || service.image,
-                    imageLabel:
-                      service.imageTag || "Archive Specimen",
-                    price: service.price,
-                    priceNote: service.priceNote,
-                    deliverables:
-                      service.deliverables || [],
-                    isRecommended:
-                      service.isRecommended,
-                    isActive: service.isActive,
-                    tier: service.tier,
-                  }}
-                  isAdmin={true}
-                  index={index}
-                  isDragging={isDragging}
-                  isOver={isOver}
-                  onEdit={() => {
-                    setEditTarget(service);
-                    setModalOpen(true);
-                  }}
-                  onDelete={() => {
-                    setDeleteTarget(service);
-                  }}
-                  onToggleActive={(item, e) =>
-                    handleToggleActive(service, e)
-                  }
-                  dragProps={{
-                    draggable: true,
-                    onDragStart: (e) =>
-                      handleDragStart(e, index),
-                    onDragOver: (e) =>
-                      handleDragOver(e, index),
-                    onDragEnd: handleDragEnd,
-                    onDrop: (e) =>
-                      handleDrop(e, index),
-                  }}
-                />
-
-              </div>
-            );
-          })}
-
         </div>
       )}
 
+      {/* =========================================================
+          6. PACKAGE GRID & MANAGEMENT SECTION
+      ========================================================= */}
+      <div ref={packagesSectionRef} className="pt-6 border-t border-[#EAE4DA] scroll-mt-8">
+        <div className="flex items-baseline justify-between mb-6">
+          <h3 className="font-display text-2xl font-normal text-[#181818]">
+            {activeCategoryObj.label} Packages
+          </h3>
+          <span className="text-[13px] text-[#7A7367]">
+            {filteredServices.length} {filteredServices.length === 1 ? 'package' : 'packages'}
+          </span>
+        </div>
+
+        {loading ? (
+          /* LOADING STATE */
+          <div className="min-h-[320px] flex flex-col items-center justify-center">
+            <div className="w-7 h-7 border-2 border-[#181818] border-t-transparent rounded-full animate-spin mb-4" />
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[#7A7367] font-medium">
+              Loading {activeCategoryObj.label} Packages...
+            </p>
+          </div>
+        ) : filteredServices.length === 0 ? (
+          /* EMPTY STATE */
+          <div className="min-h-[320px] flex items-center justify-center py-8">
+            <div className="w-full max-w-[560px] px-8 py-12 text-center rounded-2xl border border-dashed border-[#DDD5C9] bg-white/70">
+              <div className="w-14 h-14 mx-auto mb-5 rounded-full border border-[#E5DED3] bg-[#FAF8F4] flex items-center justify-center">
+                <Layers size={22} className="text-[#AAA197] stroke-[1.2]" />
+              </div>
+
+              <h4 className="font-display text-2xl text-[#181818] font-normal mb-3">
+                {searchQuery
+                  ? `No packages match "${searchQuery}"`
+                  : `No service packages found for ${activeCategoryObj.label}`}
+              </h4>
+
+              <p className="max-w-[420px] mx-auto mb-6 text-[13px] text-[#7A7367] leading-relaxed">
+                {searchQuery
+                  ? "Try searching for a different keyword, category, or tier name."
+                  : "Create your first package tier for this category to present transparent deliverables and luxury booking options."}
+              </p>
+
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="inline-flex items-center px-5 py-2.5 rounded-lg bg-white border border-[#D8D1C5] text-[#181818] text-xs font-semibold hover:bg-[#F3EFE8] transition-colors cursor-pointer"
+                >
+                  Clear Search
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditTarget(null);
+                    setModalTargetCategory(activeCategory);
+                    setModalLockCategory(true);
+                    setModalOpen(true);
+                  }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#181818] text-[#FAF8F5] text-xs font-semibold hover:bg-[#2A2A2A] transition-colors cursor-pointer"
+                >
+                  <Plus size={14} />
+                  <span>Add First Package for {activeCategoryObj.label}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* PACKAGE GRID */
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10 items-stretch">
+            {filteredServices.map((service, index) => {
+              const isDragging = draggedIndex === index;
+              const isOver = dragOverIndex === index;
+
+              return (
+                <div
+                  key={service._id || service.id}
+                  className={`relative rounded-2xl transition-all duration-300 ${
+                    isDragging
+                      ? "opacity-40 scale-[0.985]"
+                      : isOver
+                        ? "ring-1 ring-[#9E8159] scale-[1.005]"
+                        : "hover:-translate-y-1"
+                  }`}
+                >
+                  <CollectionTierCard
+                    collection={{
+                      ...service,
+                      id: service._id || service.tier,
+                      _id: service._id,
+                      title: service.eyebrow || service.title || "Collection",
+                      subtitle: service.subtitle,
+                      image: service.imageUrl || service.image,
+                      imageUrl: service.imageUrl || service.image,
+                      imageLabel: service.imageTag || "Archive Specimen",
+                      price: service.price,
+                      priceNote: service.priceNote,
+                      deliverables: service.deliverables || [],
+                      isRecommended: service.isRecommended,
+                      isActive: service.isActive,
+                      tier: service.tier,
+                    }}
+                    isAdmin={true}
+                    index={index}
+                    isDragging={isDragging}
+                    isOver={isOver}
+                    onEdit={() => {
+                      setEditTarget(service);
+                      setModalOpen(true);
+                    }}
+                    onDelete={() => {
+                      setDeleteTarget(service);
+                    }}
+                    onToggleActive={(item, e) => handleToggleActive(service, e)}
+                    dragProps={{
+                      draggable: true,
+                      onDragStart: (e) => handleDragStart(e, index),
+                      onDragOver: (e) => handleDragOver(e, index),
+                      onDragEnd: handleDragEnd,
+                      onDrop: (e) => handleDrop(e, index),
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {/* =========================================================
-          MODALS
-          FUNCTIONALITY COMPLETELY UNCHANGED
+          MODALS & SYSTEM INTEGRATION (Wiring Unchanged)
       ========================================================= */}
-
       <AddEditServiceModal
         isOpen={modalOpen}
         onClose={() => {
@@ -1017,64 +991,52 @@ export default function AdminServicesPage() {
           setEditTarget(null);
           setModalLockCategory(false);
         }}
-        onSuccess={handleModalSuccess}
-        initialData={editTarget}
-        serviceToEdit={editTarget}
-        category={modalTargetCategory || activeCategory}
-        initialCategory={modalTargetCategory || activeCategory}
-        availableCategories={categoriesList}
+        service={editTarget}
+        targetCategory={modalTargetCategory}
         lockCategory={modalLockCategory}
+        categories={categoriesList}
+        onSuccess={handleModalSuccess}
       />
 
-      {/* Delete Confirmation Modal with Courtesy Warning for Last Service */}
+      {/* Delete Confirmation Modal */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-5 sm:p-7">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs"
+          onClick={() => setDeleteTarget(null)}
+        >
           <div
-            onClick={() => !isDeleting && setDeleteTarget(null)}
-            className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-          />
-
-          <div
-            className="relative z-10 w-full max-w-md rounded-[24px] shadow-2xl text-center overflow-hidden bg-[#FAF8F5] border border-[#E3DBCC] p-7 sm:p-9"
+            className="w-full max-w-[480px] bg-white rounded-2xl border border-[#E8E2D6] p-7 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
           >
             {isLastServiceInCat ? (
               <>
-                <div
-                  className="w-14 h-14 rounded-full mx-auto mb-5 flex items-center justify-center bg-[#FEF3C7] border border-[#FCD34D] text-[#B45309]"
-                >
-                  <AlertTriangle size={24} />
+                <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center bg-[#FEF3C7] border border-[#FDE68A] text-[#D97706]">
+                  <AlertTriangle size={22} />
                 </div>
 
-                <h3
-                  className="text-[24px] sm:text-[26px] text-[#181818] font-normal leading-[1.2] mb-3"
-                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-                >
-                  Delete Last Service in {deleteTargetCatName}?
+                <h3 className="font-display text-2xl text-[#181818] font-normal leading-tight text-center mb-2">
+                  Unpublish Category Warning
                 </h3>
 
-                {/* Courtesy warning banner */}
-                <div className="mb-5 p-4 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] text-left">
-                  <p
-                    className="text-[12.5px] leading-[1.65] text-[#92400E] font-medium"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                  >
-                    This is the last service in <strong className="font-semibold text-[#78350F]">{deleteTargetCatName}</strong> — deleting it will remove this category from the site until a new service is added.
-                  </p>
-                </div>
+                <p className="text-[13px] text-[#7A7367] leading-relaxed text-center mb-5 px-2">
+                  Deleting this service will leave{' '}
+                  <strong className="text-[#181818] font-semibold">"{deleteTargetCatName}"</strong> with{' '}
+                  <span className="text-[#B91C1C] font-semibold">0 active packages</span>.
+                  The category will be hidden from the public navigation and pricing pages.
+                </p>
 
                 {deleteTarget && (
-                  <div className="py-2.5 px-4 mb-6 rounded-lg bg-[#EFEAE1] font-mono text-[11.5px] text-[#55493A] truncate">
+                  <div className="py-2 px-3.5 mb-5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DA] font-mono text-[11px] text-[#554E45] truncate">
                     {deleteTarget.eyebrow || deleteTarget.title || 'Package'} — {deleteTarget.subtitle} ({deleteTarget.tier})
                   </div>
                 )}
 
-                <div className="pt-5 border-t border-[#E3DBCC]/60 flex items-center justify-end gap-3">
+                <div className="pt-4 border-t border-[#EAE4DA] flex items-center justify-end gap-3">
                   <button
                     type="button"
                     disabled={isDeleting}
                     onClick={() => setDeleteTarget(null)}
-                    className="px-5 py-2.5 rounded-full border border-[#D5CEC2] text-[#55493A] text-[11px] uppercase tracking-[0.14em] font-medium hover:bg-[#EFEAE1] transition-all cursor-pointer"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    className="px-4 py-2 rounded-lg border border-[#D5CEC2] text-[#554E45] text-xs font-medium hover:bg-[#FAF8F5] transition-colors cursor-pointer"
                   >
                     Keep Service
                   </button>
@@ -1082,8 +1044,7 @@ export default function AdminServicesPage() {
                     type="button"
                     disabled={isDeleting}
                     onClick={handleDeleteConfirm}
-                    className="px-6 py-2.5 rounded-full bg-[#B91C1C] hover:bg-[#991B1B] text-white text-[11px] uppercase tracking-[0.14em] font-semibold transition-all cursor-pointer disabled:opacity-50"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    className="px-4 py-2 rounded-lg bg-[#B91C1C] hover:bg-[#991B1B] text-white text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete Service'}
                   </button>
@@ -1091,39 +1052,30 @@ export default function AdminServicesPage() {
               </>
             ) : (
               <>
-                <div
-                  className="w-14 h-14 rounded-full mx-auto mb-5 flex items-center justify-center bg-[#FEE2E2] border border-[#FECACA] text-[#DC2626] font-bold text-xl"
-                >
+                <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center bg-[#FEE2E2] border border-[#FECACA] text-[#DC2626] font-bold text-xl">
                   !
                 </div>
 
-                <h3
-                  className="text-[24px] sm:text-[26px] text-[#181818] font-normal leading-[1.2] mb-3"
-                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-                >
+                <h3 className="font-display text-2xl text-[#181818] font-normal leading-tight text-center mb-2">
                   Delete Service Package?
                 </h3>
 
-                <p
-                  className="text-[13px] text-[#7A7770] leading-[1.7] mb-5 px-2"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                >
+                <p className="text-[13px] text-[#7A7367] leading-relaxed text-center mb-5 px-2">
                   This action cannot be undone. This tier will be permanently removed from your service catalog.
                 </p>
 
                 {deleteTarget && (
-                  <div className="py-2.5 px-4 mb-6 rounded-lg bg-[#EFEAE1] font-mono text-[11.5px] text-[#55493A] truncate">
+                  <div className="py-2 px-3.5 mb-5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DA] font-mono text-[11px] text-[#554E45] truncate">
                     {deleteTarget.eyebrow || deleteTarget.title || 'Package'} — {deleteTarget.subtitle} ({deleteTarget.tier})
                   </div>
                 )}
 
-                <div className="pt-5 border-t border-[#E3DBCC]/60 flex items-center justify-end gap-3">
+                <div className="pt-4 border-t border-[#EAE4DA] flex items-center justify-end gap-3">
                   <button
                     type="button"
                     disabled={isDeleting}
                     onClick={() => setDeleteTarget(null)}
-                    className="px-5 py-2.5 rounded-full border border-[#D5CEC2] text-[#55493A] text-[11px] uppercase tracking-[0.14em] font-medium hover:bg-[#EFEAE1] transition-all cursor-pointer"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    className="px-4 py-2 rounded-lg border border-[#D5CEC2] text-[#554E45] text-xs font-medium hover:bg-[#FAF8F5] transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1131,8 +1083,7 @@ export default function AdminServicesPage() {
                     type="button"
                     disabled={isDeleting}
                     onClick={handleDeleteConfirm}
-                    className="px-6 py-2.5 rounded-full bg-[#B91C1C] hover:bg-[#991B1B] text-white text-[11px] uppercase tracking-[0.14em] font-semibold transition-all cursor-pointer disabled:opacity-50"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    className="px-4 py-2 rounded-lg bg-[#B91C1C] hover:bg-[#991B1B] text-white text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete Package'}
                   </button>
