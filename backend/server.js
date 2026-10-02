@@ -51,11 +51,18 @@ app.use(
 );
 
 // 2. Robust CORS Configuration
-const rawOrigins = process.env.CORS_ORIGIN || "http://localhost:5173,http://localhost:3000";
-const allowedOrigins = rawOrigins
-  .split(",")
+const configuredOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.CORS_ORIGIN,
+  "http://localhost:5173",
+  "http://localhost:3000",
+]
+  .filter(Boolean)
+  .flatMap((val) => val.split(","))
   .map((origin) => origin.trim().replace(/\/$/, ""))
   .filter(Boolean);
+
+const allowedOrigins = Array.from(new Set(configuredOrigins));
 
 app.use(
   cors({

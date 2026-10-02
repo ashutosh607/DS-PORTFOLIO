@@ -11,11 +11,11 @@ try {
 const connectDB = async () => {
 
   try {
-    const uri = process.env.MONGODB_URI;
+    const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
     const dbName = process.env.DB_NAME || "ds_portfolio";
 
     if (!uri) {
-      throw new Error("MONGODB_URI is not defined in environment variables");
+      throw new Error("MONGODB_URI (or MONGO_URI) is not defined in environment variables");
     }
 
     const connectionInstance = await mongoose.connect(uri, {

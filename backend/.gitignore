@@ -1,5 +1,6 @@
-node_modules
+node_modules/
 .env
+.env.local
 dist/
 public/temp/*
 !public/temp/.gitkeep
