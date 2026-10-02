@@ -14,7 +14,6 @@ export default function Navbar({ onOpenInquiry }) {
     { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
     { label: 'Collections', ariaLabel: 'Explore photo collections', link: '/collections' },
     { label: 'Services', ariaLabel: 'Photographer services & pricing', link: '/services' },
-    { label: 'Book a Session', ariaLabel: 'Book a photography session', link: '/services#book', isBooking: true },
   ];
 
   const handleMobileMenuClick = (it) => {
