@@ -31,9 +31,9 @@ export default function Navbar({ onOpenInquiry }) {
   };
 
   const socialItems = [
-    { label: 'Instagram', link: 'https://instagram.com' },
+    { label: 'Instagram', link: 'https://www.instagram.com/dishant_shelar_photography/' },
     { label: 'WhatsApp', link: 'https://wa.me/919876543210' },
-    { label: 'Inquiries', link: 'mailto:contact@dsphotography.com' },
+    { label: 'Inquiries', link: 'mailto:ashutoshkadam2406@gmail.com' },
   ];
 
   useEffect(() => {
