@@ -7,6 +7,7 @@ import ServicesPage from './pages/services/ServicesPage';
 import Footer from './components/layout/Footer';
 import InquiryModal from './components/modals/InquiryModal';
 import { PageTransitionProvider } from './components/common/PageTransition';
+import SplashScreen from './components/common/SplashScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import NotFoundPage from './pages/error/NotFoundPage';
 import ErrorPage from './pages/error/ErrorPage';
@@ -35,6 +36,7 @@ function ScrollToTop() {
 export default function App() {
   const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState('');
+  const [splashActive, setSplashActive] = useState(true);
   const location = useLocation();
 
   const isAdminRoute = location.pathname.startsWith('/admin');
@@ -61,6 +63,11 @@ export default function App() {
     <ErrorBoundary>
       <AdminAuthProvider>
         <PageTransitionProvider>
+          {/* Initial Luxury Brand Intro Splash Screen */}
+          {splashActive && !isAdminRoute && (
+            <SplashScreen onComplete={() => setSplashActive(false)} />
+          )}
+
           <div className="portfolio-app-root">
             {/* Auto scroll to top on navigation */}
             <ScrollToTop />
