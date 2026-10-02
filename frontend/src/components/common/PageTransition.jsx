@@ -32,6 +32,7 @@ export function PageTransitionProvider({ children }) {
     if (path === '/') return 'HOME';
     if (path === '/collections') return 'COLLECTIONS';
     if (path === '/services') return 'SERVICES';
+    if (path === '/terms') return 'TERMS & CONDITIONS';
     const clean = path.replace('/', '').toUpperCase();
     return clean || 'PORTFOLIO';
   };

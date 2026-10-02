@@ -11,6 +11,7 @@ import SplashScreen from './components/common/SplashScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import NotFoundPage from './pages/error/NotFoundPage';
 import ErrorPage from './pages/error/ErrorPage';
+import TermsPage from './pages/terms/TermsPage';
 
 // Admin Panel imports
 import { AdminAuthProvider } from './pages/admin/context/AdminAuthContext';
@@ -45,7 +46,8 @@ export default function App() {
     (!isAdminRoute &&
       location.pathname !== '/' &&
       !location.pathname.startsWith('/collections') &&
-      location.pathname !== '/services');
+      location.pathname !== '/services' &&
+      location.pathname !== '/terms');
 
   const showPublicChrome = !isAdminRoute && !isErrorOrNotFoundRoute;
 
@@ -88,6 +90,7 @@ export default function App() {
                 element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
               />
               <Route path="/services" element={<ServicesPage />} />
+              <Route path="/terms" element={<TermsPage onOpenInquiry={handleOpenInquiry} />} />
 
               {/* Dedicated Error Testing Route */}
               <Route path="/error" element={<ErrorPage />} />
