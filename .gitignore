@@ -15,6 +15,11 @@ dist/
 dist-ssr/
 */dist/
 
+# Uploads & User Media (stored locally / Cloudinary, excluded from Git to prevent file size limits)
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+
+
 # Logs
 logs/
 *.log

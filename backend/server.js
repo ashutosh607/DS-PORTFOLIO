@@ -92,6 +92,7 @@ app.use(sanitizeInputs);
 
 app.use(cookieParser());
 app.use("/uploads", express.static(uploadsDir));
+app.use("/categories", express.static(path.resolve(uploadsDir, "ds_portfolio/categories")));
 app.use(express.static("public"));
 
 // 6. Global Rate Limiter for all API routes (protects existing and newly added endpoints)

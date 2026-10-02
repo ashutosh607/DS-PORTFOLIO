@@ -3,4 +3,7 @@ node_modules
 dist/
 public/temp/*
 !public/temp/.gitkeep
+public/uploads/*
+!public/uploads/.gitkeep
+
 
