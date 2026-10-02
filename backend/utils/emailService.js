@@ -4,17 +4,17 @@ const nodemailer = require("nodemailer");
  * Sends automated commission inquiry email directly to the studio admin
  */
 async function sendInquiryEmail(inquiryData) {
-  const recipient = process.env.STUDIO_RECIPIENT_EMAIL || "ashutoshkadam2406@gmail.com";
-  const emailUser = process.env.EMAIL_USER || "ashutoshkadam2406@gmail.com";
+  const recipient = process.env.STUDIO_RECIPIENT_EMAIL || process.env.EMAIL_USER;
+  const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS; // 16-character Google App Password
 
-  if (!emailPass) {
+  if (!emailPass || !emailUser || !recipient) {
     console.warn(
-      "⚠️ [Email Service] EMAIL_PASS is not set in backend/.env. Email not dispatched to inbox. Please provide a Google App Password or SMTP key."
+      "⚠️ [Email Service] EMAIL_USER, EMAIL_PASS, or STUDIO_RECIPIENT_EMAIL is not fully configured in environment variables. Email notification skipped."
     );
     return {
       sent: false,
-      reason: "Missing EMAIL_PASS in environment variables",
+      reason: "Missing email credentials in environment variables",
     };
   }
 

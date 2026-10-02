@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import TextBlurReveal from '../../../components/common/TextBlurReveal';
+import { getApiUrl } from '../../../utils/api';
 
 export default function CollectionsHero({
   onScrollToExplore,
@@ -37,8 +38,9 @@ export default function CollectionsHero({
           }}
           aria-hidden="true"
         >
-          <source src="/uploads/ds_portfolio/categories/landingpagevd.mp4" type="video/mp4" />
-          <source src="/categories/landingpagevd.mp4" type="video/mp4" />
+          <source src={getApiUrl("/uploads/ds_portfolio/categories/landingpagevd.mp4")} type="video/mp4" />
+          <source src={getApiUrl("/categories/landingpagevd.mp4")} type="video/mp4" />
+          <source src="/videos/cinematic-film.mp4" type="video/mp4" />
         </video>
       </motion.div>
 

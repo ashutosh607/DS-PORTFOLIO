@@ -58,7 +58,7 @@ const inquirySchema = new mongoose.Schema(
     },
     recipientEmail: {
       type: String,
-      default: "ashutoshkadam2406@gmail.com",
+      default: "",
     },
     status: {
       type: String,

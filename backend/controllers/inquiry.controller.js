@@ -42,10 +42,10 @@ exports.createInquiry = asyncHandler(async (req, res) => {
     message: message || "",
     source: source || "Website",
     channel: channel || "email",
-    recipientEmail: "ashutoshkadam2406@gmail.com",
+    recipientEmail: process.env.STUDIO_RECIPIENT_EMAIL || process.env.EMAIL_USER || "studio@dsphotography.com",
   });
 
-  // Automatically dispatch email notification to ashutoshkadam2406@gmail.com
+  // Automatically dispatch email notification to studio recipient
   sendInquiryEmail(newInquiry).catch((err) => {
     console.error("Background email dispatch error:", err);
   });

@@ -14,11 +14,14 @@ node_modules/
 dist/
 dist-ssr/
 */dist/
+build/
+.vercel/
 
-# Uploads & User Media (stored locally / Cloudinary, excluded from Git to prevent file size limits)
+# Uploads & Temp Media (excluded from Git to prevent repository bloat)
 backend/public/uploads/*
 !backend/public/uploads/.gitkeep
-
+backend/public/temp/*
+!backend/public/temp/.gitkeep
 
 # Logs
 logs/
@@ -32,6 +35,7 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 .vscode/
+!.vscode/extensions.json
 .idea/
 *.suo
 *.ntvs*

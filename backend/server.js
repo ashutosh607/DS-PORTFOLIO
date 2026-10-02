@@ -50,20 +50,28 @@ app.use(
   })
 );
 
-// 2. Strict CORS Configuration
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+// 2. Robust CORS Configuration
+const rawOrigins = process.env.CORS_ORIGIN || "http://localhost:5173,http://localhost:3000";
+const allowedOrigins = rawOrigins
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/$/, ""))
   .filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+      const cleanOrigin = origin.replace(/\/$/, "");
+
+      const isAllowed =
+        allowedOrigins.includes("*") ||
+        allowedOrigins.includes(cleanOrigin) ||
+        (allowedOrigins.some((o) => o.includes(".vercel.app")) && cleanOrigin.endsWith(".vercel.app"));
+
+      if (isAllowed) {
         return callback(null, true);
       }
-      return callback(new ApiError(403, "CORS origin blocked by security policy"));
+      return callback(new ApiError(403, `CORS origin ${origin} blocked by security policy`));
     },
     credentials: true,
   })

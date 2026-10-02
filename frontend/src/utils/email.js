@@ -1,6 +1,6 @@
 import { formatEventDate, formatTitleCase, getCollectionPrice, formatDisciplines } from './whatsapp';
 
-export const STUDIO_EMAIL = 'ashutoshkadam2406@gmail.com';
+export const STUDIO_EMAIL = import.meta.env.VITE_STUDIO_EMAIL || 'contact@dsphotography.com';
 
 /**
  * Build professional email subject
@@ -128,7 +128,7 @@ export const getGmailUrl = ({
 };
 
 /**
- * Open email directly with pre-composed draft addressed to ashutoshkadam2406@gmail.com
+ * Open email directly with pre-composed draft addressed to studio email
  */
 export const handleEmailSubmit = ({ formData, selectedCollection, inquiryId = '' }) => {
   const gmailUrl = getGmailUrl({ formData, selectedCollection, inquiryId, toEmail: STUDIO_EMAIL });
