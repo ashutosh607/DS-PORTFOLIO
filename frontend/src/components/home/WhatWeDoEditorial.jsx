@@ -592,6 +592,8 @@ export default function WhatWeDoEditorial() {
           {/* Cards 0 through 6 */}
           {PHOTOS.map((src, i) => {
             const floatAnimation = `${i % 2 === 0 ? 'editorialDrift' : 'editorialDriftAlt'} ${5.5 + i * 0.6}s ease-in-out infinite`;
+            const normalShadow = '0 24px 50px -10px rgba(16, 14, 12, 0.32), 0 12px 24px -6px rgba(16, 14, 12, 0.2), 0 3px 8px rgba(16, 14, 12, 0.1)';
+            const hoverShadow = '0 38px 75px -12px rgba(16, 14, 12, 0.44), 0 18px 36px -6px rgba(16, 14, 12, 0.28), 0 4px 12px rgba(16, 14, 12, 0.15)';
 
             return (
               <div
@@ -599,24 +601,27 @@ export default function WhatWeDoEditorial() {
                 ref={(el) => (cardRefs.current[i] = el)}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.zIndex = '65';
+                  e.currentTarget.style.boxShadow = hoverShadow;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.zIndex = `${10 + i}`;
+                  e.currentTarget.style.boxShadow = normalShadow;
                 }}
-                className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-lg overflow-hidden will-change-transform group cursor-pointer shadow-[0_16px_36px_-8px_rgba(16,14,12,0.22)] hover:shadow-[0_28px_56px_-12px_rgba(16,14,12,0.32)]"
+                className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-xl overflow-hidden will-change-transform group cursor-pointer"
                 style={{
                   opacity: i === 0 ? 1 : 0,
                   transform: 'translate3d(0, 0, 0)',
-                  transition: 'box-shadow 0.3s ease-out',
+                  boxShadow: normalShadow,
+                  transition: 'box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
               >
                 {/* Inner Breathing/Floating Drift Wrapper */}
                 <div
-                  className="w-full h-full relative overflow-hidden rounded-lg"
+                  className="w-full h-full relative overflow-hidden rounded-xl"
                   style={{ animation: floatAnimation }}
                 >
                   {/* Clean Borderless Archival Photograph */}
-                  <div className="w-full h-full overflow-hidden rounded-lg relative">
+                  <div className="w-full h-full overflow-hidden rounded-xl relative">
                     <img
                       src={src}
                       alt={`Atelier Portfolio Print ${i + 1}`}
@@ -630,7 +635,7 @@ export default function WhatWeDoEditorial() {
                   </div>
 
                   {/* Subtle Minimal Archival Plate Watermark on Hover */}
-                  <div className="absolute bottom-1 left-1.5 right-1.5 flex items-center justify-between text-[0.45rem] font-mono tracking-widest text-white/90 uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between text-[0.45rem] font-mono tracking-widest text-white/90 uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                     <span>PLATE 0{i + 1}</span>
                     <span>ATELIER PROOF</span>
                   </div>
