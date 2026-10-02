@@ -62,7 +62,7 @@ export default function LocationMapSection({
             width="100%"
             height="100%"
             style={{ border: 0, filter: 'contrast(102%) brightness(99%)' }}
-            allowFullScreen=""
+            allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />
