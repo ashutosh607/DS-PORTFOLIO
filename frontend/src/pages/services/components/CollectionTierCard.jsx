@@ -123,19 +123,17 @@ export default function CollectionTierCard({
         padding: '32px',
         boxSizing: 'border-box',
       }}
-      className={`group relative h-full flex flex-col justify-between rounded-2xl transition-all duration-300 ease-out ${
-        isDragging
+      className={`group relative h-full flex flex-col justify-between rounded-2xl transition-all duration-300 ease-out ${isDragging
           ? 'opacity-40 border-[#101010] shadow-lg'
           : isOver
-          ? 'border-[#9E8159] shadow-md bg-[#FAF6F0]'
-          : isSelected
-          ? 'bg-[#FAF8F5] border-2 border-[#101010] shadow-[0_8px_32px_-6px_rgba(16,16,16,0.12)] -translate-y-1'
-          : isRecommended
-          ? 'bg-[#FAF8F5] border border-[#D5CBB9] shadow-[0_4px_24px_-6px_rgba(16,16,16,0.05)] hover:border-[#101010]/50 hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.08)]'
-          : 'bg-[#FDFCF8] border border-[#E3DBCC] shadow-[0_2px_20px_-6px_rgba(16,16,16,0.04)] hover:border-[#C5B7A4] hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.07)]'
-      } ${isAdmin ? 'cursor-grab active:cursor-grabbing' : ''} ${
-        collection.isActive === false ? 'opacity-70' : ''
-      }`}
+            ? 'border-[#9E8159] shadow-md bg-[#FAF6F0]'
+            : isSelected
+              ? 'bg-[#FAF8F5] border-2 border-[#101010] shadow-[0_8px_32px_-6px_rgba(16,16,16,0.12)] -translate-y-1'
+              : isRecommended
+                ? 'bg-[#FAF8F5] border border-[#D5CBB9] shadow-[0_4px_24px_-6px_rgba(16,16,16,0.05)] hover:border-[#101010]/50 hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.08)]'
+                : 'bg-[#FDFCF8] border border-[#E3DBCC] shadow-[0_2px_20px_-6px_rgba(16,16,16,0.04)] hover:border-[#C5B7A4] hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.07)]'
+        } ${isAdmin ? 'cursor-grab active:cursor-grabbing' : ''} ${collection.isActive === false ? 'opacity-70' : ''
+        }`}
     >
       <div className="flex-1 flex flex-col">
         {/* =========================================================
@@ -176,11 +174,10 @@ export default function CollectionTierCard({
                   e.stopPropagation();
                   if (onToggleActive) onToggleActive(collection, e);
                 }}
-                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] uppercase tracking-[0.14em] font-medium transition-colors cursor-pointer ${
-                  collection.isActive !== false
+                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] uppercase tracking-[0.14em] font-medium transition-colors cursor-pointer ${collection.isActive !== false
                     ? 'bg-[#101010] text-[#FDFCF8] hover:bg-[#2A2825]'
                     : 'bg-red-800/80 text-white hover:bg-red-700'
-                }`}
+                  }`}
                 title={collection.isActive !== false ? 'Visible on public site' : 'Hidden draft'}
               >
                 {collection.isActive !== false ? (

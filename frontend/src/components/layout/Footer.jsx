@@ -62,7 +62,7 @@ export default function Footer({ onOpenInquiry }) {
       >
         {/* Main Balanced Multi-Column Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-14 pb-14 border-b border-[#E3DBCC]/10 items-start">
-          
+
           {/* Left Branding Block with Side-by-Side Logo (6 columns) */}
           <div className="md:col-span-6 space-y-4 pr-0 lg:pr-12">
             {/* Side-by-Side Logo & Studio Identity */}

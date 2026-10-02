@@ -61,7 +61,7 @@ export default function AboutSection({ imageUrl = null }) {
                   />
                   {/* Subtle inner editorial vignette / film border */}
                   <div className="about-portrait-overlay" aria-hidden="true" />
-                  
+
                   {/* Editorial identification pill tag */}
                   <div className="about-portrait-badge">
                     <span className="about-badge-dot" />
@@ -196,7 +196,8 @@ export default function AboutSection({ imageUrl = null }) {
       </div>
 
       {/* Scoped CSS for Editorial Typography, Grid & Responsive Spacing */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         /* Main 2-Column Asymmetric Composition */
         .about-editorial-grid {
           display: grid;

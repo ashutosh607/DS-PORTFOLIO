@@ -76,7 +76,7 @@ function FlipFlyingClone({ flipState, onFinish }) {
       try {
         outerAnim.cancel();
         innerAnim.cancel();
-      } catch (err) {}
+      } catch (err) { }
     };
   }, [deltaX, deltaY, scaleX, scaleY, counterRatio, onFinish]);
 
@@ -364,7 +364,7 @@ export default function CollectionsGallery({
 
             {/* ─── MAIN SHOWCASE: Sticky Large Left Photo + Scrollable Right Grid ─── */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-10 items-start">
-              
+
               {/* ─── LEFT: Stationary Large Master Frame (7 Cols) ─── */}
               <div className="lg:col-span-7 lg:sticky lg:top-24">
                 <div
@@ -509,11 +509,10 @@ export default function CollectionsGallery({
                         <div
                           key={itemKey}
                           onClick={() => handleThumbnailClick(item, idx)}
-                          className={`group relative bg-white rounded-[4px] border overflow-hidden cursor-pointer transition-all duration-250 ${
-                            isCurrent
+                          className={`group relative bg-white rounded-[4px] border overflow-hidden cursor-pointer transition-all duration-250 ${isCurrent
                               ? 'border-[#101010] ring-2 ring-[#101010] shadow-[0_16px_32px_-8px_rgba(20,18,15,0.22)] -translate-y-0.5'
                               : 'border-[#E2DACD] shadow-[0_6px_16px_-4px_rgba(20,18,15,0.06)] hover:border-[#101010]/60 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-6px_rgba(20,18,15,0.12)]'
-                          }`}
+                            }`}
                           style={{
                             padding: '6px',
                           }}

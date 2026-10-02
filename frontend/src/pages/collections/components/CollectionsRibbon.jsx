@@ -420,11 +420,10 @@ export default function CollectionsRibbon({
               key={cat.id}
               type="button"
               onClick={() => onSelectCategory(cat.id)}
-              className={`font-sans text-[10px] uppercase tracking-[0.14em] px-2.5 py-1 rounded-full transition-all duration-300 cursor-pointer ${
-                isActive
+              className={`font-sans text-[10px] uppercase tracking-[0.14em] px-2.5 py-1 rounded-full transition-all duration-300 cursor-pointer ${isActive
                   ? 'bg-[#101010] text-[#FDFCF8] font-medium shadow-sm'
                   : 'bg-[#EAE4D8] text-[#6B655B] hover:bg-[#DDD6C8]'
-              }`}
+                }`}
             >
               {cat.name}
             </button>

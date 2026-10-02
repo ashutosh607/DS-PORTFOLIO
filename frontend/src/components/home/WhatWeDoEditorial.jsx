@@ -28,22 +28,22 @@ const PHOTOS = [
  */
 const DESKTOP_RESTING = [
   { x: -290, y: -120, rotate: -3.0 }, // 0: Top-Left
-  { x: 280,  y: -130, rotate: 2.5 },  // 1: Top-Right
-  { x: -170, y: 55,   rotate: 1.5 },  // 2: Center-Left
-  { x: 165,  y: 65,   rotate: -2.0 }, // 3: Center-Right
-  { x: -350, y: 130,  rotate: -3.5 }, // 4: Far-Left Lower
-  { x: 345,  y: 120,  rotate: 3.0 },  // 5: Far-Right Lower
-  { x: 0,    y: -15,  rotate: -0.5 }, // 6: Center Finale
+  { x: 280, y: -130, rotate: 2.5 },  // 1: Top-Right
+  { x: -170, y: 55, rotate: 1.5 },  // 2: Center-Left
+  { x: 165, y: 65, rotate: -2.0 }, // 3: Center-Right
+  { x: -350, y: 130, rotate: -3.5 }, // 4: Far-Left Lower
+  { x: 345, y: 120, rotate: 3.0 },  // 5: Far-Right Lower
+  { x: 0, y: -15, rotate: -0.5 }, // 6: Center Finale
 ];
 
 const MOBILE_RESTING = [
   { x: -62, y: -70, rotate: -2.5 }, // 0: Upper-Left
-  { x: 62,  y: -60, rotate: 2.5 },  // 1: Upper-Right
-  { x: -60, y: 0,   rotate: 1.5 },  // 2: Mid-Left
-  { x: 60,  y: 10,  rotate: -1.5 }, // 3: Mid-Right
-  { x: -62, y: 70,  rotate: -2.5 }, // 4: Lower-Left
-  { x: 62,  y: 80,  rotate: 2.5 },  // 5: Lower-Right
-  { x: 0,   y: 105, rotate: 0.0 },  // 6: Bottom Center
+  { x: 62, y: -60, rotate: 2.5 },  // 1: Upper-Right
+  { x: -60, y: 0, rotate: 1.5 },  // 2: Mid-Left
+  { x: 60, y: 10, rotate: -1.5 }, // 3: Mid-Right
+  { x: -62, y: 70, rotate: -2.5 }, // 4: Lower-Left
+  { x: 62, y: 80, rotate: 2.5 },  // 5: Lower-Right
+  { x: 0, y: 105, rotate: 0.0 },  // 6: Bottom Center
 ];
 
 /**

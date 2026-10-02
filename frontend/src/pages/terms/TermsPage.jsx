@@ -60,7 +60,7 @@ export default function TermsPage({ onOpenInquiry }) {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1E1B18] pt-28 sm:pt-36 pb-24 selection:bg-[#E3DBCC] selection:text-[#101010]">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
-        
+
         {/* ===================================================================
             BREADCRUMB & BACK LINK
             =================================================================== */}

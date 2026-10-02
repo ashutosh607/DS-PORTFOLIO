@@ -39,7 +39,7 @@ export default function ServicesPage() {
           setBackendCategories(json.data);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Fetch all active services to determine which categories are published
@@ -108,8 +108,8 @@ export default function ServicesPage() {
       servicesLoaded && allActiveServices.length > 0
         ? allActiveServices
         : !servicesLoaded
-        ? COLLECTIONS
-        : allActiveServices;
+          ? COLLECTIONS
+          : allActiveServices;
 
     return candidateCategories.filter((cat) => {
       const catKey = toCanonicalKey(cat.id);
@@ -327,8 +327,8 @@ export default function ServicesPage() {
     normalizedDynamicList.length > 0
       ? normalizedDynamicList
       : allActiveServices.length === 0
-      ? filteredStaticCollections
-      : [];
+        ? filteredStaticCollections
+        : [];
 
   const selectedCollection =
     activeCollections.find(
@@ -543,8 +543,8 @@ export default function ServicesPage() {
                         type="button"
                         onClick={() => handleCategorySelect(cat.id)}
                         className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer pb-1.5 border-b ${isCatSelected
-                            ? 'text-[#101010] font-semibold border-[#101010]'
-                            : 'text-[#7A7770] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
+                          ? 'text-[#101010] font-semibold border-[#101010]'
+                          : 'text-[#7A7770] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
                           }`}
                       >
                         {cat.label}
