@@ -11,6 +11,7 @@ import BookingBriefForm from './components/BookingBriefForm';
 import ConfirmationScreen from './components/ConfirmationScreen';
 import LocationMapSection from './components/LocationMapSection';
 import { handleWhatsAppSubmit } from '../../utils/whatsapp';
+import { handleEmailSubmit } from '../../utils/email';
 
 export default function ServicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -377,13 +378,17 @@ export default function ServicesPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleFormSubmit = async () => {
+  const handleFormSubmit = async (channel = 'whatsapp') => {
     setIsSubmitting(true);
     const generatedRef = `RL-2025-${Math.floor(100 + Math.random() * 900)}`;
     setInquiryId(generatedRef);
 
-    // 1. Open WhatsApp with pre-filled encoded message synchronously (preserves user gesture)
-    handleWhatsAppSubmit({ formData, selectedCollection });
+    // 1. Open WhatsApp or Email with pre-filled message synchronously (preserves user gesture)
+    if (channel === 'email') {
+      handleEmailSubmit({ formData, selectedCollection, inquiryId: generatedRef });
+    } else {
+      handleWhatsAppSubmit({ formData, selectedCollection });
+    }
 
     // 2. Background persistence resilience
     try {
@@ -393,6 +398,7 @@ export default function ServicesPage() {
         body: JSON.stringify({
           inquiryId: generatedRef,
           collection: selectedCollection.title,
+          channel,
           ...formData,
           createdAt: new Date().toISOString(),
         }),
@@ -401,10 +407,10 @@ export default function ServicesPage() {
       // Resilience
     }
 
-    // 3. Keep current page intact and reset submission status after debounce
+    // 3. Directly dispatch to WhatsApp or Email without intermediate confirmation screen
     setTimeout(() => {
       setIsSubmitting(false);
-    }, 1200);
+    }, 800);
   };
 
   const handleReset = () => {

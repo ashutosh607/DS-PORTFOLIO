@@ -7,6 +7,7 @@ import {
   COLLECTIONS,
 } from '../data/servicesData';
 import { handleWhatsAppSubmit } from '../../../utils/whatsapp';
+import { handleEmailSubmit } from '../../../utils/email';
 import LocationSearchInput from './LocationSearchInput';
 
 export default function BookingBriefForm({
@@ -48,8 +49,8 @@ export default function BookingBriefForm({
     }
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
+  const handleFormSubmit = (e, channel = 'whatsapp') => {
+    if (e && e.preventDefault) e.preventDefault();
     const newErrors = {};
 
     if (!formData.name?.trim()) {
@@ -86,9 +87,13 @@ export default function BookingBriefForm({
 
     setErrors({});
     if (onSubmit) {
-      onSubmit();
+      onSubmit(channel);
     } else {
-      handleWhatsAppSubmit({ formData, selectedCollection });
+      if (channel === 'email') {
+        handleEmailSubmit({ formData, selectedCollection });
+      } else {
+        handleWhatsAppSubmit({ formData, selectedCollection });
+      }
     }
   };
 
@@ -959,48 +964,88 @@ export default function BookingBriefForm({
           <span>RETURN TO COLLECTIONS</span>
         </button>
 
-        <div className="w-full sm:w-auto flex flex-col items-start sm:items-end">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            style={{
-              minWidth: '280px',
-              minHeight: '54px',
-              padding: '14px 28px',
-              borderRadius: '999px',
-              background: '#101010',
-              color: '#FDFCF8',
-              fontSize: '12.5px',
-              fontWeight: 600,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '12px',
-              transition: 'all 250ms ease',
-              boxSizing: 'border-box',
-            }}
-            className="w-full sm:w-auto hover:-translate-y-0.5 hover:bg-[#262422] shadow-md group"
-          >
-            <span>SUBMIT &amp; CONTINUE TO WHATSAPP</span>
-            <span className="transform transition-transform duration-200 group-hover:translate-x-1">
-              →
-            </span>
-          </button>
+        <div className="w-full sm:w-auto flex flex-col items-stretch sm:items-end gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            {/* 1. Submit & Continue to WhatsApp */}
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={(e) => handleFormSubmit(e, 'whatsapp')}
+              style={{
+                minWidth: '260px',
+                minHeight: '52px',
+                padding: '13px 24px',
+                borderRadius: '999px',
+                background: '#101010',
+                color: '#FDFCF8',
+                fontSize: '11.5px',
+                fontWeight: 600,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                border: '1.5px solid #101010',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                transition: 'all 250ms ease',
+                boxSizing: 'border-box',
+              }}
+              className="w-full sm:w-auto hover:-translate-y-0.5 hover:bg-[#262422] shadow-md group"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#25D366]">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+              </svg>
+              <span>SUBMIT &amp; CONTINUE TO WHATSAPP</span>
+              <span className="transform transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </button>
+
+            {/* 2. Submit & Continue to Email */}
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={(e) => handleFormSubmit(e, 'email')}
+              style={{
+                minWidth: '260px',
+                minHeight: '52px',
+                padding: '13px 24px',
+                borderRadius: '999px',
+                background: '#FAF8F5',
+                color: '#101010',
+                fontSize: '11.5px',
+                fontWeight: 600,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                border: '1.5px solid #101010',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                transition: 'all 250ms ease',
+                boxSizing: 'border-box',
+              }}
+              className="w-full sm:w-auto hover:-translate-y-0.5 hover:bg-[#101010] hover:text-[#FAF8F5] shadow-sm group"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="20" height="16" x="2" y="4" rx="2" />
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+              <span>SUBMIT &amp; CONTINUE TO EMAIL</span>
+              <span className="transform transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </button>
+          </div>
 
           <p
             data-testid="submit-explanatory-text"
             style={{
-              marginTop: '24px',
+              marginTop: '12px',
               fontSize: '12px',
               color: '#7A7770',
               fontFamily: 'var(--font-sans)',
             }}
           >
-            Submitting opens a pre-composed WhatsApp brief directly with the atelier.
+            Submitting instantly generates a pre-composed atelier brief via WhatsApp or your Email client.
           </p>
         </div>
       </div>

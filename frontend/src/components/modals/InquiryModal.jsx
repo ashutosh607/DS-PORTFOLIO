@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { handleWhatsAppSubmit } from '../../utils/whatsapp';
+import { handleEmailSubmit } from '../../utils/email';
 
 export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
   const [name, setName] = useState('');
@@ -15,12 +17,29 @@ export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (e, channel = 'whatsapp') => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!name.trim() || !email.trim()) return;
+
+    const modalFormData = {
+      name,
+      email,
+      eventType: scope,
+      message: details,
+      source: 'Direct Website Inquiry',
+    };
+    const modalCollection = {
+      title: scope,
+      price: 'Custom Quote',
+    };
+
+    if (channel === 'email') {
+      handleEmailSubmit({ formData: modalFormData, selectedCollection: modalCollection });
+    } else {
+      handleWhatsAppSubmit({ formData: modalFormData, selectedCollection: modalCollection });
+    }
+
     setIsSuccess(true);
-    setTimeout(() => {
-      // auto close or let them close
-    }, 4000);
   };
 
   return (
@@ -269,13 +288,68 @@ export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
               />
             </div>
 
-            <button
-              type="submit"
-              className="btn-primary"
-              style={{ width: '100%', padding: '1rem', marginTop: '0.5rem' }}
-            >
-              Send Commission Request
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={(e) => handleSubmit(e, 'whatsapp')}
+                style={{
+                  width: '100%',
+                  padding: '0.85rem 1.25rem',
+                  backgroundColor: '#101010',
+                  color: '#FDFCF8',
+                  borderRadius: '999px',
+                  border: '1.5px solid #101010',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.65rem',
+                  transition: 'all 0.25s ease',
+                }}
+                className="hover:-translate-y-0.5 hover:bg-[#242424]"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#25D366]">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                </svg>
+                <span>CONTINUE TO WHATSAPP →</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => handleSubmit(e, 'email')}
+                style={{
+                  width: '100%',
+                  padding: '0.85rem 1.25rem',
+                  backgroundColor: 'var(--color-ivory)',
+                  color: 'var(--color-obsidian)',
+                  borderRadius: '999px',
+                  border: '1.5px solid var(--color-obsidian)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.65rem',
+                  transition: 'all 0.25s ease',
+                }}
+                className="hover:-translate-y-0.5 hover:bg-[#101010] hover:text-[#FAF8F5]"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+                <span>CONTINUE TO EMAIL →</span>
+              </button>
+            </div>
           </form>
         )}
       </div>
