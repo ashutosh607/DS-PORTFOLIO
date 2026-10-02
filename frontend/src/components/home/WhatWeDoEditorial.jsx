@@ -586,7 +586,7 @@ export default function WhatWeDoEditorial() {
           {/* Deck Physical Stack Base / Mat Outline */}
           <div
             ref={matRef}
-            className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-[2px] bg-[#E3DBCC]/25 border border-[#E3DBCC]/60 pointer-events-none -z-10 shadow-[0_8px_24px_-8px_rgba(16,14,12,0.08)] will-change-transform"
+            className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-lg bg-[#E3DBCC]/20 pointer-events-none -z-10 shadow-[0_8px_24px_-8px_rgba(16,14,12,0.08)] will-change-transform"
           />
 
           {/* Cards 0 through 6 */}
@@ -603,7 +603,7 @@ export default function WhatWeDoEditorial() {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.zIndex = `${10 + i}`;
                 }}
-                className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] bg-[#F3F0E9] p-1.5 sm:p-2 border-[1.5px] border-[#101010] rounded-[2px] will-change-transform group cursor-pointer shadow-[0_14px_32px_-10px_rgba(16,14,12,0.18)] hover:shadow-[0_26px_54px_-14px_rgba(16,14,12,0.28)]"
+                className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-lg overflow-hidden will-change-transform group cursor-pointer shadow-[0_16px_36px_-8px_rgba(16,14,12,0.22)] hover:shadow-[0_28px_56px_-12px_rgba(16,14,12,0.32)]"
                 style={{
                   opacity: i === 0 ? 1 : 0,
                   transform: 'translate3d(0, 0, 0)',
@@ -612,11 +612,11 @@ export default function WhatWeDoEditorial() {
               >
                 {/* Inner Breathing/Floating Drift Wrapper */}
                 <div
-                  className="w-full h-full relative"
+                  className="w-full h-full relative overflow-hidden rounded-lg"
                   style={{ animation: floatAnimation }}
                 >
-                  {/* Inner Ivory Mat Border & Archival Photograph */}
-                  <div className="w-full h-full overflow-hidden border border-[#E3DBCC] rounded-[1px] bg-[#E3DBCC]/20 relative">
+                  {/* Clean Borderless Archival Photograph */}
+                  <div className="w-full h-full overflow-hidden rounded-lg relative">
                     <img
                       src={src}
                       alt={`Atelier Portfolio Print ${i + 1}`}
