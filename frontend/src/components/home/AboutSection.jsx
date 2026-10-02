@@ -1,5 +1,5 @@
 import React from 'react';
-import PhotoPlaceholder from '../common/PhotoPlaceholder';
+import photographerImg from '../../assets/photographer.jpg';
 
 /**
  * Editorial About Section — Dishant (DS Photography & Films)
@@ -13,6 +13,8 @@ import PhotoPlaceholder from '../common/PhotoPlaceholder';
  * - Generous 100–140px desktop breathing room
  */
 export default function AboutSection({ imageUrl = null }) {
+  const activeImage = imageUrl || photographerImg;
+
   return (
     <section
       id="about"
@@ -48,17 +50,26 @@ export default function AboutSection({ imageUrl = null }) {
                 aria-hidden="true"
               />
 
-              {/* Single Photographer Portrait Image Placeholder */}
+              {/* Single Photographer Portrait Image */}
               <div className="about-portrait-frame">
-                <PhotoPlaceholder
-                  imageUrl={imageUrl}
-                  aspectRatio="4/5"
-                  label="DISHANT · PORTRAIT"
-                  meta="DS PHOTOGRAPHY & FILMS"
-                  title="Studio Portrait"
-                  borderRadius="14px"
-                  dark={false}
-                />
+                <div className="about-portrait-img-container">
+                  <img
+                    src={activeImage}
+                    alt="Dishant — Photographer & Visual Storyteller"
+                    className="about-portrait-img"
+                    loading="lazy"
+                  />
+                  {/* Subtle inner editorial vignette / film border */}
+                  <div className="about-portrait-overlay" aria-hidden="true" />
+                  
+                  {/* Editorial identification pill tag */}
+                  <div className="about-portrait-badge">
+                    <span className="about-badge-dot" />
+                    <span className="about-badge-text">
+                      DISHANT · DS PHOTOGRAPHY
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -249,6 +260,66 @@ export default function AboutSection({ imageUrl = null }) {
           box-shadow: 0 20px 45px -15px rgba(16, 16, 16, 0.08);
           border: 1px solid var(--color-nude, #E3DBCC);
           background-color: var(--color-ivory, #F3F0E9);
+        }
+
+        .about-portrait-img-container {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 4/5;
+          overflow: hidden;
+          background-color: var(--color-ivory, #F3F0E9);
+        }
+
+        .about-portrait-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 22%;
+          display: block;
+          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .about-portrait-frame:hover .about-portrait-img {
+          transform: scale(1.03);
+        }
+
+        .about-portrait-overlay {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), inset 0 -40px 60px -20px rgba(16, 16, 16, 0.25);
+        }
+
+        .about-portrait-badge {
+          position: absolute;
+          bottom: 16px;
+          left: 16px;
+          padding: 6px 12px;
+          border-radius: 999px;
+          background-color: rgba(16, 16, 16, 0.68);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          pointer-events: none;
+        }
+
+        .about-badge-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: #E3DBCC;
+        }
+
+        .about-badge-text {
+          font-family: var(--font-sans);
+          font-size: 0.65rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: #FDFCF8;
+          font-weight: 600;
         }
 
         /* Bottom-Left Corner Tagline */

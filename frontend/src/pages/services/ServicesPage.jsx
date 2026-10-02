@@ -9,7 +9,6 @@ import CompareMatrixModal from './components/CompareMatrixModal';
 import CommissionSummaryCard from './components/CommissionSummaryCard';
 import BookingBriefForm from './components/BookingBriefForm';
 import ConfirmationScreen from './components/ConfirmationScreen';
-import LocationMapSection from './components/LocationMapSection';
 import { handleWhatsAppSubmit } from '../../utils/whatsapp';
 import { handleEmailSubmit } from '../../utils/email';
 
@@ -586,12 +585,6 @@ export default function ServicesPage() {
               {/* Connected Atelier Standards Section with generous 140px whitespace */}
               <AtelierStandards />
 
-              {/* Destination Map Section */}
-              <LocationMapSection
-                location={formData.location}
-                coordinates={formData.coordinates}
-                venue={formData.venue}
-              />
             </motion.div>
           )}
 
@@ -691,12 +684,6 @@ export default function ServicesPage() {
                 </div>
               </div>
 
-              {/* Destination Map Section */}
-              <LocationMapSection
-                location={formData.location}
-                coordinates={formData.coordinates}
-                venue={formData.venue}
-              />
             </motion.div>
           )}
 

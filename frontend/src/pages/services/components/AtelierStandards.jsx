@@ -4,18 +4,18 @@ export default function AtelierStandards() {
   const standards = [
     {
       num: '01',
-      title: 'Dual-Medium Mastery',
-      description: 'Simultaneous digital raw capture and traditional grain analog film cameras on location worldwide.',
+      title: 'Traditional Photography',
+      description: 'Comprehensive coverage capturing sacred rituals, family portraits, and authentic emotional moments.',
     },
     {
       num: '02',
-      title: 'Encrypted Private Vault',
-      description: 'Permanent cloud preservation, 10-year archival security, and full laboratory resolution access.',
+      title: 'Traditional Videography',
+      description: 'Multi-angle cinematic documentation preserving the vows, ceremonies, and festive celebrations in high definition.',
     },
     {
       num: '03',
-      title: 'Museum Box Delivery',
-      description: 'Complimentary white-glove hand delivery of your signed archival print folio box and fine art papers.',
+      title: 'Album — 300 Selected Photos',
+      description: 'A bespoke handcrafted heirloom album featuring 300 individually retouched master photographs on fine art paper.',
     },
   ];
 

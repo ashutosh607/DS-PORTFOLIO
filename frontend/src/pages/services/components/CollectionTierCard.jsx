@@ -7,6 +7,9 @@ const condenseDeliverable = (item) => {
   const text = item.trim();
 
   const editorialMap = {
+    'Traditional Photography': 'Traditional Photography',
+    'Traditional Videography': 'Traditional Videography',
+    'Album — 300 Selected Photos': '300-Photo Archival Album',
     'Lead principal photographer + associate': 'Principal & Associate Lead',
     '35mm analog film rolls (Portra 400 & HP5)': '35mm Analog Film Rolls',
     '35mm analog film rolls (Portra 400)': '35mm Analog Film Rolls',
