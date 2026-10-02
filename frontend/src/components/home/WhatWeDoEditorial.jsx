@@ -1,18 +1,24 @@
 import React, { useRef, useState, useEffect } from 'react';
 
+import img01 from '../../assets/landing-down-animation/612A9674.jpg';
+import img02 from '../../assets/landing-down-animation/DSP09982.jpg';
+import img03 from '../../assets/landing-down-animation/IMG_1186.jpg';
+import img04 from '../../assets/landing-down-animation/IMG_7783.jpg';
+import img05 from '../../assets/landing-down-animation/IMG_7785.JPG';
+import img06 from '../../assets/landing-down-animation/_0005916.JPG';
+import img07 from '../../assets/landing-down-animation/_0006027.jpg';
+
 /**
- * PHASE 9 — PHOTO COUNT & ASSETS
- * 7 Curated atelier photographs, all identically cropped to 3:4 aspect ratio.
- * Sized to w=500 (optimal 2x retina for max 190px card display) to avoid GPU rasterization overhead.
+ * 7 Curated atelier photographs from assets/landing-down-animation.
  */
 const PHOTOS = [
-  'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=500&auto=format&fit=crop', // 0: Veil & Monolith
-  'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=500&auto=format&fit=crop', // 1: Coastal Promenade
-  'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=500&auto=format&fit=crop', // 2: Fine Lace Study
-  'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=500&auto=format&fit=crop', // 3: Intimate Gaze
-  'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=500&auto=format&fit=crop', // 4: Meadow Embrace
-  'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=500&auto=format&fit=crop', // 5: Terrace Ceremony
-  'https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=500&auto=format&fit=crop', // 6: Artisanal Bouquet
+  img01,
+  img02,
+  img03,
+  img04,
+  img05,
+  img06,
+  img07,
 ];
 
 /**
