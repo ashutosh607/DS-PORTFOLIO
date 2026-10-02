@@ -176,7 +176,6 @@ export default function WhatWeDoEditorial() {
   const containerRef = useRef(null);
   const stageRef = useRef(null);
   const matRef = useRef(null);
-  const progressFillRef = useRef(null);
   const counterRef = useRef(null);
 
   // Direct element references for 60fps GPU mutations without React re-renders
@@ -258,11 +257,6 @@ export default function WhatWeDoEditorial() {
       // 2. Mat Base Offset
       if (matRef.current) {
         matRef.current.style.transform = `translate3d(${mouse.x * 4}px, ${mouse.y * 3}px, 0)`;
-      }
-
-      // 3. Hairline Progress Bar (scaleX is pure GPU composited, zero layout reflow!)
-      if (progressFillRef.current) {
-        progressFillRef.current.style.transform = `scaleX(${progress})`;
       }
 
       // 4. Odometer Card Count
@@ -741,30 +735,6 @@ export default function WhatWeDoEditorial() {
           ))}
         </div>
 
-        {/* =================================================================
-            BOTTOM ARCHIVAL FOOTER: Hairline Progress & Status
-            ================================================================= */}
-        <div className="w-full max-w-[1400px] flex flex-col gap-2 pointer-events-none z-30 -translate-y-[40px] md:translate-y-0">
-          {/* Hairline Scrub Progress Line with GPU ScaleX */}
-          <div className="w-full h-[1px] bg-[#E3DBCC]/60 relative overflow-hidden">
-            <div
-              ref={progressFillRef}
-              className="absolute top-0 left-0 h-full w-full bg-[#101010] origin-left will-change-transform"
-              style={{ transform: 'scaleX(0)' }}
-            />
-          </div>
-
-          <div className="w-full flex items-center justify-between font-mono text-[0.58rem] sm:text-[0.64rem] tracking-[0.22em] text-[#7A7770] uppercase">
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#101010] animate-pulse" />
-              <span className="text-[#101010] font-medium">SCROLL ARCHIVE</span>
-            </div>
-
-            <div className="hidden sm:flex items-center gap-1.5">
-              <span>FINE ART 35MM COLLECTION</span>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Image as ImageIcon } from 'lucide-react';
+import TextBlurReveal from '../../../components/common/TextBlurReveal';
 
 /**
  * Shared-element FLIP Flying Clone Component
@@ -336,11 +337,11 @@ export default function CollectionsGallery({
                       lineHeight: 1,
                     }}
                   >
-                    {activeCategory.name}
+                    <TextBlurReveal text={activeCategory.name} delay={0.05} />
                   </h2>
                 </div>
 
-                <p
+                <div
                   style={{
                     fontFamily: 'var(--font-sans)',
                     fontSize: 'clamp(0.875rem, 1vw, 0.975rem)',
@@ -348,8 +349,8 @@ export default function CollectionsGallery({
                     maxWidth: '520px',
                   }}
                 >
-                  {activeCategory.tagline}
-                </p>
+                  <TextBlurReveal text={activeCategory.tagline} delay={0.15} />
+                </div>
               </div>
 
               {/* Minimal Frame Count Indicator */}
@@ -506,8 +507,16 @@ export default function CollectionsGallery({
                       const itemKey = item.id || `thumb-${idx}`;
 
                       return (
-                        <div
+                        <motion.div
                           key={itemKey}
+                          initial={{ opacity: 0, y: 16, scale: 0.96 }}
+                          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                          viewport={{ once: true, margin: '-20px' }}
+                          transition={{
+                            duration: 0.45,
+                            delay: (idx % 6) * 0.05,
+                            ease: [0.16, 1, 0.3, 1],
+                          }}
                           onClick={() => handleThumbnailClick(item, idx)}
                           className={`group relative bg-white rounded-[4px] border overflow-hidden cursor-pointer transition-all duration-250 ${isCurrent
                               ? 'border-[#101010] ring-2 ring-[#101010] shadow-[0_16px_32px_-8px_rgba(20,18,15,0.22)] -translate-y-0.5'
@@ -584,7 +593,7 @@ export default function CollectionsGallery({
                               </p>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
                   </div>

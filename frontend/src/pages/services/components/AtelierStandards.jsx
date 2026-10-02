@@ -1,4 +1,6 @@
 import React from 'react';
+import TextBlurReveal from '../../../components/common/TextBlurReveal';
+import ScrollCardReveal from '../../../components/common/ScrollCardReveal';
 
 export default function AtelierStandards() {
   const standards = [
@@ -29,11 +31,19 @@ export default function AtelierStandards() {
     >
       {/* Centered Section Header */}
       <div className="text-center max-w-xl mx-auto mb-16 sm:mb-20">
-        <span className="font-sans text-[9px] sm:text-[10px] font-semibold tracking-[0.25em] text-[#7A7770] uppercase block mb-3">
-          ATELIER STANDARDS
-        </span>
+        <TextBlurReveal
+          text="ATELIER STANDARDS"
+          blurAmount={6}
+          delay={0.05}
+          className="font-sans text-[9px] sm:text-[10px] font-semibold tracking-[0.25em] text-[#7A7770] uppercase block mb-3"
+        />
 
-        <h2
+        <TextBlurReveal
+          as="h2"
+          text="Every Commission Includes"
+          blurAmount={12}
+          stagger={0.06}
+          delay={0.12}
           style={{
             fontFamily: 'var(--font-serif)',
             fontSize: 'clamp(2.2rem, 3.5vw, 3rem)',
@@ -42,19 +52,28 @@ export default function AtelierStandards() {
             color: 'var(--color-obsidian)',
             marginBottom: '1rem',
           }}
-        >
-          Every Commission Includes
-        </h2>
+        />
 
-        <p className="font-serif italic text-sm sm:text-base text-[#7A7770] leading-relaxed max-w-md mx-auto">
-          Regardless of your selected suite, every client receives sovereign attention and artisanal laboratory post-production.
-        </p>
+        <TextBlurReveal
+          as="p"
+          text="Regardless of your selected suite, every client receives sovereign attention and artisanal laboratory post-production."
+          blurAmount={8}
+          delay={0.25}
+          className="font-serif italic text-sm sm:text-base text-[#7A7770] leading-relaxed max-w-md mx-auto"
+        />
       </div>
 
       {/* 3-Column Editorial Manifesto Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 sm:gap-14 lg:gap-[70px]">
         {standards.map((item, idx) => (
-          <div key={idx} className="space-y-3">
+          <ScrollCardReveal
+            key={idx}
+            index={idx}
+            delay={0.15}
+            yOffset={28}
+            blurAmount={8}
+            className="space-y-3 p-5 rounded-2xl bg-[#FAF8F5]/60 border border-[#E3DBCC]/50 shadow-xs hover:shadow-md transition-shadow"
+          >
             <span className="font-sans text-xs font-semibold text-[#7A7770] tracking-[0.2em] block">
               [{item.num}]
             </span>
@@ -72,7 +91,7 @@ export default function AtelierStandards() {
             <p className="font-sans text-xs sm:text-[13px] text-[#5C5852] leading-relaxed">
               {item.description}
             </p>
-          </div>
+          </ScrollCardReveal>
         ))}
       </div>
     </section>

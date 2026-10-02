@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Logo from './Logo';
 
 export default function Footer({ onOpenInquiry }) {
@@ -43,7 +44,11 @@ export default function Footer({ onOpenInquiry }) {
   ];
 
   return (
-    <footer
+    <motion.footer
+      initial={{ opacity: 0, y: 35, filter: 'blur(10px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       style={{
         backgroundColor: '#101010',
         color: 'rgba(243, 240, 233, 0.7)',
@@ -194,6 +199,6 @@ export default function Footer({ onOpenInquiry }) {
         </div>
 
       </div>
-    </footer>
+    </motion.footer>
   );
 }

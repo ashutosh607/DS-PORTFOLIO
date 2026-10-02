@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import TextBlurReveal from '../../../components/common/TextBlurReveal';
 
 export default function CollectionsHero({
   onScrollToExplore,
@@ -18,7 +19,10 @@ export default function CollectionsHero({
 
             {/* Eyebrow Label with horizontal line */}
             <div className="flex items-center gap-3.5 mb-5 sm:mb-6">
-              <span
+              <TextBlurReveal
+                text="The Collections"
+                blurAmount={6}
+                delay={0.05}
                 style={{
                   fontFamily: 'var(--font-sans)',
                   fontSize: '0.6875rem',
@@ -27,14 +31,22 @@ export default function CollectionsHero({
                   textTransform: 'uppercase',
                   color: '#8A857D',
                 }}
-              >
-                The Collections
-              </span>
-              <span className="w-10 sm:w-12 h-[1px] bg-[#D1C9BD]" />
+              />
+              <motion.span
+                initial={{ scaleX: 0, originX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+                className="w-10 sm:w-12 h-[1px] bg-[#D1C9BD]"
+              />
             </div>
 
             {/* Main Heading: "Different moments. Same feeling." */}
-            <h1
+            <TextBlurReveal
+              as="h1"
+              text="Different moments. Same feeling."
+              blurAmount={12}
+              stagger={0.06}
+              delay={0.1}
               style={{
                 fontFamily: 'var(--font-serif)',
                 fontSize: 'clamp(2.5rem, 4.2vw, 3.85rem)',
@@ -44,21 +56,14 @@ export default function CollectionsHero({
                 color: '#151515',
                 marginBottom: '1.4rem',
               }}
-            >
-              Different moments.
-              <br />
-              <span
-                style={{
-                  fontStyle: 'italic',
-                  fontWeight: 400,
-                }}
-              >
-                Same feeling.
-              </span>
-            </h1>
+            />
 
             {/* Description */}
-            <p
+            <TextBlurReveal
+              as="p"
+              text="Explore our curated photography collections, each designed to tell a different story."
+              blurAmount={8}
+              delay={0.25}
               style={{
                 fontFamily: 'var(--font-sans)',
                 fontSize: 'clamp(0.95rem, 1.1vw, 1.05rem)',
@@ -67,9 +72,7 @@ export default function CollectionsHero({
                 maxWidth: '380px',
                 marginBottom: '2.25rem',
               }}
-            >
-              Explore our curated photography collections, each designed to tell a different story.
-            </p>
+            />
 
             {/* Subtle Scroll to explore widget */}
             <div

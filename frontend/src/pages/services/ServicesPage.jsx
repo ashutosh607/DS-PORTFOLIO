@@ -11,6 +11,8 @@ import BookingBriefForm from './components/BookingBriefForm';
 import ConfirmationScreen from './components/ConfirmationScreen';
 import { handleWhatsAppSubmit } from '../../utils/whatsapp';
 import { handleEmailSubmit } from '../../utils/email';
+import TextBlurReveal from '../../components/common/TextBlurReveal';
+import ScrollCardReveal from '../../components/common/ScrollCardReveal';
 
 export default function ServicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -331,9 +333,14 @@ export default function ServicesPage() {
         : [];
 
   const selectedCollection =
-    activeCollections.find(
-      (c) => c.id === selectedCollectionId || c._id === selectedCollectionId
-    ) ||
+    activeCollections.find((c) => {
+      const target = String(selectedCollectionId || '').toLowerCase().trim();
+      return (
+        String(c.id || '').toLowerCase().trim() === target ||
+        String(c._id || '').toLowerCase().trim() === target ||
+        String(c.tier || '').toLowerCase().trim() === target
+      );
+    }) ||
     activeCollections.find((c) => c.highlight || c.isAtelierChoice) ||
     activeCollections[0] || {
       id: `${selectedCategoryId}-custom-suite`,
@@ -502,7 +509,12 @@ export default function ServicesPage() {
                   STAGE 01 · COMMISSION SELECTION
                 </span>
 
-                <h1
+                <TextBlurReveal
+                  as="h1"
+                  text="Choose Your Experience"
+                  blurAmount={12}
+                  stagger={0.06}
+                  delay={0.08}
                   style={{
                     fontFamily: 'var(--font-serif)',
                     fontSize: 'clamp(2.6rem, 4.8vw, 4.4rem)',
@@ -512,11 +524,13 @@ export default function ServicesPage() {
                     fontWeight: 400,
                     textAlign: 'center',
                   }}
-                >
-                  Choose Your Experience
-                </h1>
+                />
 
-                <p
+                <TextBlurReveal
+                  as="p"
+                  text="Every story deserves a collection that feels right for you. Curated with archival permanence, medium format tonality, and understated elegance."
+                  blurAmount={8}
+                  delay={0.2}
                   style={{
                     maxWidth: '650px',
                     margin: '24px auto 0',
@@ -527,9 +541,7 @@ export default function ServicesPage() {
                     color: '#7A7770',
                     lineHeight: 1.65,
                   }}
-                >
-                  Every story deserves a collection that feels right for you. Curated with archival permanence, medium format tonality, and understated elegance.
-                </p>
+                />
               </div>
 
               {/* Category Navigation with 55px top / 45px bottom margin and thin underline */}
@@ -565,13 +577,28 @@ export default function ServicesPage() {
                   className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[clamp(28px,3vw,56px)] items-stretch"
                 >
                   {activeCollections.length > 0 ? (
-                    activeCollections.map((col) => (
-                      <CollectionTierCard
+                    activeCollections.map((col, idx) => (
+                      <ScrollCardReveal
                         key={col.id || col._id}
-                        collection={col}
-                        isSelected={selectedCollectionId === col.id || selectedCollectionId === col._id}
-                        onSelectAndBook={handleSelectAndBook}
-                      />
+                        index={idx}
+                        delay={0.05}
+                        stagger={0.08}
+                        yOffset={28}
+                        blurAmount={8}
+                        hoverEffect={false}
+                        className="h-full"
+                      >
+                        <CollectionTierCard
+                          collection={col}
+                          isSelected={
+                            Boolean(selectedCollectionId) &&
+                            (String(selectedCollectionId).toLowerCase().trim() === String(col.id || '').toLowerCase().trim() ||
+                              String(selectedCollectionId).toLowerCase().trim() === String(col._id || '').toLowerCase().trim() ||
+                              String(selectedCollectionId).toLowerCase().trim() === String(col.tier || '').toLowerCase().trim())
+                          }
+                          onSelectAndBook={handleSelectAndBook}
+                        />
+                      </ScrollCardReveal>
                     ))
                   ) : loadingServices ? (
                     <div className="col-span-full py-20 text-center">

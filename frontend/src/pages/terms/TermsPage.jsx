@@ -4,6 +4,152 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, Calendar, CreditCard, Clock, BookOpen, Camera, CheckCircle2, ArrowRight } from 'lucide-react';
 import Logo from '../../components/layout/Logo';
 
+/**
+ * Editorial Word-by-Word Blur-to-Clear Reveal
+ * Words glide into view from an artistic lens blur (blur(12px) -> blur(0px))
+ * with organic micro-staggering, delivering high-end editorial elegance.
+ */
+function WordBlurReveal({
+  text,
+  as: Component = 'div',
+  className = '',
+  style = {},
+  delay = 0,
+  stagger = 0.035,
+  blur = 10,
+}) {
+  const words = typeof text === 'string' ? text.split(' ') : [];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: stagger,
+        delayChildren: delay,
+      },
+    },
+  };
+
+  const wordVariants = {
+    hidden: {
+      opacity: 0,
+      filter: `blur(${blur}px)`,
+      y: 12,
+    },
+    visible: {
+      opacity: 1,
+      filter: 'blur(0px)',
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
+
+  if (!words.length) return null;
+
+  return (
+    <Component className={className} style={style}>
+      <motion.span
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-30px' }}
+        style={{ display: 'inline' }}
+      >
+        {words.map((word, i) => (
+          <motion.span
+            key={i}
+            variants={wordVariants}
+            style={{
+              display: 'inline-block',
+              willChange: 'transform, opacity, filter',
+            }}
+          >
+            {word}&nbsp;
+          </motion.span>
+        ))}
+      </motion.span>
+    </Component>
+  );
+}
+
+/**
+ * Editorial Pop-Up Card Entrance
+ * Cards pop up into focus with subtle spring scaling (0.94 -> 1.0),
+ * vertical glide (y: 32 -> 0), and optical lens de-blurring.
+ */
+function PopUpCard({
+  children,
+  index = 0,
+  delay = 0,
+  className = '',
+  style = {},
+  enableHover = true,
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 32, scale: 0.94, filter: 'blur(8px)' }}
+      whileInView={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{
+        duration: 0.65,
+        delay: delay + index * 0.12,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      whileHover={
+        enableHover
+          ? {
+              y: -5,
+              transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
+            }
+          : undefined
+      }
+      className={className}
+      style={{
+        willChange: 'transform, opacity, filter',
+        ...style,
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * Silky Blur Fade-In Block
+ */
+function BlurFadeIn({
+  children,
+  delay = 0,
+  y = 18,
+  blur = 8,
+  className = '',
+  style = {},
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y, filter: `blur(${blur}px)` }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{
+        duration: 0.6,
+        delay,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className={className}
+      style={{
+        willChange: 'transform, opacity, filter',
+        ...style,
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export default function TermsPage({ onOpenInquiry }) {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -64,43 +210,66 @@ export default function TermsPage({ onOpenInquiry }) {
         {/* ===================================================================
             BREADCRUMB & BACK LINK
             =================================================================== */}
-        <div className="mb-10 flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#7A6E5D]">
+        <BlurFadeIn delay={0.05} y={10} blur={6} className="mb-10 flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#7A6E5D]">
           <Link to="/" className="hover:text-[#1E1B18] transition-colors">Home</Link>
           <span>/</span>
           <span className="text-[#1E1B18] font-semibold">Terms &amp; Conditions</span>
-        </div>
+        </BlurFadeIn>
 
         {/* ===================================================================
             HEADER: MATCHING OFFICIAL STUDIO DOCUMENT
             =================================================================== */}
         <header className="text-center pb-12 mb-12 border-b border-[#E5DCD0]">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col items-center justify-center gap-3"
-          >
-            <div className="mb-2">
+          <div className="flex flex-col items-center justify-center gap-3">
+            {/* Studio Logo with Optical Scaling Entrance */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.82, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              className="mb-2"
+            >
               <Logo variant="dark" height={56} withText={false} />
-            </div>
+            </motion.div>
 
-            <h1
+            {/* Title: Words Blur-to-Clear */}
+            <WordBlurReveal
+              as="h1"
+              text="DS PHOTOGRAPHY"
+              delay={0.12}
+              stagger={0.08}
+              blur={14}
               style={{ fontFamily: 'var(--font-serif)' }}
               className="text-3xl sm:text-5xl font-medium tracking-[0.14em] uppercase text-[#101010]"
+            />
+
+            {/* Subtitle: Words Blur-to-Clear */}
+            <WordBlurReveal
+              as="p"
+              text="• Photography • Videography • Cinematic Films"
+              delay={0.28}
+              stagger={0.04}
+              blur={8}
+              className="font-sans text-[11px] sm:text-xs tracking-[0.26em] uppercase text-[#7A6E5D] font-medium"
+            />
+
+            {/* Divider Hairline with ScaleX Reveal */}
+            <motion.div
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={{ scaleX: 1, opacity: 1 }}
+              transition={{ duration: 0.75, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="w-16 h-[1.5px] bg-[#CBB9A4] my-3 origin-center"
+            />
+
+            {/* Official Document Pill Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 12, scale: 0.9, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 0.55, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-block px-4 py-1.5 rounded-full bg-[#EFE8DC] border border-[#DDD3C2] text-[#554737] text-[10px] sm:text-xs font-mono tracking-[0.22em] uppercase font-semibold shadow-xs"
             >
-              DS PHOTOGRAPHY
-            </h1>
-
-            <p className="font-sans text-[11px] sm:text-xs tracking-[0.26em] uppercase text-[#7A6E5D] font-medium">
-              • Photography • Videography • Cinematic Films
-            </p>
-
-            <div className="w-16 h-[1.5px] bg-[#CBB9A4] my-3" />
-
-            <div className="inline-block px-4 py-1.5 rounded-full bg-[#EFE8DC] border border-[#DDD3C2] text-[#554737] text-[10px] sm:text-xs font-mono tracking-[0.22em] uppercase font-semibold">
               Payment Terms &amp; Delivery Timeline
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </header>
 
         {/* ===================================================================
@@ -108,40 +277,58 @@ export default function TermsPage({ onOpenInquiry }) {
             =================================================================== */}
         <section className="mb-16">
           <div className="flex items-center gap-3 mb-8">
-            <CreditCard className="w-5 h-5 text-[#9E8159]" />
-            <h2
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
+              whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <CreditCard className="w-5 h-5 text-[#9E8159]" />
+            </motion.div>
+            <WordBlurReveal
+              as="h2"
+              text="01. Payment Terms & Milestones"
+              delay={0.06}
+              stagger={0.04}
+              blur={10}
               style={{ fontFamily: 'var(--font-serif)' }}
               className="text-2xl sm:text-3xl text-[#101010] tracking-wide"
-            >
-              01. Payment Terms &amp; Milestones
-            </h2>
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {paymentMilestones.map((item, idx) => (
-              <motion.div
+              <PopUpCard
                 key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="bg-[#FFFFFF] border border-[#E3D9CA] rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden"
+                index={idx}
+                className="bg-[#FFFFFF] border border-[#E3D9CA] rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
               >
-                {/* Accent Top Border */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[#101010]" />
+                {/* Accent Top Border with Hover Glow */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-[#101010] group-hover:bg-[#9E8159] transition-colors duration-300" />
 
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-4">
-                    <span className="text-3xl sm:text-4xl font-serif text-[#101010] font-medium">
+                    <motion.span
+                      initial={{ scale: 0.85, opacity: 0 }}
+                      whileInView={{ scale: 1, opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.45, delay: idx * 0.12 + 0.15, ease: [0.16, 1, 0.3, 1] }}
+                      className="text-3xl sm:text-4xl font-serif text-[#101010] font-medium"
+                    >
                       {item.percentage}
-                    </span>
+                    </motion.span>
                     <span className="text-[10px] font-mono tracking-widest uppercase px-2.5 py-1 rounded-full bg-[#FAF7F0] border border-[#E3D9CA] text-[#7A6E5D]">
                       {item.status}
                     </span>
                   </div>
 
-                  <h3 className="font-serif text-lg text-[#101010] mb-1 font-semibold">
-                    {item.title}
-                  </h3>
+                  <WordBlurReveal
+                    as="h3"
+                    text={item.title}
+                    delay={idx * 0.1 + 0.12}
+                    blur={8}
+                    className="font-serif text-lg text-[#101010] mb-1 font-semibold"
+                  />
 
                   <p className="font-sans text-xs font-medium text-[#9E8159] tracking-wider uppercase mb-3">
                     {item.timeline}
@@ -156,7 +343,7 @@ export default function TermsPage({ onOpenInquiry }) {
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#2E7D32]" />
                   <span>Binding atelier commission clause</span>
                 </div>
-              </motion.div>
+              </PopUpCard>
             ))}
           </div>
         </section>
@@ -166,27 +353,43 @@ export default function TermsPage({ onOpenInquiry }) {
             =================================================================== */}
         <section className="mb-16">
           <div className="flex items-center gap-3 mb-8">
-            <Calendar className="w-5 h-5 text-[#9E8159]" />
-            <h2
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
+              whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Calendar className="w-5 h-5 text-[#9E8159]" />
+            </motion.div>
+            <WordBlurReveal
+              as="h2"
+              text="02. Delivery Timeline & Curation Guidelines"
+              delay={0.06}
+              stagger={0.035}
+              blur={10}
               style={{ fontFamily: 'var(--font-serif)' }}
               className="text-2xl sm:text-3xl text-[#101010] tracking-wide"
-            >
-              02. Delivery Timeline &amp; Curation Guidelines
-            </h2>
+            />
           </div>
 
           <div className="space-y-5">
             {deliveryTimelines.map((item, idx) => {
               const Icon = item.icon;
               return (
-                <div
+                <PopUpCard
                   key={idx}
-                  className="bg-[#FFFFFF] border border-[#E3D9CA] rounded-2xl p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm"
+                  index={idx}
+                  delay={0.08}
+                  className="bg-[#FFFFFF] border border-[#E3D9CA] rounded-2xl p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm hover:shadow-lg transition-all duration-300 group"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#FAF7F0] border border-[#E3D9CA] flex items-center justify-center shrink-0 text-[#101010] mt-0.5">
+                    <motion.div
+                      whileHover={{ scale: 1.08, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-10 h-10 rounded-xl bg-[#FAF7F0] border border-[#E3D9CA] flex items-center justify-center shrink-0 text-[#101010] mt-0.5 group-hover:border-[#CBB9A4] transition-colors"
+                    >
                       <Icon className="w-5 h-5" />
-                    </div>
+                    </motion.div>
 
                     <div>
                       <div className="flex flex-wrap items-center gap-2 mb-1.5">
@@ -203,7 +406,7 @@ export default function TermsPage({ onOpenInquiry }) {
                       </p>
                     </div>
                   </div>
-                </div>
+                </PopUpCard>
               );
             })}
           </div>
@@ -212,84 +415,112 @@ export default function TermsPage({ onOpenInquiry }) {
         {/* ===================================================================
             SECTION 03: GENERAL ATELIER PROTOCOLS & CLIENT RIGHTS
             =================================================================== */}
-        <section className="mb-16 bg-[#FFFFFF] border border-[#E3D9CA] rounded-3xl p-8 sm:p-12 shadow-sm">
+        <PopUpCard delay={0.05} enableHover={false} className="mb-16 bg-[#FFFFFF] border border-[#E3D9CA] rounded-3xl p-8 sm:p-12 shadow-sm relative overflow-hidden">
           <div className="flex items-center gap-3 mb-6">
-            <ShieldCheck className="w-5 h-5 text-[#9E8159]" />
-            <h2
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <ShieldCheck className="w-5 h-5 text-[#9E8159]" />
+            </motion.div>
+            <WordBlurReveal
+              as="h2"
+              text="03. Studio Standards & Client Agreement"
+              delay={0.06}
+              stagger={0.035}
+              blur={10}
               style={{ fontFamily: 'var(--font-serif)' }}
               className="text-2xl sm:text-3xl text-[#101010] tracking-wide"
-            >
-              03. Studio Standards &amp; Client Agreement
-            </h2>
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs sm:text-[13.5px] text-[#554C42] leading-relaxed">
             <div className="space-y-4">
-              <div>
+              <BlurFadeIn delay={0.1}>
                 <h4 className="font-serif text-base text-[#101010] font-semibold mb-1">
                   Copyright &amp; Personal License
                 </h4>
                 <p>
                   DS Photography &amp; Films retains full artistic copyright of all photographic and video assets. Clients receive lifetime, royalty-free reproduction rights for personal non-commercial printing, social media sharing, and family archiving.
                 </p>
-              </div>
+              </BlurFadeIn>
 
-              <div>
+              <BlurFadeIn delay={0.18}>
                 <h4 className="font-serif text-base text-[#101010] font-semibold mb-1">
                   Rescheduling &amp; Date Changes
                 </h4>
                 <p>
                   In the event of unforeseen rescheduling, dates may be transferred subject to studio availability with written notice provided at least 30 days prior to the original booking date.
                 </p>
-              </div>
+              </BlurFadeIn>
             </div>
 
             <div className="space-y-4">
-              <div>
+              <BlurFadeIn delay={0.26}>
                 <h4 className="font-serif text-base text-[#101010] font-semibold mb-1">
                   Equipment Redundancy &amp; Dual Storage
                 </h4>
                 <p>
                   All weddings and events are captured using high-end cinema bodies and prime lenses with dual SD/CFexpress card recording, backed up to multi-redundant secure cloud and on-premise storage immediately post-event.
                 </p>
-              </div>
+              </BlurFadeIn>
 
-              <div>
+              <BlurFadeIn delay={0.34}>
                 <h4 className="font-serif text-base text-[#101010] font-semibold mb-1">
                   Creative Discretion &amp; Color Grading
                 </h4>
                 <p>
                   Editing, color balancing, and cinematic grading are executed in our signature warm editorial style. Adjustments and album layout proofs are reviewed in collaboration with clients prior to binding.
                 </p>
-              </div>
+              </BlurFadeIn>
             </div>
           </div>
-        </section>
+        </PopUpCard>
 
         {/* ===================================================================
             BOTTOM COMMISSION ACTION
             =================================================================== */}
         <div className="text-center pt-6">
-          <p className="font-sans text-xs tracking-widest uppercase text-[#7A6E5D] mb-4">
-            Have questions regarding payment schedules or bespoke commissions?
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/services#book"
-              className="inline-flex items-center gap-2 bg-[#101010] text-[#FDFCF8] hover:bg-[#262422] px-8 py-3.5 rounded-full font-sans text-xs font-semibold uppercase tracking-[0.16em] transition-all shadow-md group"
-            >
-              <span>Book Your Wedding / Event</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </Link>
+          <WordBlurReveal
+            as="p"
+            text="Have questions regarding payment schedules or bespoke commissions?"
+            delay={0.08}
+            stagger={0.03}
+            blur={8}
+            className="font-sans text-xs tracking-widest uppercase text-[#7A6E5D] mb-5"
+          />
 
-            <button
-              type="button"
-              onClick={onOpenInquiry}
-              className="inline-flex items-center gap-2 bg-[#FAF8F5] border border-[#101010] text-[#101010] hover:bg-[#101010] hover:text-[#FAF8F5] px-8 py-3.5 rounded-full font-sans text-xs font-semibold uppercase tracking-[0.16em] transition-all cursor-pointer"
+          <BlurFadeIn delay={0.2} y={15} className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <motion.div
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.2 }}
             >
-              <span>Contact Atelier Directly</span>
-            </button>
-          </div>
+              <Link
+                to="/services#book"
+                className="inline-flex items-center gap-2 bg-[#101010] text-[#FDFCF8] hover:bg-[#262422] px-8 py-3.5 rounded-full font-sans text-xs font-semibold uppercase tracking-[0.16em] transition-all shadow-md group"
+              >
+                <span>Book Your Wedding / Event</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.2 }}
+            >
+              <button
+                type="button"
+                onClick={onOpenInquiry}
+                className="inline-flex items-center gap-2 bg-[#FAF8F5] border border-[#101010] text-[#101010] hover:bg-[#101010] hover:text-[#FAF8F5] px-8 py-3.5 rounded-full font-sans text-xs font-semibold uppercase tracking-[0.16em] transition-all cursor-pointer shadow-xs"
+              >
+                <span>Contact Atelier Directly</span>
+              </button>
+            </motion.div>
+          </BlurFadeIn>
         </div>
 
       </div>

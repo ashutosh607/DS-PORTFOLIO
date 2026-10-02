@@ -1,5 +1,8 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import photographerImg from '../../assets/photographer.jpg';
+import TextBlurReveal from '../common/TextBlurReveal';
+import ScrollCardReveal from '../common/ScrollCardReveal';
 
 /**
  * Editorial About Section — Dishant (DS Photography & Films)
@@ -43,41 +46,47 @@ export default function AboutSection({ imageUrl = null }) {
               LEFT COLUMN: Offset Portrait & Editorial Framing
               ========================================================= */}
           <div className="about-portrait-col">
-            <div className="about-portrait-wrapper">
-              {/* Warm Nude/Ivory Accent Backdrop Block (Offset Top-Left) */}
-              <div
-                className="about-accent-block"
-                aria-hidden="true"
-              />
+            <ScrollCardReveal yOffset={35} initialScale={0.95} blurAmount={10} hoverEffect={false} className="w-full">
+              <div className="about-portrait-wrapper">
+                {/* Warm Nude/Ivory Accent Backdrop Block (Offset Top-Left) */}
+                <div
+                  className="about-accent-block"
+                  aria-hidden="true"
+                />
 
-              {/* Single Photographer Portrait Image */}
-              <div className="about-portrait-frame">
-                <div className="about-portrait-img-container">
-                  <img
-                    src={activeImage}
-                    alt="Dishant — Photographer & Visual Storyteller"
-                    className="about-portrait-img"
-                    loading="lazy"
-                  />
-                  {/* Subtle inner editorial vignette / film border */}
-                  <div className="about-portrait-overlay" aria-hidden="true" />
+                {/* Single Photographer Portrait Image */}
+                <div className="about-portrait-frame">
+                  <div className="about-portrait-img-container">
+                    <img
+                      src={activeImage}
+                      alt="Dishant — Photographer & Visual Storyteller"
+                      className="about-portrait-img"
+                      loading="lazy"
+                    />
+                    {/* Subtle inner editorial vignette / film border */}
+                    <div className="about-portrait-overlay" aria-hidden="true" />
 
-                  {/* Editorial identification pill tag */}
-                  <div className="about-portrait-badge">
-                    <span className="about-badge-dot" />
-                    <span className="about-badge-text">
-                      DISHANT · DS PHOTOGRAPHY
-                    </span>
+                    {/* Editorial identification pill tag */}
+                    <div className="about-portrait-badge">
+                      <span className="about-badge-dot" />
+                      <span className="about-badge-text">
+                        DISHANT · DS PHOTOGRAPHY
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ScrollCardReveal>
 
             {/* Bottom-left Editorial Tagline & Accent Rule */}
             <div className="about-corner-tagline">
-              <span className="about-corner-text">
-                CAPTURING<br />WHAT MATTERS
-              </span>
+              <TextBlurReveal
+                text="CAPTURING WHAT MATTERS"
+                delay={0.2}
+                blurAmount={6}
+                stagger={0.06}
+                className="about-corner-text"
+              />
               <span className="about-corner-rule" aria-hidden="true" />
             </div>
           </div>
@@ -89,62 +98,52 @@ export default function AboutSection({ imageUrl = null }) {
             {/* Top Row: Label & Arched Typography Stamp */}
             <div className="about-header-row">
               <div className="about-label-wrap">
-                <span className="about-section-label">
-                  ABOUT THE PHOTOGRAPHER
-                </span>
-              </div>
-
-              {/* Arched "PHOTOGRAPHY × FILMS" Editorial Stamp */}
-              <div className="about-arch-stamp" aria-hidden="true">
-                <svg
-                  viewBox="0 0 160 80"
-                  style={{
-                    width: '130px',
-                    height: '65px',
-                    overflow: 'visible',
-                  }}
-                >
-                  <path
-                    id="archPath"
-                    d="M 15,75 A 65,65 0 0,1 145,75"
-                    fill="none"
-                  />
-                  <text
-                    style={{
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: '9.5px',
-                      letterSpacing: '0.28em',
-                      textTransform: 'uppercase',
-                      fill: 'var(--color-obsidian-light, #7A7770)',
-                      fontWeight: 600,
-                    }}
-                  >
-                    <textPath href="#archPath" startOffset="50%" textAnchor="middle">
-                      PHOTOGRAPHY × FILMS
-                    </textPath>
-                  </text>
-                </svg>
+                <TextBlurReveal
+                  text="ABOUT THE PHOTOGRAPHER"
+                  blurAmount={6}
+                  delay={0.05}
+                  className="about-section-label"
+                />
               </div>
             </div>
 
             {/* Primary Editorial Heading */}
-            <h2 className="about-primary-heading">
-              Hi,<br />
-              I’m Dishant.
-            </h2>
+            <TextBlurReveal
+              as="h2"
+              text="Hi, I’m Dishant."
+              blurAmount={12}
+              stagger={0.06}
+              delay={0.1}
+              className="about-primary-heading"
+            />
 
             {/* Supporting Storyteller Subheading */}
-            <p className="about-supporting-title">
-              Photographer & Visual Storyteller
-            </p>
+            <TextBlurReveal
+              as="p"
+              text="Photographer & Visual Storyteller"
+              blurAmount={8}
+              delay={0.2}
+              className="about-supporting-title"
+            />
 
             {/* Minimal Editorial Text */}
-            <p className="about-description-text">
-              Capturing honest moments, meaningful stories, and the details that make each frame yours.
-            </p>
+            <TextBlurReveal
+              as="p"
+              text="Capturing honest moments, meaningful stories, and the details that make each frame yours."
+              blurAmount={8}
+              stagger={0.03}
+              delay={0.3}
+              className="about-description-text"
+            />
 
             {/* Handwritten Signature Flourish */}
-            <div className="about-signature-wrap">
+            <motion.div
+              initial={{ opacity: 0, y: 10, filter: 'blur(6px)' }}
+              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="about-signature-wrap"
+            >
               <span className="about-signature-text">
                 Dishant
               </span>
@@ -164,24 +163,24 @@ export default function AboutSection({ imageUrl = null }) {
                   opacity="0.75"
                 />
               </svg>
-            </div>
+            </motion.div>
 
             {/* Studio Identifier Metadata Bar (Factual DS Details Only) */}
             <div className="about-studio-meta-grid">
-              <div className="about-meta-item">
+              <ScrollCardReveal index={0} delay={0.2} yOffset={16} blurAmount={6} className="about-meta-item">
                 <span className="about-meta-label">STUDIO</span>
                 <span className="about-meta-val">DS Photography & Films</span>
-              </div>
+              </ScrollCardReveal>
               <div className="about-meta-divider" aria-hidden="true" />
-              <div className="about-meta-item">
+              <ScrollCardReveal index={1} delay={0.2} yOffset={16} blurAmount={6} className="about-meta-item">
                 <span className="about-meta-label">DISCIPLINE</span>
                 <span className="about-meta-val">Photography & Films</span>
-              </div>
+              </ScrollCardReveal>
               <div className="about-meta-divider" aria-hidden="true" />
-              <div className="about-meta-item">
+              <ScrollCardReveal index={2} delay={0.2} yOffset={16} blurAmount={6} className="about-meta-item">
                 <span className="about-meta-label">APPROACH</span>
                 <span className="about-meta-val">Honest & Meaningful</span>
-              </div>
+              </ScrollCardReveal>
             </div>
           </div>
         </div>
@@ -382,21 +381,6 @@ export default function AboutSection({ imageUrl = null }) {
           display: inline-block;
         }
 
-        .about-arch-stamp {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          margin-top: -12px;
-          user-select: none;
-          pointer-events: none;
-        }
-
-        @media (max-width: 768px) {
-          .about-arch-stamp {
-            transform: scale(0.85);
-            transform-origin: right top;
-          }
-        }
 
         /* Large Editorial Heading */
         .about-primary-heading {

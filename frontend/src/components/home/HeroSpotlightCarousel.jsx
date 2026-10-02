@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PhotoPlaceholder from '../common/PhotoPlaceholder';
+import TextBlurReveal from '../common/TextBlurReveal';
 
 import img01 from '../../assets/landing-page-images/landing-01.png';
 import img02 from '../../assets/landing-page-images/landing-02.png';
@@ -278,12 +279,17 @@ export default function HeroSpotlightCarousel() {
               }}
             >
               <span style={{ width: '22px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
-              <span>The Spotlight Collection</span>
+              <TextBlurReveal text="The Spotlight Collection" blurAmount={6} delay={0.05} />
               <span style={{ width: '22px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
             </div>
           </div>
 
-          <h1
+          <TextBlurReveal
+            as="h1"
+            text="Selected works, framed in light"
+            blurAmount={12}
+            stagger={0.06}
+            delay={0.12}
             style={{
               maxWidth: '720px',
               margin: '0 auto',
@@ -293,13 +299,7 @@ export default function HeroSpotlightCarousel() {
               letterSpacing: '-0.015em',
               fontWeight: 400,
             }}
-          >
-            Selected works,<br />
-            framed in{' '}
-            <span className="editorial-italic" style={{ color: 'var(--color-obsidian)' }}>
-              light
-            </span>
-          </h1>
+          />
         </div>
 
         {/* ===================================================================

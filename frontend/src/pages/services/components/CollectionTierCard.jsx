@@ -107,8 +107,21 @@ export default function CollectionTierCard({
   const descriptionLine =
     collection.priceNote || 'Archival proofing & master curation included';
 
-  const handleClick = (e) => {
+  const handleCardClick = (e) => {
+    if (isAdmin) return;
+    // Don't duplicate click if the user clicked directly on a button inside
+    if (e.target.closest('button')) return;
+
+    if (isSelected) {
+      onSelectAndBook(cardId, true);
+    } else {
+      onSelectAndBook(cardId, false);
+    }
+  };
+
+  const handleButtonClick = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (isSelected) {
       onSelectAndBook(cardId, true);
     } else {
@@ -119,11 +132,13 @@ export default function CollectionTierCard({
   return (
     <div
       {...(isAdmin ? dragProps : {})}
+      onClick={handleCardClick}
       style={{
         padding: '32px',
         boxSizing: 'border-box',
       }}
-      className={`group relative h-full flex flex-col justify-between rounded-2xl transition-all duration-300 ease-out ${isDragging
+      className={`group relative h-full flex flex-col justify-between rounded-2xl transition-all duration-300 ease-out ${
+        isDragging
           ? 'opacity-40 border-[#101010] shadow-lg'
           : isOver
             ? 'border-[#9E8159] shadow-md bg-[#FAF6F0]'
@@ -132,8 +147,9 @@ export default function CollectionTierCard({
               : isRecommended
                 ? 'bg-[#FAF8F5] border border-[#D5CBB9] shadow-[0_4px_24px_-6px_rgba(16,16,16,0.05)] hover:border-[#101010]/50 hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.08)]'
                 : 'bg-[#FDFCF8] border border-[#E3DBCC] shadow-[0_2px_20px_-6px_rgba(16,16,16,0.04)] hover:border-[#C5B7A4] hover:-translate-y-1 hover:shadow-[0_16px_36px_-8px_rgba(16,16,16,0.07)]'
-        } ${isAdmin ? 'cursor-grab active:cursor-grabbing' : ''} ${collection.isActive === false ? 'opacity-70' : ''
-        }`}
+      } ${isAdmin ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${
+        collection.isActive === false ? 'opacity-70' : ''
+      }`}
     >
       <div className="flex-1 flex flex-col">
         {/* =========================================================
@@ -423,7 +439,7 @@ export default function CollectionTierCard({
         >
           <button
             type="button"
-            onClick={handleClick}
+            onClick={handleButtonClick}
             className={`w-full py-3.5 px-6 rounded-full font-sans text-xs font-medium uppercase tracking-[0.14em]
       transition-all duration-300 flex items-center justify-center gap-2.5
       cursor-pointer group/btn
@@ -452,11 +468,11 @@ export default function CollectionTierCard({
           >
             {isSelected ? (
               <>
-                <span className="text-[#FDFCF8] text-black">
-                  Selected · Continue to Booking →
+                <span className="text-[#FDFCF8] font-semibold tracking-[0.14em]">
+                  Selected · Continue to Booking
                 </span>
 
-                <span className="transition-transform duration-300 ease-out group-hover/btn:translate-x-1">
+                <span className="text-[#FDFCF8] transition-transform duration-300 ease-out group-hover/btn:translate-x-1">
                   →
                 </span>
               </>
