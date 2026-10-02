@@ -76,7 +76,7 @@ export default function Footer({ onOpenInquiry }) {
                   DS PHOTOGRAPHY
                 </span>
                 <span className="font-sans text-[10px] tracking-[0.24em] text-[#CBB9A4] uppercase font-semibold mt-1">
-                  Wedding Photography • Videography • Films
+                  • Photography • Videography • Films
                 </span>
               </div>
             </div>

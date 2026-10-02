@@ -92,7 +92,7 @@ export default function TermsPage({ onOpenInquiry }) {
             </h1>
 
             <p className="font-sans text-[11px] sm:text-xs tracking-[0.26em] uppercase text-[#7A6E5D] font-medium">
-              Wedding Photography • Videography • Cinematic Films
+              • Photography • Videography • Cinematic Films
             </p>
 
             <div className="w-16 h-[1.5px] bg-[#CBB9A4] my-3" />
