@@ -115,7 +115,7 @@ function FlipFlyingClone({ flipState, onFinish }) {
         {item.type === 'video' ? (
           <video
             src={item.image}
-            className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
+            className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
             autoPlay
             muted
             loop
@@ -125,7 +125,7 @@ function FlipFlyingClone({ flipState, onFinish }) {
           <img
             src={item.image}
             alt=""
-            className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
+            className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
             loading="eager"
             decoding="sync"
           />
@@ -378,7 +378,7 @@ export default function CollectionsGallery({
                       {outgoingItem.type === 'video' ? (
                         <video
                           src={outgoingItem.image}
-                          className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
+                          className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
                           autoPlay
                           muted
                           loop
@@ -388,7 +388,7 @@ export default function CollectionsGallery({
                         <img
                           src={outgoingItem.image}
                           alt=""
-                          className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
+                          className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
                         />
                       )}
                     </div>
@@ -413,7 +413,7 @@ export default function CollectionsGallery({
                         {selectedItem?.type === 'video' ? (
                           <video
                             src={selectedItem.image}
-                            className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
+                            className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
                             autoPlay
                             muted
                             loop
@@ -423,7 +423,7 @@ export default function CollectionsGallery({
                           <img
                             src={selectedItem?.image}
                             alt={selectedItem?.title || selectedItem?.tag || activeCategory.name}
-                            className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02] group-hover:scale-[1.015] transition-transform duration-700 ease-out"
+                            className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02] group-hover:scale-[1.015] transition-transform duration-700 ease-out"
                             loading="eager"
                           />
                         )}
@@ -539,7 +539,7 @@ export default function CollectionsGallery({
                             {item.type === 'video' ? (
                               <video
                                 src={item.image}
-                                className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
+                                className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
                                 preload="metadata"
                                 muted
                                 loop
@@ -549,7 +549,7 @@ export default function CollectionsGallery({
                               <img
                                 src={item.image}
                                 alt={item.tag || item.title || `Specimen ${globalIdx}`}
-                                className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02] group-hover:scale-105 transition-transform duration-500 ease-out"
+                                className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02] group-hover:scale-105 transition-transform duration-500 ease-out"
                                 loading="lazy"
                               />
                             )}
