@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus, Pencil, RotateCcw, Sparkles, FolderPlus } from 'lucide-react';
+import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus, Pencil, RotateCcw, Sparkles, FolderPlus, Crop } from 'lucide-react';
 import { useCategories } from '../../utils/categoryManager';
 import AddMediaModal from './components/AddMediaModal';
 import EditMediaModal from './components/EditMediaModal';
+import EditDisplayModal from './components/EditDisplayModal';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import AddCategoryModal from './components/AddCategoryModal';
 import EditCategoryModal from './components/EditCategoryModal';
 import DeleteCategoryModal from './components/DeleteCategoryModal';
 import { useAdminAuth } from './context/AdminAuthContext';
 import { getApiUrl } from '../../utils/api';
+import { getFramingStyle, getFramingContainerStyle } from '../../utils/mediaFraming';
 import './AdminDashboard.css';
 
 export default function AdminCollectionsPage() {
@@ -24,6 +26,7 @@ export default function AdminCollectionsPage() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
+  const [displayModalTarget, setDisplayModalTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all'); // all, photo, video
@@ -253,6 +256,7 @@ export default function AdminCollectionsPage() {
           type: override.type || item.type,
           caption: override.caption || item.caption,
           meta: override.meta || item.meta,
+          display: override.display || item.display,
           isBaseline: true,
           isModifiedBaseline: true,
         };
@@ -291,20 +295,22 @@ export default function AdminCollectionsPage() {
       className="admin-media-card group"
     >
       {/* Framed Media Preview (Padded on all sides) */}
-      <div className="photo-frame">
+      <div className="photo-frame" style={getFramingContainerStyle(item.display)}>
         {item.type === 'video' ? (
           <video
             src={getApiUrl(item.url)}
             preload="metadata"
             muted
             playsInline
-            className="w-full h-full object-cover object-top"
+            className="w-full h-full object-cover transition-transform duration-300"
+            style={getFramingStyle(item.display)}
           />
         ) : (
           <img
             src={getApiUrl(item.url)}
             alt={item.title || 'Media'}
-            className="w-full h-full object-cover object-top"
+            className="w-full h-full object-cover transition-transform duration-300"
+            style={getFramingStyle(item.display)}
             loading="lazy"
           />
         )}
@@ -341,6 +347,15 @@ export default function AdminCollectionsPage() {
             )}
           </div>
           <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setDisplayModalTarget({ ...item, isBaseline })}
+              className="px-2 py-0.5 rounded-md text-[10.5px] font-sans font-medium text-[#4A453D] bg-[#FAF8F5] hover:bg-[#F0EAE0] hover:text-[#181818] border border-[#DDD5C7] transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
+              title="Edit public display & framing"
+            >
+              <Crop size={11} />
+              <span>Edit Display</span>
+            </button>
             <button
               type="button"
               onClick={() => setEditTarget({ ...item, isBaseline })}
@@ -665,7 +680,19 @@ export default function AdminCollectionsPage() {
         onClose={() => setEditTarget(null)}
         onSuccess={handleMediaUpdated}
         onResetBaseline={handleResetBaseline}
+        onOpenDisplay={(item) => setDisplayModalTarget(item)}
         mediaItem={editTarget}
+      />
+
+      {/* Edit Display Framing Modal */}
+      <EditDisplayModal
+        isOpen={!!displayModalTarget}
+        mediaItem={displayModalTarget}
+        onClose={() => setDisplayModalTarget(null)}
+        onSuccess={(updated) => {
+          handleMediaUpdated(updated);
+          setDisplayModalTarget(null);
+        }}
       />
 
       {/* Delete Media Confirmation Modal */}

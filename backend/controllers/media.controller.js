@@ -5,6 +5,28 @@ const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
 const { uploadOnCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
 
+const sanitizeDisplay = (input) => {
+  if (!input) return null;
+  let parsed = input;
+  if (typeof input === "string") {
+    try {
+      parsed = JSON.parse(input);
+    } catch {
+      return null;
+    }
+  }
+  if (typeof parsed !== "object" || parsed === null) return null;
+  const fit = parsed.fit === "contain" || parsed.fit === "fit" ? "contain" : "cover";
+  const posX = typeof parsed.position?.x === "number" ? Math.max(0, Math.min(100, Math.round(parsed.position.x * 10) / 10)) : 50;
+  const posY = typeof parsed.position?.y === "number" ? Math.max(0, Math.min(100, Math.round(parsed.position.y * 10) / 10)) : 50;
+  const zoom = typeof parsed.zoom === "number" ? Math.max(1, Math.min(3, Math.round(parsed.zoom * 100) / 100)) : 1;
+  return {
+    fit,
+    position: { x: posX, y: posY },
+    zoom,
+  };
+};
+
 /**
  * @route   GET /api/media
  * @desc    Get all media, optionally filtered by category query (?category=weddings)
@@ -107,6 +129,7 @@ const createMedia = asyncHandler(async (req, res) => {
     title: title ? title.trim() : "",
     caption: caption ? caption.trim() : "",
     meta: meta ? meta.trim() : "",
+    ...(sanitizeDisplay(req.body.display) ? { display: sanitizeDisplay(req.body.display) } : {}),
   });
 
   return res.status(201).json(
@@ -121,7 +144,7 @@ const createMedia = asyncHandler(async (req, res) => {
  */
 const updateMedia = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { category, title, caption, meta, url, type } = req.body;
+  const { category, title, caption, meta, url, type, display } = req.body;
   const mongoose = require("mongoose");
 
   let existingMedia = null;
@@ -175,6 +198,8 @@ const updateMedia = asyncHandler(async (req, res) => {
     }
   }
 
+  const cleanDisplay = sanitizeDisplay(display);
+
   // 2. If record exists in DB, update it
   if (existingMedia) {
     if (mediaUrl) existingMedia.url = mediaUrl;
@@ -184,6 +209,7 @@ const updateMedia = asyncHandler(async (req, res) => {
     if (title !== undefined) existingMedia.title = title.trim();
     if (caption !== undefined) existingMedia.caption = caption.trim();
     if (meta !== undefined) existingMedia.meta = meta.trim();
+    if (cleanDisplay) existingMedia.display = cleanDisplay;
 
     const updated = await existingMedia.save();
     return res.status(200).json(
@@ -202,10 +228,61 @@ const updateMedia = asyncHandler(async (req, res) => {
     meta: meta !== undefined ? meta.trim() : "",
     isBaseline: true,
     baselineId: id,
+    ...(cleanDisplay ? { display: cleanDisplay } : {}),
   });
 
   return res.status(200).json(
     new ApiResponse(200, newBaselineOverride, "Baseline asset customized successfully")
+  );
+});
+
+/**
+ * @route   PATCH /api/media/:id/display or PATCH /api/media/:id
+ * @desc    Update framing and display positioning without modifying other metadata
+ * @access  Protected (Admin)
+ */
+const updateMediaDisplay = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const mongoose = require("mongoose");
+  const cleanDisplay = sanitizeDisplay(req.body.display || req.body);
+
+  if (!cleanDisplay) {
+    throw new ApiError(400, "Valid display framing settings are required (fit, position, zoom)");
+  }
+
+  let existingMedia = null;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    existingMedia = await Media.findById(id);
+  }
+  if (!existingMedia) {
+    existingMedia = await Media.findOne({ baselineId: id });
+  }
+
+  if (existingMedia) {
+    existingMedia.display = cleanDisplay;
+    const updated = await existingMedia.save();
+    return res.status(200).json(
+      new ApiResponse(200, updated, "Media display framing updated successfully")
+    );
+  }
+
+  // Baseline item being framed for the first time
+  const { url, type, category, title, caption, meta } = req.body;
+  const newBaselineOverride = await Media.create({
+    url: url || "",
+    publicId: "",
+    type: type || "photo",
+    category: category ? category.toLowerCase().trim() : "weddings",
+    title: title || "",
+    caption: caption || "",
+    meta: meta || "",
+    isBaseline: true,
+    baselineId: id,
+    display: cleanDisplay,
+  });
+
+  return res.status(200).json(
+    new ApiResponse(200, newBaselineOverride, "Baseline display framing saved successfully")
   );
 });
 
@@ -254,5 +331,6 @@ module.exports = {
   getMediaByCategory,
   createMedia,
   updateMedia,
+  updateMediaDisplay,
   deleteMedia,
 };

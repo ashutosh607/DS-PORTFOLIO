@@ -100,6 +100,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
       caption: item.caption || item.meta || 'Atelier Master Archive',
       type: item.type || 'photo',
       isCustom: true,
+      display: item.display,
     }));
 
     // Find any baseline overrides for this category
@@ -118,6 +119,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
       caption: coverOverride?.caption || cat.featured?.caption || cat.tagline,
       meta: coverOverride?.meta || cat.featured?.meta || cat.medium || 'Medium Format Film / 35mm',
       type: coverOverride?.type || cat.featured?.type || 'photo',
+      display: coverOverride?.display || cat.featured?.display,
     };
 
     const baseSupporting = (cat.supporting || []).map((s, idx) => {
@@ -134,6 +136,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
         meta: supOverride?.meta || s.meta,
         caption: supOverride?.caption || s.meta,
         type: supOverride?.type || s.type || 'photo',
+        display: supOverride?.display || s.display,
       };
     });
 
@@ -152,6 +155,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
       title: formattedCustom[0].tag,
       caption: formattedCustom[0].meta,
       type: formattedCustom[0].type,
+      display: formattedCustom[0].display,
     } : baseFeatured;
 
     const supporting = formattedCustom.length > 0
@@ -160,6 +164,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
     return {
       ...cat,
+      coverDisplay: coverOverride?.display,
       featured,
       supporting,
       allMedia,

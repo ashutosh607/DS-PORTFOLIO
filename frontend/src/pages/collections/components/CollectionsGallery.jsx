@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Image as ImageIcon } from 'lucide-react';
 import TextBlurReveal from '../../../components/common/TextBlurReveal';
+import { getFramingStyle, getFramingContainerStyle } from '../../../utils/mediaFraming';
 
 /**
  * Shared-element FLIP Flying Clone Component
@@ -115,7 +116,8 @@ function FlipFlyingClone({ flipState, onFinish }) {
         {item.type === 'video' ? (
           <video
             src={item.image}
-            className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
+            className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+            style={getFramingStyle(item.display, { disableZoom: true })}
             autoPlay
             muted
             loop
@@ -125,7 +127,8 @@ function FlipFlyingClone({ flipState, onFinish }) {
           <img
             src={item.image}
             alt=""
-            className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
+            className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+            style={getFramingStyle(item.display, { disableZoom: true })}
             loading="eager"
             decoding="sync"
           />
@@ -371,6 +374,7 @@ export default function CollectionsGallery({
                 <div
                   ref={masterFrameRef}
                   className="group relative w-full aspect-[16/10.8] rounded-[6px] overflow-hidden bg-[#1D1C19] border border-[#E0D8CA] shadow-[0_20px_45px_-12px_rgba(20,18,15,0.16)]"
+                  style={getFramingContainerStyle(selectedItem?.display)}
                 >
                   {/* 1. Outgoing photo held visible underneath during expand flight so frame is never black */}
                   {outgoingItem && isExpanding && (
@@ -378,7 +382,8 @@ export default function CollectionsGallery({
                       {outgoingItem.type === 'video' ? (
                         <video
                           src={outgoingItem.image}
-                          className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
+                          className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+                          style={getFramingStyle(outgoingItem.display)}
                           autoPlay
                           muted
                           loop
@@ -388,7 +393,8 @@ export default function CollectionsGallery({
                         <img
                           src={outgoingItem.image}
                           alt=""
-                          className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
+                          className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+                          style={getFramingStyle(outgoingItem.display)}
                         />
                       )}
                     </div>
@@ -413,7 +419,8 @@ export default function CollectionsGallery({
                         {selectedItem?.type === 'video' ? (
                           <video
                             src={selectedItem.image}
-                            className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
+                            className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+                            style={getFramingStyle(selectedItem.display)}
                             autoPlay
                             muted
                             loop
@@ -423,7 +430,8 @@ export default function CollectionsGallery({
                           <img
                             src={selectedItem?.image}
                             alt={selectedItem?.title || selectedItem?.tag || activeCategory.name}
-                            className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02] group-hover:scale-[1.015] transition-transform duration-700 ease-out"
+                            className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02] group-hover:scale-[1.015] transition-all duration-700 ease-out"
+                            style={getFramingStyle(selectedItem?.display)}
                             loading="eager"
                           />
                         )}
@@ -535,11 +543,13 @@ export default function CollectionsGallery({
                               }
                             }}
                             className="relative w-full aspect-[4/3] overflow-hidden rounded-[2px] bg-[#ECE7DC]"
+                            style={getFramingContainerStyle(item.display)}
                           >
                             {item.type === 'video' ? (
                               <video
                                 src={item.image}
-                                className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02]"
+                                className="w-full h-full filter brightness-[0.98] contrast-[1.02]"
+                                style={getFramingStyle(item.display)}
                                 preload="metadata"
                                 muted
                                 loop
@@ -549,7 +559,8 @@ export default function CollectionsGallery({
                               <img
                                 src={item.image}
                                 alt={item.tag || item.title || `Specimen ${globalIdx}`}
-                                className="w-full h-full object-cover object-top filter brightness-[0.98] contrast-[1.02] group-hover:scale-105 transition-transform duration-500 ease-out"
+                                className="w-full h-full filter brightness-[0.98] contrast-[1.02] group-hover:scale-105 transition-transform duration-500 ease-out"
+                                style={getFramingStyle(item.display)}
                                 loading="lazy"
                               />
                             )}

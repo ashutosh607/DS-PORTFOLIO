@@ -48,6 +48,14 @@ const mediaSchema = new mongoose.Schema(
       default: "",
       index: true,
     },
+    display: {
+      type: mongoose.Schema.Types.Mixed,
+      default: () => ({
+        fit: "cover",
+        position: { x: 50, y: 50 },
+        zoom: 1,
+      }),
+    },
   },
   {
     timestamps: true,

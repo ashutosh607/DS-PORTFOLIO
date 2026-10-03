@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Image, Film, Check, RotateCcw, Sparkles } from 'lucide-react';
+import { X, Upload, Image, Film, Check, RotateCcw, Sparkles, Crop } from 'lucide-react';
 import { CATEGORIES as DEFAULT_CATEGORIES } from '../../collections/data/collectionsData';
 import { useCategories } from '../../../utils/categoryManager';
 import { useAdminAuth } from '../context/AdminAuthContext';
@@ -12,6 +12,7 @@ export default function EditMediaModal({
   onClose,
   onSuccess,
   onResetBaseline,
+  onOpenDisplay,
   mediaItem,
 }) {
   const { getAuthHeaders } = useAdminAuth();
@@ -283,7 +284,7 @@ export default function EditMediaModal({
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
@@ -291,6 +292,18 @@ export default function EditMediaModal({
                   >
                     <Upload size={13} /> Replace with File
                   </button>
+                  {onOpenDisplay && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenDisplay(mediaItem);
+                      }}
+                      className="px-4 py-2 rounded-full bg-[#FAF8F5] text-[#181818] border border-[#DDD5C7] text-[11px] font-semibold uppercase tracking-[0.06em] hover:bg-[#EFEAE2] transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                    >
+                      <Crop size={13} /> Edit Display Framing
+                    </button>
+                  )}
                   {file && (
                     <button
                       type="button"
