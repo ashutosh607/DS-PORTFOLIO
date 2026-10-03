@@ -10,6 +10,7 @@ export default function CollectionsHero({
 }) {
   const shouldReduceMotion = useReducedMotion();
   const videoRef = useRef(null);
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
   useEffect(() => {
@@ -70,23 +71,51 @@ export default function CollectionsHero({
     };
   }, []);
 
+  useEffect(() => {
+    // Smooth cinematic trigger: transition from off to on opening from the middle
+    const openTimer = setTimeout(() => {
+      setIsVideoOpen(true);
+    }, 200);
+
+    return () => clearTimeout(openTimer);
+  }, []);
+
   return (
     <section
-      className="relative w-full overflow-hidden flex items-center"
+      className="relative w-full overflow-hidden flex items-center bg-[#11100F]"
       style={{
         minHeight: '100svh',
         height: '100svh',
-        backgroundColor: '#FDFCF8',
       }}
     >
-      {/* 1. Fullscreen Background Video Layer */}
+      {/* 1. Fullscreen Background Video Layer with TV / Shutter "Off to On" Middle Reveal */}
       <motion.div
         className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none"
-        initial={shouldReduceMotion ? false : { opacity: 0 }}
-        animate={{ opacity: isVideoReady ? 1 : 0 }}
+        initial={
+          shouldReduceMotion
+            ? false
+            : {
+                clipPath: 'inset(50% 0% 50% 0%)',
+                opacity: 0,
+                scale: 1.06,
+              }
+        }
+        animate={
+          isVideoOpen
+            ? {
+                clipPath: 'inset(0% 0% 0% 0%)',
+                opacity: isVideoReady || isVideoOpen ? 1 : 0,
+                scale: 1,
+              }
+            : {
+                clipPath: 'inset(50% 0% 50% 0%)',
+                opacity: 0,
+                scale: 1.06,
+              }
+        }
         transition={{
-          duration: 0.65,
-          ease: [0.16, 1, 0.3, 1],
+          duration: 1.25,
+          ease: [0.16, 1, 0.3, 1], // silky luxury cinema easing
         }}
       >
         <video
@@ -100,18 +129,47 @@ export default function CollectionsHero({
           preload="auto"
           onLoadedData={() => setIsVideoReady(true)}
           onPlaying={() => setIsVideoReady(true)}
+          poster="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1600&auto=format&fit=crop"
           className="w-full h-full object-cover object-center pointer-events-none select-none"
           style={{
             objectPosition: 'center center',
           }}
           aria-hidden="true"
         >
-          {/* Direct edge-served asset for instant playback */}
+          {/* Direct edge-served Vercel asset for instant 0ms latency playback */}
           <source src="/videos/landingpagevd.mp4" type="video/mp4" />
           <source src="/uploads/ds_portfolio/categories/landingpagevd.mp4" type="video/mp4" />
           <source src="/categories/landingpagevd.mp4" type="video/mp4" />
         </video>
       </motion.div>
+
+      {/* Luminous Center Horizon Shutter Beam: Pulses across the middle on power-on */}
+      {!shouldReduceMotion && (
+        <motion.div
+          className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[2px] z-[2] pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.85) 30%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.85) 70%, transparent 100%)',
+            boxShadow:
+              '0 0 18px 3px rgba(255, 255, 255, 0.9), 0 0 36px 8px rgba(235, 226, 212, 0.6)',
+          }}
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={
+            isVideoOpen
+              ? {
+                  scaleX: [0, 1, 1],
+                  opacity: [0, 1, 0],
+                  scaleY: [1, 2, 0.2],
+                }
+              : { scaleX: 0, opacity: 0 }
+          }
+          transition={{
+            duration: 0.9,
+            times: [0, 0.35, 1],
+            ease: [0.16, 1, 0.3, 1],
+          }}
+        />
+      )}
 
       {/* 2. Soft Warm-Neutral Scrim for Flawless Text Readability */}
       {/* Desktop: Horizontal directional gradient strongest behind the text and fading toward the center/right */}
