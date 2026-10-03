@@ -298,13 +298,13 @@ export default function AdminCollectionsPage() {
             preload="metadata"
             muted
             playsInline
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
           />
         ) : (
           <img
             src={getApiUrl(item.url)}
             alt={item.title || 'Media'}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
             loading="lazy"
           />
         )}
@@ -464,7 +464,7 @@ export default function AdminCollectionsPage() {
               <img
                 src={currentCategoryObj.coverImage || currentCategoryObj.featured?.image}
                 alt={currentCategoryObj.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
             </div>
             <div className="min-w-0">

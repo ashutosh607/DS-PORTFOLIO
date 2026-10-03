@@ -359,7 +359,7 @@ export default function CollectionsRibbon({
                     <img
                       src={cat.coverImage}
                       alt={`${cat.name} Collection`}
-                      className="absolute inset-0 w-full h-full object-cover object-center transition-[transform] duration-500 ease-out group-hover:scale-105 pointer-events-none"
+                      className="absolute inset-0 w-full h-full object-cover object-top transition-[transform] duration-500 ease-out group-hover:scale-105 pointer-events-none"
                       loading="lazy"
                       draggable={false}
                     />
