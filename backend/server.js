@@ -70,10 +70,14 @@ app.use(
       if (!origin) return callback(null, true);
       const cleanOrigin = origin.replace(/\/$/, "");
 
+      const isVercelDomain =
+        cleanOrigin.endsWith(".vercel.app") ||
+        cleanOrigin.endsWith(".vercel.dev");
+
       const isAllowed =
         allowedOrigins.includes("*") ||
         allowedOrigins.includes(cleanOrigin) ||
-        (allowedOrigins.some((o) => o.includes(".vercel.app")) && cleanOrigin.endsWith(".vercel.app"));
+        isVercelDomain;
 
       if (isAllowed) {
         return callback(null, true);

@@ -12,11 +12,19 @@ export function AdminAuthProvider({ children }) {
     let isMounted = true;
 
     async function checkAuth() {
-      try {
-        const headers = {};
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
+      // If there is no stored JWT token, the user is unauthenticated; finish loading immediately
+      if (!token) {
+        if (isMounted) {
+          setAdminUser(null);
+          setLoading(false);
         }
+        return;
+      }
+
+      try {
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
 
         const res = await fetch('/api/admin/me', {
           method: 'GET',
@@ -24,7 +32,8 @@ export function AdminAuthProvider({ children }) {
           credentials: 'include',
         });
 
-        if (res.ok) {
+        const contentType = res.headers.get('content-type') || '';
+        if (res.ok && contentType.includes('application/json')) {
           const data = await res.json();
           if (isMounted && data.data) {
             setAdminUser(data.data);
@@ -62,6 +71,13 @@ export function AdminAuthProvider({ children }) {
       credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
+
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error(
+        'Backend server did not return JSON. If running on Render free tier, the backend may take 30-50s to wake up from cold start. Please wait a moment and try again.'
+      );
+    }
 
     const data = await res.json();
 

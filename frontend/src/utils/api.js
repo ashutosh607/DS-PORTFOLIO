@@ -6,7 +6,18 @@ import axios from 'axios';
  * In local Vite development, uses local backend URL or proxy.
  */
 
-const RAW_API_URL = import.meta.env.VITE_API_URL || '';
+const isClient = typeof window !== 'undefined';
+const isLocalhost = isClient && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+// Prefer explicit environment variable, then localStorage override, then production Render fallback
+const DEFAULT_RENDER_URL = 'https://ds-portfolio-backend.onrender.com';
+const storedApiUrl = isClient ? localStorage.getItem('ds_api_url') : '';
+
+const RAW_API_URL =
+  import.meta.env.VITE_API_URL ||
+  storedApiUrl ||
+  (!isLocalhost && import.meta.env.PROD ? DEFAULT_RENDER_URL : '');
+
 export const API_BASE_URL = RAW_API_URL.replace(/\/$/, '');
 
 // Centralized Axios instance configured for cross-origin credentials

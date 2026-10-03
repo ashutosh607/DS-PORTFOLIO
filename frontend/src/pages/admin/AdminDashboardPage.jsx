@@ -66,8 +66,9 @@ export default function AdminDashboardPage() {
 
   // Compute category counts
   const categoryStats = currentCategories.map((cat) => {
+    const catSlug = (cat?.slug || cat?.id || '').toLowerCase();
     const catMedia = mediaList.filter(
-      (m) => m.category?.toLowerCase() === cat.slug.toLowerCase()
+      (m) => (m.category || '').toLowerCase() === catSlug
     );
     const customPhotosCount = catMedia.filter((m) => m.type !== 'video').length;
     const customVideosCount = catMedia.filter((m) => m.type === 'video').length;

@@ -6,16 +6,42 @@ import App from './App.jsx'
 import { API_BASE_URL } from './utils/api.js'
 
 // In production (Vercel), automatically route relative /api, /uploads, and /categories to Render backend URL
-if (API_BASE_URL && typeof window !== 'undefined') {
+if (typeof window !== 'undefined') {
   const originalFetch = window.fetch;
   window.fetch = function (resource, init) {
-    if (
-      typeof resource === 'string' &&
-      (resource.startsWith('/api') || resource.startsWith('/uploads') || resource.startsWith('/categories'))
-    ) {
-      resource = `${API_BASE_URL}${resource}`;
+    let url = typeof resource === 'string' ? resource : resource?.url || '';
+    const isRelativeApiPath =
+      url.startsWith('/api') ||
+      url.startsWith('/uploads') ||
+      url.startsWith('/categories');
+
+    if (API_BASE_URL && isRelativeApiPath) {
+      url = `${API_BASE_URL}${url}`;
     }
-    return originalFetch.call(this, resource, init);
+
+    const modifiedInit = { ...(init || {}) };
+
+    // Ensure cross-origin cookies & headers are allowed for API requests
+    if (url.includes('/api/')) {
+      if (!modifiedInit.credentials) {
+        modifiedInit.credentials = 'include';
+      }
+
+      // Automatically attach Bearer token from localStorage if not already present
+      const token = localStorage.getItem('ds_admin_jwt');
+      if (token) {
+        const headers = new Headers(modifiedInit.headers || {});
+        if (!headers.has('Authorization')) {
+          headers.set('Authorization', `Bearer ${token}`);
+          modifiedInit.headers = headers;
+        }
+      }
+    }
+
+    if (typeof resource === 'string') {
+      return originalFetch.call(this, url, modifiedInit);
+    }
+    return originalFetch.call(this, new Request(url, modifiedInit));
   };
 }
 
