@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getFramingStyle } from '../../../utils/mediaFraming';
 
 const VISIBLE_COUNT = 6;
 const CARD_GAP = 18;
@@ -359,7 +360,8 @@ export default function CollectionsRibbon({
                     <img
                       src={cat.coverImage}
                       alt={`${cat.name} Collection`}
-                      className="absolute inset-0 w-full h-full object-cover object-top transition-[transform] duration-500 ease-out group-hover:scale-105 pointer-events-none"
+                      className="absolute inset-0 w-full h-full transition-[transform] duration-500 ease-out group-hover:scale-105 pointer-events-none"
+                      style={getFramingStyle(cat.coverDisplay || cat.display)}
                       loading="lazy"
                       draggable={false}
                     />

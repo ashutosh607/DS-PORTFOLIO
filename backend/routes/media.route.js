@@ -4,6 +4,7 @@ const {
   getMediaByCategory,
   createMedia,
   updateMedia,
+  updateMediaDisplay,
   deleteMedia,
 } = require("../controllers/media.controller");
 const { verifyAdmin } = require("../middlewares/auth.middleware");
@@ -20,6 +21,8 @@ router.get("/:category", validateIdOrSlug("category"), getMediaByCategory);
 // Protected admin management endpoints
 router.post("/", verifyAdmin, upload.single("file"), createMedia);
 router.put("/:id", verifyAdmin, validateIdOrSlug("id"), upload.single("file"), updateMedia);
+router.patch("/:id/display", verifyAdmin, validateIdOrSlug("id"), updateMediaDisplay);
+router.patch("/:id", verifyAdmin, validateIdOrSlug("id"), updateMediaDisplay);
 router.delete("/:id", verifyAdmin, validateIdOrSlug("id"), deleteMedia);
 
 module.exports = router;
