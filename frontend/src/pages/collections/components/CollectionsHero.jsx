@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import TextBlurReveal from '../../../components/common/TextBlurReveal';
-import { getApiUrl } from '../../../utils/api';
 
 export default function CollectionsHero({
   onScrollToExplore,
@@ -10,39 +9,152 @@ export default function CollectionsHero({
   onNextCategory,
 }) {
   const shouldReduceMotion = useReducedMotion();
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Strict DOM properties and attributes for iOS Safari, WebKit, and Chrome autoplay policies
+    video.defaultMuted = true;
+    video.muted = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', 'true');
+
+    const playVideo = () => {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.debug('Autoplay waiting for policy or user touch:', err);
+        });
+      }
+    };
+
+    // Explicitly trigger media loading pipeline
+    video.load();
+    playVideo();
+
+    video.addEventListener('loadeddata', playVideo);
+    video.addEventListener('canplay', playVideo);
+
+    // Fallback: If mobile browser power-saver initially deferred autoplay, trigger on first user interaction
+    const handleFirstInteraction = () => {
+      if (video.paused) {
+        playVideo();
+      }
+      window.removeEventListener('click', handleFirstInteraction);
+      window.removeEventListener('touchstart', handleFirstInteraction);
+    };
+
+    window.addEventListener('click', handleFirstInteraction, { passive: true, once: true });
+    window.addEventListener('touchstart', handleFirstInteraction, { passive: true, once: true });
+
+    return () => {
+      video.removeEventListener('loadeddata', playVideo);
+      video.removeEventListener('canplay', playVideo);
+      window.removeEventListener('click', handleFirstInteraction);
+      window.removeEventListener('touchstart', handleFirstInteraction);
+    };
+  }, []);
+
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
+  useEffect(() => {
+    // Smooth cinematic trigger: transition from off to on opening from the middle
+    const openTimer = setTimeout(() => {
+      setIsVideoOpen(true);
+    }, 200);
+
+    return () => clearTimeout(openTimer);
+  }, []);
 
   return (
     <section
-      className="relative w-full overflow-hidden flex items-center"
+      className="relative w-full overflow-hidden flex items-center bg-[#11100F]"
       style={{
         minHeight: '100svh',
         height: '100svh',
       }}
     >
-      {/* 1. Fullscreen Background Video Layer */}
+      {/* 1. Fullscreen Background Video Layer with TV / Shutter "Off to On" Middle Reveal */}
       <motion.div
         className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none"
-        initial={shouldReduceMotion ? false : { opacity: 0, scale: 1.02 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+        initial={
+          shouldReduceMotion
+            ? false
+            : {
+                clipPath: 'inset(50% 0% 50% 0%)',
+                opacity: 0,
+                scale: 1.06,
+              }
+        }
+        animate={
+          isVideoOpen
+            ? {
+                clipPath: 'inset(0% 0% 0% 0%)',
+                opacity: 1,
+                scale: 1,
+              }
+            : {
+                clipPath: 'inset(50% 0% 50% 0%)',
+                opacity: 0,
+                scale: 1.06,
+              }
+        }
+        transition={{
+          duration: 1.25,
+          ease: [0.16, 1, 0.3, 1], // silky luxury cinema easing
+        }}
       >
         <video
+          ref={videoRef}
+          src="/videos/landingpagevd.mp4"
           autoPlay
           muted
+          defaultMuted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
+          poster="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1600&auto=format&fit=crop"
           className="w-full h-full object-cover object-center pointer-events-none select-none"
           style={{
             objectPosition: 'center center',
           }}
           aria-hidden="true"
         >
-          <source src={getApiUrl("/uploads/ds_portfolio/categories/landingpagevd.mp4")} type="video/mp4" />
-          <source src={getApiUrl("/categories/landingpagevd.mp4")} type="video/mp4" />
-          <source src="/videos/cinematic-film.mp4" type="video/mp4" />
+          {/* Direct edge-served Vercel asset for instant 0ms latency playback */}
+          <source src="/videos/landingpagevd.mp4" type="video/mp4" />
         </video>
       </motion.div>
+
+      {/* Luminous Center Horizon Shutter Beam: Pulses across the middle on power-on */}
+      {!shouldReduceMotion && (
+        <motion.div
+          className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[2px] z-[2] pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.85) 30%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.85) 70%, transparent 100%)',
+            boxShadow:
+              '0 0 18px 3px rgba(255, 255, 255, 0.9), 0 0 36px 8px rgba(235, 226, 212, 0.6)',
+          }}
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={
+            isVideoOpen
+              ? {
+                  scaleX: [0, 1, 1],
+                  opacity: [0, 1, 0],
+                  scaleY: [1, 2, 0.2],
+                }
+              : { scaleX: 0, opacity: 0 }
+          }
+          transition={{
+            duration: 0.9,
+            times: [0, 0.35, 1],
+            ease: [0.16, 1, 0.3, 1],
+          }}
+        />
+      )}
 
       {/* 2. Soft Warm-Neutral Scrim for Flawless Text Readability */}
       {/* Desktop: Horizontal directional gradient strongest behind the text and fading toward the center/right */}
