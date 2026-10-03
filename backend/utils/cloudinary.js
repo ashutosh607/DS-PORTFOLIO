@@ -146,7 +146,7 @@ const uploadOnCloudinary = async (localFilePath, folder = "ds_portfolio") => {
         console.error("Error removing local file after upload failure:", unlinkError);
       }
     }
-    console.error("Media upload handler error:", error);
+    console.error("Media upload handler error is caused:", error);
     throw error;
   }
 };
