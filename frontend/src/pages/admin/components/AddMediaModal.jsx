@@ -3,6 +3,7 @@ import { X, Upload, Image, Film } from 'lucide-react';
 import { CATEGORIES as DEFAULT_CATEGORIES } from '../../collections/data/collectionsData';
 import { useCategories } from '../../../utils/categoryManager';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import { optimizeImageFile } from '../../../utils/imageOptimizer';
 import '../AdminDashboard.css';
 
 export default function AddMediaModal({
@@ -23,6 +24,7 @@ export default function AddMediaModal({
   const [title, setTitle] = useState('');
   const [caption, setCaption] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('');
   const [error, setError] = useState('');
 
   const fileInputRef = useRef(null);
@@ -42,6 +44,7 @@ export default function AddMediaModal({
       setCaption('');
       setError('');
       setUploading(false);
+      setUploadStatus('');
     }
   }, [isOpen]);
 
@@ -59,11 +62,8 @@ export default function AddMediaModal({
       setFilePreview(URL.createObjectURL(selectedFile));
     } else {
       setMediaType('photo');
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setFilePreview(event.target.result);
-      };
-      reader.readAsDataURL(selectedFile);
+      const previewUrl = URL.createObjectURL(selectedFile);
+      setFilePreview(previewUrl);
     }
   };
 
@@ -82,13 +82,31 @@ export default function AddMediaModal({
     }
 
     setUploading(true);
+    setUploadStatus('');
     try {
       let res;
       const headers = getAuthHeaders();
 
       if (file) {
+        let uploadPayload = file;
+
+        // Perform browser-side compression before sending to Cloudinary
+        if (file.type?.startsWith('image/')) {
+          setUploadStatus('Optimizing image...');
+          try {
+            uploadPayload = await optimizeImageFile(file);
+          } catch (compErr) {
+            setError(compErr.message || 'Image optimization failed.');
+            setUploading(false);
+            setUploadStatus('');
+            return;
+          }
+        }
+
+        setUploadStatus('Uploading...');
+
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', uploadPayload);
         formData.append('category', category);
         formData.append('type', mediaType);
         if (title.trim()) formData.append('title', title.trim());
@@ -101,6 +119,7 @@ export default function AddMediaModal({
           body: formData,
         });
       } else {
+        setUploadStatus('Uploading...');
         res = await fetch('/api/media', {
           method: 'POST',
           headers: {
@@ -130,6 +149,7 @@ export default function AddMediaModal({
       setError(err.message || 'Error uploading media asset');
     } finally {
       setUploading(false);
+      setUploadStatus('');
     }
   };
 
@@ -363,7 +383,7 @@ export default function AddMediaModal({
             {uploading ? (
               <>
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>SENDING...</span>
+                <span>{uploadStatus ? uploadStatus.toUpperCase() : 'UPLOADING...'}</span>
               </>
             ) : (
               <>

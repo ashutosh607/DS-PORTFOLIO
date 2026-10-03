@@ -540,6 +540,7 @@ export default function CollectionsGallery({
                               <video
                                 src={item.image}
                                 className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
+                                preload="metadata"
                                 muted
                                 loop
                                 playsInline

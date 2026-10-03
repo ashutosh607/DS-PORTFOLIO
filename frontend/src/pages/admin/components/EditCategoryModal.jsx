@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { updateCategory } from '../../../utils/categoryManager';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import { optimizeImageFile } from '../../../utils/imageOptimizer';
 import '../AdminDashboard.css';
 
 /* ── Inline style objects (guarantees spacing regardless of Tailwind) ── */
@@ -152,9 +153,13 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
     try {
       let payload;
       if (coverFile) {
+        let uploadCover = coverFile;
+        if (coverFile.type?.startsWith('image/')) {
+          uploadCover = await optimizeImageFile(coverFile);
+        }
         payload = new FormData();
         payload.append('name', name.trim());
-        payload.append('coverFile', coverFile);
+        payload.append('coverFile', uploadCover);
         payload.append('tagline', tagline.trim());
         payload.append('quote', quote.trim());
         payload.append('medium', medium.trim());

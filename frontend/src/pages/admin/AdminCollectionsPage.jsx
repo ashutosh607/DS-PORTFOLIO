@@ -9,6 +9,7 @@ import AddCategoryModal from './components/AddCategoryModal';
 import EditCategoryModal from './components/EditCategoryModal';
 import DeleteCategoryModal from './components/DeleteCategoryModal';
 import { useAdminAuth } from './context/AdminAuthContext';
+import { getApiUrl } from '../../utils/api';
 import './AdminDashboard.css';
 
 export default function AdminCollectionsPage() {
@@ -292,12 +293,19 @@ export default function AdminCollectionsPage() {
       {/* Framed Media Preview (Padded on all sides) */}
       <div className="photo-frame">
         {item.type === 'video' ? (
-          <video src={item.url} className="w-full h-full object-cover" />
+          <video
+            src={getApiUrl(item.url)}
+            preload="metadata"
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
         ) : (
           <img
-            src={item.url}
+            src={getApiUrl(item.url)}
             alt={item.title || 'Media'}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         )}
 

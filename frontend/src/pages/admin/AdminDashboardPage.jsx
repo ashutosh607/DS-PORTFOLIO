@@ -6,6 +6,7 @@ import { useCategories } from '../../utils/categoryManager';
 import AddMediaModal from './components/AddMediaModal';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import { useAdminAuth } from './context/AdminAuthContext';
+import { getApiUrl } from '../../utils/api';
 import './AdminDashboard.css';
 
 export default function AdminDashboardPage() {
@@ -268,11 +269,18 @@ export default function AdminDashboardPage() {
               >
                 <div className="media-thumb">
                   {item.type === 'video' ? (
-                    <video src={item.url} />
+                    <video
+                      src={getApiUrl(item.url)}
+                      preload="metadata"
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <img
-                      src={item.url}
+                      src={getApiUrl(item.url)}
                       alt={item.title || 'Media'}
+                      loading="lazy"
                     />
                   )}
                   {item.type === 'video' && (

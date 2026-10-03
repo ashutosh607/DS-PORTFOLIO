@@ -88,9 +88,9 @@ app.use(
   })
 );
 
-// 3. Payload size limiting & body parsing (strict 100KB limit to prevent DoS)
-app.use(express.json({ limit: "100kb" }));
-app.use(express.urlencoded({ extended: true, limit: "100kb" }));
+// 3. Payload size limiting & body parsing (generous 50MB limit for high-res base64 media & admin uploads)
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // 4. Trap and reject malformed JSON syntax payloads with clean 400 Bad Request
 app.use((err, req, res, next) => {

@@ -5,6 +5,7 @@ import { useCategories } from '../../utils/categoryManager';
 import CollectionsHero from './components/CollectionsHero';
 import CollectionsRibbon from './components/CollectionsRibbon';
 import CollectionsGallery from './components/CollectionsGallery';
+import { getApiUrl } from '../../utils/api';
 
 export default function CollectionsPage({ onOpenInquiry }) {
   const { categorySlug } = useParams();
@@ -92,7 +93,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
     const formattedCustom = customItems.map((item, idx) => ({
       id: item._id || `custom-${cat.id}-${idx}`,
-      image: item.url,
+      image: getApiUrl(item.url),
       title: item.title || `${cat.name} Specimen`,
       tag: item.title || `${cat.name} Specimen`,
       meta: item.caption || item.meta || 'Atelier Master Archive',
@@ -110,7 +111,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
     const baseFeatured = {
       id: `${cat.id}-featured`,
-      image: coverOverride?.url || cat.coverImage || cat.featured?.image,
+      image: coverOverride?.url ? getApiUrl(coverOverride.url) : (cat.coverImage || cat.featured?.image),
       title: coverOverride?.title || cat.featured?.title || cat.name,
       tag: coverOverride?.title || cat.featured?.title || cat.name,
       count: cat.featured?.count || '1/08',
@@ -127,7 +128,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
       );
       return {
         id: s.id || `${cat.id}-sup-${idx}`,
-        image: supOverride?.url || s.image,
+        image: supOverride?.url ? getApiUrl(supOverride.url) : s.image,
         title: supOverride?.title || s.tag,
         tag: supOverride?.title || s.tag,
         meta: supOverride?.meta || s.meta,

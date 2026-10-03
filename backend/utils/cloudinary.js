@@ -15,27 +15,86 @@ const uploadOnCloudinary = async (localFilePath, folder = "ds_portfolio") => {
 
     // 1. Try Cloudinary if real credentials are provided
     if (isCloudinaryConfigured) {
+      let optimizedFilePath = null;
       try {
         const ext = path.extname(localFilePath).toLowerCase();
         const isVideo = [".mp4", ".mov", ".webm", ".avi", ".mkv"].includes(ext);
+        const isImage = [".jpg", ".jpeg", ".png", ".webp", ".avif", ".tiff", ".bmp"].includes(ext);
+
+        let fileToUpload = localFilePath;
+
+        // Auto-optimize images with sharp if dimensions > 2560px or file size > 2.5MB
+        if (isImage) {
+          try {
+            const sharp = require("sharp");
+            const meta = await sharp(localFilePath).metadata();
+            const stats = fs.existsSync(localFilePath) ? fs.statSync(localFilePath) : null;
+            const size = stats ? stats.size : 0;
+            const needsResize = (meta.width && meta.width > 2560) || (meta.height && meta.height > 2560);
+            const needsCompression = size > 2.5 * 1024 * 1024;
+
+            if (needsResize || needsCompression) {
+              optimizedFilePath = path.join(
+                path.dirname(localFilePath),
+                `opt_${Date.now()}_${path.basename(localFilePath, ext)}.jpg`
+              );
+              await sharp(localFilePath)
+                .rotate() // preserve camera EXIF orientation
+                .resize({
+                  width: 2560,
+                  height: 2560,
+                  fit: "inside",
+                  withoutEnlargement: true,
+                })
+                .jpeg({ quality: 86, mozjpeg: true })
+                .toFile(optimizedFilePath);
+
+              fileToUpload = optimizedFilePath;
+            }
+          } catch (sharpErr) {
+            console.warn("⚠️ Sharp image optimization skipped:", sharpErr.message);
+          }
+        }
+
+        const stats = fs.existsSync(fileToUpload) ? fs.statSync(fileToUpload) : null;
+        const fileSize = stats ? stats.size : 0;
+        const isLarge = isVideo || fileSize > 10 * 1024 * 1024; // > 10MB or video
 
         const uploadOptions = {
           resource_type: isVideo ? "video" : "auto",
           folder: folder,
+          timeout: 240000, // 4 minutes timeout for large 30MB-100MB files
         };
-        if (isVideo) {
-          uploadOptions.chunk_size = 6000000;
+
+        if (isLarge) {
+          uploadOptions.chunk_size = 6000000; // 6MB chunk size for upload_large
         }
 
-        const response = await cloudinary.uploader.upload(localFilePath, uploadOptions);
+        let response;
+        if (isLarge) {
+          response = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_large(fileToUpload, uploadOptions, (err, res) => {
+              if (err) return reject(err);
+              resolve(res);
+            });
+          });
+        } else {
+          response = await cloudinary.uploader.upload(fileToUpload, uploadOptions);
+        }
 
-        // Clean up temporary upload file
+        // Clean up temporary upload files
+        if (optimizedFilePath && fs.existsSync(optimizedFilePath)) {
+          fs.unlinkSync(optimizedFilePath);
+        }
         if (fs.existsSync(localFilePath)) {
           fs.unlinkSync(localFilePath);
         }
 
         return response;
       } catch (cloudErr) {
+        if (optimizedFilePath && fs.existsSync(optimizedFilePath)) {
+          try { fs.unlinkSync(optimizedFilePath); } catch (e) {}
+        }
         console.warn("⚠️ Cloudinary upload rejected:", cloudErr.message);
         console.warn("📁 Falling back to local static storage...");
       }

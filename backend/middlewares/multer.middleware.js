@@ -58,7 +58,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB maximum payload
+    fileSize: 100 * 1024 * 1024, // 100MB maximum payload (supports large 30MB+ photography & 4K video clips)
   },
 });
 

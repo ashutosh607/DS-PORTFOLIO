@@ -20,6 +20,11 @@ const errorHandler = (err, req, res, next) => {
     error = new ApiError(400, `Validation failed: ${messages.join("; ")}`, messages);
   }
 
+  // Handle Multer fileSize limit error
+  if (err.code === "LIMIT_FILE_SIZE" || err.message?.includes("File too large")) {
+    error = new ApiError(400, "File size exceeds maximum allowed upload limit (100MB). Please select a file under 100MB.");
+  }
+
   if (!(error instanceof ApiError)) {
     const statusCode = error.statusCode || 500;
     const isProduction = process.env.NODE_ENV === "production";

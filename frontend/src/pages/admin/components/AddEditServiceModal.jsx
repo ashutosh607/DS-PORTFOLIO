@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useCategories } from '../../../utils/categoryManager';
+import { optimizeImageFile } from '../../../utils/imageOptimizer';
 import '../AdminDashboard.css';
 
 const DEFAULT_CATEGORIES = [
@@ -211,7 +212,11 @@ export default function AddEditServiceModal({
       formData.append('isActive', String(isActive));
 
       if (imageFile) {
-        formData.append('imageFile', imageFile);
+        let uploadImage = imageFile;
+        if (imageFile.type?.startsWith('image/')) {
+          uploadImage = await optimizeImageFile(imageFile);
+        }
+        formData.append('imageFile', uploadImage);
       } else if (imageUrl.trim()) {
         formData.append('imageUrl', imageUrl.trim());
       }

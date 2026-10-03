@@ -3,6 +3,8 @@ import { X, Upload, Image, Film, Check, RotateCcw, Sparkles } from 'lucide-react
 import { CATEGORIES as DEFAULT_CATEGORIES } from '../../collections/data/collectionsData';
 import { useCategories } from '../../../utils/categoryManager';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import { getApiUrl } from '../../../utils/api';
+import { optimizeImageFile } from '../../../utils/imageOptimizer';
 import '../AdminDashboard.css';
 
 export default function EditMediaModal({
@@ -25,6 +27,7 @@ export default function EditMediaModal({
   const [caption, setCaption] = useState('');
   const [meta, setMeta] = useState('');
   const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('');
   const [resetting, setResetting] = useState(false);
   const [error, setError] = useState('');
 
@@ -43,6 +46,7 @@ export default function EditMediaModal({
       setFile(null);
       setError('');
       setSaving(false);
+      setSaveStatus('');
       setResetting(false);
     }
   }, [isOpen, mediaItem]);
@@ -64,11 +68,8 @@ export default function EditMediaModal({
       setFilePreview(URL.createObjectURL(selectedFile));
     } else {
       setMediaType('photo');
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setFilePreview(event.target.result);
-      };
-      reader.readAsDataURL(selectedFile);
+      const previewUrl = URL.createObjectURL(selectedFile);
+      setFilePreview(previewUrl);
     }
   };
 
@@ -92,14 +93,32 @@ export default function EditMediaModal({
     }
 
     setSaving(true);
+    setSaveStatus('');
     try {
       const headers = getAuthHeaders();
       const targetId = mediaItem._id || mediaItem.id || mediaItem.baselineId;
 
       let res;
       if (file) {
+        let uploadPayload = file;
+
+        // Perform browser-side compression before sending to Cloudinary
+        if (file.type?.startsWith('image/')) {
+          setSaveStatus('Optimizing image...');
+          try {
+            uploadPayload = await optimizeImageFile(file);
+          } catch (compErr) {
+            setError(compErr.message || 'Image optimization failed.');
+            setSaving(false);
+            setSaveStatus('');
+            return;
+          }
+        }
+
+        setSaveStatus('Uploading...');
+
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', uploadPayload);
         formData.append('category', category);
         formData.append('type', mediaType);
         formData.append('title', title.trim());
@@ -115,6 +134,7 @@ export default function EditMediaModal({
           body: formData,
         });
       } else {
+        setSaveStatus('Saving...');
         res = await fetch(`/api/media/${targetId}`, {
           method: 'PUT',
           headers: {
@@ -246,13 +266,14 @@ export default function EditMediaModal({
                 <div className="relative max-h-56 max-w-full overflow-hidden rounded-[10px] flex items-center justify-center shadow-xs bg-black/5">
                   {mediaType === 'video' ? (
                     <video
-                      src={filePreview || directUrl}
+                      src={filePreview || getApiUrl(directUrl)}
                       className="max-h-52 rounded-[8px]"
+                      preload="metadata"
                       controls
                     />
                   ) : (
                     <img
-                      src={filePreview || directUrl}
+                      src={filePreview || getApiUrl(directUrl)}
                       alt={title || 'Preview'}
                       className="max-h-52 object-contain rounded-[8px]"
                       onError={(e) => {
@@ -443,7 +464,7 @@ export default function EditMediaModal({
             {saving ? (
               <>
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>SAVING...</span>
+                <span>{saveStatus ? saveStatus.toUpperCase() : 'SAVING...'}</span>
               </>
             ) : (
               <>
