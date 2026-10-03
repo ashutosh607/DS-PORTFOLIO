@@ -292,18 +292,18 @@ export default function EditMediaModal({
                   >
                     <Upload size={13} /> Replace with File
                   </button>
-                  {onOpenDisplay && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose();
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      if (onOpenDisplay) {
                         onOpenDisplay(mediaItem);
-                      }}
-                      className="px-4 py-2 rounded-full bg-[#FAF8F5] text-[#181818] border border-[#DDD5C7] text-[11px] font-semibold uppercase tracking-[0.06em] hover:bg-[#EFEAE2] transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
-                    >
-                      <Crop size={13} /> Edit Display Framing
-                    </button>
-                  )}
+                      }
+                    }}
+                    className="px-4 py-2 rounded-full bg-[#FAF8F5] text-[#181818] border border-[#C2A378] text-[11px] font-semibold uppercase tracking-[0.06em] hover:bg-[#F0EAE0] transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                  >
+                    <Crop size={13} className="text-[#C2A378]" /> Edit Display Framing
+                  </button>
                   {file && (
                     <button
                       type="button"

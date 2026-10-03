@@ -315,6 +315,20 @@ export default function AdminCollectionsPage() {
           />
         )}
 
+        {/* Quick Edit Display Hover Overlay */}
+        <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none z-10">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setDisplayModalTarget({ ...item, isBaseline });
+            }}
+            className="pointer-events-auto px-3.5 py-1.5 rounded-full bg-white text-[#181818] text-[11px] font-sans font-bold uppercase tracking-[0.06em] flex items-center gap-1.5 shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          >
+            <Crop size={13} className="text-[#C2A378]" /> Edit Display
+          </button>
+        </div>
+
         {/* Video Play Badge */}
         {item.type === 'video' && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -350,11 +364,11 @@ export default function AdminCollectionsPage() {
             <button
               type="button"
               onClick={() => setDisplayModalTarget({ ...item, isBaseline })}
-              className="px-2 py-0.5 rounded-md text-[10.5px] font-sans font-medium text-[#4A453D] bg-[#FAF8F5] hover:bg-[#F0EAE0] hover:text-[#181818] border border-[#DDD5C7] transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
+              className="px-2.5 py-1 rounded-md text-[11px] font-sans font-semibold text-[#181818] bg-[#FAF8F5] hover:bg-[#181818] hover:text-white border border-[#DDD5C7] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
               title="Edit public display & framing"
             >
-              <Crop size={11} />
-              <span>Edit Display</span>
+              <Crop size={12} className="text-[#C2A378]" />
+              <span>EDIT DISPLAY</span>
             </button>
             <button
               type="button"
