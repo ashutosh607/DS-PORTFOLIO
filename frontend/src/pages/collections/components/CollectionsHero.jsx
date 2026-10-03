@@ -72,13 +72,22 @@ export default function CollectionsHero({
   }, []);
 
   useEffect(() => {
-    // Smooth cinematic trigger: transition from off to on opening from the middle
-    const openTimer = setTimeout(() => {
-      setIsVideoOpen(true);
-    }, 200);
+    // Open smoothly from the middle once the video is genuinely ready to play
+    if (isVideoReady) {
+      const openTimer = setTimeout(() => {
+        setIsVideoOpen(true);
+      }, 80);
+      return () => clearTimeout(openTimer);
+    }
 
-    return () => clearTimeout(openTimer);
-  }, []);
+    // Safety fallback: ensure UI opens after max 1.2s even if video takes longer to buffer
+    const fallbackTimer = setTimeout(() => {
+      setIsVideoReady(true);
+      setIsVideoOpen(true);
+    }, 1200);
+
+    return () => clearTimeout(fallbackTimer);
+  }, [isVideoReady]);
 
   return (
     <section
@@ -101,10 +110,10 @@ export default function CollectionsHero({
               }
         }
         animate={
-          isVideoOpen
+          isVideoOpen && isVideoReady
             ? {
                 clipPath: 'inset(0% 0% 0% 0%)',
-                opacity: isVideoReady || isVideoOpen ? 1 : 0,
+                opacity: 1,
                 scale: 1,
               }
             : {
@@ -129,7 +138,6 @@ export default function CollectionsHero({
           preload="auto"
           onLoadedData={() => setIsVideoReady(true)}
           onPlaying={() => setIsVideoReady(true)}
-          poster="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1600&auto=format&fit=crop"
           className="w-full h-full object-cover object-center pointer-events-none select-none"
           style={{
             objectPosition: 'center center',
@@ -155,7 +163,7 @@ export default function CollectionsHero({
           }}
           initial={{ scaleX: 0, opacity: 0 }}
           animate={
-            isVideoOpen
+            isVideoOpen && isVideoReady
               ? {
                   scaleX: [0, 1, 1],
                   opacity: [0, 1, 0],
