@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { CATEGORIES as DEFAULT_CATEGORIES } from './data/collectionsData';
-import { useCategories, findBaselineCategory, toCanonicalCategoryKey } from '../../utils/categoryManager';
+import { useCategories, toCanonicalCategoryKey } from '../../utils/categoryManager';
 import CollectionsHero from './components/CollectionsHero';
 import CollectionsRibbon from './components/CollectionsRibbon';
 import CollectionsGallery from './components/CollectionsGallery';
@@ -84,135 +83,51 @@ export default function CollectionsPage({ onOpenInquiry }) {
     };
   }, []);
 
-  // Dynamically augment categories with newly uploaded media & customized baseline items
+  // Dynamically augment categories with newly uploaded media
   const dynamicCategories = baseCategories.map((cat) => {
-    // Only true custom uploads (matched by exact or canonical slug)
-    const customItems = mediaList.filter(
+    // Media belonging to this category
+    const categoryItems = mediaList.filter(
       (m) =>
-        !m.isBaseline &&
-        !m.baselineId &&
-        (m.category?.toLowerCase() === cat.slug?.toLowerCase() ||
-          toCanonicalCategoryKey(m.category) === toCanonicalCategoryKey(cat.slug))
+        m.category?.toLowerCase() === cat.slug?.toLowerCase() ||
+        toCanonicalCategoryKey(m.category) === toCanonicalCategoryKey(cat.slug)
     );
 
-    const formattedCustom = customItems.map((item, idx) => ({
+    const formattedCustom = categoryItems.map((item, idx) => ({
       id: item._id || `custom-${cat.id}-${idx}`,
       image: getApiUrl(item.url),
       title: item.title || `${cat.name} Specimen`,
       tag: item.title || `${cat.name} Specimen`,
-      meta: item.caption || item.meta || 'Atelier Master Archive',
-      caption: item.caption || item.meta || 'Atelier Master Archive',
+      meta: item.caption || item.meta || cat.medium || 'Atelier Master Archive',
+      caption: item.caption || item.meta || cat.tagline || 'Atelier Master Archive',
       type: item.type || 'photo',
       isCustom: true,
       display: item.display,
     }));
 
-    // Find baseline template for fallback supporting specimens if needed
-    const baselineTemplate =
-      findBaselineCategory(cat.slug) ||
-      findBaselineCategory(cat.id) ||
-      findBaselineCategory(cat._id) ||
-      findBaselineCategory(cat.name);
-
-    const effectiveSupporting =
-      Array.isArray(cat.supporting) && cat.supporting.length > 0
-        ? cat.supporting
-        : baselineTemplate?.supporting || [];
-
-    // Find any baseline cover overrides for this category across all ID permutations
-    const possibleCoverIds = new Set([
-      `seed-cover-${cat.id}`,
-      `seed-cover-${cat.slug}`,
-      `${cat.id}-featured`,
-      `${cat.slug}-featured`,
-    ]);
-    if (cat._id) {
-      possibleCoverIds.add(`seed-cover-${cat._id}`);
-      possibleCoverIds.add(`${cat._id}-featured`);
-    }
-    if (cat.order) {
-      possibleCoverIds.add(`seed-cover-${cat.order}`);
-      possibleCoverIds.add(`seed-cover-${String(cat.order).padStart(2, '0')}`);
-    }
-
-    const coverOverride = mediaList.find(
-      (m) =>
-        (m.isBaseline || m.baselineId) &&
-        (possibleCoverIds.has(m.baselineId) || possibleCoverIds.has(m.id))
-    );
-
-    const effectiveCoverImage = coverOverride?.url
-      ? getApiUrl(coverOverride.url)
-      : (cat.coverImage || cat.featured?.image);
+    const effectiveCoverImage = cat.coverImage || cat.featured?.image;
 
     const baseFeatured = {
       id: `${cat.id}-featured`,
       image: effectiveCoverImage,
-      title: coverOverride?.title || cat.featured?.title || cat.name,
-      tag: coverOverride?.title || cat.featured?.title || cat.name,
-      count: cat.featured?.count || '1/08',
-      caption: coverOverride?.caption || cat.featured?.caption || cat.tagline,
-      meta: coverOverride?.meta || cat.featured?.meta || cat.medium || 'Medium Format Film / 35mm',
-      type: coverOverride?.type || cat.featured?.type || 'photo',
-      display: coverOverride?.display || cat.coverDisplay || cat.display || cat.featured?.display,
+      title: cat.featured?.title || cat.name,
+      tag: cat.featured?.title || cat.name,
+      count: '01',
+      caption: cat.quote || cat.tagline || 'A story in every frame.',
+      meta: cat.medium || 'Medium Format Film / 35mm',
+      type: 'photo',
+      display: cat.coverDisplay || cat.display || cat.featured?.display,
     };
 
-    const baseSupporting = effectiveSupporting.map((s, idx) => {
-      const possibleSupIds = new Set([
-        `seed-sup-${cat.id}-${idx}`,
-        `seed-sup-${cat.slug}-${idx}`,
-      ]);
-      if (cat._id) possibleSupIds.add(`seed-sup-${cat._id}-${idx}`);
-      if (cat.order) {
-        possibleSupIds.add(`seed-sup-${cat.order}-${idx}`);
-        possibleSupIds.add(`seed-sup-${String(cat.order).padStart(2, '0')}-${idx}`);
-      }
-      if (s.id) possibleSupIds.add(s.id);
-
-      const supOverride = mediaList.find(
-        (m) =>
-          (m.isBaseline || m.baselineId) &&
-          (possibleSupIds.has(m.baselineId) || possibleSupIds.has(m.id))
-      );
-
-      return {
-        id: s.id || `${cat.id}-sup-${idx}`,
-        image: supOverride?.url ? getApiUrl(supOverride.url) : s.image,
-        title: supOverride?.title || s.tag,
-        tag: supOverride?.title || s.tag,
-        meta: supOverride?.meta || s.meta,
-        caption: supOverride?.caption || s.meta,
-        type: supOverride?.type || s.type || 'photo',
-        display: supOverride?.display || s.display,
-      };
-    });
-
-    // Comprehensive archive list: base featured, all supporting, custom uploads
-    const allMedia = [
-      baseFeatured,
-      ...baseSupporting,
-      ...formattedCustom,
-    ];
-
-    // If custom uploads exist, feature the latest custom upload
-    const featured = formattedCustom.length > 0 ? {
-      ...baseFeatured,
-      image: formattedCustom[0].image,
-      title: formattedCustom[0].tag,
-      caption: formattedCustom[0].meta,
-      type: formattedCustom[0].type,
-      display: formattedCustom[0].display,
-    } : baseFeatured;
-
-    // Preserve all supporting items, prepending any secondary custom uploads without dropping specimens
-    const supporting = formattedCustom.length > 0
-      ? [...formattedCustom.slice(1), ...baseSupporting]
-      : baseSupporting;
+    // If custom uploads exist for this category, use ONLY the custom uploaded media
+    // No fake baseline specimens appended
+    const featured = formattedCustom.length > 0 ? formattedCustom[0] : baseFeatured;
+    const supporting = formattedCustom.length > 1 ? formattedCustom.slice(1) : [];
+    const allMedia = formattedCustom.length > 0 ? formattedCustom : [baseFeatured];
 
     return {
       ...cat,
       coverImage: effectiveCoverImage,
-      coverDisplay: coverOverride?.display || cat.coverDisplay || cat.display,
+      coverDisplay: cat.coverDisplay || cat.display,
       featured,
       supporting,
       allMedia,

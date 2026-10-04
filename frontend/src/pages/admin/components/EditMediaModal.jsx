@@ -11,7 +11,6 @@ export default function EditMediaModal({
   isOpen,
   onClose,
   onSuccess,
-  onResetBaseline,
   onOpenDisplay,
   mediaItem,
 }) {
@@ -29,7 +28,6 @@ export default function EditMediaModal({
   const [meta, setMeta] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
-  const [resetting, setResetting] = useState(false);
   const [error, setError] = useState('');
 
   const fileInputRef = useRef(null);
@@ -48,14 +46,10 @@ export default function EditMediaModal({
       setError('');
       setSaving(false);
       setSaveStatus('');
-      setResetting(false);
     }
   }, [isOpen, mediaItem]);
 
   if (!isOpen || !mediaItem) return null;
-
-  const isBaseline = Boolean(mediaItem.isBaseline || mediaItem.id?.startsWith('seed-'));
-  const isModifiedBaseline = Boolean(mediaItem.isModifiedBaseline || (isBaseline && mediaItem._id));
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
@@ -98,7 +92,7 @@ export default function EditMediaModal({
     setSaveStatus('');
     try {
       const headers = getAuthHeaders();
-      const targetId = mediaItem._id || mediaItem.id || mediaItem.baselineId;
+      const targetId = mediaItem._id || mediaItem.id;
 
       let res;
       if (file) {
@@ -128,8 +122,6 @@ export default function EditMediaModal({
         formData.append('title', title.trim());
         formData.append('caption', caption.trim());
         formData.append('meta', meta.trim());
-        formData.append('isBaseline', isBaseline ? 'true' : 'false');
-        formData.append('baselineId', mediaItem.baselineId || mediaItem.id || '');
 
         res = await fetch(`/api/media/${targetId}`, {
           method: 'PUT',
@@ -153,8 +145,6 @@ export default function EditMediaModal({
             title: title.trim(),
             caption: caption.trim(),
             meta: meta.trim(),
-            isBaseline,
-            baselineId: mediaItem.baselineId || mediaItem.id || '',
           }),
         });
       }
@@ -173,8 +163,6 @@ export default function EditMediaModal({
         url: targetUrl || filePreview,
         caption: caption.trim(),
         meta: meta.trim(),
-        isBaseline,
-        isModifiedBaseline: true,
       });
 
       onClose();
@@ -182,20 +170,6 @@ export default function EditMediaModal({
       setError(err.message || 'Error saving changes to media asset');
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleReset = async () => {
-    if (!onResetBaseline || !isBaseline) return;
-    setResetting(true);
-    setError('');
-    try {
-      await onResetBaseline(mediaItem);
-      onClose();
-    } catch (err) {
-      setError(err.message || 'Error resetting baseline media asset');
-    } finally {
-      setResetting(false);
     }
   };
 
@@ -222,23 +196,15 @@ export default function EditMediaModal({
 
           <div className="flex items-center justify-center gap-2 mb-2">
             <span className="admin-eyebrow">
-              {isBaseline ? 'PORTFOLIO SPECIMEN' : 'CUSTOM UPLOAD'}
+              MEDIA ASSET
             </span>
-            {isBaseline && (
-              <span className="text-[9px] tracking-[0.1em] uppercase font-medium text-[#7A756D] bg-[#EFEAE2] px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Sparkles size={10} />
-                Baseline {isModifiedBaseline ? '· Customized' : 'Photo'}
-              </span>
-            )}
           </div>
 
           <h3 className="admin-serif-title text-[28px] sm:text-[32px]">
             Edit Media Details
           </h3>
           <p className="admin-subtext text-[12px] sm:text-[13px] mt-2 max-w-[420px] mx-auto">
-            {isBaseline
-              ? 'Customize this baseline portfolio asset. Edits will sync across the repository and public gallery.'
-              : 'Update metadata, title, and display properties for this uploaded media.'}
+            Update metadata, title, and display properties for this media asset.
           </p>
         </div>
 
@@ -499,21 +465,9 @@ export default function EditMediaModal({
         {/* ─── Footer ─── */}
         <div className="admin-modal-footer">
           <div className="flex items-center gap-2">
-            {isBaseline && isModifiedBaseline && (
-              <button
-                type="button"
-                disabled={resetting || saving}
-                onClick={handleReset}
-                className="text-[11px] text-[#7A756D] hover:text-red-600 uppercase font-semibold tracking-wider flex items-center gap-1.5 px-3 py-2 rounded-[8px] hover:bg-[#FAF0F0] transition-colors cursor-pointer"
-                title="Revert modifications and restore original baseline photo"
-              >
-                <RotateCcw size={13} />
-                {resetting ? 'RESETTING...' : 'RESET TO ORIGINAL'}
-              </button>
-            )}
             <button
               type="button"
-              disabled={saving || resetting}
+              disabled={saving}
               onClick={onClose}
               className="admin-btn-secondary"
             >
@@ -523,7 +477,7 @@ export default function EditMediaModal({
 
           <button
             type="button"
-            disabled={saving || resetting}
+            disabled={saving}
             onClick={handleSubmit}
             className="admin-btn-primary"
             title="Save changes to this media asset"

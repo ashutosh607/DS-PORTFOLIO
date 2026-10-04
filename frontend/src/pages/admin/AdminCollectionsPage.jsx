@@ -178,125 +178,16 @@ export default function AdminCollectionsPage() {
         c.id === activeCategorySlug
     ) || findBaselineCategory(activeCategorySlug);
 
-  // Helper to collect all potential baseline IDs an override could have been saved under
-  const getPossibleBaselineIds = (prefix, cat, idx = null) => {
-    const ids = new Set();
-    const suffix = idx !== null ? `-${idx}` : '';
-    if (cat.id) ids.add(`${prefix}-${cat.id}${suffix}`);
-    if (cat._id) ids.add(`${prefix}-${cat._id}${suffix}`);
-    if (cat.slug) ids.add(`${prefix}-${cat.slug}${suffix}`);
-    if (cat.order) {
-      ids.add(`${prefix}-${cat.order}${suffix}`);
-      ids.add(`${prefix}-${String(cat.order).padStart(2, '0')}${suffix}`);
-    }
-    return Array.from(ids);
-  };
-
-  // Set of media IDs that were matched and applied as baseline overrides
-  const matchedOverrideMediaIds = new Set();
-
-  // Baseline items computation with overrides applied
-  const getBaselineItems = () => {
-    matchedOverrideMediaIds.clear();
-    const targetCats =
-      activeCategorySlug === 'all'
-        ? categories
-        : currentCategoryObj
-        ? [currentCategoryObj]
-        : [];
-
-    const rawDefaults = targetCats.flatMap((cat) => {
-      const baselineTemplate =
-        findBaselineCategory(cat.slug) ||
-        findBaselineCategory(cat.id) ||
-        findBaselineCategory(cat._id) ||
-        findBaselineCategory(cat.name);
-
-      const effectiveSupporting =
-        Array.isArray(cat.supporting) && cat.supporting.length > 0
-          ? cat.supporting
-          : baselineTemplate?.supporting || [];
-
-      const coverPossibleIds = getPossibleBaselineIds('seed-cover', cat);
-      coverPossibleIds.push(`${cat.id}-featured`, `${cat.slug}-featured`);
-      if (cat._id) coverPossibleIds.push(`${cat._id}-featured`);
-
-      const coverItem = {
-        id: `seed-cover-${cat.id}`,
-        baselineId: `seed-cover-${cat.id}`,
-        possibleBaselineIds: coverPossibleIds,
-        title: `${cat.slug}-01.jpg`,
-        category: cat.slug,
-        type: 'photo',
-        url: cat.coverImage,
-        caption: cat.quote || '',
-        meta: cat.medium || '',
-        size: '2.4 MB',
-        date: '2025',
-        isBaseline: true,
-      };
-
-      const supportingItems = effectiveSupporting.map((sup, idx) => {
-        const supPossibleIds = getPossibleBaselineIds('seed-sup', cat, idx);
-        if (sup.id) supPossibleIds.push(sup.id);
-
-        return {
-          id: `seed-sup-${cat.id}-${idx}`,
-          baselineId: `seed-sup-${cat.id}-${idx}`,
-          possibleBaselineIds: supPossibleIds,
-          title: sup.tag || (sup.title ? `${sup.title.toLowerCase().replace(/\s+/g, '-')}.jpg` : `${cat.slug}-0${idx + 2}.jpg`),
-          category: cat.slug,
-          type: sup.type || 'photo',
-          url: sup.image,
-          caption: sup.tag || '',
-          meta: sup.meta || '',
-          size: sup.type === 'video' ? '18.8 MB' : '2.8 MB',
-          date: '2025',
-          isBaseline: true,
-        };
-      });
-
-      return [coverItem, ...supportingItems];
-    });
-
-    // Merge in any saved overrides from MongoDB/mediaList
-    return rawDefaults.map((item) => {
-      const override = mediaList.find((m) => {
-        if (!m.isBaseline && !m.baselineId) return false;
-        if (item.possibleBaselineIds?.includes(m.baselineId)) return true;
-        if (m.baselineId && (m.baselineId === item.baselineId || m.baselineId === item.id)) return true;
-        if (!m.baselineId && m.title && m.title === item.title && toCanonicalCategoryKey(m.category) === toCanonicalCategoryKey(item.category)) return true;
-        return false;
-      });
-
-      if (override) {
-        matchedOverrideMediaIds.add(override._id);
-        return {
-          ...item,
-          ...override,
-          _id: override._id,
-          id: override._id || item.id,
-          baselineId: item.baselineId,
-          url: override.url || item.url,
-          title: override.title || item.title,
-          category: override.category || item.category,
-          type: override.type || item.type,
-          caption: override.caption || item.caption,
-          meta: override.meta || item.meta,
-          display: override.display || item.display,
-          isBaseline: true,
-          isModifiedBaseline: true,
-        };
-      }
-      return item;
-    });
-  };
-
-  const baselineItems = getBaselineItems();
-
-  // Filter custom items by type and search query (excluding baseline overrides)
-  const filteredCustomMedia = mediaList
-    .filter((item) => !matchedOverrideMediaIds.has(item._id) && (!item.isBaseline || !item.baselineId))
+  // Filter media by active category, type, and search query
+  const filteredMedia = mediaList
+    .filter((item) => {
+      if (activeCategorySlug === 'all') return true;
+      const targetSlug = currentCategoryObj?.slug || activeCategorySlug;
+      return (
+        item.category?.toLowerCase() === targetSlug.toLowerCase() ||
+        toCanonicalCategoryKey(item.category) === toCanonicalCategoryKey(targetSlug)
+      );
+    })
     .filter((item) => {
       const matchesType = typeFilter === 'all' || item.type === typeFilter;
       const matchesSearch =
@@ -306,17 +197,8 @@ export default function AdminCollectionsPage() {
       return matchesType && matchesSearch;
     });
 
-  const filteredBaseline = baselineItems.filter((item) => {
-    const matchesType = typeFilter === 'all' || item.type === typeFilter;
-    const matchesSearch =
-      !searchQuery ||
-      item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.category?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesType && matchesSearch;
-  });
-
-  // Shared media card renderer with generous padding and framed presentation
-  const renderMediaCard = (item, isBaseline = false) => (
+  // Media card renderer
+  const renderMediaCard = (item) => (
     <div
       key={item._id || item.id}
       className="admin-media-card group"
@@ -348,7 +230,7 @@ export default function AdminCollectionsPage() {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              setEditTarget({ ...item, isBaseline });
+              setEditTarget(item);
             }}
             className="pointer-events-auto inline-flex items-center gap-1.5 py-2 px-4 rounded-full border border-[#E3DBCC] bg-[#FAF7F2] hover:bg-[#F3EFE6] text-[11px] uppercase tracking-[0.14em] font-medium text-[#101010] shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
             title="Edit photo details, replace file, or adjust framing"
@@ -376,50 +258,30 @@ export default function AdminCollectionsPage() {
             <span className="text-[10px] tracking-[0.14em] uppercase font-bold text-[#7A756D]">
               {item.type === 'video' ? 'Video' : 'Photo'}
             </span>
-            {isBaseline && (
-              <span
-                className={`text-[9px] tracking-[0.1em] uppercase font-medium px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                  item.isModifiedBaseline
-                    ? 'text-[#6A5A38] bg-[#F5EEDC]'
-                    : 'text-[#8E887E] bg-[#F0EAE0]'
-                }`}
-              >
-                {item.isModifiedBaseline && <Sparkles size={10} />}
-                {item.isModifiedBaseline ? 'Baseline · Customized' : 'Baseline'}
+            {activeCategorySlug === 'all' && item.category && (
+              <span className="text-[9.5px] uppercase tracking-wider text-[#8E887E] bg-[#F0EAE0] px-2 py-0.5 rounded-full font-medium">
+                {item.category}
               </span>
             )}
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setEditTarget({ ...item, isBaseline })}
+              onClick={() => setEditTarget(item)}
               className="inline-flex items-center gap-1.5 py-1.5 px-3.5 rounded-full border border-[#E3DBCC] bg-[#FAF7F2] hover:bg-[#F3EFE6] text-[11px] uppercase tracking-[0.14em] font-medium text-[#101010] transition-colors cursor-pointer"
-              title={isBaseline ? 'Edit photo, replace image, or adjust framing' : 'Edit photo, replace image, or adjust framing'}
+              title="Edit photo, replace image, or adjust framing"
             >
               <Pencil size={11} />
               <span>EDIT</span>
             </button>
-            {isBaseline ? (
-              item.isModifiedBaseline ? (
-                <button
-                  type="button"
-                  onClick={() => handleResetBaseline(item)}
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-900 transition-colors cursor-pointer"
-                  title="Reset modifications and restore default photo"
-                >
-                  <RotateCcw size={12} />
-                </button>
-              ) : null
-            ) : (
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(item)}
-                className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-800 transition-colors cursor-pointer"
-                title="Delete asset"
-              >
-                <Trash2 size={12} />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setDeleteTarget(item)}
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-800 transition-colors cursor-pointer"
+              title="Delete asset"
+            >
+              <Trash2 size={12} />
+            </button>
           </div>
         </div>
 
@@ -615,18 +477,21 @@ export default function AdminCollectionsPage() {
       )}
 
       {/* ─── SECTION: Custom Uploads ─── */}
+      {/* ─── SECTION: Collection Media ─── */}
       <section style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div className="flex items-baseline justify-between">
           <div>
             <h3 className="font-sans font-semibold text-[16px] text-[#181818]">
-              Custom Uploads
+              {activeCategorySlug === 'all'
+                ? 'All Portfolio Media'
+                : `${currentCategoryObj?.name || 'Collection'} Media`}
             </h3>
             <p className="text-[12px] text-[#7A756D] mt-1">
-              Media uploaded through the admin panel.
+              Manage photography and video assets for this collection.
             </p>
           </div>
           <span className="text-[12px] text-[#7A756D] font-normal">
-            {filteredCustomMedia.length} {filteredCustomMedia.length === 1 ? 'item' : 'items'}
+            {filteredMedia.length} {filteredMedia.length === 1 ? 'item' : 'items'}
           </span>
         </div>
 
@@ -659,10 +524,12 @@ export default function AdminCollectionsPage() {
           <div className="py-14 text-center text-xs text-[#7A756D]">
             Loading media items...
           </div>
-        ) : filteredCustomMedia.length === 0 && activeCategorySlug === 'all' ? (
+        ) : filteredMedia.length === 0 ? (
           <div className="p-10 text-center bg-white border border-dashed border-[#D4CCC0] rounded-[14px]">
             <p className="text-[13px] text-[#5C5852] mb-4">
-              No custom uploads yet.
+              {activeCategorySlug === 'all'
+                ? 'No media uploaded to the portfolio yet.'
+                : `No media uploaded for ${currentCategoryObj?.name || 'this collection'} yet.`}
             </p>
             <button
               type="button"
@@ -672,34 +539,11 @@ export default function AdminCollectionsPage() {
               <Plus size={14} /> Add Media
             </button>
           </div>
-        ) : filteredCustomMedia.length > 0 ? (
+        ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredCustomMedia.map((item) => renderMediaCard(item, false))}
+            {filteredMedia.map((item) => renderMediaCard(item))}
           </div>
-        ) : null}
-      </section>
-
-      {/* ─── SECTION: Baseline Portfolio ─── */}
-      <section style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div className="border-t border-[#E8E2D6] pt-10">
-          <div className="flex items-baseline justify-between">
-            <div>
-              <h3 className="font-sans font-semibold text-[16px] text-[#181818]">
-                {activeCategorySlug === 'all' ? 'Baseline Portfolio' : 'Baseline Portfolio Specimens'}
-              </h3>
-              <p className="text-[12px] text-[#7A756D] mt-1">
-                Default media from the original portfolio.
-              </p>
-            </div>
-            <span className="text-[12px] text-[#7A756D] font-normal">
-              {filteredBaseline.length} {filteredBaseline.length === 1 ? 'item' : 'items'}
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredBaseline.map((item) => renderMediaCard(item, true))}
-        </div>
+        )}
       </section>
 
       {/* Add Media Modal */}
@@ -715,7 +559,6 @@ export default function AdminCollectionsPage() {
         isOpen={!!editTarget}
         onClose={() => setEditTarget(null)}
         onSuccess={handleMediaUpdated}
-        onResetBaseline={handleResetBaseline}
         onOpenDisplay={(item) => setDisplayModalTarget(item)}
         mediaItem={editTarget}
       />
