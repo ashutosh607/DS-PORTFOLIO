@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus, Pencil, RotateCcw, Sparkles, FolderPlus, Crop } from 'lucide-react';
+import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus, Pencil, RotateCcw, Sparkles, FolderPlus } from 'lucide-react';
 import { useCategories } from '../../utils/categoryManager';
 import AddMediaModal from './components/AddMediaModal';
 import EditMediaModal from './components/EditMediaModal';
@@ -315,29 +315,19 @@ export default function AdminCollectionsPage() {
           />
         )}
 
-        {/* Quick Edit Hover Overlay: Edit Photo & Framing Buttons */}
-        <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2 pointer-events-none z-10 px-2">
+        {/* Quick Edit Hover Overlay: Edit Photo Button */}
+        <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none z-10 px-2">
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               setEditTarget({ ...item, isBaseline });
             }}
-            className="pointer-events-auto px-3.5 py-1.5 rounded-full bg-[#181818] text-white text-[11px] font-sans font-bold uppercase tracking-[0.06em] flex items-center gap-1.5 shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer hover:bg-black border border-white/20"
-            title="Replace photo file, update URL, or edit details"
+            className="pointer-events-auto inline-flex items-center gap-1.5 py-2 px-4 rounded-full border border-[#E3DBCC] bg-[#FAF7F2] hover:bg-[#F3EFE6] text-[11px] uppercase tracking-[0.14em] font-medium text-[#101010] shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            title="Edit photo details, replace file, or adjust framing"
           >
-            <Pencil size={12} className="text-[#C2A378]" /> Edit Photo
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setDisplayModalTarget({ ...item, isBaseline });
-            }}
-            className="pointer-events-auto px-3 py-1.5 rounded-full bg-white text-[#181818] text-[11px] font-sans font-bold uppercase tracking-[0.06em] flex items-center gap-1.5 shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
-            title="Adjust display framing, crop, and zoom"
-          >
-            <Crop size={12} className="text-[#C2A378]" /> Framing
+            <Pencil size={11} />
+            <span>EDIT PHOTO</span>
           </button>
         </div>
 
@@ -372,44 +362,35 @@ export default function AdminCollectionsPage() {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setEditTarget({ ...item, isBaseline })}
-              className="px-2.5 py-1 rounded-md text-[11px] font-sans font-semibold text-white bg-[#181818] hover:bg-[#333] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
-              title={isBaseline ? 'Edit / replace baseline photo' : 'Edit / replace custom photo'}
+              className="inline-flex items-center gap-1.5 py-1.5 px-3.5 rounded-full border border-[#E3DBCC] bg-[#FAF7F2] hover:bg-[#F3EFE6] text-[11px] uppercase tracking-[0.14em] font-medium text-[#101010] transition-colors cursor-pointer"
+              title={isBaseline ? 'Edit photo, replace image, or adjust framing' : 'Edit photo, replace image, or adjust framing'}
             >
-              <Pencil size={12} className="text-[#C2A378]" />
-              <span>EDIT PHOTO</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setDisplayModalTarget({ ...item, isBaseline })}
-              className="px-2 py-1 rounded-md text-[11px] font-sans font-medium text-[#4A453D] bg-[#FAF8F5] hover:bg-[#EFEAE2] hover:text-[#181818] border border-[#DDD5C7] transition-all flex items-center gap-1 cursor-pointer shadow-2xs"
-              title="Edit public display framing & zoom"
-            >
-              <Crop size={11} className="text-[#7A756D]" />
-              <span>FRAMING</span>
+              <Pencil size={11} />
+              <span>EDIT</span>
             </button>
             {isBaseline ? (
               item.isModifiedBaseline ? (
                 <button
                   type="button"
                   onClick={() => handleResetBaseline(item)}
-                  className="p-1.5 text-[#8E887E] hover:text-amber-700 transition-colors rounded-full hover:bg-[#FAF0F0] cursor-pointer"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-900 transition-colors cursor-pointer"
                   title="Reset modifications and restore default photo"
                 >
-                  <RotateCcw size={14} />
+                  <RotateCcw size={12} />
                 </button>
               ) : null
             ) : (
               <button
                 type="button"
                 onClick={() => setDeleteTarget(item)}
-                className="p-1.5 text-[#8E887E] hover:text-red-600 transition-colors rounded-full hover:bg-[#FAF0F0] cursor-pointer"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-800 transition-colors cursor-pointer"
                 title="Delete asset"
               >
-                <Trash2 size={14} />
+                <Trash2 size={12} />
               </button>
             )}
           </div>

@@ -262,7 +262,7 @@ export default function EditDisplayModal({
                 title="Edit photo file, replace image, and update metadata"
               >
                 <Pencil size={12} className="text-[#C2A378]" />
-                <span>Replace / Edit Photo</span>
+                <span>Back to Edit Photo</span>
               </button>
             )}
             <button

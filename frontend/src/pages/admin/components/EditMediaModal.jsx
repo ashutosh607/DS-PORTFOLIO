@@ -326,7 +326,7 @@ export default function EditMediaModal({
                     }}
                     className="px-4 py-2 rounded-full bg-[#FAF8F5] text-[#181818] border border-[#C2A378] text-[11px] font-semibold uppercase tracking-[0.06em] hover:bg-[#F0EAE0] transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
                   >
-                    <Crop size={13} className="text-[#C2A378]" /> Edit Display Framing
+                    <Crop size={13} className="text-[#C2A378]" /> Adjust Framing &amp; Crop
                   </button>
                   {file && (
                     <button
@@ -462,6 +462,34 @@ export default function EditMediaModal({
                 placeholder="e.g., Leica M11 · 35mm Summilux · Natural Ambient Twilight"
                 className="admin-form-input"
               />
+            </div>
+
+            {/* Display Framing & Focal Adjustments Option */}
+            <div className="p-4 rounded-[14px] bg-[#FAF8F5] border border-[#E2DACD] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs mt-2">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <Crop size={14} className="text-[#C2A378]" />
+                  <span className="text-[10px] font-mono uppercase tracking-[0.16em] font-bold text-[#6B6358]">
+                    Display Framing &amp; Focal Position
+                  </span>
+                </div>
+                <p className="text-xs text-[#5C5852] max-w-md leading-relaxed">
+                  Fine-tune zoom, aspect ratio crops (16:10, 4:3, 3:4), and focal center point for how this photo is framed on the public site.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onOpenDisplay) {
+                    onOpenDisplay(mediaItem);
+                  }
+                }}
+                className="shrink-0 px-4 py-2 rounded-full bg-[#181818] text-white text-[11px] font-sans font-bold uppercase tracking-[0.08em] hover:bg-[#333] transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+              >
+                <Crop size={13} className="text-[#C2A378]" />
+                <span>Adjust Framing</span>
+              </button>
             </div>
           </form>
         </div>
