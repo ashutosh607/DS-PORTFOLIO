@@ -213,7 +213,8 @@ export default function AddEditServiceModal({
 
       if (imageFile) {
         let uploadImage = imageFile;
-        if (imageFile.type?.startsWith('image/')) {
+        const isImage = imageFile.type?.startsWith('image/') || /\.(jpg|jpeg|png|webp|avif|gif)$/i.test(imageFile.name);
+        if (isImage) {
           uploadImage = await optimizeImageFile(imageFile);
         }
         formData.append('imageFile', uploadImage);
@@ -512,7 +513,7 @@ export default function AddEditServiceModal({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.jpg,.jpeg,.png,.webp,.avif,.gif"
                   onChange={handleFileChange}
                   className="hidden"
                 />

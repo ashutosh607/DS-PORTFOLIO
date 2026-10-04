@@ -15,13 +15,17 @@ const TARGET_MAX_SIZE_MB = 8;
  * @returns {Promise<File>} Compressed File ready for Cloudinary upload
  */
 export async function optimizeImageFile(file, customOptions = {}) {
-  // 1. Guard check: only process image files (skip videos, audio, etc.)
-  if (!file || !file.type?.startsWith('image/')) {
+  // 1. Guard check: identify image by MIME type or extension
+  const fileName = (file?.name || '').toLowerCase();
+  const isImageExt = /\.(jpg|jpeg|png|webp|avif|bmp|tiff)$/i.test(fileName);
+  const isImageMime = file?.type?.startsWith('image/');
+
+  if (!file || (!isImageMime && !isImageExt)) {
     return file;
   }
 
   // Non-compressible or vector images
-  if (file.type === 'image/svg+xml' || file.type === 'image/gif') {
+  if (file.type === 'image/svg+xml' || file.type === 'image/gif' || /\.gif$/i.test(fileName)) {
     return file;
   }
 

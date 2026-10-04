@@ -9,13 +9,22 @@ if (!fs.existsSync(tempDir)) {
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
+  "image/jpg",
+  "image/pjpeg",
+  "image/jfif",
   "image/png",
+  "image/x-png",
   "image/webp",
   "image/avif",
   "image/gif",
+  "image/tiff",
+  "image/bmp",
   "video/mp4",
   "video/quicktime",
   "video/webm",
+  "video/x-msvideo",
+  "video/x-matroska",
+  "application/octet-stream",
 ]);
 
 const ALLOWED_EXTENSIONS = new Set([
@@ -25,9 +34,13 @@ const ALLOWED_EXTENSIONS = new Set([
   ".webp",
   ".avif",
   ".gif",
+  ".tiff",
+  ".bmp",
   ".mp4",
   ".mov",
   ".webm",
+  ".avi",
+  ".mkv",
 ]);
 
 const storage = multer.diskStorage({
@@ -45,9 +58,16 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
+  const mime = (file.mimetype || "").toLowerCase();
 
-  if (!ALLOWED_MIME_TYPES.has(file.mimetype) || !ALLOWED_EXTENSIONS.has(ext)) {
-    const err = new Error("Unsupported file type. Only standard images (JPEG, PNG, WebP, AVIF, GIF) and videos (MP4, MOV, WebM) are permitted.");
+  const isAllowedExt = ALLOWED_EXTENSIONS.has(ext);
+  const isAllowedMime =
+    ALLOWED_MIME_TYPES.has(mime) ||
+    mime.startsWith("image/") ||
+    mime.startsWith("video/");
+
+  if (!isAllowedExt || !isAllowedMime) {
+    const err = new Error("Unsupported file type. Standard images (JPG, JPEG, PNG, WebP, AVIF, GIF) and videos (MP4, MOV, WebM) are permitted.");
     err.statusCode = 400;
     return cb(err, false);
   }

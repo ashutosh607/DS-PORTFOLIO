@@ -145,8 +145,9 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file (JPG, PNG, WEBP).'); return;
+    const isImage = file.type?.startsWith('image/') || /\.(jpg|jpeg|png|webp|avif|gif)$/i.test(file.name);
+    if (!isImage) {
+      setError('Please select a valid image file (JPG, JPEG, PNG, WEBP).'); return;
     }
     setCoverFile(file); setError('');
     const reader = new FileReader();
@@ -164,7 +165,8 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
       let payload;
       if (coverFile) {
         let uploadCover = coverFile;
-        if (coverFile.type?.startsWith('image/')) {
+        const isImage = coverFile.type?.startsWith('image/') || /\.(jpg|jpeg|png|webp|avif|gif)$/i.test(coverFile.name);
+        if (isImage) {
           uploadCover = await optimizeImageFile(coverFile);
         }
         payload = new FormData();
@@ -261,7 +263,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
                 onMouseEnter={(e) => { if (!coverPreview) e.currentTarget.style.borderColor = '#AAA49A'; }}
                 onMouseLeave={(e) => { if (!coverPreview) e.currentTarget.style.borderColor = '#DDD8CD'; }}
               >
-                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={handleFileChange} style={{ display: 'none' }} />
+                <input ref={fileInputRef} type="file" accept="image/*,.jpg,.jpeg,.png,.webp,.avif" onChange={handleFileChange} style={{ display: 'none' }} />
 
                 {coverPreview ? (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>

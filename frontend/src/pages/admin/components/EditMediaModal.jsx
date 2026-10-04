@@ -64,7 +64,8 @@ export default function EditMediaModal({
     setFile(selectedFile);
     setError('');
 
-    if (selectedFile.type.startsWith('video/')) {
+    const isVideo = selectedFile.type?.startsWith('video/') || /\.(mp4|mov|webm)$/i.test(selectedFile.name);
+    if (isVideo) {
       setMediaType('video');
       setFilePreview(URL.createObjectURL(selectedFile));
     } else {
@@ -104,7 +105,8 @@ export default function EditMediaModal({
         let uploadPayload = file;
 
         // Perform browser-side compression before sending to Cloudinary
-        if (file.type?.startsWith('image/')) {
+        const isImage = file.type?.startsWith('image/') || /\.(jpg|jpeg|png|webp|avif|gif)$/i.test(file.name);
+        if (isImage) {
           setSaveStatus('Optimizing image...');
           try {
             uploadPayload = await optimizeImageFile(file);
@@ -259,7 +261,7 @@ export default function EditMediaModal({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept={mediaType === 'video' ? 'video/*' : 'image/*'}
+                accept={mediaType === 'video' ? 'video/*,.mp4,.mov,.webm' : 'image/*,.jpg,.jpeg,.png,.webp,.avif,.gif'}
                 onChange={handleFileChange}
                 className="hidden"
               />
