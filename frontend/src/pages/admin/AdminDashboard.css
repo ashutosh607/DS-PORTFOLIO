@@ -693,3 +693,25 @@
   background-color: #F5EFE6;
 }
 
+/* Modal Overlay & Container */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.admin-modal-container {
+  position: relative;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+

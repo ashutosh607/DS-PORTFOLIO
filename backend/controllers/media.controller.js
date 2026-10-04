@@ -154,8 +154,11 @@ const updateMedia = asyncHandler(async (req, res) => {
   if (!existingMedia) {
     existingMedia = await Media.findOne({ baselineId: id });
   }
+  if (!existingMedia && req.body.baselineId) {
+    existingMedia = await Media.findOne({ baselineId: req.body.baselineId });
+  }
 
-  let mediaUrl = url ? url.trim() : (existingMedia ? existingMedia.url : "");
+  let mediaUrl = url ? url.trim() : (existingMedia ? existingMedia.url : (req.body.url || ""));
   let publicId = existingMedia ? existingMedia.publicId : "";
   let mediaType = type ? type.toLowerCase().trim() : (existingMedia ? existingMedia.type : "photo");
   if (type && !["photo", "video"].includes(mediaType)) {
@@ -219,7 +222,7 @@ const updateMedia = asyncHandler(async (req, res) => {
 
   // 3. If baseline asset edited for the first time, persist new baseline override in MongoDB
   const newBaselineOverride = await Media.create({
-    url: mediaUrl || "",
+    url: mediaUrl || req.body.url || "",
     publicId,
     type: mediaType,
     category: targetCategory,

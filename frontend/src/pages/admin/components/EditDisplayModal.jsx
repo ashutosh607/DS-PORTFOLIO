@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, ZoomIn, ZoomOut, RotateCcw, Check, Move, Maximize2, Minimize2, Eye, Sparkles } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, RotateCcw, Check, Move, Maximize2, Minimize2, Eye, Sparkles, Pencil } from 'lucide-react';
 import { getApiUrl } from '../../../utils/api';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { DEFAULT_DISPLAY, getFramingStyle } from '../../../utils/mediaFraming';
@@ -28,6 +28,7 @@ export default function EditDisplayModal({
   mediaItem,
   onClose,
   onSuccess,
+  onOpenEditMedia,
 }) {
   const { getAuthHeaders } = useAdminAuth();
 
@@ -215,12 +216,19 @@ export default function EditDisplayModal({
   const imageFramingStyle = getFramingStyle(currentDisplay);
 
   return (
-    <div className="admin-modal-overlay">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+      {/* Backdrop */}
       <div
-        className="admin-modal-container max-w-[1040px] w-[95vw] max-h-[92vh] flex flex-col overflow-hidden"
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+      />
+
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative z-10 max-w-[1040px] w-[95vw] max-h-[92vh] flex flex-col overflow-hidden"
         style={{
           borderRadius: '16px',
-          boxShadow: '0 30px 70px -15px rgba(20, 18, 15, 0.35)',
+          boxShadow: '0 30px 70px -15px rgba(20, 18, 15, 0.45)',
           border: '1px solid #E2DACD',
           backgroundColor: '#FAF8F5',
         }}
@@ -242,7 +250,21 @@ export default function EditDisplayModal({
             </h3>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            {onOpenEditMedia && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenEditMedia(mediaItem);
+                }}
+                className="px-3 py-1.5 rounded-full bg-[#181818] text-white text-[11px] font-sans font-semibold tracking-wider uppercase flex items-center gap-1.5 shadow-sm hover:bg-[#333] transition-all cursor-pointer"
+                title="Edit photo file, replace image, and update metadata"
+              >
+                <Pencil size={12} className="text-[#C2A378]" />
+                <span>Replace / Edit Photo</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}
@@ -509,6 +531,21 @@ export default function EditDisplayModal({
 
               {/* 4. Action Buttons (Reset, Cancel, Save Display) */}
               <div className="pt-2 border-t border-[#E8E2D6] flex flex-col gap-2.5">
+                {onOpenEditMedia && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenEditMedia(mediaItem);
+                    }}
+                    className="w-full py-2.5 px-4 rounded-lg bg-[#FAF8F5] border border-[#C2A378] text-[#181818] hover:bg-[#F0EAE0] text-[12px] font-semibold tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                    title="Replace the image file or edit title and caption"
+                  >
+                    <Pencil size={13} className="text-[#C2A378]" />
+                    <span>REPLACE PHOTO / EDIT METADATA</span>
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={handleSave}
