@@ -172,7 +172,8 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
           medium: medium.trim(), location: location.trim(),
         };
       }
-      const updated = await updateCategory(category._id || category.id || category.slug, payload, getAuthHeaders());
+      const targetCatId = category.slug || category._id || category.id;
+      const updated = await updateCategory(targetCatId, payload, getAuthHeaders());
       if (onSuccess) onSuccess(updated);
       onClose();
     } catch (err) {

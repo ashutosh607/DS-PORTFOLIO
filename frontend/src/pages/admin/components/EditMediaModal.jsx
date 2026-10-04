@@ -120,6 +120,7 @@ export default function EditMediaModal({
 
         const formData = new FormData();
         formData.append('file', uploadPayload);
+        formData.append('url', directUrl.trim() || mediaItem.url || '');
         formData.append('category', category);
         formData.append('type', mediaType);
         formData.append('title', title.trim());
@@ -263,25 +264,48 @@ export default function EditMediaModal({
                 className="hidden"
               />
 
-              <div className="relative w-full p-4 bg-[#EFEAE2] rounded-[14px] flex flex-col items-center justify-center gap-3">
-                <div className="relative max-h-56 max-w-full overflow-hidden rounded-[10px] flex items-center justify-center shadow-xs bg-black/5">
+              <div
+                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const dropped = e.dataTransfer.files?.[0];
+                  if (dropped) {
+                    handleFileChange({ target: { files: [dropped] } });
+                  }
+                }}
+                className="relative w-full p-4 bg-[#EFEAE2] rounded-[14px] flex flex-col items-center justify-center gap-3 border-2 border-dashed border-transparent hover:border-[#C2A378]/50 transition-all"
+              >
+                {/* Clickable Image Box */}
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="group/img relative max-h-56 max-w-full overflow-hidden rounded-[10px] flex items-center justify-center shadow-xs bg-black/5 cursor-pointer"
+                  title="Click to choose a replacement photo"
+                >
                   {mediaType === 'video' ? (
                     <video
-                      src={filePreview || getApiUrl(directUrl)}
+                      src={filePreview?.startsWith('blob:') ? filePreview : getApiUrl(filePreview || directUrl)}
                       className="max-h-52 rounded-[8px]"
                       preload="metadata"
                       controls
                     />
                   ) : (
                     <img
-                      src={filePreview || getApiUrl(directUrl)}
+                      src={filePreview?.startsWith('blob:') ? filePreview : getApiUrl(filePreview || directUrl)}
                       alt={title || 'Preview'}
-                      className="max-h-52 object-contain rounded-[8px]"
+                      className="max-h-52 object-contain rounded-[8px] transition-transform duration-300 group-hover/img:scale-102"
                       onError={(e) => {
                         e.currentTarget.src = 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800';
                       }}
                     />
                   )}
+
+                  {/* Click to Replace Hover Badge */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="px-3 py-1.5 rounded-full bg-white text-[#181818] text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                      <Upload size={13} className="text-[#C2A378]" /> Click to Replace
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
@@ -290,7 +314,7 @@ export default function EditMediaModal({
                     onClick={() => fileInputRef.current?.click()}
                     className="px-4 py-2 rounded-full bg-[#181818] text-white text-[11px] font-semibold uppercase tracking-[0.06em] hover:bg-[#2e2e2e] transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
                   >
-                    <Upload size={13} /> Replace with File
+                    <Upload size={13} /> {file ? 'Change Selected File' : 'Replace with File'}
                   </button>
                   <button
                     type="button"

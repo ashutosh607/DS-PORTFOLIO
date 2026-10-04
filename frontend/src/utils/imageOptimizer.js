@@ -75,9 +75,19 @@ export async function optimizeImageFile(file, customOptions = {}) {
 
     return compressedFile;
   } catch (error) {
-    console.error('Client-side image compression failed:', error);
-    // Rethrow to trigger the existing upload error UI
-    throw new Error(error.message || 'Image optimization failed. Please check the file format.');
+    console.warn('Client-side image compression issue, continuing with original file:', error);
+    // If the original file is within safe limit, upload directly
+    const limitBytes = CLOUDINARY_MAX_LIMIT_MB * 1024 * 1024;
+    if (file && file.size <= limitBytes) {
+      return file;
+    }
+    // Only rethrow if original file truly exceeds limit
+    if (file && file.size > limitBytes) {
+      throw new Error(
+        `Photo size is ${(file.size / (1024 * 1024)).toFixed(1)} MB, which exceeds the ${CLOUDINARY_MAX_LIMIT_MB} MB upload limit. Please select a smaller photo.`
+      );
+    }
+    return file;
   }
 }
 

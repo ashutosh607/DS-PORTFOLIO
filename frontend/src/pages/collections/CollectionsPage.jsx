@@ -110,12 +110,18 @@ export default function CollectionsPage({ onOpenInquiry }) {
     const coverOverride = mediaList.find(
       (m) =>
         (m.isBaseline || m.baselineId) &&
-        (m.baselineId === `seed-cover-${cat.id}` || m.baselineId === `${cat.id}-featured`)
+        (m.baselineId === `seed-cover-${cat.id}` ||
+          m.baselineId === `seed-cover-${cat.slug}` ||
+          m.baselineId === `${cat.id}-featured`)
     );
+
+    const effectiveCoverImage = coverOverride?.url
+      ? getApiUrl(coverOverride.url)
+      : (cat.coverImage || cat.featured?.image);
 
     const baseFeatured = {
       id: `${cat.id}-featured`,
-      image: coverOverride?.url ? getApiUrl(coverOverride.url) : (cat.coverImage || cat.featured?.image),
+      image: effectiveCoverImage,
       title: coverOverride?.title || cat.featured?.title || cat.name,
       tag: coverOverride?.title || cat.featured?.title || cat.name,
       count: cat.featured?.count || '1/08',
@@ -129,7 +135,9 @@ export default function CollectionsPage({ onOpenInquiry }) {
       const supOverride = mediaList.find(
         (m) =>
           (m.isBaseline || m.baselineId) &&
-          (m.baselineId === `seed-sup-${cat.id}-${idx}` || m.baselineId === s.id)
+          (m.baselineId === `seed-sup-${cat.id}-${idx}` ||
+            m.baselineId === `seed-sup-${cat.slug}-${idx}` ||
+            m.baselineId === s.id)
       );
       return {
         id: s.id || `${cat.id}-sup-${idx}`,
@@ -167,7 +175,8 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
     return {
       ...cat,
-      coverDisplay: coverOverride?.display,
+      coverImage: effectiveCoverImage,
+      coverDisplay: coverOverride?.display || cat.coverDisplay || cat.display,
       featured,
       supporting,
       allMedia,

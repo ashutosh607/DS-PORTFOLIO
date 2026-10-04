@@ -189,6 +189,26 @@ const updateCategory = asyncHandler(async (req, res) => {
   if (!category) {
     category = await Category.findOne({ slug: id.toLowerCase().trim() });
   }
+  if (!category && !isNaN(Number(id))) {
+    category = await Category.findOne({ order: Number(id) });
+  }
+
+  // If categories not yet seeded in MongoDB, auto-seed and try finding again
+  if (!category) {
+    const totalCount = await Category.countDocuments();
+    if (totalCount === 0) {
+      await Category.insertMany(DEFAULT_SEED_CATEGORIES);
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        category = await Category.findById(id);
+      }
+      if (!category) {
+        category = await Category.findOne({ slug: id.toLowerCase().trim() });
+      }
+      if (!category && !isNaN(Number(id))) {
+        category = await Category.findOne({ order: Number(id) });
+      }
+    }
+  }
 
   if (!category) {
     throw new ApiError(404, "Category not found");
@@ -264,6 +284,9 @@ const deleteCategory = asyncHandler(async (req, res) => {
   }
   if (!category) {
     category = await Category.findOne({ slug: id.toLowerCase().trim() });
+  }
+  if (!category && !isNaN(Number(id))) {
+    category = await Category.findOne({ order: Number(id) });
   }
 
   if (!category) {
