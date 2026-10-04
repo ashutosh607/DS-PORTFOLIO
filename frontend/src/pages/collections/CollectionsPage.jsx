@@ -4,6 +4,7 @@ import { useCategories, toCanonicalCategoryKey, findBaselineCategory } from '../
 import CollectionsHero from './components/CollectionsHero';
 import CollectionsRibbon from './components/CollectionsRibbon';
 import CollectionsGallery from './components/CollectionsGallery';
+import { CATEGORIES as DEFAULT_CATEGORIES } from './data/collectionsData';
 import { getApiUrl } from '../../utils/api';
 import SEOHead from '../../components/common/SEOHead';
 import { buildCollectionGallerySchema, buildBreadcrumbSchema } from '../../utils/structuredData';

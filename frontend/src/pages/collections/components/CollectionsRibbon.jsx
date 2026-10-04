@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getFramingStyle } from '../../../utils/mediaFraming';
 
 const VISIBLE_COUNT = 6;
-const CARD_GAP = 18;
 
 export default function CollectionsRibbon({
   categories = [],
@@ -13,7 +12,38 @@ export default function CollectionsRibbon({
   ribbonRef,
 }) {
   const N = categories.length;
-  const isCircular = N > VISIBLE_COUNT;
+
+  // Viewport container width tracking with responsive initial estimation
+  const viewportRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const w = window.innerWidth;
+      const padding = w < 640 ? 32 : (w < 1024 ? 64 : 108);
+      return Math.max(280, w - padding);
+    }
+    return 1140;
+  });
+
+  // Responsive sizing calculations
+  const isMobile = containerWidth < 640;
+  const isTablet = containerWidth >= 640 && containerWidth < 1024;
+  const CARD_GAP = isMobile ? 14 : 18;
+
+  // On mobile (e.g. 360px - 440px), show ~2 to 2.2 cards so the arched window has proper 155-175px width
+  // On tablet, show ~3.8 cards
+  // On desktop, show 6 cards
+  const effectiveVisible = isMobile
+    ? (containerWidth < 380 ? 1.75 : 2.15)
+    : isTablet
+      ? 3.8
+      : VISIBLE_COUNT;
+
+  // Circular slider is active on mobile/tablet whenever N >= 2, or on desktop if N > VISIBLE_COUNT
+  const isCircular = isMobile
+    ? N >= 2
+    : isTablet
+      ? N >= 3
+      : N > VISIBLE_COUNT;
 
   // Tripled list for infinite circular looping
   const items = isCircular
@@ -25,15 +55,13 @@ export default function CollectionsRibbon({
   const [withTransition, setWithTransition] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Viewport container width tracking
-  const viewportRef = useRef(null);
-  const [containerWidth, setContainerWidth] = useState(1140);
-
   // Mouse & Touch Dragging State
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartX = useRef(0);
+  const dragStartY = useRef(0);
   const hasDragged = useRef(false);
+  const isHorizontalScroll = useRef(false);
 
   // Update container width on resize
   useEffect(() => {
@@ -63,6 +91,26 @@ export default function CollectionsRibbon({
     }
   }, [N, isCircular]);
 
+  // Keep active category in view if it changes from outside (e.g. quick-tabs or hero)
+  useEffect(() => {
+    if (!isCircular || !activeCategoryId || N === 0) return;
+    const catIdx = categories.findIndex((c) => c.id === activeCategoryId);
+    if (catIdx === -1) return;
+
+    const currentMod = ((currentIndex % N) + N) % N;
+    const isVisibleInWindow =
+      catIdx === currentMod || (effectiveVisible >= 2 && catIdx === (currentMod + 1) % N);
+
+    if (!isVisibleInWindow) {
+      let target = Math.floor(currentIndex / N) * N + catIdx;
+      if (target - currentIndex > N / 2) target -= N;
+      if (currentIndex - target > N / 2) target += N;
+
+      setWithTransition(true);
+      setCurrentIndex(target);
+    }
+  }, [activeCategoryId, categories, isCircular, N, effectiveVisible]);
+
   // Restore transition after instantaneous teleport
   useEffect(() => {
     if (!withTransition) {
@@ -73,13 +121,18 @@ export default function CollectionsRibbon({
     }
   }, [withTransition]);
 
-  // Responsive sizing calculations
-  const isMobile = containerWidth < 640;
-  const isTablet = containerWidth >= 640 && containerWidth < 1024;
-  const effectiveVisible = isMobile ? 2.2 : isTablet ? 3.8 : VISIBLE_COUNT;
+  // Safety timer to clear isAnimating if transitionend is missed
+  useEffect(() => {
+    if (isAnimating) {
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 450);
+      return () => clearTimeout(timer);
+    }
+  }, [isAnimating]);
 
   const cardWidth = isCircular
-    ? (containerWidth - (effectiveVisible - 1) * CARD_GAP) / effectiveVisible
+    ? Math.max(140, Math.min(185, (containerWidth - (effectiveVisible - 1) * CARD_GAP) / effectiveVisible))
     : Math.min(175, (containerWidth - (N - 1) * CARD_GAP) / Math.max(1, N));
 
   const step = cardWidth + CARD_GAP;
@@ -136,7 +189,7 @@ export default function CollectionsRibbon({
   const handleMouseUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    const threshold = 40;
+    const threshold = 35;
     if (dragOffset < -threshold) {
       handleNext();
     } else if (dragOffset > threshold) {
@@ -153,25 +206,43 @@ export default function CollectionsRibbon({
 
   const handleTouchStart = (e) => {
     if (isAnimating || !isCircular) return;
-    setIsDragging(true);
-    dragStartX.current = e.touches[0].clientX;
+    const touch = e.touches[0];
+    dragStartX.current = touch.clientX;
+    dragStartY.current = touch.clientY;
     hasDragged.current = false;
+    isHorizontalScroll.current = false;
+    setIsDragging(true);
     setDragOffset(0);
   };
 
   const handleTouchMove = (e) => {
     if (!isDragging) return;
-    const diff = e.touches[0].clientX - dragStartX.current;
-    if (Math.abs(diff) > 5) {
-      hasDragged.current = true;
+    const touch = e.touches[0];
+    const diffX = touch.clientX - dragStartX.current;
+    const diffY = touch.clientY - dragStartY.current;
+
+    // Detect if movement is primarily horizontal or vertical
+    if (!hasDragged.current) {
+      if (Math.abs(diffX) > 8 && Math.abs(diffX) > Math.abs(diffY)) {
+        hasDragged.current = true;
+        isHorizontalScroll.current = true;
+      } else if (Math.abs(diffY) > 8) {
+        // Vertical scroll - let browser handle page scrolling
+        setIsDragging(false);
+        setDragOffset(0);
+        return;
+      }
     }
-    setDragOffset(diff);
+
+    if (isHorizontalScroll.current) {
+      setDragOffset(diffX);
+    }
   };
 
   const handleTouchEnd = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    const threshold = 40;
+    const threshold = 35;
     if (dragOffset < -threshold) {
       handleNext();
     } else if (dragOffset > threshold) {
@@ -225,7 +296,7 @@ export default function CollectionsRibbon({
           position: 'relative',
           maxWidth: '1280px',
           margin: '0 auto',
-          padding: '0 54px',
+          padding: isMobile ? '0 28px' : '0 54px',
         }}
       >
         {/* Left Arrow Button (Infinite Rotation) */}
@@ -236,12 +307,12 @@ export default function CollectionsRibbon({
             aria-label="Previous categories"
             style={{
               position: 'absolute',
-              left: 4,
+              left: isMobile ? 0 : 4,
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 35,
-              width: 44,
-              height: 44,
+              width: isMobile ? 36 : 44,
+              height: isMobile ? 36 : 44,
               borderRadius: '50%',
               border: '1px solid rgba(210, 200, 184, 0.85)',
               backgroundColor: '#FFFFFF',
@@ -254,7 +325,7 @@ export default function CollectionsRibbon({
               transition: 'all 0.2s ease',
             }}
           >
-            <ChevronLeft size={22} strokeWidth={2.4} />
+            <ChevronLeft size={isMobile ? 18 : 22} strokeWidth={2.4} />
           </button>
         )}
 
@@ -266,12 +337,12 @@ export default function CollectionsRibbon({
             aria-label="Next categories"
             style={{
               position: 'absolute',
-              right: 4,
+              right: isMobile ? 0 : 4,
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 35,
-              width: 44,
-              height: 44,
+              width: isMobile ? 36 : 44,
+              height: isMobile ? 36 : 44,
               borderRadius: '50%',
               border: '1px solid rgba(210, 200, 184, 0.85)',
               backgroundColor: '#FFFFFF',
@@ -284,11 +355,11 @@ export default function CollectionsRibbon({
               transition: 'all 0.2s ease',
             }}
           >
-            <ChevronRight size={22} strokeWidth={2.4} />
+            <ChevronRight size={isMobile ? 18 : 22} strokeWidth={2.4} />
           </button>
         )}
 
-        {/* Viewport Window (clips exactly to 6 cards on laptop) */}
+        {/* Viewport Window */}
         <div
           ref={viewportRef}
           onMouseDown={handleMouseDown}
@@ -305,6 +376,8 @@ export default function CollectionsRibbon({
             margin: '0 auto',
             cursor: isDragging ? 'grabbing' : 'grab',
             userSelect: 'none',
+            WebkitUserSelect: 'none',
+            touchAction: 'pan-y',
             padding: '1.25rem 0.15rem',
           }}
         >
@@ -371,7 +444,7 @@ export default function CollectionsRibbon({
                       className="absolute inset-0 pointer-events-none"
                       style={{
                         background:
-                          'linear-gradient(to bottom, rgba(16, 16, 16, 0.05) 0%, rgba(16, 16, 16, 0.12) 40%, rgba(16, 16, 16, 0.68) 75%, rgba(16, 16, 16, 0.95) 100%)',
+                          'linear-gradient(to bottom, rgba(16, 16, 16, 0.05) 0%, rgba(16, 16, 16, 0.12) 40%, rgba(16, 16, 0.68) 75%, rgba(16, 16, 16, 0.95) 100%)',
                       }}
                     />
 
@@ -380,7 +453,7 @@ export default function CollectionsRibbon({
                       <h3
                         style={{
                           fontFamily: 'var(--font-serif)',
-                          fontSize: 'clamp(1.15rem, 1.3vw, 1.35rem)',
+                          fontSize: 'clamp(1.05rem, 1.3vw, 1.35rem)',
                           color: '#FFFFFF',
                           fontWeight: 400,
                           lineHeight: 1.15,
@@ -444,25 +517,32 @@ export default function CollectionsRibbon({
             marginTop: 20,
           }}
         >
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => onSelectCategory(cat.id)}
-              aria-label={cat.name}
-              style={{
-                width: cat.id === activeCategoryId ? 22 : 6,
-                height: 6,
-                borderRadius: 3,
-                border: 'none',
-                backgroundColor:
-                  cat.id === activeCategoryId ? '#1C1917' : '#D2C8B8',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                padding: 0,
-              }}
-            />
-          ))}
+          {categories.map((cat, idx) => {
+            const isCatActive = cat.id === activeCategoryId;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                  onSelectCategory(cat.id);
+                  setWithTransition(true);
+                  setCurrentIndex(N + idx);
+                }}
+                aria-label={cat.name}
+                style={{
+                  width: isCatActive ? 22 : 6,
+                  height: 6,
+                  borderRadius: 3,
+                  border: 'none',
+                  backgroundColor:
+                    isCatActive ? '#1C1917' : '#D2C8B8',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  padding: 0,
+                }}
+              />
+            );
+          })}
         </div>
       )}
     </section>
