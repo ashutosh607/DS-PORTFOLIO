@@ -19,7 +19,7 @@ const uploadOnCloudinary = async (localFilePath, folder = "ds_portfolio") => {
       try {
         const ext = path.extname(localFilePath).toLowerCase();
         const isVideo = [".mp4", ".mov", ".webm", ".avi", ".mkv"].includes(ext);
-        const isImage = [".jpg", ".jpeg", ".png", ".webp", ".avif", ".tiff", ".bmp"].includes(ext);
+        const isImage = [".jpg", ".jpeg", ".jfif", ".png", ".webp", ".avif", ".tiff", ".bmp", ".heic", ".heif"].includes(ext);
 
         let fileToUpload = localFilePath;
 

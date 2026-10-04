@@ -161,7 +161,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
         }
         payload = new FormData();
         payload.append('name', name.trim());
-        payload.append('coverFile', uploadCover);
+        payload.append('coverFile', uploadCover, coverFile.name || 'cover.jpg');
         payload.append('tagline', tagline.trim());
         payload.append('quote', quote.trim());
         payload.append('medium', medium.trim());

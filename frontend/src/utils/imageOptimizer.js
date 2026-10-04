@@ -30,24 +30,26 @@ export async function optimizeImageFile(file, customOptions = {}) {
   }
 
   // 2. Base compression configuration as specified
+  const resolvedName = file.name || 'photo.jpg';
+  const resolvedType = file.type && file.type !== 'application/octet-stream' ? file.type : 'image/jpeg';
+
   const options = {
     maxSizeMB: TARGET_MAX_SIZE_MB,
     maxWidthOrHeight: 3000,
     useWebWorker: true,
     initialQuality: 0.9,
+    fileType: resolvedType,
     ...customOptions,
   };
 
   try {
     let compressedFile = await imageCompression(file, options);
 
-    // Keep the original filename where possible so existing logic remains unaffected
-    if (compressedFile && file.name && compressedFile.name !== file.name) {
-      compressedFile = new File([compressedFile], file.name, {
-        type: compressedFile.type || file.type,
-        lastModified: Date.now(),
-      });
-    }
+    // Always ensure the return value is a real File object with original name and valid MIME
+    compressedFile = new File([compressedFile], resolvedName, {
+      type: compressedFile.type || resolvedType,
+      lastModified: Date.now(),
+    });
 
     // 3. Check if resulting file is still above Cloudinary's 10 MB limit
     const limitBytes = CLOUDINARY_MAX_LIMIT_MB * 1024 * 1024;
@@ -58,16 +60,15 @@ export async function optimizeImageFile(file, customOptions = {}) {
         maxWidthOrHeight: 2560,
         useWebWorker: true,
         initialQuality: 0.82,
+        fileType: resolvedType,
       };
 
       compressedFile = await imageCompression(compressedFile, secondaryOptions);
 
-      if (compressedFile && file.name && compressedFile.name !== file.name) {
-        compressedFile = new File([compressedFile], file.name, {
-          type: compressedFile.type || file.type,
-          lastModified: Date.now(),
-        });
-      }
+      compressedFile = new File([compressedFile], resolvedName, {
+        type: compressedFile.type || resolvedType,
+        lastModified: Date.now(),
+      });
     }
 
     // 4. Hard safety check: Never silently upload a file larger than Cloudinary limit

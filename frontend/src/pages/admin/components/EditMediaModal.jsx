@@ -121,7 +121,7 @@ export default function EditMediaModal({
         setSaveStatus('Uploading...');
 
         const formData = new FormData();
-        formData.append('file', uploadPayload);
+        formData.append('file', uploadPayload, file.name || 'photo.jpg');
         formData.append('url', directUrl.trim() || mediaItem.url || '');
         formData.append('category', category);
         formData.append('type', mediaType);

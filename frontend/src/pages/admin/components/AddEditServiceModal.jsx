@@ -217,7 +217,7 @@ export default function AddEditServiceModal({
         if (isImage) {
           uploadImage = await optimizeImageFile(imageFile);
         }
-        formData.append('imageFile', uploadImage);
+        formData.append('imageFile', uploadImage, imageFile.name || 'service.jpg');
       } else if (imageUrl.trim()) {
         formData.append('imageUrl', imageUrl.trim());
       }

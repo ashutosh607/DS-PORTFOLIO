@@ -172,7 +172,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
         payload = new FormData();
         payload.append('name', name.trim());
         payload.append('slug', slug.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
-        payload.append('coverFile', uploadCover);
+        payload.append('coverFile', uploadCover, coverFile.name || 'cover.jpg');
         payload.append('tagline', tagline.trim());
         payload.append('quote', quote.trim());
         payload.append('medium', medium.trim());
