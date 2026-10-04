@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import {
   DURATION_OPTIONS,
-  CREATIVE_DISCIPLINES,
   PROVENANCE_OPTIONS,
   COUNTRY_CODES,
 } from '../data/servicesData';
 import { handleWhatsAppSubmit } from '../../../utils/whatsapp';
 import { handleEmailSubmit } from '../../../utils/email';
 import LocationSearchInput from './LocationSearchInput';
+import { useCategories } from '../../../utils/categoryManager';
+import { CATEGORIES as DEFAULT_COLLECTIONS_CATEGORIES } from '../../collections/data/collectionsData';
 
 export default function BookingBriefForm({
   formData,
@@ -17,26 +18,48 @@ export default function BookingBriefForm({
   onScrollToCollections,
   onSelectCollection,
   categoryCollections,
+  availableCategories,
+  onSelectCategory,
   onSubmit,
   isSubmitting,
 }) {
   const [errors, setErrors] = useState({});
 
-  const celebrationTypes = [
-    'Wedding',
-    'Pre-Wedding',
-    'Portrait',
-    'Birthday / Milestone',
-    'Private Event',
-    'Commercial',
-  ];
+  // Dynamic celebration types from portfolio Collections + "Other"
+  const { categories: dynamicCategories } = useCategories();
+  const collectionsPool =
+    dynamicCategories && dynamicCategories.length > 0
+      ? dynamicCategories
+      : DEFAULT_COLLECTIONS_CATEGORIES;
 
-  const handleToggleDiscipline = (id) => {
-    const current = formData.disciplines || ['fine-art-photo', 'archival-album'];
-    if (current.includes(id)) {
-      updateFormData({ disciplines: current.filter((item) => item !== id) });
-    } else {
-      updateFormData({ disciplines: [...current, id] });
+  const collectionNames = collectionsPool
+    .map((c) => c.name || c.label)
+    .filter(Boolean);
+
+  const baseEventNames =
+    collectionNames.length > 0
+      ? collectionNames
+      : ['Weddings', 'Pre-Wedding', 'Baby Shower', 'Portraits', 'Engagement', 'Haldi'];
+
+  const celebrationTypes = Array.from(new Set([...baseEventNames, 'Other']));
+
+  const handleSelectEventType = (type) => {
+    updateFormData({
+      eventType: type,
+      ...(type !== 'Other' ? { otherEventType: '' } : {}),
+    });
+
+    if (onSelectCategory && type !== 'Other') {
+      const typeKey = type.toLowerCase().trim().replace(/[^a-z0-9]/g, '').replace(/s$/, '');
+      const matched = availableCategories?.find((c) => {
+        const cIdKey = (c.id || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '').replace(/s$/, '');
+        const cLabelKey = (c.label || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '').replace(/s$/, '');
+        const cNameKey = (c.name || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '').replace(/s$/, '');
+        return cIdKey === typeKey || cLabelKey === typeKey || cNameKey === typeKey;
+      });
+      if (matched) {
+        onSelectCategory(matched.id);
+      }
     }
   };
 
@@ -87,8 +110,6 @@ export default function BookingBriefForm({
       }
     }
   };
-
-  const currentDisciplines = formData.disciplines || ['fine-art-photo', 'archival-album'];
 
   const availableTiers =
     Array.isArray(categoryCollections) && categoryCollections.length > 0
@@ -366,12 +387,17 @@ export default function BookingBriefForm({
             }}
           >
             {celebrationTypes.map((type) => {
-              const isSelected = (formData.eventType || 'Wedding') === type;
+              const currentEvent = (formData.eventType || 'Wedding').toLowerCase().trim();
+              const typeLower = type.toLowerCase().trim();
+              const isSelected =
+                currentEvent === typeLower ||
+                currentEvent.replace(/s$/, '') === typeLower.replace(/s$/, '');
+
               return (
                 <button
                   key={type}
                   type="button"
-                  onClick={() => updateFormData({ eventType: type })}
+                  onClick={() => handleSelectEventType(type)}
                   style={{
                     padding: '12px 20px',
                     minHeight: '46px',
@@ -380,6 +406,7 @@ export default function BookingBriefForm({
                     background: isSelected ? '#101010' : '#FDFCF8',
                     color: isSelected ? '#FDFCF8' : '#101010',
                     fontSize: '13px',
+                    fontWeight: isSelected ? 600 : 400,
                     cursor: 'pointer',
                     fontFamily: 'var(--font-sans)',
                     transition: 'all 200ms ease',
@@ -392,6 +419,46 @@ export default function BookingBriefForm({
               );
             })}
           </div>
+
+          {/* Conditional "Other" Celebration Specification Input */}
+          {(formData.eventType || '').toLowerCase() === 'other' && (
+            <div style={{ marginTop: '16px' }} className="animate-in fade-in duration-200">
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '11px',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: '#55493A',
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-sans)',
+                }}
+              >
+                PLEASE SPECIFY YOUR EVENT / OCCASION
+              </label>
+              <input
+                type="text"
+                value={formData.otherEventType || ''}
+                onChange={(e) => updateFormData({ otherEventType: e.target.value })}
+                placeholder="e.g. Milestone Birthday, Private Anniversary, Fashion Editorial, Housewarming..."
+                style={{
+                  width: '100%',
+                  minHeight: '50px',
+                  padding: '12px 18px',
+                  borderRadius: '8px',
+                  border: '1px solid #101010',
+                  background: '#FDFCF8',
+                  fontSize: '13.5px',
+                  fontFamily: 'var(--font-sans)',
+                  color: '#101010',
+                  boxSizing: 'border-box',
+                }}
+                className="outline-none focus:ring-1 focus:ring-[#101010] placeholder-[#A59C8F]"
+                autoFocus
+              />
+            </div>
+          )}
         </div>
 
         {/* Target Event Date + Duration Two-Field Row (24px gap, 28px bottom margin) */}
@@ -565,13 +632,13 @@ export default function BookingBriefForm({
                 fontFamily: 'var(--font-sans)',
               }}
             >
-              Curated Suite &amp; Disciplines
+              Curated Suite
             </span>
           </div>
         </div>
 
-        {/* COLLECTION SUITE CARDS: 32px padding, 20px gap, 28px bottom */}
-        <div style={{ marginBottom: '28px' }}>
+        {/* COLLECTION SUITE CARDS: 32px padding, 20px gap */}
+        <div>
           <label
             style={{
               display: 'block',
@@ -655,126 +722,6 @@ export default function BookingBriefForm({
                         {tier.specs[0].title}
                       </span>
                     )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* CREATIVE DISCIPLINES CARDS: 32px padding, 20px gap */}
-        <div>
-          <label
-            style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontSize: '11px',
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: '#55493A',
-              fontWeight: 600,
-              fontFamily: 'var(--font-sans)',
-            }}
-          >
-            SELECT CREATIVE DISCIPLINES REQUIRED
-          </label>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '20px',
-            }}
-          >
-            {CREATIVE_DISCIPLINES.map((disc) => {
-              const checked = currentDisciplines.includes(disc.id);
-              return (
-                <div
-                  key={disc.id}
-                  data-testid={`creative-discipline-card-${disc.id}`}
-                  onClick={() => handleToggleDiscipline(disc.id)}
-                  style={{
-                    padding: '32px',
-                    minHeight: '140px',
-                    border: checked ? '1.5px solid #101010' : '1px solid #E3DBCC',
-                    borderRadius: '12px',
-                    background: checked ? '#FAF8F5' : '#FDFCF8',
-                    cursor: 'pointer',
-                    transition: 'all 200ms ease',
-                    boxSizing: 'border-box',
-                  }}
-                  className="flex flex-col justify-between hover:shadow-xs"
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '4px',
-                        border: checked ? 'none' : '1.5px solid #C5B9A5',
-                        background: checked ? '#101010' : '#FDFCF8',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                        marginTop: '2px',
-                      }}
-                    >
-                      {checked && (
-                        <span className="text-white text-xs font-bold leading-none">✓</span>
-                      )}
-                    </div>
-
-                    <div className="flex-1">
-                      <h4
-                        style={{
-                          fontSize: '21px',
-                          marginBottom: '8px',
-                          fontFamily: 'var(--font-serif)',
-                          color: '#101010',
-                          lineHeight: 1.15,
-                          fontWeight: 500,
-                        }}
-                      >
-                        {disc.title}
-                      </h4>
-                      <p
-                        style={{
-                          lineHeight: 1.5,
-                          fontSize: '12.5px',
-                          color: '#7A7770',
-                          fontFamily: 'var(--font-sans)',
-                          margin: 0,
-                        }}
-                      >
-                        {disc.subtitle}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: '16px',
-                      paddingTop: '16px',
-                      borderTop: '1px solid rgba(227, 219, 204, 0.4)',
-                    }}
-                    className="flex justify-end"
-                  >
-                    <span
-                      style={{
-                        fontSize: '10px',
-                        letterSpacing: '0.12em',
-                        textTransform: 'uppercase',
-                        fontWeight: 600,
-                        padding: '4px 10px',
-                        borderRadius: '4px',
-                        fontFamily: 'var(--font-sans)',
-                        background: disc.isIncluded ? '#EDE4D6' : '#F3F0E9',
-                        color: disc.isIncluded ? '#55493A' : '#7A7770',
-                      }}
-                    >
-                      {disc.isIncluded ? 'INCLUDED IN SUITE' : '+ BESPOKE ADD-ON'}
-                    </span>
                   </div>
                 </div>
               );

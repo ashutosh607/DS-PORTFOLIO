@@ -10,7 +10,10 @@ export default function CommissionSummaryCard({
     ? category.charAt(0).toUpperCase() + category.slice(1)
     : 'Wedding';
 
-  const celebrationText = formData.eventType || `${categoryLabel} Celebration`;
+  const celebrationText =
+    formData.eventType === 'Other' && formData.otherEventType?.trim()
+      ? formData.otherEventType.trim()
+      : formData.eventType || `${categoryLabel} Celebration`;
   const locationText = formData.location ? formData.location : 'Pending Venue Entry';
   const durationText = formData.duration ? `${formData.duration} Archive` : '2 Days Archive';
 

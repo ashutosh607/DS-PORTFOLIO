@@ -778,6 +778,8 @@ export default function ServicesPage() {
                     onScrollToCollections={handleBackToCollections}
                     onSelectCollection={setSelectedCollectionId}
                     categoryCollections={activeCollections}
+                    availableCategories={categories}
+                    onSelectCategory={handleCategorySelect}
                     onSubmit={handleFormSubmit}
                     isSubmitting={isSubmitting}
                   />

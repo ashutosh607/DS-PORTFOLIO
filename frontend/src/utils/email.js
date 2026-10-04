@@ -30,7 +30,10 @@ export const buildEmailBody = ({ formData = {}, selectedCollection = null, inqui
     }
   }
 
-  const eventType = formData.eventType?.trim() || 'Not provided';
+  let eventType = formData.eventType?.trim() || 'Not provided';
+  if (eventType === 'Other' && formData.otherEventType?.trim()) {
+    eventType = `Other (${formData.otherEventType.trim()})`;
+  }
   const eventDate = formatEventDate(formData.eventDate);
   const duration = formData.duration?.trim() || 'Not provided';
   const location = formData.location?.trim() || 'Not provided';
@@ -46,8 +49,15 @@ export const buildEmailBody = ({ formData = {}, selectedCollection = null, inqui
   const collectionName = formatTitleCase(rawCollectionTitle);
   const price = getCollectionPrice(selectedCollection);
 
-  const currentDisciplines = formData.disciplines || ['fine-art-photo', 'archival-album'];
-  const servicesList = formatDisciplines(currentDisciplines);
+  const currentDisciplines = formData.disciplines || [];
+  const curationItems =
+    selectedCollection?.deliverables || selectedCollection?.curationHighlights || [];
+  const servicesList =
+    currentDisciplines.length > 0
+      ? formatDisciplines(currentDisciplines)
+      : curationItems.length > 0
+        ? curationItems.slice(0, 4).map((d) => `• ${d}`).join('\n')
+        : '• Full Atelier Coverage';
 
   const budget = formData.budget?.trim() || 'Not provided';
   const visionNotes = formData.message?.trim() || 'Not provided';
