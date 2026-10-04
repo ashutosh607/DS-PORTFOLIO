@@ -81,6 +81,14 @@ const serviceSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    display: {
+      type: mongoose.Schema.Types.Mixed,
+      default: () => ({
+        fit: "cover",
+        position: { x: 50, y: 50 },
+        zoom: 1,
+      }),
+    },
   },
   {
     timestamps: true,

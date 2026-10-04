@@ -586,6 +586,23 @@ const createService = asyncHandler(async (req, res) => {
     order = Number(order);
   }
 
+  let cleanDisplay = null;
+  if (req.body.display) {
+    try {
+      const parsed = typeof req.body.display === 'string' ? JSON.parse(req.body.display) : req.body.display;
+      if (typeof parsed === 'object' && parsed !== null) {
+        cleanDisplay = {
+          fit: parsed.fit === 'contain' || parsed.fit === 'fit' ? 'contain' : 'cover',
+          position: {
+            x: typeof parsed.position?.x === 'number' ? Math.max(0, Math.min(100, parsed.position.x)) : 50,
+            y: typeof parsed.position?.y === 'number' ? Math.max(0, Math.min(100, parsed.position.y)) : 50,
+          },
+          zoom: typeof parsed.zoom === 'number' ? Math.max(1, Math.min(3, parsed.zoom)) : 1,
+        };
+      }
+    } catch (e) {}
+  }
+
   const service = await Service.create({
     category: cleanCategory,
     tier: tier.trim(),
@@ -603,6 +620,7 @@ const createService = asyncHandler(async (req, res) => {
     order,
     isActive: isActive === undefined ? true : Boolean(isActive),
     isRecommended: isRecommended === undefined ? false : Boolean(isRecommended),
+    ...(cleanDisplay ? { display: cleanDisplay } : {}),
   });
 
   return res.status(201).json(
@@ -710,6 +728,22 @@ const updateService = asyncHandler(async (req, res) => {
 
   if (isRecommended !== undefined) {
     service.isRecommended = Boolean(isRecommended);
+  }
+
+  if (req.body.display !== undefined) {
+    try {
+      const parsed = typeof req.body.display === 'string' ? JSON.parse(req.body.display) : req.body.display;
+      if (typeof parsed === 'object' && parsed !== null) {
+        service.display = {
+          fit: parsed.fit === 'contain' || parsed.fit === 'fit' ? 'contain' : 'cover',
+          position: {
+            x: typeof parsed.position?.x === 'number' ? Math.max(0, Math.min(100, parsed.position.x)) : 50,
+            y: typeof parsed.position?.y === 'number' ? Math.max(0, Math.min(100, parsed.position.y)) : 50,
+          },
+          zoom: typeof parsed.zoom === 'number' ? Math.max(1, Math.min(3, parsed.zoom)) : 1,
+        };
+      }
+    } catch (e) {}
   }
 
   await service.save();

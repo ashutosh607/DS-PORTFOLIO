@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   X,
   Upload,
@@ -12,11 +12,31 @@ import {
   FileText,
   Tag,
   AlignLeft,
+  ZoomIn,
+  ZoomOut,
+  Move,
+  RotateCcw,
+  Maximize2,
+  Minimize2,
+  Crop,
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useCategories } from '../../../utils/categoryManager';
 import { optimizeImageFile } from '../../../utils/imageOptimizer';
+import { DEFAULT_DISPLAY, getFramingStyle } from '../../../utils/mediaFraming';
 import '../AdminDashboard.css';
+
+const PRESETS = [
+  { id: 'tl', label: '↖ Top Left', x: 0, y: 0, symbol: '↖' },
+  { id: 'tc', label: '↑ Top', x: 50, y: 0, symbol: '↑' },
+  { id: 'tr', label: '↗ Top Right', x: 100, y: 0, symbol: '↗' },
+  { id: 'ml', label: '← Left', x: 0, y: 50, symbol: '←' },
+  { id: 'mc', label: '• Center', x: 50, y: 50, symbol: '•' },
+  { id: 'mr', label: '→ Right', x: 100, y: 50, symbol: '→' },
+  { id: 'bl', label: '↙ Bottom Left', x: 0, y: 100, symbol: '↙' },
+  { id: 'bc', label: '↓ Bottom', x: 50, y: 100, symbol: '↓' },
+  { id: 'br', label: '↘ Bottom Right', x: 100, y: 100, symbol: '↘' },
+];
 
 const DEFAULT_CATEGORIES = [
   { id: 'wedding', label: 'Wedding' },
@@ -30,16 +50,19 @@ const DEFAULT_CATEGORIES = [
 export default function AddEditServiceModal({
   isOpen,
   onClose,
-  initialCategory,
-  category: categoryProp,
+  service,
   serviceToEdit,
   initialData,
+  targetCategory,
+  initialCategory,
+  category: categoryProp,
+  categories = [],
   availableCategories = [],
   lockCategory = false,
   onSuccess,
 }) {
-  const effectiveCategory = (categoryProp || initialCategory || 'wedding').toLowerCase().trim();
-  const effectiveServiceToEdit = serviceToEdit || initialData || null;
+  const effectiveCategory = (categoryProp || targetCategory || initialCategory || 'wedding').toLowerCase().trim();
+  const effectiveServiceToEdit = service || serviceToEdit || initialData || null;
   const isEditMode = Boolean(effectiveServiceToEdit);
 
   const { getAuthHeaders } = useAdminAuth();
@@ -48,7 +71,7 @@ export default function AddEditServiceModal({
 
   const categoriesOptions = React.useMemo(() => {
     const list = [...DEFAULT_CATEGORIES];
-    const sourcePool = [...(availableCategories || []), ...(dynamicCategories || [])];
+    const sourcePool = [...(categories || []), ...(availableCategories || []), ...(dynamicCategories || [])];
 
     sourcePool.forEach((c) => {
       const slug = (c.id || c.slug || c.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
@@ -90,37 +113,145 @@ export default function AddEditServiceModal({
   const [isRecommended, setIsRecommended] = useState(false);
   const [isActive, setIsActive] = useState(true);
 
+  // Image Resizing, Scaling & Framing State
+  const [display, setDisplay] = useState(DEFAULT_DISPLAY);
+  const [showFocalCrosshair, setShowFocalCrosshair] = useState(true);
+
+  // Dragging state for live interactive framing canvas
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ startX: 0, startY: 0, initialPosX: 50, initialPosY: 50 });
+  const previewBoxRef = useRef(null);
+
+  const handleDragStart = (clientX, clientY) => {
+    setIsDragging(true);
+    dragStartRef.current = {
+      startX: clientX,
+      startY: clientY,
+      initialPosX: typeof display.position?.x === 'number' ? display.position.x : 50,
+      initialPosY: typeof display.position?.y === 'number' ? display.position.y : 50,
+    };
+  };
+
+  const handleDragMove = useCallback((clientX, clientY) => {
+    if (!isDragging || !previewBoxRef.current) return;
+    const rect = previewBoxRef.current.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const deltaX = clientX - dragStartRef.current.startX;
+    const deltaY = clientY - dragStartRef.current.startY;
+    const currentZoom = typeof display.zoom === 'number' && display.zoom >= 1 ? display.zoom : 1;
+    const sensitivity = (100 / rect.width) * (1 / Math.max(1, currentZoom * 0.7));
+
+    let nextX = dragStartRef.current.initialPosX - deltaX * sensitivity;
+    let nextY = dragStartRef.current.initialPosY - deltaY * sensitivity;
+
+    nextX = Math.max(0, Math.min(100, Math.round(nextX * 10) / 10));
+    nextY = Math.max(0, Math.min(100, Math.round(nextY * 10) / 10));
+
+    setDisplay((prev) => ({
+      ...prev,
+      position: { x: nextX, y: nextY },
+    }));
+  }, [isDragging, display.zoom]);
+
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isDragging) return;
+    const onMouseMove = (e) => handleDragMove(e.clientX, e.clientY);
+    const onTouchMove = (e) => {
+      if (e.touches[0]) handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onUp = () => handleDragEnd();
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onUp);
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onUp);
+    };
+  }, [isDragging, handleDragMove, handleDragEnd]);
+
+  const handleResetFraming = () => {
+    setDisplay({ fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 });
+  };
+
+  const handleZoomStep = (delta) => {
+    setDisplay((prev) => {
+      const current = typeof prev.zoom === 'number' ? prev.zoom : 1;
+      const next = Math.max(1, Math.min(2.5, Math.round((current + delta) * 10) / 10));
+      return { ...prev, zoom: next };
+    });
+  };
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
       if (effectiveServiceToEdit) {
-        setCategory(effectiveServiceToEdit.category || effectiveCategory);
+        const itemCat = (effectiveServiceToEdit.category || effectiveCategory || 'wedding').toLowerCase().trim();
+        setCategory(itemCat);
         setTier(effectiveServiceToEdit.tier || '');
-        setFolioLabel(effectiveServiceToEdit.folioLabel || '');
-        setEyebrow(effectiveServiceToEdit.eyebrow || '');
+        setFolioLabel(effectiveServiceToEdit.folioLabel || 'Folio 01');
+        setEyebrow(effectiveServiceToEdit.eyebrow || effectiveServiceToEdit.title || '');
         setSubtitle(effectiveServiceToEdit.subtitle || '');
         setBadge(effectiveServiceToEdit.badge || '');
-        setImageTag(effectiveServiceToEdit.imageTag || '');
-        setImageUrl(effectiveServiceToEdit.imageUrl || '');
-        setImagePreview(effectiveServiceToEdit.imageUrl || '');
+        setImageTag(effectiveServiceToEdit.imageTag || effectiveServiceToEdit.imageLabel || '');
+
+        const photoUrl = effectiveServiceToEdit.imageUrl || effectiveServiceToEdit.image || '';
+        setImageUrl(photoUrl);
+        setImagePreview(photoUrl);
         setImageFile(null);
-        if (effectiveServiceToEdit.price !== null && effectiveServiceToEdit.price !== undefined) {
+
+        if (effectiveServiceToEdit.display && typeof effectiveServiceToEdit.display === 'object') {
+          setDisplay({
+            fit: effectiveServiceToEdit.display.fit === 'contain' || effectiveServiceToEdit.display.fit === 'fit' ? 'contain' : 'cover',
+            position: {
+              x: typeof effectiveServiceToEdit.display.position?.x === 'number' ? effectiveServiceToEdit.display.position.x : 50,
+              y: typeof effectiveServiceToEdit.display.position?.y === 'number' ? effectiveServiceToEdit.display.position.y : 50,
+            },
+            zoom: typeof effectiveServiceToEdit.display.zoom === 'number' && effectiveServiceToEdit.display.zoom >= 1 ? effectiveServiceToEdit.display.zoom : 1,
+          });
+        } else {
+          setDisplay({ fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 });
+        }
+
+        const rawPrice =
+          effectiveServiceToEdit.price !== undefined && effectiveServiceToEdit.price !== null
+            ? effectiveServiceToEdit.price
+            : effectiveServiceToEdit.numericPrice;
+
+        if (
+          rawPrice !== undefined &&
+          rawPrice !== null &&
+          String(rawPrice).toLowerCase() !== 'null' &&
+          String(rawPrice).trim() !== ''
+        ) {
           setIsPriceToBeAdded(false);
-          setPrice(String(effectiveServiceToEdit.price));
+          setPrice(String(rawPrice));
         } else {
           setIsPriceToBeAdded(true);
           setPrice('');
         }
+
         setPriceNote(effectiveServiceToEdit.priceNote || '');
         setDescription(effectiveServiceToEdit.description || '');
         setPrivilegesLabel(effectiveServiceToEdit.privilegesLabel || 'INCLUDED DELIVERABLES');
-        setDeliverables(
+
+        const dList =
           Array.isArray(effectiveServiceToEdit.deliverables) && effectiveServiceToEdit.deliverables.length > 0
             ? effectiveServiceToEdit.deliverables
-            : ['']
-        );
+            : [''];
+        setDeliverables(dList);
+
         setIsRecommended(Boolean(effectiveServiceToEdit.isRecommended));
         setIsActive(effectiveServiceToEdit.isActive !== undefined ? Boolean(effectiveServiceToEdit.isActive) : true);
       } else {
@@ -136,6 +267,7 @@ export default function AddEditServiceModal({
         setImageUrl('');
         setImagePreview('');
         setImageFile(null);
+        setDisplay({ fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 });
         setIsPriceToBeAdded(true);
         setPrice('');
         setPriceNote('Exclusive of applicable state VAT / Art transport');
@@ -210,6 +342,7 @@ export default function AddEditServiceModal({
       formData.append('deliverables', JSON.stringify(cleanDeliverables));
       formData.append('isRecommended', String(isRecommended));
       formData.append('isActive', String(isActive));
+      formData.append('display', JSON.stringify(display));
 
       if (imageFile) {
         let uploadImage = imageFile;
@@ -524,16 +657,27 @@ export default function AddEditServiceModal({
                 <span className="text-[9.5px] text-[#9A9287] mt-0.5">PNG · JPG · WEBP</span>
               </div>
 
-              {/* Item 2: Image Preview */}
+              {/* Item 2: Image Preview with framing applied */}
               {imagePreview ? (
                 <div className="relative h-[148px] rounded-[16px] overflow-hidden border border-[#DED7CC] bg-[#EFEBE4] group">
-                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-full transition-transform duration-150 ease-out"
+                    style={getFramingStyle(display)}
+                  />
+                  <div className="absolute top-2 left-2 pointer-events-none">
+                    <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-xs text-white text-[9px] font-mono tracking-wider">
+                      {Math.round((display.zoom || 1) * 100)}% · {display.fit || 'cover'}
+                    </span>
+                  </div>
                   <button
                     type="button"
                     onClick={() => {
                       setImagePreview('');
                       setImageUrl('');
                       setImageFile(null);
+                      setDisplay({ fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 });
                     }}
                     className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full bg-white/95 hover:bg-white text-[#222222] shadow-[0_2px_6px_rgba(0,0,0,0.12)] flex items-center justify-center transition-all cursor-pointer"
                     title="Remove image"
@@ -579,6 +723,247 @@ export default function AddEditServiceModal({
                 </div>
               </div>
             </div>
+
+            {/* Live Interactive Framing & Resizing Studio Panel */}
+            {Boolean(imagePreview || imageUrl) && (
+              <div className="mt-6 rounded-[20px] border border-[#E2DACD] bg-[#F7F4EE] p-5 sm:p-6 shadow-xs">
+                {/* Header with Title and Reset */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-[#E5DECFA]">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-[10px] bg-[#EDE6DC] border border-[#DDD5C9] flex items-center justify-center text-[#2A2621]">
+                      <Crop size={14} />
+                    </div>
+                    <div>
+                      <h4 className="text-[13px] font-semibold text-[#181818] tracking-tight flex items-center gap-2">
+                        <span>Image Resizing &amp; Framing Controls</span>
+                        <span className="px-2 py-0.5 rounded-full bg-[#E5DECFA] text-[#6E675D] text-[9.5px] font-mono font-medium">
+                          4:3 Tier Card Simulation
+                        </span>
+                      </h4>
+                      <p className="text-[11px] text-[#7A7367] mt-0.5">
+                        Scale, zoom and drag focal position to customize how this photo appears in public packages.
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleResetFraming}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#FAF8F5] text-[#5C5852] hover:text-[#181818] border border-[#DDD5C9] text-[10.5px] font-medium transition-colors cursor-pointer shadow-2xs"
+                  >
+                    <RotateCcw size={11} />
+                    <span>Reset Framing</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  {/* Left (6 cols): Interactive 4:3 Drag & Pan Canvas */}
+                  <div className="lg:col-span-6 flex flex-col gap-2.5">
+                    <div className="flex items-center justify-between text-[10.5px] text-[#7A7367] px-1 font-mono uppercase tracking-wider">
+                      <span>4:3 Live Framing Preview</span>
+                      <span>
+                        X: <strong className="text-[#181818]">{Math.round(display.position?.x ?? 50)}%</strong> · Y: <strong className="text-[#181818]">{Math.round(display.position?.y ?? 50)}%</strong>
+                      </span>
+                    </div>
+
+                    <div className="relative w-full rounded-[14px] overflow-hidden bg-[#EAE4D8] border border-[#DCD5C7] shadow-inner p-2 sm:p-2.5">
+                      <div
+                        ref={previewBoxRef}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleDragStart(e.clientX, e.clientY);
+                        }}
+                        onTouchStart={(e) => {
+                          if (e.touches[0]) {
+                            handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
+                          }
+                        }}
+                        className={`relative w-full aspect-[4/3] overflow-hidden rounded-[10px] select-none transition-shadow ${
+                          isDragging ? 'cursor-grabbing ring-2 ring-[#101010]' : 'cursor-grab'
+                        }`}
+                        style={{
+                          backgroundColor: display.fit === 'contain' ? '#FAF8F5' : '#141414',
+                        }}
+                        title="Click and drag to position image"
+                      >
+                        <img
+                          src={imagePreview || imageUrl}
+                          alt="Framing preview"
+                          draggable={false}
+                          className="w-full h-full pointer-events-none select-none transition-transform duration-75 ease-out"
+                          style={getFramingStyle(display)}
+                        />
+
+                        {/* Subtle focal crosshair */}
+                        {showFocalCrosshair && (
+                          <div
+                            className="absolute pointer-events-none transition-all duration-75 z-20"
+                            style={{
+                              left: `${display.position?.x ?? 50}%`,
+                              top: `${display.position?.y ?? 50}%`,
+                              transform: 'translate(-50%, -50%)',
+                            }}
+                          >
+                            <div className="w-7 h-7 rounded-full border-2 border-white/90 shadow-[0_0_6px_rgba(0,0,0,0.6)] flex items-center justify-center">
+                              <div className="w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Drag Gesture Hint Tag */}
+                        <div className="absolute top-2.5 right-2.5 pointer-events-none z-30">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs text-white text-[9.5px] font-mono tracking-wider shadow-sm">
+                            <Move size={9} />
+                            <span>DRAG TO RE-CENTER</span>
+                          </span>
+                        </div>
+
+                        {/* Badge */}
+                        <div className="absolute bottom-2.5 left-2.5 pointer-events-none z-30">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/85 backdrop-blur-xs text-[#181818] text-[9px] font-mono font-medium shadow-xs">
+                            {display.fit === 'contain' ? 'Fit · Contain' : 'Cover · Fill'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-2 flex items-center justify-between text-[10.5px] text-[#7A7367] px-1 font-sans">
+                        <span>Click and drag inside preview to reposition</span>
+                        <button
+                          type="button"
+                          onClick={() => setShowFocalCrosshair(!showFocalCrosshair)}
+                          className="hover:text-[#181818] underline cursor-pointer"
+                        >
+                          {showFocalCrosshair ? 'Hide crosshair' : 'Show crosshair'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right (6 cols): Scaling, Fit & Presets */}
+                  <div className="lg:col-span-6 flex flex-col gap-4 bg-white p-4.5 sm:p-5 rounded-[14px] border border-[#E5DECFA]">
+                    
+                    {/* 1. Zoom / Scaling Slider */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[10px] font-mono tracking-[0.16em] uppercase text-[#6E675D] font-semibold flex items-center gap-1.5">
+                          <ZoomIn size={12} />
+                          <span>IMAGE RESIZE / ZOOM</span>
+                        </label>
+                        <span className="font-mono text-[11px] font-semibold text-[#181818] bg-[#F4EFEA] px-2 py-0.5 rounded-md border border-[#E3DBD0]">
+                          {Math.round((display.zoom || 1) * 100)}%
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => handleZoomStep(-0.1)}
+                          className="w-8 h-8 rounded-lg bg-[#FAF8F5] border border-[#DCD5C9] hover:bg-[#F0EBE3] flex items-center justify-center text-[#554E44] transition-colors cursor-pointer shrink-0"
+                          title="Zoom out"
+                        >
+                          <ZoomOut size={13} />
+                        </button>
+
+                        <input
+                          type="range"
+                          min="1"
+                          max="2.5"
+                          step="0.05"
+                          value={display.zoom || 1}
+                          onChange={(e) => setDisplay((prev) => ({ ...prev, zoom: parseFloat(e.target.value) }))}
+                          className="w-full accent-[#181818] cursor-pointer"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => handleZoomStep(0.1)}
+                          className="w-8 h-8 rounded-lg bg-[#FAF8F5] border border-[#DCD5C9] hover:bg-[#F0EBE3] flex items-center justify-center text-[#554E44] transition-colors cursor-pointer shrink-0"
+                          title="Zoom in"
+                        >
+                          <ZoomIn size={13} />
+                        </button>
+                      </div>
+                      <div className="flex justify-between text-[9px] font-mono text-[#9C9488] mt-1 px-1">
+                        <span>1.0x (Normal)</span>
+                        <span>1.75x</span>
+                        <span>2.5x (Close-up)</span>
+                      </div>
+                    </div>
+
+                    {/* 2. Fit Mode Toggle */}
+                    <div>
+                      <label className="text-[10px] font-mono tracking-[0.16em] uppercase text-[#6E675D] font-semibold block mb-1.5">
+                        FIT MODE
+                      </label>
+                      <div className="grid grid-cols-2 gap-2 bg-[#F6F3EC] p-1 rounded-lg border border-[#E4DDD1]">
+                        <button
+                          type="button"
+                          onClick={() => setDisplay((prev) => ({ ...prev, fit: 'cover' }))}
+                          className={`py-1.5 px-3 rounded-md text-[11px] font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                            display.fit !== 'contain'
+                              ? 'bg-[#101010] text-white shadow-xs font-semibold'
+                              : 'text-[#5C5852] hover:text-[#181818]'
+                          }`}
+                        >
+                          <Maximize2 size={11} />
+                          <span>Cover (Fill Card)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDisplay((prev) => ({ ...prev, fit: 'contain' }))}
+                          className={`py-1.5 px-3 rounded-md text-[11px] font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                            display.fit === 'contain'
+                              ? 'bg-[#101010] text-white shadow-xs font-semibold'
+                              : 'text-[#5C5852] hover:text-[#181818]'
+                          }`}
+                        >
+                          <Minimize2 size={11} />
+                          <span>Contain (No Crop)</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 3. Focal Alignment Presets (9 points) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-[10px] font-mono tracking-[0.16em] uppercase text-[#6E675D] font-semibold">
+                          FOCAL ALIGNMENT
+                        </label>
+                        <span className="text-[9.5px] text-[#8E887E]">9 Presets</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5 bg-[#FAF8F5] p-1.5 rounded-lg border border-[#E8E2D6]">
+                        {PRESETS.map((preset) => {
+                          const isSelected =
+                            Math.abs((display.position?.x ?? 50) - preset.x) < 5 &&
+                            Math.abs((display.position?.y ?? 50) - preset.y) < 5;
+                          return (
+                            <button
+                              key={preset.id}
+                              type="button"
+                              onClick={() =>
+                                setDisplay((prev) => ({
+                                  ...prev,
+                                  position: { x: preset.x, y: preset.y },
+                                }))
+                              }
+                              className={`h-8 rounded-md text-[11px] font-mono font-medium transition-all flex items-center justify-center gap-1 cursor-pointer border ${
+                                isSelected
+                                  ? 'bg-[#101010] text-white border-[#101010] shadow-xs'
+                                  : 'bg-white text-[#4A463F] border-[#E2DACD] hover:bg-[#F2ECE1]'
+                              }`}
+                              title={preset.label}
+                            >
+                              <span className="text-[12px]">{preset.symbol}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
 
           {/* ═══════════════════════════════════════════════════

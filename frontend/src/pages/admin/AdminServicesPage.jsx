@@ -965,9 +965,14 @@ export default function AdminServicesPage() {
           setModalLockCategory(false);
         }}
         service={editTarget}
+        serviceToEdit={editTarget}
+        initialData={editTarget}
         targetCategory={modalTargetCategory}
+        initialCategory={modalTargetCategory}
+        category={modalTargetCategory}
         lockCategory={modalLockCategory}
         categories={categoriesList}
+        availableCategories={categoriesList}
         onSuccess={handleModalSuccess}
       />
 

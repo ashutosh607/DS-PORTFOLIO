@@ -1,5 +1,6 @@
 import React from 'react';
 import { GripVertical, Eye, EyeOff, Pencil, Trash2 } from 'lucide-react';
+import { getFramingStyle, getFramingContainerStyle } from '../../../utils/mediaFraming';
 
 // Helper function to condense full-sentence deliverables into clean 3-4 word phrases
 const condenseDeliverable = (item) => {
@@ -267,6 +268,7 @@ export default function CollectionTierCard({
                 backgroundColor: '#F3EFE6',
                 border: '1px solid rgba(227, 219, 204, 0.8)',
                 boxShadow: '0 2px 12px rgba(16, 16, 16, 0.04)',
+                ...getFramingContainerStyle(collection?.display),
               }}
             >
               <img
@@ -279,8 +281,9 @@ export default function CollectionTierCard({
                   height: '100%',
                   objectFit: 'cover',
                   objectPosition: 'center',
+                  ...getFramingStyle(collection?.display),
                 }}
-                className="filter brightness-[0.98] contrast-[1.02] transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                className={`filter brightness-[0.98] contrast-[1.02] transition-transform duration-500 ease-out ${(collection?.display?.zoom || 1) <= 1 ? 'group-hover:scale-[1.02]' : ''}`}
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent pointer-events-none" />
