@@ -142,7 +142,7 @@ export default function ServicesPage() {
     });
   }, [candidateCategories, allActiveServices, servicesLoaded]);
 
-  const [stage, setStage] = useState(queryStep === 'book' ? 2 : 1); // 1 = Collections, 2 = Booking Form, 3 = Confirmation
+  const [stage, setStage] = useState(queryStep === 'book' || (typeof window !== 'undefined' && window.location.hash === '#book') ? 2 : 1); // 1 = Collections, 2 = Booking Form, 3 = Confirmation
   const [selectedCategoryId, setSelectedCategoryId] = useState('wedding');
   const [selectedCollectionId, setSelectedCollectionId] = useState('signature');
   const [compareMatrixOpen, setCompareMatrixOpen] = useState(false);
@@ -150,6 +150,24 @@ export default function ServicesPage() {
   const [inquiryId, setInquiryId] = useState('RL-2025-D98');
 
   const location = useLocation();
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    countryCode: '+91',
+    eventType: 'Wedding',
+    eventDate: '',
+    duration: '2 Days',
+    location: '',
+    disciplines: ['fine-art-photo', 'archival-album'],
+    message: '',
+    source: 'Instagram',
+  });
+
+  const updateFormData = (fields) => {
+    setFormData((prev) => ({ ...prev, ...fields }));
+  };
 
   // Sync state from URL query parameters
   useEffect(() => {
@@ -209,30 +227,18 @@ export default function ServicesPage() {
   // Ensure professional query URL on initial load if none set
   useEffect(() => {
     if (!searchParams.get('category')) {
+      const isBooking = queryStep === 'book' || location.hash === '#book' || stage === 2;
+      const stepParam = isBooking ? { step: 'book' } : {};
       setSearchParams(
-        { category: selectedCategoryId, tier: selectedCollectionId },
+        { category: selectedCategoryId, tier: selectedCollectionId, ...stepParam },
         { replace: true }
       );
     }
-  }, []);
-
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    countryCode: '+91',
-    eventType: 'Wedding',
-    eventDate: '',
-    duration: '2 Days',
-    location: '',
-    disciplines: ['fine-art-photo', 'archival-album'],
-    message: '',
-    source: 'Instagram',
-  });
+  }, [searchParams, queryStep, location.hash, stage, selectedCategoryId, selectedCollectionId, setSearchParams]);
 
   // Listen for Navbar "Book a Session" event or URL hash #book
   useEffect(() => {
-    if (location.hash === '#book') {
+    if (location.hash === '#book' || queryStep === 'book') {
       setStage(2);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -248,11 +254,7 @@ export default function ServicesPage() {
 
     window.addEventListener('open-booking-form', handleOpenBooking);
     return () => window.removeEventListener('open-booking-form', handleOpenBooking);
-  }, [location, selectedCategoryId, selectedCollectionId, setSearchParams]);
-
-  const updateFormData = (fields) => {
-    setFormData((prev) => ({ ...prev, ...fields }));
-  };
+  }, [location.hash, queryStep, selectedCategoryId, selectedCollectionId, setSearchParams]);
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategoryId(categoryId);
@@ -269,15 +271,16 @@ export default function ServicesPage() {
     const signatureOrFirst =
       categoryCols.find((c) => c.isRecommended) || categoryCols[0];
     const newTier = signatureOrFirst ? (signatureOrFirst.tier || signatureOrFirst._id) : '';
+    const stepParam = stage === 2 ? { step: 'book' } : {};
     if (newTier) {
       setSelectedCollectionId(newTier);
       setSearchParams(
-        { category: categoryId, tier: newTier },
+        { category: categoryId, tier: newTier, ...stepParam },
         { replace: true }
       );
     } else {
       setSearchParams(
-        { category: categoryId },
+        { category: categoryId, ...stepParam },
         { replace: true }
       );
     }
@@ -369,6 +372,12 @@ export default function ServicesPage() {
       image: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop',
       imageLabel: 'Archive Specimen',
       deliverables: [
+        'Dedicated Creative Director & Principal Master',
+        'Custom Pacing & Bespoke Itinerary Direction',
+        'Medium Format Analog Film & Digital Masters',
+        'Handcrafted Archival Presentation Folio',
+      ],
+      curationHighlights: [
         'Dedicated Creative Director & Principal Master',
         'Custom Pacing & Bespoke Itinerary Direction',
         'Medium Format Analog Film & Digital Masters',

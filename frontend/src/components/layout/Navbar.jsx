@@ -17,12 +17,12 @@ export default function Navbar({ onOpenInquiry }) {
   ];
 
   const handleMobileMenuClick = (it) => {
-    if (it.isBooking || it.link === '/services#book') {
+    if (it.isBooking || it.link === '/services#book' || it.link?.includes('step=book')) {
       if (location.pathname === '/services') {
         window.dispatchEvent(new CustomEvent('open-booking-form'));
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        navigateWithTransition('/services#book', 'SERVICES');
+        navigateWithTransition('/services?step=book#book', 'SERVICES');
       }
     } else {
       navigateWithTransition(it.link, it.label.toUpperCase());
@@ -245,7 +245,7 @@ export default function Navbar({ onOpenInquiry }) {
                 window.dispatchEvent(new CustomEvent('open-booking-form'));
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               } else {
-                navigateWithTransition('/services#book', 'SERVICES');
+                navigateWithTransition('/services?step=book#book', 'SERVICES');
               }
             }}
             className="btn-primary desktop-cta"

@@ -90,6 +90,11 @@ export default function BookingBriefForm({
 
   const currentDisciplines = formData.disciplines || ['fine-art-photo', 'archival-album'];
 
+  const availableTiers =
+    Array.isArray(categoryCollections) && categoryCollections.length > 0
+      ? categoryCollections
+      : (selectedCollection ? [selectedCollection] : []);
+
   return (
     <form
       id="booking-form-top"

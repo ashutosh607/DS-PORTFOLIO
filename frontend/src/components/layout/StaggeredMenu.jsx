@@ -509,7 +509,7 @@ export const StaggeredMenu = ({
               onClick={() => {
                 closeMenu();
                 if (onItemClick) {
-                  onItemClick({ link: '/services#book', label: 'BOOK A SESSION', isBooking: true });
+                  onItemClick({ link: '/services?step=book#book', label: 'BOOK A SESSION', isBooking: true });
                 }
               }}
               className="w-full inline-flex items-center justify-center gap-2 bg-[#101010] hover:bg-[#242424] text-[#FDFCF8] py-3.5 px-6 rounded-full font-sans text-xs font-semibold uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(16,16,16,0.25)] cursor-pointer"

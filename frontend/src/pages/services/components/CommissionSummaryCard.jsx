@@ -94,7 +94,7 @@ export default function CommissionSummaryCard({
         >
           <img
             src={cardImage}
-            alt={collection.title}
+            alt={collection?.title || 'Collection'}
             style={{
               width: '100%',
               height: '100%',
@@ -105,7 +105,7 @@ export default function CommissionSummaryCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent pointer-events-none" />
           <div className="absolute bottom-3 left-3 text-white/95 text-[9.5px] font-sans font-medium tracking-wide flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-white/90" />
-            <span>{collection.imageLabel || 'Archive Specimen'}</span>
+            <span>{collection?.imageLabel || 'Archive Specimen'}</span>
           </div>
         </div>
 
@@ -143,7 +143,7 @@ export default function CommissionSummaryCard({
                 fontWeight: 500,
               }}
             >
-              {collection.title} Collection
+              {collection?.title || 'Bespoke'} Collection
             </span>
           </div>
 
@@ -316,7 +316,7 @@ export default function CommissionSummaryCard({
           </span>
 
           <ul className="space-y-2.5">
-            {(collection.curationHighlights || collection.deliverables || [
+            {(collection?.curationHighlights || collection?.deliverables || [
               'Full-day dual principal photographer direction',
               '750+ master hand-graded digital archival images',
               '120 Medium Format Hasselblad analog film exposures',

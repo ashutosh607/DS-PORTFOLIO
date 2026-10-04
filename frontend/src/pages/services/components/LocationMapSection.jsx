@@ -8,12 +8,19 @@ export default function LocationMapSection({
 }) {
   const activeQuery = location || 'The Taj Mahal Palace, Mumbai, Maharashtra, India';
 
+  const hasCoordinates =
+    Boolean(coordinates) &&
+    typeof coordinates.lat === 'number' &&
+    typeof coordinates.lng === 'number' &&
+    !isNaN(coordinates.lat) &&
+    !isNaN(coordinates.lng);
+
   // Construct Google Maps search URL & dynamic embed URL
-  const googleMapsSearchUrl = coordinates
+  const googleMapsSearchUrl = hasCoordinates
     ? `https://www.google.com/maps/search/?api=1&query=${coordinates.lat},${coordinates.lng}`
     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeQuery)}`;
 
-  const embedUrl = coordinates
+  const embedUrl = hasCoordinates
     ? `https://maps.google.com/maps?q=${coordinates.lat},${coordinates.lng}&t=m&z=15&ie=UTF8&iwloc=&output=embed`
     : `https://maps.google.com/maps?q=${encodeURIComponent(activeQuery)}&t=m&z=14&ie=UTF8&iwloc=&output=embed`;
 
@@ -84,10 +91,10 @@ export default function LocationMapSection({
                   {location || 'Apollo Bandar, Colaba, Mumbai, Maharashtra 400001'}
                 </p>
 
-                {coordinates && (
+                {hasCoordinates && (
                   <div className="mt-2 pt-2 border-t border-[#E3DBCC]/60 flex items-center justify-between text-[11px] font-mono text-[#55493A]">
-                    <span>LAT: {coordinates.lat.toFixed(4)}°</span>
-                    <span>LNG: {coordinates.lng.toFixed(4)}°</span>
+                    <span>LAT: {Number(coordinates.lat).toFixed(4)}°</span>
+                    <span>LNG: {Number(coordinates.lng).toFixed(4)}°</span>
                     <span className="text-[#2E7D32] font-semibold flex items-center gap-1">
                       <span>●</span> PINNED
                     </span>
