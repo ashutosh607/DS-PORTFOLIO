@@ -142,6 +142,8 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
   const { getAuthHeaders } = useAdminAuth();
 
   const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [isSlugCustomized, setIsSlugCustomized] = useState(false);
   const [tagline, setTagline] = useState('');
   const [quote, setQuote] = useState('');
   const [medium, setMedium] = useState('');
@@ -169,6 +171,8 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
   useEffect(() => {
     if (category) {
       setName(category.name || '');
+      setSlug(category.slug || '');
+      setIsSlugCustomized(false);
       setTagline(category.tagline || '');
       setQuote(category.quote || '');
       setMedium(category.medium || '');
@@ -269,6 +273,28 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
 
   if (!isOpen || !category) return null;
 
+  const handleNameChange = (e) => {
+    const val = e.target.value;
+    setName(val);
+    if (!isSlugCustomized) {
+      const generatedSlug = val
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+      setSlug(generatedSlug);
+    }
+  };
+
+  const handleSlugChange = (e) => {
+    setIsSlugCustomized(true);
+    setSlug(
+      e.target.value
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, '')
+    );
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -291,6 +317,15 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       setError('Category title cannot be empty.');
       return;
     }
+    const finalSlug = (slug || name)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+    if (!finalSlug) {
+      setError('Category URL slug cannot be empty.');
+      return;
+    }
     const effectiveCover = coverFile ? coverPreview : (useDirectUrl ? directCoverUrl.trim() : coverPreview);
     if (!effectiveCover) {
       setError('Category cover photo is required.');
@@ -307,6 +342,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
         }
         payload = new FormData();
         payload.append('name', name.trim());
+        payload.append('slug', finalSlug);
         payload.append('coverFile', uploadCover, coverFile.name || 'cover.jpg');
         payload.append('tagline', tagline.trim());
         payload.append('quote', quote.trim());
@@ -326,6 +362,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       } else {
         payload = {
           name: name.trim(),
+          slug: finalSlug,
           coverImage: useDirectUrl ? directCoverUrl.trim() : coverPreview,
           tagline: tagline.trim(),
           quote: quote.trim(),
@@ -776,10 +813,37 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
             )}
           </div>
 
-          {/* ── 2. Category Title ── */}
-          <div style={styles.fieldGap}>
-            <label style={styles.label}>Category Title <span style={{ color: '#EF4444' }}>*</span></label>
-            <InputField icon={Type} value={name} onChange={(e) => setName(e.target.value)} required />
+          {/* ── 2. Category Title + URL Slug ── */}
+          <div style={{ ...styles.twoCol, marginBottom: 16 }}>
+            <div>
+              <label style={styles.label}>
+                Category Title <span style={{ color: '#EF4444' }}>*</span>
+              </label>
+              <InputField
+                icon={Type}
+                placeholder="e.g. Baby Shower, Maternity"
+                value={name}
+                onChange={handleNameChange}
+                required
+              />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <label style={styles.label}>
+                  URL Slug <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+                <span style={{ fontSize: 10, color: '#7A756D', fontFamily: 'monospace' }}>
+                  /collections/{slug || '...'}
+                </span>
+              </div>
+              <InputField
+                icon={Link2}
+                placeholder="e.g. baby-shower"
+                value={slug}
+                onChange={handleSlugChange}
+                required
+              />
+            </div>
           </div>
 
           {/* ── 3. Tagline ── */}

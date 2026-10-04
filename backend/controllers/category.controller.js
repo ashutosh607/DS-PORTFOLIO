@@ -1,5 +1,6 @@
 const Category = require("../models/category.model");
 const Media = require("../models/media.model");
+const Service = require("../models/service.model");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
@@ -240,19 +241,25 @@ const updateCategory = asyncHandler(async (req, res) => {
     publicId = result.public_id;
   }
 
+  const oldSlug = category.slug;
   if (name !== undefined) category.name = name.trim();
-  if (req.body.slug !== undefined) {
-    const newSlug = req.body.slug.toLowerCase().trim();
-    if (newSlug && newSlug !== category.slug) {
-      if (!/^[a-z0-9-]+$/.test(newSlug)) {
-        throw new ApiError(400, "Invalid slug format: lowercase alphanumeric characters and hyphens only");
-      }
-      const duplicate = await Category.findOne({ slug: newSlug, _id: { $ne: category._id } });
-      if (duplicate) {
-        throw new ApiError(400, `Category slug "${newSlug}" already exists`);
-      }
-      category.slug = newSlug;
+
+  let targetSlug = req.body.slug ? req.body.slug.toLowerCase().trim() : '';
+  if (!targetSlug && name && name.trim() && name.trim() !== category.name) {
+    targetSlug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  }
+
+  let slugChanged = false;
+  if (targetSlug && targetSlug !== oldSlug) {
+    if (!/^[a-z0-9-]+$/.test(targetSlug)) {
+      throw new ApiError(400, "Invalid slug format: lowercase alphanumeric characters and hyphens only");
     }
+    const duplicate = await Category.findOne({ slug: targetSlug, _id: { $ne: category._id } });
+    if (duplicate) {
+      throw new ApiError(400, `Category slug "${targetSlug}" already exists`);
+    }
+    category.slug = targetSlug;
+    slugChanged = true;
   }
 
   category.coverImage = coverImage;
@@ -295,6 +302,54 @@ const updateCategory = asyncHandler(async (req, res) => {
   }
 
   const updatedCategory = await category.save();
+
+  // If slug was changed, cascade rename to all associated Media and Services
+  if (slugChanged && oldSlug && category.slug) {
+    try {
+      await Media.updateMany(
+        { category: oldSlug },
+        { $set: { category: category.slug } }
+      );
+      // Update baseline IDs referencing the old slug
+      await Media.updateMany(
+        { baselineId: `seed-cover-${oldSlug}` },
+        { $set: { baselineId: `seed-cover-${category.slug}` } }
+      );
+      const oldSupItems = await Media.find({ baselineId: { $regex: `^seed-sup-${oldSlug}-` } });
+      for (const item of oldSupItems) {
+        item.baselineId = item.baselineId.replace(`seed-sup-${oldSlug}-`, `seed-sup-${category.slug}-`);
+        await item.save();
+      }
+    } catch (mediaErr) {
+      console.warn("Could not cascade category slug to Media:", mediaErr.message);
+    }
+
+    try {
+      await Service.updateMany(
+        { category: oldSlug },
+        { $set: { category: category.slug } }
+      );
+    } catch (serviceErr) {
+      console.warn("Could not cascade category slug to Service:", serviceErr.message);
+    }
+  }
+
+  // Sync any existing baseline cover overrides so that media queries immediately reflect the new cover
+  try {
+    const paddedOrder = category.order ? String(category.order).padStart(2, "0") : "";
+    const coverBaselineIds = [
+      `seed-cover-${category.slug}`,
+      ...(oldSlug ? [`seed-cover-${oldSlug}`] : []),
+      `seed-cover-${category.order}`,
+      ...(paddedOrder ? [`seed-cover-${paddedOrder}`] : []),
+    ];
+    await Media.updateMany(
+      { baselineId: { $in: coverBaselineIds } },
+      { $set: { url: coverImage, publicId: publicId || "" } }
+    );
+  } catch (err) {
+    console.warn("Could not sync baseline cover override in Media:", err.message);
+  }
 
   return res.status(200).json(
     new ApiResponse(200, updatedCategory, "Category updated successfully")

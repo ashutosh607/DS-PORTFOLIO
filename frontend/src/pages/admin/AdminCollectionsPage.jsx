@@ -45,6 +45,21 @@ export default function AdminCollectionsPage() {
     }
   }, [categoryParam]);
 
+  // Canonical slug auto-redirect: if user accessed an old/legacy slug (e.g. /events)
+  // for a category that now has a new slug (e.g. /engagement), automatically redirect!
+  useEffect(() => {
+    if (activeCategorySlug !== 'all' && categories.length > 0) {
+      const baseline = findBaselineCategory(activeCategorySlug);
+      if (baseline) {
+        const liveCat = categories.find((c) => c.id === baseline.id);
+        if (liveCat && liveCat.slug && liveCat.slug.toLowerCase() !== activeCategorySlug.toLowerCase()) {
+          setActiveCategorySlug(liveCat.slug.toLowerCase());
+          navigate(`/admin/collections/${liveCat.slug}`, { replace: true });
+        }
+      }
+    }
+  }, [activeCategorySlug, categories, navigate]);
+
   // Fetch media from backend
   const fetchMedia = async () => {
     try {
@@ -159,7 +174,11 @@ export default function AdminCollectionsPage() {
 
   const handleCategoryUpdated = async (updatedCat) => {
     await refreshCategories();
-    fetchMedia();
+    if (updatedCat?.slug && updatedCat.slug !== activeCategorySlug && activeCategorySlug !== 'all') {
+      handleCategorySelect(updatedCat.slug);
+    } else {
+      fetchMedia();
+    }
   };
 
   const handleCategoryDeleted = async (deletedCat) => {
@@ -170,13 +189,15 @@ export default function AdminCollectionsPage() {
   };
 
   // Active Category Data with canonical fallback
+  const matchedBaseline = findBaselineCategory(activeCategorySlug);
   const currentCategoryObj =
     categories.find(
       (c) =>
         c.slug?.toLowerCase() === activeCategorySlug.toLowerCase() ||
         toCanonicalCategoryKey(c.slug) === toCanonicalCategoryKey(activeCategorySlug) ||
-        c.id === activeCategorySlug
-    ) || findBaselineCategory(activeCategorySlug);
+        c.id === activeCategorySlug ||
+        (matchedBaseline && c.id === matchedBaseline.id)
+    ) || matchedBaseline;
 
   // Filter media by active category, type, and search query
   const filteredMedia = mediaList

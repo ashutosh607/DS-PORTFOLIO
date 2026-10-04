@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { useCategories, toCanonicalCategoryKey } from '../../utils/categoryManager';
+import { useCategories, toCanonicalCategoryKey, findBaselineCategory } from '../../utils/categoryManager';
 import CollectionsHero from './components/CollectionsHero';
 import CollectionsRibbon from './components/CollectionsRibbon';
 import CollectionsGallery from './components/CollectionsGallery';
@@ -33,11 +33,17 @@ export default function CollectionsPage({ onOpenInquiry }) {
     }
     const targetSlug = queryCategory || categorySlug;
     if (targetSlug) {
-      const matched = baseCategories.find(
+      let matched = baseCategories.find(
         (c) =>
           c.slug?.toLowerCase() === targetSlug.toLowerCase() ||
           c.name?.toLowerCase() === targetSlug.toLowerCase()
       );
+      if (!matched) {
+        const baseline = findBaselineCategory(targetSlug);
+        if (baseline) {
+          matched = baseCategories.find((c) => c.id === baseline.id);
+        }
+      }
       if (matched) {
         setActiveCategoryId(matched.id);
         return;
