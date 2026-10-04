@@ -54,7 +54,27 @@ const getAllMedia = asyncHandler(async (req, res) => {
  */
 const getMediaByCategory = asyncHandler(async (req, res) => {
   const category = req.params.category.toLowerCase().trim();
-  const mediaList = await Media.find({ category }).sort({ createdAt: -1 });
+  const variants = new Set([category]);
+
+  if (category.endsWith("s")) {
+    variants.add(category.slice(0, -1));
+  } else {
+    variants.add(`${category}s`);
+  }
+
+  // Common aliases
+  if (category === "wedding" || category === "weddings") {
+    variants.add("wedding");
+    variants.add("weddings");
+  }
+  if (category === "pre-wedding" || category === "prewedding") {
+    variants.add("pre-wedding");
+    variants.add("prewedding");
+  }
+
+  const mediaList = await Media.find({
+    category: { $in: Array.from(variants) },
+  }).sort({ createdAt: -1 });
 
   return res.status(200).json(
     new ApiResponse(200, mediaList, `Media for ${category} retrieved successfully`)

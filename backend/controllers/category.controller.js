@@ -262,6 +262,24 @@ const updateCategory = asyncHandler(async (req, res) => {
   if (medium !== undefined) category.medium = medium.trim();
   if (location !== undefined) category.location = location.trim();
   if (order !== undefined) category.order = Number(order);
+  if (req.body.supporting !== undefined) {
+    try {
+      category.supporting = typeof req.body.supporting === 'string'
+        ? JSON.parse(req.body.supporting)
+        : req.body.supporting;
+    } catch {
+      // Keep existing supporting
+    }
+  }
+  if (req.body.featured !== undefined) {
+    try {
+      category.featured = typeof req.body.featured === 'string'
+        ? JSON.parse(req.body.featured)
+        : req.body.featured;
+    } catch {
+      // Keep existing featured
+    }
+  }
 
   const updatedCategory = await category.save();
 
@@ -270,8 +288,10 @@ const updateCategory = asyncHandler(async (req, res) => {
     const paddedOrder = category.order ? String(category.order).padStart(2, "0") : "";
     const coverBaselineIds = [
       `seed-cover-${category.slug}`,
+      `seed-cover-${category._id}`,
       `seed-cover-${category.order}`,
       ...(paddedOrder ? [`seed-cover-${paddedOrder}`] : []),
+      ...(category.slug ? [`${category.slug}-featured`, `seed-cover-${category.slug}-featured`] : []),
     ];
     await Media.updateMany(
       { baselineId: { $in: coverBaselineIds } },

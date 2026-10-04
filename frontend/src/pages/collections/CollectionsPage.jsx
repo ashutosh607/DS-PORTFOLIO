@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { CATEGORIES as DEFAULT_CATEGORIES } from './data/collectionsData';
-import { useCategories } from '../../utils/categoryManager';
+import { useCategories, findBaselineCategory, toCanonicalCategoryKey } from '../../utils/categoryManager';
 import CollectionsHero from './components/CollectionsHero';
 import CollectionsRibbon from './components/CollectionsRibbon';
 import CollectionsGallery from './components/CollectionsGallery';
@@ -86,12 +86,13 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
   // Dynamically augment categories with newly uploaded media & customized baseline items
   const dynamicCategories = baseCategories.map((cat) => {
-    // Only true custom uploads
+    // Only true custom uploads (matched by exact or canonical slug)
     const customItems = mediaList.filter(
       (m) =>
-        m.category?.toLowerCase() === cat.slug.toLowerCase() &&
         !m.isBaseline &&
-        !m.baselineId
+        !m.baselineId &&
+        (m.category?.toLowerCase() === cat.slug?.toLowerCase() ||
+          toCanonicalCategoryKey(m.category) === toCanonicalCategoryKey(cat.slug))
     );
 
     const formattedCustom = customItems.map((item, idx) => ({
@@ -106,13 +107,38 @@ export default function CollectionsPage({ onOpenInquiry }) {
       display: item.display,
     }));
 
-    // Find any baseline overrides for this category
+    // Find baseline template for fallback supporting specimens if needed
+    const baselineTemplate =
+      findBaselineCategory(cat.slug) ||
+      findBaselineCategory(cat.id) ||
+      findBaselineCategory(cat._id) ||
+      findBaselineCategory(cat.name);
+
+    const effectiveSupporting =
+      Array.isArray(cat.supporting) && cat.supporting.length > 0
+        ? cat.supporting
+        : baselineTemplate?.supporting || [];
+
+    // Find any baseline cover overrides for this category across all ID permutations
+    const possibleCoverIds = new Set([
+      `seed-cover-${cat.id}`,
+      `seed-cover-${cat.slug}`,
+      `${cat.id}-featured`,
+      `${cat.slug}-featured`,
+    ]);
+    if (cat._id) {
+      possibleCoverIds.add(`seed-cover-${cat._id}`);
+      possibleCoverIds.add(`${cat._id}-featured`);
+    }
+    if (cat.order) {
+      possibleCoverIds.add(`seed-cover-${cat.order}`);
+      possibleCoverIds.add(`seed-cover-${String(cat.order).padStart(2, '0')}`);
+    }
+
     const coverOverride = mediaList.find(
       (m) =>
         (m.isBaseline || m.baselineId) &&
-        (m.baselineId === `seed-cover-${cat.id}` ||
-          m.baselineId === `seed-cover-${cat.slug}` ||
-          m.baselineId === `${cat.id}-featured`)
+        (possibleCoverIds.has(m.baselineId) || possibleCoverIds.has(m.id))
     );
 
     const effectiveCoverImage = coverOverride?.url
@@ -131,14 +157,24 @@ export default function CollectionsPage({ onOpenInquiry }) {
       display: coverOverride?.display || cat.featured?.display,
     };
 
-    const baseSupporting = (cat.supporting || []).map((s, idx) => {
+    const baseSupporting = effectiveSupporting.map((s, idx) => {
+      const possibleSupIds = new Set([
+        `seed-sup-${cat.id}-${idx}`,
+        `seed-sup-${cat.slug}-${idx}`,
+      ]);
+      if (cat._id) possibleSupIds.add(`seed-sup-${cat._id}-${idx}`);
+      if (cat.order) {
+        possibleSupIds.add(`seed-sup-${cat.order}-${idx}`);
+        possibleSupIds.add(`seed-sup-${String(cat.order).padStart(2, '0')}-${idx}`);
+      }
+      if (s.id) possibleSupIds.add(s.id);
+
       const supOverride = mediaList.find(
         (m) =>
           (m.isBaseline || m.baselineId) &&
-          (m.baselineId === `seed-sup-${cat.id}-${idx}` ||
-            m.baselineId === `seed-sup-${cat.slug}-${idx}` ||
-            m.baselineId === s.id)
+          (possibleSupIds.has(m.baselineId) || possibleSupIds.has(m.id))
       );
+
       return {
         id: s.id || `${cat.id}-sup-${idx}`,
         image: supOverride?.url ? getApiUrl(supOverride.url) : s.image,
@@ -151,12 +187,11 @@ export default function CollectionsPage({ onOpenInquiry }) {
       };
     });
 
-    // Comprehensive archive list: base featured, initial supporting, custom uploads, and extra supporting
+    // Comprehensive archive list: base featured, all supporting, custom uploads
     const allMedia = [
       baseFeatured,
-      ...baseSupporting.slice(0, 4),
+      ...baseSupporting,
       ...formattedCustom,
-      ...baseSupporting.slice(4),
     ];
 
     // If custom uploads exist, feature the latest custom upload
@@ -169,9 +204,10 @@ export default function CollectionsPage({ onOpenInquiry }) {
       display: formattedCustom[0].display,
     } : baseFeatured;
 
+    // Preserve all supporting items, prepending any secondary custom uploads without dropping specimens
     const supporting = formattedCustom.length > 0
-      ? [...formattedCustom.slice(1), ...baseSupporting].slice(0, 4)
-      : baseSupporting.slice(0, 4);
+      ? [...formattedCustom.slice(1), ...baseSupporting]
+      : baseSupporting;
 
     return {
       ...cat,
@@ -185,7 +221,12 @@ export default function CollectionsPage({ onOpenInquiry }) {
   });
 
   const activeCategory =
-    dynamicCategories.find((c) => c.id === activeCategoryId) || dynamicCategories[0];
+    dynamicCategories.find(
+      (c) =>
+        c.id === activeCategoryId ||
+        c.slug === activeCategoryId ||
+        toCanonicalCategoryKey(c.slug) === toCanonicalCategoryKey(activeCategoryId)
+    ) || dynamicCategories[0];
 
   const handleSelectCategory = (id) => {
     setActiveCategoryId(id);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Search, ArrowLeft, MoreHorizontal, Trash2, Video, Upload, Plus, Pencil, RotateCcw, Sparkles, FolderPlus } from 'lucide-react';
-import { useCategories } from '../../utils/categoryManager';
+import { useCategories, findBaselineCategory, toCanonicalCategoryKey } from '../../utils/categoryManager';
 import AddMediaModal from './components/AddMediaModal';
 import EditMediaModal from './components/EditMediaModal';
 import EditDisplayModal from './components/EditDisplayModal';
@@ -169,82 +169,108 @@ export default function AdminCollectionsPage() {
     }
   };
 
-  // Active Category Data
-  const currentCategoryObj = categories.find(
-    (c) => c.slug?.toLowerCase() === activeCategorySlug.toLowerCase()
-  );
+  // Active Category Data with canonical fallback
+  const currentCategoryObj =
+    categories.find(
+      (c) =>
+        c.slug?.toLowerCase() === activeCategorySlug.toLowerCase() ||
+        toCanonicalCategoryKey(c.slug) === toCanonicalCategoryKey(activeCategorySlug) ||
+        c.id === activeCategorySlug
+    ) || findBaselineCategory(activeCategorySlug);
+
+  // Helper to collect all potential baseline IDs an override could have been saved under
+  const getPossibleBaselineIds = (prefix, cat, idx = null) => {
+    const ids = new Set();
+    const suffix = idx !== null ? `-${idx}` : '';
+    if (cat.id) ids.add(`${prefix}-${cat.id}${suffix}`);
+    if (cat._id) ids.add(`${prefix}-${cat._id}${suffix}`);
+    if (cat.slug) ids.add(`${prefix}-${cat.slug}${suffix}`);
+    if (cat.order) {
+      ids.add(`${prefix}-${cat.order}${suffix}`);
+      ids.add(`${prefix}-${String(cat.order).padStart(2, '0')}${suffix}`);
+    }
+    return Array.from(ids);
+  };
+
+  // Set of media IDs that were matched and applied as baseline overrides
+  const matchedOverrideMediaIds = new Set();
 
   // Baseline items computation with overrides applied
   const getBaselineItems = () => {
-    const rawDefaults =
+    matchedOverrideMediaIds.clear();
+    const targetCats =
       activeCategorySlug === 'all'
-        ? categories.flatMap((cat) => [
-            {
-              id: `seed-cover-${cat.id}`,
-              baselineId: `seed-cover-${cat.id}`,
-              title: `${cat.slug}-01.jpg`,
-              category: cat.slug,
-              type: 'photo',
-              url: cat.coverImage,
-              caption: cat.quote || '',
-              meta: cat.medium || '',
-              size: '2.4 MB',
-              date: '2025',
-              isBaseline: true,
-            },
-            ...(cat.supporting || []).map((sup, idx) => ({
-              id: `seed-sup-${cat.id}-${idx}`,
-              baselineId: `seed-sup-${cat.id}-${idx}`,
-              title: sup.tag || (sup.title ? `${sup.title.toLowerCase().replace(/\s+/g, '-')}.jpg` : `${cat.slug}-0${idx + 2}.jpg`),
-              category: cat.slug,
-              type: sup.type || 'photo',
-              url: sup.image,
-              caption: sup.tag || '',
-              meta: sup.meta || '',
-              size: sup.type === 'video' ? '18.8 MB' : '2.8 MB',
-              date: '2025',
-              isBaseline: true,
-            })),
-          ])
-        : !currentCategoryObj
-        ? []
-        : [
-            {
-              id: `seed-cover-${currentCategoryObj.id}`,
-              baselineId: `seed-cover-${currentCategoryObj.id}`,
-              title: `${currentCategoryObj.slug}-01.jpg`,
-              category: currentCategoryObj.slug,
-              type: 'photo',
-              url: currentCategoryObj.coverImage,
-              caption: currentCategoryObj.quote || '',
-              meta: currentCategoryObj.medium || '',
-              size: '2.3 MB',
-              date: '2025',
-              isBaseline: true,
-            },
-            ...(currentCategoryObj.supporting || []).map((sup, idx) => ({
-              id: `seed-sup-${currentCategoryObj.id}-${idx}`,
-              baselineId: `seed-sup-${currentCategoryObj.id}-${idx}`,
-              title: sup.tag || (sup.title ? `${sup.title.toLowerCase().replace(/\s+/g, '-')}.jpg` : `${currentCategoryObj.slug}-0${idx + 2}.jpg`),
-              category: currentCategoryObj.slug,
-              type: sup.type || 'photo',
-              url: sup.image,
-              caption: sup.tag || '',
-              meta: sup.meta || '',
-              size: sup.type === 'video' ? '16.7 MB' : '2.5 MB',
-              date: '2025',
-              isBaseline: true,
-            })),
-          ];
+        ? categories
+        : currentCategoryObj
+        ? [currentCategoryObj]
+        : [];
+
+    const rawDefaults = targetCats.flatMap((cat) => {
+      const baselineTemplate =
+        findBaselineCategory(cat.slug) ||
+        findBaselineCategory(cat.id) ||
+        findBaselineCategory(cat._id) ||
+        findBaselineCategory(cat.name);
+
+      const effectiveSupporting =
+        Array.isArray(cat.supporting) && cat.supporting.length > 0
+          ? cat.supporting
+          : baselineTemplate?.supporting || [];
+
+      const coverPossibleIds = getPossibleBaselineIds('seed-cover', cat);
+      coverPossibleIds.push(`${cat.id}-featured`, `${cat.slug}-featured`);
+      if (cat._id) coverPossibleIds.push(`${cat._id}-featured`);
+
+      const coverItem = {
+        id: `seed-cover-${cat.id}`,
+        baselineId: `seed-cover-${cat.id}`,
+        possibleBaselineIds: coverPossibleIds,
+        title: `${cat.slug}-01.jpg`,
+        category: cat.slug,
+        type: 'photo',
+        url: cat.coverImage,
+        caption: cat.quote || '',
+        meta: cat.medium || '',
+        size: '2.4 MB',
+        date: '2025',
+        isBaseline: true,
+      };
+
+      const supportingItems = effectiveSupporting.map((sup, idx) => {
+        const supPossibleIds = getPossibleBaselineIds('seed-sup', cat, idx);
+        if (sup.id) supPossibleIds.push(sup.id);
+
+        return {
+          id: `seed-sup-${cat.id}-${idx}`,
+          baselineId: `seed-sup-${cat.id}-${idx}`,
+          possibleBaselineIds: supPossibleIds,
+          title: sup.tag || (sup.title ? `${sup.title.toLowerCase().replace(/\s+/g, '-')}.jpg` : `${cat.slug}-0${idx + 2}.jpg`),
+          category: cat.slug,
+          type: sup.type || 'photo',
+          url: sup.image,
+          caption: sup.tag || '',
+          meta: sup.meta || '',
+          size: sup.type === 'video' ? '18.8 MB' : '2.8 MB',
+          date: '2025',
+          isBaseline: true,
+        };
+      });
+
+      return [coverItem, ...supportingItems];
+    });
 
     // Merge in any saved overrides from MongoDB/mediaList
     return rawDefaults.map((item) => {
-      const override = mediaList.find(
-        (m) =>
-          (m.isBaseline || m.baselineId) &&
-          (m.baselineId === item.baselineId || m.baselineId === item.id)
-      );
+      const override = mediaList.find((m) => {
+        if (!m.isBaseline && !m.baselineId) return false;
+        if (item.possibleBaselineIds?.includes(m.baselineId)) return true;
+        if (m.baselineId && (m.baselineId === item.baselineId || m.baselineId === item.id)) return true;
+        if (!m.baselineId && m.title && m.title === item.title && toCanonicalCategoryKey(m.category) === toCanonicalCategoryKey(item.category)) return true;
+        return false;
+      });
+
       if (override) {
+        matchedOverrideMediaIds.add(override._id);
         return {
           ...item,
           ...override,
@@ -270,7 +296,7 @@ export default function AdminCollectionsPage() {
 
   // Filter custom items by type and search query (excluding baseline overrides)
   const filteredCustomMedia = mediaList
-    .filter((item) => !item.isBaseline && !item.baselineId)
+    .filter((item) => !matchedOverrideMediaIds.has(item._id) && (!item.isBaseline || !item.baselineId))
     .filter((item) => {
       const matchesType = typeFilter === 'all' || item.type === typeFilter;
       const matchesSearch =

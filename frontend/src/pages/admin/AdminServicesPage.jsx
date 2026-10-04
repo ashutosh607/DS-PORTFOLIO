@@ -689,7 +689,13 @@ export default function AdminServicesPage() {
                               type="button"
                               onClick={() => {
                                 setCategoryMenuOpenId(null);
-                                setEditCategoryTarget(cat);
+                                const fullCat =
+                                  (dynamicCategories || []).find((c) =>
+                                    c.slug === cat.slug ||
+                                    c.id === cat.id ||
+                                    toCanonicalKey(c.slug) === toCanonicalKey(cat.id || cat.slug)
+                                  ) || cat;
+                                setEditCategoryTarget(fullCat);
                               }}
                               className="w-full px-3 py-1.5 text-left text-[12px] text-[#181818] hover:bg-[#FAF8F5] flex items-center gap-2 cursor-pointer font-medium"
                             >

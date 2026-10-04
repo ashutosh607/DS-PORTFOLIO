@@ -1,24 +1,53 @@
 import { useState, useEffect, useCallback } from 'react';
-import { CATEGORIES as INITIAL_CATEGORIES } from '../pages/collections/data/collectionsData';
+import { CATEGORIES as INITIAL_CATEGORIES } from '../pages/collections/data/collectionsData.js';
 
 const STORAGE_KEY = 'ds_portfolio_dynamic_categories';
 const CATEGORIES_EVENT = 'ds_categories_updated';
 
 /**
+ * Canonical category key generator (strips non-alphanumeric, removes trailing 's')
+ * to seamlessly reconcile singular/plural variants like 'wedding' / 'weddings', 'birthday' / 'birthdays'.
+ */
+export const toCanonicalCategoryKey = (str) =>
+  (str || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]/g, '')
+    .replace(/s$/, '');
+
+/**
+ * Finds baseline template category from INITIAL_CATEGORIES using slug, ID, or canonical key.
+ */
+export const findBaselineCategory = (slugOrId) => {
+  if (!slugOrId) return undefined;
+  const raw = String(slugOrId).toLowerCase().trim();
+  const key = toCanonicalCategoryKey(raw);
+  return INITIAL_CATEGORIES.find((c) => {
+    if (c.id === slugOrId || c.slug === slugOrId) return true;
+    if (c.slug?.toLowerCase() === raw) return true;
+    if (toCanonicalCategoryKey(c.slug) === key) return true;
+    if (toCanonicalCategoryKey(c.id) === key) return true;
+    if (toCanonicalCategoryKey(c.name) === key) return true;
+    return false;
+  });
+};
+
+/**
  * Normalizes a category object to guarantee all required properties exist
  * and ensures baseline collections never lose their stable IDs or supporting photos.
  */
-function normalizeCategory(cat, index = 0) {
-  const slug = (
+export function normalizeCategory(cat, index = 0) {
+  const rawSlug = (
     cat.slug ||
     cat.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') ||
     `cat-${index}`
   ).toLowerCase();
 
   // Find initial template category if it's one of the baseline collections
-  const initialMatch = INITIAL_CATEGORIES.find(
-    (c) => c.slug?.toLowerCase() === slug || (cat.id && c.id === cat.id)
-  );
+  const initialMatch = findBaselineCategory(cat.slug) || findBaselineCategory(cat.id) || findBaselineCategory(cat._id) || findBaselineCategory(cat.name) || findBaselineCategory(rawSlug);
+
+  // Canonical slug: prefer initial baseline slug if it matches
+  const slug = initialMatch?.slug || rawSlug;
 
   // Preserve stable human-friendly ID ('01', '02', etc.) for baseline categories
   const id = initialMatch?.id || cat.id || cat._id || String(index + 1).padStart(2, '0');
@@ -93,9 +122,7 @@ export function getLiveCategories() {
         // Heal any cached categories that might have lost their supporting photos
         // or had their stable ID corrupted by MongoDB ObjectId
         const healed = parsed.map((cat, idx) => {
-          const initial = INITIAL_CATEGORIES.find(
-            (c) => c.slug?.toLowerCase() === cat.slug?.toLowerCase() || c.id === cat.id
-          );
+          const initial = findBaselineCategory(cat.slug) || findBaselineCategory(cat.id) || findBaselineCategory(cat._id) || findBaselineCategory(cat.name);
           if (initial) {
             const hasSupporting = Array.isArray(cat.supporting) && cat.supporting.length > 0;
             return normalizeCategory(
@@ -115,7 +142,8 @@ export function getLiveCategories() {
 
         // Ensure all baseline categories from INITIAL_CATEGORIES are present in the list
         INITIAL_CATEGORIES.forEach((initCat, idx) => {
-          if (!healed.some((c) => c.slug === initCat.slug || c.id === initCat.id)) {
+          const initKey = toCanonicalCategoryKey(initCat.slug);
+          if (!healed.some((c) => c.id === initCat.id || c.slug === initCat.slug || toCanonicalCategoryKey(c.slug) === initKey)) {
             healed.push(normalizeCategory(initCat, idx));
           }
         });
@@ -173,9 +201,13 @@ export async function syncCategoriesWithBackend() {
       if (Array.isArray(json.data) && json.data.length > 0) {
         const live = getLiveCategories();
         const merged = json.data.map((bCat, idx) => {
-          const initialMatch = INITIAL_CATEGORIES.find((c) => c.slug === bCat.slug);
+          const initialMatch = findBaselineCategory(bCat.slug) || findBaselineCategory(bCat.id) || findBaselineCategory(bCat._id) || findBaselineCategory(bCat.name);
           const match = live.find(
-            (c) => c.slug === bCat.slug || c._id === bCat._id || (initialMatch && c.id === initialMatch.id)
+            (c) =>
+              c.slug === bCat.slug ||
+              c._id === bCat._id ||
+              (initialMatch && (c.id === initialMatch.id || c.slug === initialMatch.slug)) ||
+              toCanonicalCategoryKey(c.slug) === toCanonicalCategoryKey(bCat.slug)
           );
 
           const preservedId =
@@ -311,6 +343,12 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
   const updatedCategory = json.data;
   const current = getLiveCategories();
 
+  const initialMatch =
+    findBaselineCategory(updatedCategory.slug) ||
+    findBaselineCategory(idOrSlug) ||
+    findBaselineCategory(updatedCategory.name) ||
+    findBaselineCategory(updatedCategory._id);
+
   // Find the existing category to preserve existing client-side attributes (like supporting photos)
   const existing =
     current.find(
@@ -318,15 +356,10 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
         c.slug === updatedCategory.slug ||
         c.id === idOrSlug ||
         c._id === idOrSlug ||
-        c.slug === idOrSlug
-    ) || INITIAL_CATEGORIES.find((c) => c.slug === updatedCategory.slug || c.slug === idOrSlug);
-
-  const initialMatch = INITIAL_CATEGORIES.find(
-    (c) =>
-      c.slug === updatedCategory.slug ||
-      c.slug === idOrSlug ||
-      (existing && c.id === existing.id)
-  );
+        c.slug === idOrSlug ||
+        (initialMatch && (c.id === initialMatch.id || c.slug === initialMatch.slug)) ||
+        toCanonicalCategoryKey(c.slug) === toCanonicalCategoryKey(updatedCategory.slug)
+    ) || initialMatch;
 
   // Preserve supporting items, card shape style, transform, and stable ID
   const preservedId =
@@ -368,15 +401,18 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
 
   const normalized = normalizeCategory(merged);
 
-  const updated = current.map((c) =>
-    c.slug === normalized.slug ||
-    c.id === idOrSlug ||
-    c._id === idOrSlug ||
-    c.slug === idOrSlug ||
-    c.id === normalized.id
-      ? { ...c, ...normalized }
-      : c
-  );
+  const updated = current.map((c) => {
+    const isTarget =
+      c.slug === normalized.slug ||
+      c.id === idOrSlug ||
+      c._id === idOrSlug ||
+      c.slug === idOrSlug ||
+      c.id === normalized.id ||
+      c._id === normalized._id ||
+      toCanonicalCategoryKey(c.slug) === toCanonicalCategoryKey(normalized.slug) ||
+      (initialMatch && (c.id === initialMatch.id || c.slug === initialMatch.slug));
+    return isTarget ? { ...c, ...normalized, supporting: preservedSupporting } : c;
+  });
 
   broadcastCategories(updated);
   return normalized;

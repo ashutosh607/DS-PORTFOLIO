@@ -166,12 +166,20 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
         payload.append('quote', quote.trim());
         payload.append('medium', medium.trim());
         payload.append('location', location.trim());
+        if (Array.isArray(category.supporting) && category.supporting.length > 0) {
+          payload.append('supporting', JSON.stringify(category.supporting));
+        }
+        if (category.featured) {
+          payload.append('featured', JSON.stringify(category.featured));
+        }
       } else {
         payload = {
           name: name.trim(),
           coverImage: useDirectUrl ? directCoverUrl.trim() : coverPreview,
           tagline: tagline.trim(), quote: quote.trim(),
           medium: medium.trim(), location: location.trim(),
+          supporting: category.supporting || [],
+          featured: category.featured || {},
         };
       }
       const targetCatId = category.slug || category._id || category.id;
