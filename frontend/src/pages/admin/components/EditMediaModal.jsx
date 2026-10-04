@@ -53,7 +53,11 @@ export default function EditMediaModal({
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
+    if (selectedFile.size > 100 * 1024 * 1024) {
+      const sizeMB = (selectedFile.size / (1024 * 1024)).toFixed(1);
+      setError(`Selected file is ${sizeMB} MB. Maximum upload size is 100 MB. Please compress this video (20–50 MB is ideal for web streaming) or paste a direct video URL.`);
+      return;
+    }
 
     setFile(selectedFile);
     setError('');
