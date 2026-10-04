@@ -14,7 +14,6 @@ export default function Navbar({ onOpenInquiry }) {
     { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
     { label: 'Collections', ariaLabel: 'Explore photo collections', link: '/collections' },
     { label: 'Services', ariaLabel: 'Photographer services & pricing', link: '/services' },
-    { label: 'Journal', ariaLabel: 'Editorial guides and stories', link: '/journal' },
   ];
 
   const handleMobileMenuClick = (it) => {
@@ -86,11 +85,6 @@ export default function Navbar({ onOpenInquiry }) {
       label: 'Services',
       to: '/services',
       isActive: location.pathname === '/services',
-    },
-    {
-      label: 'Journal',
-      to: '/journal',
-      isActive: location.pathname.startsWith('/journal'),
     },
   ];
 

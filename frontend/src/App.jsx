@@ -14,8 +14,6 @@ import ErrorPage from './pages/error/ErrorPage';
 
 // Code-split routes for optimal performance and smaller initial JS bundle
 const TermsPage = lazy(() => import('./pages/terms/TermsPage'));
-const JournalIndexPage = lazy(() => import('./pages/journal/JournalIndexPage'));
-const JournalArticlePage = lazy(() => import('./pages/journal/JournalArticlePage'));
 
 // Admin Panel lazy imports (excluded from public user bundle)
 import { AdminAuthProvider } from './pages/admin/context/AdminAuthContext';
@@ -51,7 +49,6 @@ export default function App() {
       location.pathname !== '/' &&
       !location.pathname.startsWith('/collections') &&
       location.pathname !== '/services' &&
-      !location.pathname.startsWith('/journal') &&
       location.pathname !== '/terms');
 
   const showPublicChrome = !isAdminRoute && !isErrorOrNotFoundRoute;
@@ -97,10 +94,6 @@ export default function App() {
                 />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/terms" element={<TermsPage onOpenInquiry={handleOpenInquiry} />} />
-
-                {/* Editorial Journal & Guides */}
-                <Route path="/journal" element={<JournalIndexPage />} />
-                <Route path="/journal/:slug" element={<JournalArticlePage />} />
 
                 {/* Dedicated Error Testing Route */}
                 <Route path="/error" element={<ErrorPage />} />

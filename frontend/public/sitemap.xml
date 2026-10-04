@@ -122,36 +122,4 @@
     <priority>0.5</priority>
   </url>
 
-  <!-- Journal & Editorial Guides Index -->
-  <url>
-    <loc>https://dsphotography.com/journal</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Guide: Best Pre-Wedding Locations in Mumbai -->
-  <url>
-    <loc>https://dsphotography.com/journal/best-pre-wedding-locations-mumbai</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Guide: Wedding Photography Timeline Guide -->
-  <url>
-    <loc>https://dsphotography.com/journal/wedding-photography-guide</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Guide: What to Wear for Pre-Wedding Shoot -->
-  <url>
-    <loc>https://dsphotography.com/journal/what-to-wear-for-pre-wedding-shoot</loc>
-    <lastmod>2026-10-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
 </urlset>
