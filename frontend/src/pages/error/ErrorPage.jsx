@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AlertCircle, RefreshCw, Home, ChevronDown, ChevronUp } from 'lucide-react';
 import Logo from '../../components/layout/Logo';
+import SEOHead from '../../components/common/SEOHead';
 
 export default function ErrorPage({
   error = null,
@@ -28,6 +29,11 @@ export default function ErrorPage({
         color: '#101010',
       }}
     >
+      <SEOHead
+        title="Application Exception | DS Photography & Films"
+        description="A system condition occurred."
+        robots="noindex, nofollow"
+      />
       {/* Ambient background glow */}
       <div
         className="absolute inset-0 pointer-events-none opacity-50"

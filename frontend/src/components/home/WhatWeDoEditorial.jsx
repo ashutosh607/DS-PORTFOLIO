@@ -21,6 +21,16 @@ const PHOTOS = [
   img07,
 ];
 
+const PHOTO_METADATA = [
+  'Fine art bridal portrait and wedding ceremony in Mumbai by DS Photography',
+  'Candid wedding monograph and bridal moment in Maharashtra by Dishant Shelar',
+  'Intimate pre-wedding couple monograph captured in natural sunlight',
+  'Editorial bridal heirloom and vintage veil detail in Mumbai',
+  'Emotional wedding vows and sacred moments preserved with fine art framing',
+  'Atmospheric celebration and joyful evening toast by DS Photography',
+  'Romantic couple portrait at twilight dusk across Mumbai coastal estates',
+];
+
 /**
  * REFINED EDITORIAL RESTING POSITIONS
  * Proportionally scaled for refined, smaller card dimensions.
@@ -475,7 +485,9 @@ export default function WhatWeDoEditorial() {
               <div className="w-full h-full overflow-hidden border border-[#E3DBCC]">
                 <img
                   src={src}
-                  alt={`Editorial Print ${idx + 1}`}
+                  alt={PHOTO_METADATA[idx] || `Editorial Print ${idx + 1}`}
+                  width="190"
+                  height="253"
                   className="w-full h-full object-cover select-none"
                   loading="lazy"
                 />
@@ -498,6 +510,9 @@ export default function WhatWeDoEditorial() {
         height: '650vh',
       }}
     >
+      <h2 className="sr-only">
+        What We Do — Fine Art Wedding &amp; Portrait Photography Atelier in Mumbai
+      </h2>
       {/* Keyframes for subtle organic floating drift once in resting position */}
       <style>{`
         @keyframes editorialDrift {
@@ -624,7 +639,9 @@ export default function WhatWeDoEditorial() {
                   <div className="w-full h-full overflow-hidden rounded-xl relative">
                     <img
                       src={src}
-                      alt={`Atelier Portfolio Print ${i + 1}`}
+                      alt={PHOTO_METADATA[i] || `Atelier Portfolio Print ${i + 1}`}
+                      width="190"
+                      height="253"
                       className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-700 ease-out group-hover:scale-105"
                       loading={i <= 1 ? 'eager' : 'lazy'}
                       draggable={false}

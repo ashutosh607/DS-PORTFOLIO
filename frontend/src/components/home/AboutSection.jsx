@@ -59,7 +59,9 @@ export default function AboutSection({ imageUrl = null }) {
                   <div className="about-portrait-img-container">
                     <img
                       src={activeImage}
-                      alt="Dishant — Photographer & Visual Storyteller"
+                      alt="Dishant Shelar — Lead Photographer & Cinematographer at DS Photography & Films, Mumbai"
+                      width="480"
+                      height="600"
                       className="about-portrait-img"
                       loading="lazy"
                     />
@@ -180,6 +182,11 @@ export default function AboutSection({ imageUrl = null }) {
               <ScrollCardReveal index={2} delay={0.2} yOffset={16} blurAmount={6} className="about-meta-item">
                 <span className="about-meta-label">APPROACH</span>
                 <span className="about-meta-val">Honest & Meaningful</span>
+              </ScrollCardReveal>
+              <div className="about-meta-divider" aria-hidden="true" />
+              <ScrollCardReveal index={3} delay={0.2} yOffset={16} blurAmount={6} className="about-meta-item">
+                <span className="about-meta-label">BASE</span>
+                <span className="about-meta-val">Mumbai</span>
               </ScrollCardReveal>
             </div>
           </div>

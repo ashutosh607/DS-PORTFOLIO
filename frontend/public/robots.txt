@@ -1,0 +1,20 @@
+# DS Photography & Films — Production Robots Configuration
+User-agent: *
+Allow: /
+Allow: /collections
+Allow: /collections/
+Allow: /services
+Allow: /terms
+Allow: /assets/
+Allow: /images/
+Allow: /videos/
+
+# Disallow private admin, auth, and API paths from search engine indexing
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api
+Disallow: /api/
+Disallow: /error
+
+# Production Sitemap
+Sitemap: https://dsphotography.com/sitemap.xml

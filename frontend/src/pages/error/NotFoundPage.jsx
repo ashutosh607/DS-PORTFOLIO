@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Compass, Camera, Sparkles, Home } from 'lucide-react';
 import Logo from '../../components/layout/Logo';
 import { usePageTransition } from '../../components/common/PageTransition';
+import SEOHead from '../../components/common/SEOHead';
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
@@ -25,6 +26,11 @@ export default function NotFoundPage() {
         color: '#101010',
       }}
     >
+      <SEOHead
+        title="Page Not Found (404) | DS Photography & Films"
+        description="The requested page could not be located in our active catalog."
+        robots="noindex, follow"
+      />
       {/* Subtle Warm Ambient Lighting */}
       <div
         className="absolute inset-0 pointer-events-none opacity-60"

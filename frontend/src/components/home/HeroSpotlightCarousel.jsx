@@ -20,6 +20,7 @@ const PROJECTS = [
     score: '★ 9.4',
     format: 'Hasselblad 100c · 80mm',
     image: img01,
+    alt: 'High fashion editorial monograph and candid bridal study in Mumbai by DS Photography',
   },
   {
     id: '02',
@@ -30,6 +31,7 @@ const PROJECTS = [
     score: '★ 9.2',
     format: 'Medium Format 6x7',
     image: img02,
+    alt: 'Kinetic pre-wedding monograph and couple motion study by Dishant Shelar Mumbai',
   },
   {
     id: '03',
@@ -40,6 +42,7 @@ const PROJECTS = [
     score: '★ 9.6',
     format: 'Large Format 4x5',
     image: img03,
+    alt: 'Fine art architectural chiaroscuro and spatial luxury monograph in Maharashtra',
   },
   {
     id: '04',
@@ -50,6 +53,7 @@ const PROJECTS = [
     score: '★ 9.1',
     format: '35mm Tri-X 400',
     image: img04,
+    alt: '35mm monochrome candid portrait study by DS Photography & Films Mumbai',
   },
   {
     id: '05',
@@ -60,6 +64,7 @@ const PROJECTS = [
     score: '★ 9.0',
     format: 'Leica Summilux 50mm',
     image: img05,
+    alt: 'Fine art portrait framed in natural ambient luminescence by Dishant Shelar',
   },
   {
     id: '06',
@@ -70,6 +75,7 @@ const PROJECTS = [
     score: '★ 9.5',
     format: 'Hasselblad H6D',
     image: img06,
+    alt: 'Editorial monograph capture and subtle tonal geometry by DS Photography',
   },
   {
     id: '07',
@@ -80,6 +86,7 @@ const PROJECTS = [
     score: '★ 9.3',
     format: 'Platinotype Gelatin Silver',
     image: img07,
+    alt: 'Archival platinotype print monograph and fine-art photographic proof',
   },
 ];
 
@@ -279,19 +286,19 @@ export default function HeroSpotlightCarousel() {
               }}
             >
               <span style={{ width: '22px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
-              <TextBlurReveal text="The Spotlight Collection" blurAmount={6} delay={0.05} />
+              <TextBlurReveal text="The Spotlight Collection · Mumbai" blurAmount={6} delay={0.05} />
               <span style={{ width: '22px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
             </div>
           </div>
 
           <TextBlurReveal
             as="h1"
-            text="Selected works, framed in light"
+            text="Wedding & Portrait Photographer in Mumbai"
             blurAmount={12}
             stagger={0.06}
             delay={0.12}
             style={{
-              maxWidth: '720px',
+              maxWidth: '820px',
               margin: '0 auto',
               lineHeight: 1.1,
               color: 'var(--color-obsidian)',
@@ -440,9 +447,12 @@ export default function HeroSpotlightCarousel() {
                   {item.image ? (
                     <img
                       src={item.image}
-                      alt="Portfolio showcase"
+                      alt={item.alt || `${item.title} — ${item.subtitle} by Dishant Shelar Mumbai`}
+                      width="200"
+                      height="290"
                       className="w-full h-full object-cover select-none pointer-events-none"
                       loading={Math.abs(d) <= 1 ? 'eager' : 'lazy'}
+                      fetchPriority={Math.abs(d) === 0 ? 'high' : 'auto'}
                       draggable={false}
                     />
                   ) : (

@@ -83,11 +83,14 @@ export default function Footer({ onOpenInquiry }) {
                 <span className="font-sans text-[10px] tracking-[0.24em] text-[#CBB9A4] uppercase font-semibold mt-1">
                   • Photography • Videography • Films
                 </span>
+                <span className="font-sans text-[10px] tracking-[0.16em] text-[#E3DBCC]/60 uppercase mt-0.5">
+                  Mumbai, Maharashtra
+                </span>
               </div>
             </div>
 
             <p className="font-sans text-xs sm:text-[13px] text-[#F3F0E9]/65 leading-relaxed max-w-sm pt-1">
-              Capturing authentic celebrations, honest emotion, and cinematic wedding films with fine-art craftsmanship.
+              Fine art wedding photography, candid couple monographs, and cinematic wedding films based in Mumbai and traveling worldwide.
             </p>
 
             <div className="pt-2">
@@ -120,6 +123,11 @@ export default function Footer({ onOpenInquiry }) {
               <li>
                 <Link to="/services" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
                   Services &amp; Pricing
+                </Link>
+              </li>
+              <li>
+                <Link to="/journal" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                  Journal &amp; Guides
                 </Link>
               </li>
               <li>

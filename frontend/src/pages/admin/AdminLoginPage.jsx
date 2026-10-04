@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAdminAuth } from './context/AdminAuthContext';
 import Logo from '../../components/layout/Logo';
+import SEOHead from '../../components/common/SEOHead';
 import './AdminLogin.css';
 
 export default function AdminLoginPage() {
@@ -62,7 +63,13 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div
+    <>
+      <SEOHead
+        title="Admin Portal Access | DS Photography & Films"
+        description="Private administrative access."
+        robots="noindex, nofollow, noarchive"
+      />
+      <div
       className="admin-login-page"
       style={{
         backgroundImage: `url('/images/admin-login-bg.jpg')`,
@@ -230,5 +237,6 @@ export default function AdminLoginPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }

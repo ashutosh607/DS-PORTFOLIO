@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/home/HomePage';
@@ -11,16 +11,20 @@ import SplashScreen from './components/common/SplashScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import NotFoundPage from './pages/error/NotFoundPage';
 import ErrorPage from './pages/error/ErrorPage';
-import TermsPage from './pages/terms/TermsPage';
 
-// Admin Panel imports
+// Code-split routes for optimal performance and smaller initial JS bundle
+const TermsPage = lazy(() => import('./pages/terms/TermsPage'));
+const JournalIndexPage = lazy(() => import('./pages/journal/JournalIndexPage'));
+const JournalArticlePage = lazy(() => import('./pages/journal/JournalArticlePage'));
+
+// Admin Panel lazy imports (excluded from public user bundle)
 import { AdminAuthProvider } from './pages/admin/context/AdminAuthContext';
 import AdminProtectedRoute from './pages/admin/components/AdminProtectedRoute';
-import AdminLayout from './pages/admin/AdminLayout';
-import AdminLoginPage from './pages/admin/AdminLoginPage';
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
-import AdminCollectionsPage from './pages/admin/AdminCollectionsPage';
-import AdminServicesPage from './pages/admin/AdminServicesPage';
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
+const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'));
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
+const AdminCollectionsPage = lazy(() => import('./pages/admin/AdminCollectionsPage'));
+const AdminServicesPage = lazy(() => import('./pages/admin/AdminServicesPage'));
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -47,6 +51,7 @@ export default function App() {
       location.pathname !== '/' &&
       !location.pathname.startsWith('/collections') &&
       location.pathname !== '/services' &&
+      !location.pathname.startsWith('/journal') &&
       location.pathname !== '/terms');
 
   const showPublicChrome = !isAdminRoute && !isErrorOrNotFoundRoute;
@@ -78,46 +83,52 @@ export default function App() {
             {showPublicChrome && <Navbar onOpenInquiry={() => handleOpenInquiry()} />}
 
             {/* Multi-route content: Public + Admin routes */}
-            <Routes>
-              {/* Public Portfolio Routes */}
-              <Route path="/" element={<HomePage />} />
-              <Route
-                path="/collections"
-                element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
-              />
-              <Route
-                path="/collections/:categorySlug"
-                element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
-              />
-              <Route path="/services" element={<ServicesPage />} />
-              <Route path="/terms" element={<TermsPage onOpenInquiry={handleOpenInquiry} />} />
+            <Suspense fallback={<div className="min-h-screen bg-[#FDFCF8]" />}>
+              <Routes>
+                {/* Public Portfolio Routes */}
+                <Route path="/" element={<HomePage />} />
+                <Route
+                  path="/collections"
+                  element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
+                />
+                <Route
+                  path="/collections/:categorySlug"
+                  element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
+                />
+                <Route path="/services" element={<ServicesPage />} />
+                <Route path="/terms" element={<TermsPage onOpenInquiry={handleOpenInquiry} />} />
 
-              {/* Dedicated Error Testing Route */}
-              <Route path="/error" element={<ErrorPage />} />
+                {/* Editorial Journal & Guides */}
+                <Route path="/journal" element={<JournalIndexPage />} />
+                <Route path="/journal/:slug" element={<JournalArticlePage />} />
 
-              {/* Admin Authentication */}
-              <Route path="/admin/login" element={<AdminLoginPage />} />
+                {/* Dedicated Error Testing Route */}
+                <Route path="/error" element={<ErrorPage />} />
 
-              {/* Protected Admin Panel */}
-              <Route
-                path="/admin"
-                element={
-                  <AdminProtectedRoute>
-                    <AdminLayout />
-                  </AdminProtectedRoute>
-                }
-              >
-                <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                <Route path="dashboard" element={<AdminDashboardPage />} />
-                <Route path="collections" element={<AdminCollectionsPage />} />
-                <Route path="collections/:category" element={<AdminCollectionsPage />} />
-                <Route path="services" element={<AdminServicesPage />} />
-                <Route path="services/:category" element={<AdminServicesPage />} />
-              </Route>
+                {/* Admin Authentication */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
 
-              {/* 404 Page Not Found Route */}
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
+                {/* Protected Admin Panel */}
+                <Route
+                  path="/admin"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminLayout />
+                    </AdminProtectedRoute>
+                  }
+                >
+                  <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                  <Route path="dashboard" element={<AdminDashboardPage />} />
+                  <Route path="collections" element={<AdminCollectionsPage />} />
+                  <Route path="collections/:category" element={<AdminCollectionsPage />} />
+                  <Route path="services" element={<AdminServicesPage />} />
+                  <Route path="services/:category" element={<AdminServicesPage />} />
+                </Route>
+
+                {/* 404 Page Not Found Route */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
 
             {/* Minimal footer with CET studio time and social directory (only on public site) */}
             {showPublicChrome && <Footer onOpenInquiry={() => handleOpenInquiry()} />}

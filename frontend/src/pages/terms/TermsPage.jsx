@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Calendar, CreditCard, Clock, BookOpen, Camera, CheckCircle2, ArrowRight } from 'lucide-react';
 import Logo from '../../components/layout/Logo';
+import SEOHead from '../../components/common/SEOHead';
+import { buildBreadcrumbSchema } from '../../utils/structuredData';
+import { SEO_CONFIG } from '../../utils/seoConfig';
 
 /**
  * Editorial Word-by-Word Blur-to-Clear Reveal
@@ -205,6 +208,15 @@ export default function TermsPage({ onOpenInquiry }) {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1E1B18] pt-28 sm:pt-36 pb-24 selection:bg-[#E3DBCC] selection:text-[#101010]">
+      <SEOHead
+        title="Studio Terms, Delivery Timelines & Policies | DS Photography"
+        description="Official client booking terms, payment schedules, copyright policy, and archival delivery timelines for DS Photography & Films commissions."
+        canonicalUrl={`${SEO_CONFIG.siteUrl}/terms`}
+        breadcrumbs={buildBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+          { name: 'Terms & Conditions', url: '/terms' },
+        ])}
+      />
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
 
         {/* ===================================================================

@@ -3,6 +3,9 @@ import { useLocation } from 'react-router-dom';
 import HeroSpotlightCarousel from '../../components/home/HeroSpotlightCarousel';
 import WhatWeDoEditorial from '../../components/home/WhatWeDoEditorial';
 import AboutSection from '../../components/home/AboutSection';
+import SEOHead from '../../components/common/SEOHead';
+import { buildLocalBusinessSchema, buildWebSiteSchema, buildServicesListSchema } from '../../utils/structuredData';
+import { SEO_CONFIG } from '../../utils/seoConfig';
 
 export default function HomePage() {
   const location = useLocation();
@@ -22,15 +25,30 @@ export default function HomePage() {
   }, [location]);
 
   return (
-    <main>
-      {/* Hero Spotlight Gallery */}
-      <HeroSpotlightCarousel />
+    <>
+      <SEOHead
+        title="Wedding &amp; Portrait Photographer in Mumbai | DS Photography &amp; Films"
+        description="Fine art luxury wedding photographer and cinematographer based in Mumbai by Dishant Shelar. Candid wedding monographs, pre-wedding films, portraits, and heirloom albums."
+        keywords="wedding photographer mumbai, photographer in mumbai, pre wedding photographer mumbai, candid wedding photography mumbai, wedding cinematography mumbai, portrait photographer mumbai, ds photography, dishant shelar"
+        canonicalUrl={`${SEO_CONFIG.siteUrl}/`}
+        ogType="website"
+        schema={[
+          buildLocalBusinessSchema(),
+          buildWebSiteSchema(),
+          buildServicesListSchema(),
+        ]}
+      />
 
-      {/* Spacious, Artistic Editorial Photography Section: What We Do */}
-      <WhatWeDoEditorial />
+      <main>
+        {/* Hero Spotlight Gallery */}
+        <HeroSpotlightCarousel />
 
-      {/* Studio About section with artist portrait, philosophy & exhibition history */}
-      <AboutSection />
-    </main>
+        {/* Spacious, Artistic Editorial Photography Section: What We Do */}
+        <WhatWeDoEditorial />
+
+        {/* Studio About section with artist portrait, philosophy & exhibition history */}
+        <AboutSection />
+      </main>
+    </>
   );
 }

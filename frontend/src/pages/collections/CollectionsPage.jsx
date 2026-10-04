@@ -6,6 +6,9 @@ import CollectionsHero from './components/CollectionsHero';
 import CollectionsRibbon from './components/CollectionsRibbon';
 import CollectionsGallery from './components/CollectionsGallery';
 import { getApiUrl } from '../../utils/api';
+import SEOHead from '../../components/common/SEOHead';
+import { buildCollectionGallerySchema, buildBreadcrumbSchema } from '../../utils/structuredData';
+import { SEO_CONFIG } from '../../utils/seoConfig';
 
 export default function CollectionsPage({ onOpenInquiry }) {
   const { categorySlug } = useParams();
@@ -209,6 +212,24 @@ export default function CollectionsPage({ onOpenInquiry }) {
     handleSelectCategory(baseCategories[prevIndex].id);
   };
 
+  const catSlug = activeCategory?.slug || 'weddings';
+  const catName = activeCategory?.name || 'Curated';
+  const pageTitle = `${catName} Photography Collection | DS Photography Mumbai`;
+  const pageDescription = `Explore curated ${catName.toLowerCase()} photography monographs by Dishant Shelar at DS Photography & Films in Mumbai. Fine-art aesthetic and timeless framing.`;
+  const canonical = categorySlug
+    ? `${SEO_CONFIG.siteUrl}/collections/${categorySlug}`
+    : `${SEO_CONFIG.siteUrl}/collections`;
+  const breadcrumbs = buildBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Collections', url: '/collections' },
+    ...(categorySlug ? [{ name: catName, url: `/collections/${categorySlug}` }] : []),
+  ]);
+  const schema = buildCollectionGallerySchema({
+    categoryName: catName,
+    categorySlug: catSlug,
+    mediaItems: activeCategory?.allMedia || [],
+  });
+
   return (
     <div
       className="w-full min-h-screen text-[#101010] overflow-x-hidden"
@@ -218,6 +239,13 @@ export default function CollectionsPage({ onOpenInquiry }) {
         overflowX: 'hidden',
       }}
     >
+      <SEOHead
+        title={pageTitle}
+        description={pageDescription}
+        canonicalUrl={canonical}
+        schema={schema}
+        breadcrumbs={breadcrumbs}
+      />
       {/* 1. Hero Section Polaroid Collage & Typography */}
       <CollectionsHero
         onScrollToExplore={handleScrollToExplore}

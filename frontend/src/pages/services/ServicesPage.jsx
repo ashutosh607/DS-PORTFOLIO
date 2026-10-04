@@ -14,6 +14,9 @@ import { handleWhatsAppSubmit } from '../../utils/whatsapp';
 import { handleEmailSubmit } from '../../utils/email';
 import TextBlurReveal from '../../components/common/TextBlurReveal';
 import ScrollCardReveal from '../../components/common/ScrollCardReveal';
+import SEOHead from '../../components/common/SEOHead';
+import { buildServicesListSchema, buildBreadcrumbSchema } from '../../utils/structuredData';
+import { SEO_CONFIG } from '../../utils/seoConfig';
 
 export default function ServicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -432,6 +435,17 @@ export default function ServicesPage() {
         paddingTop: 'clamp(120px, 11vw, 160px)',
       }}
     >
+      <SEOHead
+        title="Photography Services & Investment Tiers | DS Photography Mumbai"
+        description="Explore bespoke photography collections, service tiers, and consultation scheduling for weddings, pre-weddings, portraits, and events in Mumbai."
+        keywords="photography packages mumbai, wedding photography price mumbai, pre wedding packages mumbai, portrait session cost mumbai, event photographer pricing, ds photography"
+        canonicalUrl={`${SEO_CONFIG.siteUrl}/services`}
+        schema={buildServicesListSchema()}
+        breadcrumbs={buildBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+          { name: 'Services & Pricing', url: '/services' },
+        ])}
+      />
       <div
         style={{
           maxWidth: '1440px',

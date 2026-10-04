@@ -114,7 +114,11 @@ app.use("/uploads", express.static(uploadsDir));
 app.use("/categories", express.static(path.resolve(uploadsDir, "ds_portfolio/categories")));
 app.use(express.static("public"));
 
-// 6. Global Rate Limiter for all API routes (protects existing and newly added endpoints)
+// 6. Global Rate Limiter and X-Robots-Tag for all API routes
+app.use("/api", (req, res, next) => {
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  next();
+});
 app.use("/api", globalLimiter);
 
 // Root Welcome Route
