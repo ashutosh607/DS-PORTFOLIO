@@ -57,6 +57,14 @@ const categorySchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
+    display: {
+      type: Object,
+      default: null,
+    },
+    coverDisplay: {
+      type: Object,
+      default: null,
+    },
   },
   {
     timestamps: true,

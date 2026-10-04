@@ -154,7 +154,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
       caption: coverOverride?.caption || cat.featured?.caption || cat.tagline,
       meta: coverOverride?.meta || cat.featured?.meta || cat.medium || 'Medium Format Film / 35mm',
       type: coverOverride?.type || cat.featured?.type || 'photo',
-      display: coverOverride?.display || cat.featured?.display,
+      display: coverOverride?.display || cat.coverDisplay || cat.display || cat.featured?.display,
     };
 
     const baseSupporting = effectiveSupporting.map((s, idx) => {

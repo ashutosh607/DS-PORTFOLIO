@@ -514,7 +514,8 @@ export default function AdminCollectionsPage() {
               <img
                 src={currentCategoryObj.coverImage || currentCategoryObj.featured?.image}
                 alt={currentCategoryObj.name}
-                className="w-full h-full object-cover object-top"
+                className="w-full h-full"
+                style={getFramingStyle(currentCategoryObj.display || currentCategoryObj.coverDisplay)}
               />
             </div>
             <div className="min-w-0">

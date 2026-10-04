@@ -280,6 +280,19 @@ const updateCategory = asyncHandler(async (req, res) => {
       // Keep existing featured
     }
   }
+  if (req.body.display !== undefined) {
+    try {
+      const parsedDisplay = typeof req.body.display === 'string'
+        ? JSON.parse(req.body.display)
+        : req.body.display;
+      if (parsedDisplay && typeof parsedDisplay === 'object') {
+        category.display = parsedDisplay;
+        category.coverDisplay = parsedDisplay;
+      }
+    } catch {
+      // Keep existing display
+    }
+  }
 
   const updatedCategory = await category.save();
 
@@ -293,9 +306,13 @@ const updateCategory = asyncHandler(async (req, res) => {
       ...(paddedOrder ? [`seed-cover-${paddedOrder}`] : []),
       ...(category.slug ? [`${category.slug}-featured`, `seed-cover-${category.slug}-featured`] : []),
     ];
+    const updateFields = { url: coverImage, publicId: publicId || "" };
+    if (category.display) {
+      updateFields.display = category.display;
+    }
     await Media.updateMany(
       { baselineId: { $in: coverBaselineIds } },
-      { $set: { url: coverImage, publicId: publicId || "" } }
+      { $set: updateFields }
     );
   } catch (err) {
     console.warn("Could not sync baseline cover override in Media:", err.message);

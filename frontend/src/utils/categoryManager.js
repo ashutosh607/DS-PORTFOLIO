@@ -105,6 +105,8 @@ export function normalizeCategory(cat, index = 0) {
     cardTransform,
     featured,
     supporting,
+    display: cat.display || cat.coverDisplay || initialMatch?.display || { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 },
+    coverDisplay: cat.coverDisplay || cat.display || initialMatch?.coverDisplay || { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 },
     isCustom: Boolean(cat.isCustom || (!initialMatch && cat._id)),
   };
 }
@@ -391,6 +393,19 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
     supporting: preservedSupporting,
     cardShapeStyle: preservedCardShapeStyle,
     cardTransform: preservedCardTransform,
+    display:
+      updatedCategory.display ||
+      updateData?.display ||
+      existing?.display ||
+      initialMatch?.display,
+    coverDisplay:
+      updatedCategory.coverDisplay ||
+      updatedCategory.display ||
+      updateData?.coverDisplay ||
+      updateData?.display ||
+      existing?.coverDisplay ||
+      existing?.display ||
+      initialMatch?.coverDisplay,
     featured: {
       ...(initialMatch?.featured || {}),
       ...(existing?.featured || {}),
