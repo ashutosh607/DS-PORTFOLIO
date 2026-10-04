@@ -1,14 +1,17 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { COMPARISON_MATRIX_FEATURES, COLLECTIONS } from '../data/servicesData';
+import { COMPARISON_MATRIX_FEATURES } from '../data/servicesData';
 
 export default function CompareMatrixModal({
   isOpen,
   onClose,
   selectedCollectionId,
   onSelectCollection,
+  collections = [],
 }) {
   if (!isOpen) return null;
+
+  const displayCols = Array.isArray(collections) && collections.length > 0 ? collections : [];
 
   return (
     <AnimatePresence>
@@ -68,27 +71,34 @@ export default function CompareMatrixModal({
                   <th className="pb-5 font-sans text-xs font-semibold tracking-wider text-[#736554] uppercase w-1/4">
                     Dimension
                   </th>
-                  {COLLECTIONS.map((col) => (
-                    <th key={col.id} className="pb-5 text-center px-4 w-1/4">
-                      <div className="font-serif text-lg font-normal text-[#1E1B18] tracking-wider uppercase">
-                        {col.title}
-                      </div>
-                      <div className="font-sans text-[11px] text-[#7A6E5D] font-mono mt-0.5">
-                        {col.price}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => onSelectCollection(col.id)}
-                        className={`mt-2.5 px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold uppercase tracking-wider transition-all cursor-pointer ${
-                          selectedCollectionId === col.id
-                            ? 'bg-[#1E1B18] text-[#FAF8F5]'
-                            : 'bg-[#ECE5D9] hover:bg-[#DFD5C6] text-[#42372A]'
-                        }`}
-                      >
-                        {selectedCollectionId === col.id ? 'Selected' : 'Select'}
-                      </button>
-                    </th>
-                  ))}
+                  {displayCols.map((col) => {
+                    const colId = col.id || col._id || col.tier;
+                    const isSelected =
+                      Boolean(selectedCollectionId) &&
+                      String(selectedCollectionId).toLowerCase().trim() === String(colId).toLowerCase().trim();
+
+                    return (
+                      <th key={colId} className="pb-5 text-center px-4">
+                        <div className="font-serif text-lg font-normal text-[#1E1B18] tracking-wider uppercase">
+                          {col.title || col.tier || 'Collection'}
+                        </div>
+                        <div className="font-sans text-[11px] text-[#7A6E5D] font-mono mt-0.5">
+                          {col.price || 'Price on Request'}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => onSelectCollection(colId)}
+                          className={`mt-2.5 px-3.5 py-1 rounded-full text-[11px] font-sans font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#1E1B18] text-[#FAF8F5]'
+                              : 'bg-[#ECE5D9] hover:bg-[#DFD5C6] text-[#42372A]'
+                          }`}
+                        >
+                          {isSelected ? 'Selected' : 'Select'}
+                        </button>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
@@ -96,7 +106,7 @@ export default function CompareMatrixModal({
                   <React.Fragment key={sIdx}>
                     <tr className="bg-[#F2ECE2]/80">
                       <td
-                        colSpan={4}
+                        colSpan={Math.max(4, displayCols.length + 1)}
                         className="py-2.5 px-3 font-sans text-[11px] font-bold tracking-[0.2em] text-[#635546] uppercase"
                       >
                         {section.category}
@@ -107,15 +117,29 @@ export default function CompareMatrixModal({
                         <td className="py-3.5 px-3 font-sans text-xs sm:text-[13px] font-medium text-[#2E2721]">
                           {row.name}
                         </td>
-                        <td className="py-3.5 px-4 text-center font-sans text-xs sm:text-[13px] text-[#55493C]">
-                          {row.essential}
-                        </td>
-                        <td className="py-3.5 px-4 text-center font-sans text-xs sm:text-[13px] text-[#55493C] font-medium bg-[#FAF6F0]/60">
-                          {row.signature}
-                        </td>
-                        <td className="py-3.5 px-4 text-center font-sans text-xs sm:text-[13px] text-[#55493C]">
-                          {row.luxury}
-                        </td>
+                        {displayCols.map((col, cIdx) => {
+                          const colDeliverables = Array.isArray(col.deliverables) ? col.deliverables : [];
+                          const keyword = row.name.toLowerCase().split(' ')[0];
+                          const matched = colDeliverables.find((d) => d.toLowerCase().includes(keyword));
+
+                          let fallbackVal = row.essential;
+                          if (cIdx === 1) fallbackVal = row.signature;
+                          else if (cIdx >= 2) fallbackVal = row.luxury;
+
+                          const cellText = matched || fallbackVal || 'Included in atelier commission';
+                          const isHighlighted = col.highlight || col.isAtelierChoice;
+
+                          return (
+                            <td
+                              key={col.id || col._id || cIdx}
+                              className={`py-3.5 px-4 text-center font-sans text-xs sm:text-[13px] text-[#55493C] ${
+                                isHighlighted ? 'font-medium bg-[#FAF6F0]/60' : ''
+                              }`}
+                            >
+                              {cellText}
+                            </td>
+                          );
+                        })}
                       </tr>
                     ))}
                   </React.Fragment>

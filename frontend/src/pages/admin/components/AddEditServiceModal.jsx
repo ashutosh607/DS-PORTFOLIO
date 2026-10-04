@@ -379,6 +379,10 @@ export default function AddEditServiceModal({
       if (onSuccess) {
         onSuccess(json.data);
       }
+      try {
+        localStorage.removeItem('ds_portfolio_cached_services');
+      } catch (e) {}
+      window.dispatchEvent(new CustomEvent('ds_services_updated'));
       onClose();
     } catch (err) {
       setError(err.message || 'An unexpected error occurred while saving.');

@@ -4,7 +4,6 @@ import {
   CREATIVE_DISCIPLINES,
   PROVENANCE_OPTIONS,
   COUNTRY_CODES,
-  COLLECTIONS,
 } from '../data/servicesData';
 import { handleWhatsAppSubmit } from '../../../utils/whatsapp';
 import { handleEmailSubmit } from '../../../utils/email';
@@ -31,14 +30,6 @@ export default function BookingBriefForm({
     'Private Event',
     'Commercial',
   ];
-
-  // Derive available tiers for the active category
-  const availableTiers =
-    categoryCollections && categoryCollections.length > 0
-      ? categoryCollections
-      : COLLECTIONS.filter((c) => c.category === selectedCategory).length > 0
-        ? COLLECTIONS.filter((c) => c.category === selectedCategory)
-        : COLLECTIONS.slice(0, 3);
 
   const handleToggleDiscipline = (id) => {
     const current = formData.disciplines || ['fine-art-photo', 'archival-album'];

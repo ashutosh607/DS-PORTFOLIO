@@ -101,6 +101,29 @@ const styles = {
   },
 };
 
+/* ── Reusable input field component (declared outside to avoid unmounting/loss of focus on keystroke) ── */
+const InputField = ({ icon: Icon, placeholder, value, onChange, type = 'text', required = false }) => (
+  <div
+    style={styles.inputRow}
+    onFocus={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#1C1917'; }}
+    onBlur={(e) => { e.currentTarget.style.backgroundColor = '#F7F5F1'; e.currentTarget.style.borderColor = '#E0DAD0'; }}
+  >
+    {Icon && (
+      <div style={styles.iconBadge}>
+        <Icon size={14} />
+      </div>
+    )}
+    <input
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      required={required}
+      style={styles.input}
+    />
+  </div>
+);
+
 export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
   const { getAuthHeaders } = useAdminAuth();
 
@@ -195,26 +218,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSuccess }) {
     } finally { setSubmitting(false); }
   };
 
-  /* ── Reusable input field component ── */
-  const InputField = ({ icon: Icon, placeholder, value, onChange, type = 'text', required = false }) => (
-    <div
-      style={styles.inputRow}
-      onFocus={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#1C1917'; }}
-      onBlur={(e) => { e.currentTarget.style.backgroundColor = '#F7F5F1'; e.currentTarget.style.borderColor = '#E0DAD0'; }}
-    >
-      <div style={styles.iconBadge}>
-        <Icon size={14} />
-      </div>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        required={required}
-        style={styles.input}
-      />
-    </div>
-  );
+
 
   return (
     <div style={styles.overlay} onClick={(e) => { if (e.target === e.currentTarget && !submitting) onClose(); }}>

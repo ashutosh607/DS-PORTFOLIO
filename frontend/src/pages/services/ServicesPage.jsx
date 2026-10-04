@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { COLLECTIONS, CATEGORIES as DEFAULT_CATEGORIES } from './data/servicesData';
 import { useCategories } from '../../utils/categoryManager';
 import CollectionTierCard from './components/CollectionTierCard';
 import AtelierStandards from './components/AtelierStandards';
@@ -17,6 +16,15 @@ import ScrollCardReveal from '../../components/common/ScrollCardReveal';
 import SEOHead from '../../components/common/SEOHead';
 import { buildServicesListSchema, buildBreadcrumbSchema } from '../../utils/structuredData';
 import { SEO_CONFIG } from '../../utils/seoConfig';
+
+const SERVICES_CACHE_KEY = 'ds_portfolio_cached_services';
+
+// Proactively purge any stale legacy cached services to guarantee fresh real-time data
+try {
+  localStorage.removeItem(SERVICES_CACHE_KEY);
+} catch (e) {
+  // Ignore in restricted environments
+}
 
 export default function ServicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,7 +63,8 @@ export default function ServicesPage() {
       if (res.ok) {
         const json = await res.json();
         if (Array.isArray(json.data)) {
-          setAllActiveServices(json.data.filter((s) => s.isActive !== false));
+          const activeOnly = json.data.filter((s) => s.isActive !== false);
+          setAllActiveServices(activeOnly);
         }
       }
     } catch (err) {
@@ -67,12 +76,15 @@ export default function ServicesPage() {
 
   useEffect(() => {
     fetchAllServices();
-    // Live revalidation when window receives focus or page visibility changes
-    window.addEventListener('focus', fetchAllServices);
-    window.addEventListener('visibilitychange', fetchAllServices);
+    // Live revalidation when window receives focus, page visibility changes, or admin updates services
+    const handleUpdate = () => fetchAllServices();
+    window.addEventListener('focus', handleUpdate);
+    window.addEventListener('visibilitychange', handleUpdate);
+    window.addEventListener('ds_services_updated', handleUpdate);
     return () => {
-      window.removeEventListener('focus', fetchAllServices);
-      window.removeEventListener('visibilitychange', fetchAllServices);
+      window.removeEventListener('focus', handleUpdate);
+      window.removeEventListener('visibilitychange', handleUpdate);
+      window.removeEventListener('ds_services_updated', handleUpdate);
     };
   }, [fetchAllServices]);
 
@@ -110,12 +122,12 @@ export default function ServicesPage() {
   // CORE RULE: A category with 0 services must NEVER show publicly.
   // Perform an explicit length/count check (> 0) on associated active services.
   const categories = React.useMemo(() => {
-    const servicePool =
-      servicesLoaded && allActiveServices.length > 0
-        ? allActiveServices
-        : !servicesLoaded
-          ? COLLECTIONS
-          : allActiveServices;
+    const servicePool = allActiveServices.filter((s) => s.isActive !== false);
+
+    // If completely initial cold start with zero cached services yet, allow candidates so nav isn't empty
+    if (!servicesLoaded && servicePool.length === 0) {
+      return candidateCategories;
+    }
 
     return candidateCategories.filter((cat) => {
       const catKey = toCanonicalKey(cat.id);
@@ -157,17 +169,21 @@ export default function ServicesPage() {
       }
     }
     if (queryTier) {
-      const matchedCol = COLLECTIONS.find(
-        (c) => c.id.toLowerCase() === queryTier.toLowerCase()
+      const pool = allActiveServices.length > 0 ? allActiveServices : [];
+      const matchedCol = pool.find(
+        (c) =>
+          String(c.tier || c.id || c._id || '').toLowerCase() === queryTier.toLowerCase()
       );
       if (matchedCol) {
-        setSelectedCollectionId(matchedCol.id);
+        setSelectedCollectionId(matchedCol.tier || matchedCol.id || matchedCol._id);
+      } else {
+        setSelectedCollectionId(queryTier);
       }
     }
     if (queryStep === 'book' || location.hash === '#book') {
       setStage(2);
     }
-  }, [queryCategory, queryTier, queryStep, location.hash, categories]);
+  }, [queryCategory, queryTier, queryStep, location.hash, categories, allActiveServices]);
 
   // Auto-fallback if currently selected category has 0 services and is not in categories
   useEffect(() => {
@@ -214,38 +230,6 @@ export default function ServicesPage() {
     source: 'Instagram',
   });
 
-  // Dynamic services state fetched from backend MongoDB
-  const [dynamicServices, setDynamicServices] = useState([]);
-  const [loadingServices, setLoadingServices] = useState(true);
-
-  // Fetch dynamic services when active category changes
-  useEffect(() => {
-    let isCancelled = false;
-    const fetchServices = async () => {
-      try {
-        setLoadingServices(true);
-        const res = await fetch(`/api/services?category=${selectedCategoryId}`);
-        if (res.ok) {
-          const json = await res.json();
-          if (!isCancelled && Array.isArray(json.data)) {
-            setDynamicServices(json.data);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to load dynamic services:', err);
-      } finally {
-        if (!isCancelled) {
-          setLoadingServices(false);
-        }
-      }
-    };
-
-    fetchServices();
-    return () => {
-      isCancelled = true;
-    };
-  }, [selectedCategoryId]);
-
   // Listen for Navbar "Book a Session" event or URL hash #book
   useEffect(() => {
     if (location.hash === '#book') {
@@ -278,30 +262,43 @@ export default function ServicesPage() {
         eventType: matched.label === 'WEDDING' ? 'Wedding' : matched.label,
       });
     }
-    // Auto-select the signature or first collection for the newly selected category
-    const categoryCols = COLLECTIONS.filter((c) => c.category === categoryId);
-    const signatureOrFirst =
-      categoryCols.find((c) => c.highlight || c.isAtelierChoice) || categoryCols[0];
-    const newTier = signatureOrFirst ? signatureOrFirst.id : 'signature';
-    setSelectedCollectionId(newTier);
-    setSearchParams(
-      { category: categoryId, tier: newTier },
-      { replace: true }
+    // Auto-select the signature or first collection for the newly selected category from real active services
+    const categoryCols = allActiveServices.filter(
+      (c) => c.isActive !== false && toCanonicalKey(c.category) === toCanonicalKey(categoryId)
     );
+    const signatureOrFirst =
+      categoryCols.find((c) => c.isRecommended) || categoryCols[0];
+    const newTier = signatureOrFirst ? (signatureOrFirst.tier || signatureOrFirst._id) : '';
+    if (newTier) {
+      setSelectedCollectionId(newTier);
+      setSearchParams(
+        { category: categoryId, tier: newTier },
+        { replace: true }
+      );
+    } else {
+      setSearchParams(
+        { category: categoryId },
+        { replace: true }
+      );
+    }
   };
 
   const activeCategoryObj =
     categories.find((c) => c.id === selectedCategoryId) ||
     categories[0];
 
-  // Normalize dynamic services or fallback to static collections
-  const normalizedDynamicList = dynamicServices
-    .filter((s) => s.isActive !== false)
-    .map((s, idx) => ({
+  // Derive active collections for selectedCategoryId directly from live active services
+  const activeCollections = React.useMemo(() => {
+    const matching = allActiveServices.filter((s) => {
+      if (s.isActive === false) return false;
+      return toCanonicalKey(s.category) === toCanonicalKey(selectedCategoryId);
+    });
+
+    return matching.map((s, idx) => ({
       ...s,
       id: s.tier || s._id,
       _id: s._id,
-      title: s.eyebrow || s.title || 'Collection',
+      title: s.eyebrow || s.title || s.tier || 'Collection',
       subtitle: s.subtitle,
       folio: s.folioLabel || `Folio 0${idx + 1}`,
       folioLabel: s.folioLabel || `Folio 0${idx + 1}`,
@@ -324,29 +321,47 @@ export default function ServicesPage() {
       highlight: s.isRecommended,
       category: s.category,
     }));
+  }, [allActiveServices, selectedCategoryId]);
 
-  const filteredStaticCollections = COLLECTIONS.filter(
-    (c) => toCanonicalKey(c.category) === toCanonicalKey(selectedCategoryId)
-  );
+  // Sync selectedCollectionId to first or recommended collection if not set or invalid
+  useEffect(() => {
+    if (activeCollections.length > 0) {
+      const currentValid = activeCollections.some((c) => {
+        const target = String(selectedCollectionId || '').toLowerCase().trim();
+        return (
+          String(c.id || '').toLowerCase().trim() === target ||
+          String(c._id || '').toLowerCase().trim() === target ||
+          String(c.tier || '').toLowerCase().trim() === target
+        );
+      });
+      if (!currentValid) {
+        const recommendedOrFirst =
+          activeCollections.find((c) => c.highlight || c.isAtelierChoice) ||
+          activeCollections[0];
+        if (recommendedOrFirst) {
+          setSelectedCollectionId(recommendedOrFirst.id);
+        }
+      }
+    }
+  }, [activeCollections, selectedCollectionId]);
 
-  const activeCollections =
-    normalizedDynamicList.length > 0
-      ? normalizedDynamicList
-      : allActiveServices.length === 0
-        ? filteredStaticCollections
-        : [];
-
-  const selectedCollection =
-    activeCollections.find((c) => {
+  const selectedCollection = React.useMemo(() => {
+    if (activeCollections.length > 0) {
       const target = String(selectedCollectionId || '').toLowerCase().trim();
-      return (
-        String(c.id || '').toLowerCase().trim() === target ||
-        String(c._id || '').toLowerCase().trim() === target ||
-        String(c.tier || '').toLowerCase().trim() === target
-      );
-    }) ||
-    activeCollections.find((c) => c.highlight || c.isAtelierChoice) ||
-    activeCollections[0] || {
+      const found =
+        activeCollections.find((c) => {
+          return (
+            String(c.id || '').toLowerCase().trim() === target ||
+            String(c._id || '').toLowerCase().trim() === target ||
+            String(c.tier || '').toLowerCase().trim() === target
+          );
+        }) ||
+        activeCollections.find((c) => c.highlight || c.isAtelierChoice) ||
+        activeCollections[0];
+      if (found) return found;
+    }
+
+    return {
       id: `${selectedCategoryId}-custom-suite`,
       title: `${activeCategoryObj?.label || 'Custom'} Bespoke Suite`,
       subtitle: 'Tailored Archival Commission',
@@ -361,6 +376,7 @@ export default function ServicesPage() {
       ],
       description: `Bespoke commissioned suite curated specifically for ${activeCategoryObj?.label?.toLowerCase() || 'custom'} celebrations.`,
     };
+  }, [activeCollections, selectedCollectionId, selectedCategoryId, activeCategoryObj]);
 
   const handleSelectAndBook = (collectionId, proceed = false) => {
     setSelectedCollectionId(collectionId);
@@ -615,12 +631,39 @@ export default function ServicesPage() {
                         />
                       </ScrollCardReveal>
                     ))
-                  ) : loadingServices ? (
+                  ) : !servicesLoaded ? (
+                    /* Atelier Skeleton Loading State */
+                    [1, 2, 3].map((n) => (
+                      <div
+                        key={n}
+                        className="rounded-2xl border border-[#E8DFC0]/70 bg-[#FAF7F2] p-8 flex flex-col justify-between min-h-[480px] animate-pulse"
+                      >
+                        <div>
+                          <div className="flex justify-between items-center mb-6">
+                            <div className="h-3 w-20 bg-[#E5DDCF] rounded" />
+                            <div className="h-3 w-16 bg-[#E5DDCF] rounded" />
+                          </div>
+                          <div className="w-full aspect-[4/3] bg-[#E8E0D2] rounded-xl mb-6" />
+                          <div className="h-6 w-3/4 bg-[#E5DDCF] rounded mb-3" />
+                          <div className="h-4 w-1/2 bg-[#E5DDCF] rounded mb-6" />
+                          <div className="space-y-2 mb-6">
+                            <div className="h-3 w-full bg-[#EFE9DF] rounded" />
+                            <div className="h-3 w-5/6 bg-[#EFE9DF] rounded" />
+                            <div className="h-3 w-4/6 bg-[#EFE9DF] rounded" />
+                          </div>
+                        </div>
+                        <div className="pt-6 border-t border-[#E8DFC0]/50 flex justify-between items-center">
+                          <div className="h-6 w-24 bg-[#E5DDCF] rounded" />
+                          <div className="h-9 w-28 bg-[#1E1B18]/10 rounded-full" />
+                        </div>
+                      </div>
+                    ))
+                  ) : (
                     <div className="col-span-full py-20 text-center">
-                      <div className="w-6 h-6 border-2 border-[#101010] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                      <p className="text-[10px] tracking-[0.2em] uppercase text-[#7A7770]">Loading Collections...</p>
+                      <p className="font-serif text-2xl text-[#1E1B18] mb-2">No active collections in this category</p>
+                      <p className="text-sm text-[#7A7770]">Please select another category or check back soon.</p>
                     </div>
-                  ) : null}
+                  )}
                 </motion.div>
               </AnimatePresence>
 
@@ -766,6 +809,7 @@ export default function ServicesPage() {
           setSelectedCollectionId(id);
           setCompareMatrixOpen(false);
         }}
+        collections={activeCollections}
       />
     </div>
   );

@@ -73,6 +73,13 @@ const CATEGORY_ICONS = {
   maternity: Sparkles,
 };
 
+const invalidateServicesCache = () => {
+  try {
+    localStorage.removeItem('ds_portfolio_cached_services');
+  } catch (e) {}
+  window.dispatchEvent(new CustomEvent('ds_services_updated'));
+};
+
 export default function AdminServicesPage() {
   const { category: categoryParam } = useParams();
   const navigate = useNavigate();
@@ -336,6 +343,7 @@ export default function AdminServicesPage() {
         setServices((prev) =>
           prev.map((s) => (s._id === service._id ? { ...s, isActive: !s.isActive } : s))
         );
+        invalidateServicesCache();
         showToast(`Package ${service.isActive ? 'hidden from' : 'published to'} public site.`);
       }
     } catch (err) {
@@ -399,6 +407,7 @@ export default function AdminServicesPage() {
       });
 
       if (res.ok) {
+        invalidateServicesCache();
         showToast('Package order updated successfully.');
       }
     } catch (err) {
@@ -425,6 +434,7 @@ export default function AdminServicesPage() {
         setServices((prev) => prev.filter((s) => s._id !== deleteTarget._id));
         setAllServices((prev) => prev.filter((s) => s._id !== deleteTarget._id));
         setDeleteTarget(null);
+        invalidateServicesCache();
         showToast('Service tier deleted successfully.');
       }
     } catch (err) {
@@ -436,6 +446,7 @@ export default function AdminServicesPage() {
 
   const handleModalSuccess = (savedService) => {
     const savedCat = (savedService?.category || '').toLowerCase().trim();
+    invalidateServicesCache();
     fetchAllServices();
     if (editTarget) {
       // Edit

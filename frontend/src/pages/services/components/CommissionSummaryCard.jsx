@@ -14,12 +14,13 @@ export default function CommissionSummaryCard({
   const locationText = formData.location ? formData.location : 'Pending Venue Entry';
   const durationText = formData.duration ? `${formData.duration} Archive` : '2 Days Archive';
 
-  const displayPrice = collection.numericPrice
-    ? `$${collection.numericPrice.toLocaleString()}`
-    : collection.price || '$8,400';
+  const displayPrice = collection?.numericPrice
+    ? `₹${collection.numericPrice.toLocaleString('en-IN')}`
+    : collection?.price || 'Price on Request';
 
   const cardImage =
-    collection.image ||
+    collection?.image ||
+    collection?.imageUrl ||
     'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop';
 
   return (

@@ -115,6 +115,29 @@ const styles = {
   },
 };
 
+/* ── Reusable input field (declared at module scope to prevent unmounting/loss of focus on keystroke) ── */
+const InputField = ({ icon: Icon, placeholder, value, onChange, type = 'text', required = false }) => (
+  <div
+    style={styles.inputRow}
+    onFocus={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#1C1917'; }}
+    onBlur={(e) => { e.currentTarget.style.backgroundColor = '#F7F5F1'; e.currentTarget.style.borderColor = '#E0DAD0'; }}
+  >
+    {Icon && (
+      <div style={styles.iconBadge}>
+        <Icon size={14} />
+      </div>
+    )}
+    <input
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      required={required}
+      style={styles.input}
+    />
+  </div>
+);
+
 export default function EditCategoryModal({ isOpen, onClose, onSuccess, category }) {
   const { getAuthHeaders } = useAdminAuth();
 
@@ -328,24 +351,6 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       setSubmitting(false);
     }
   };
-
-  /* ── Reusable input field ── */
-  const InputField = ({ icon: Icon, placeholder, value, onChange, type = 'text', required = false }) => (
-    <div
-      style={styles.inputRow}
-      onFocus={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#1C1917'; }}
-      onBlur={(e) => { e.currentTarget.style.backgroundColor = '#F7F5F1'; e.currentTarget.style.borderColor = '#E0DAD0'; }}
-    >
-      <div style={styles.iconBadge}>
-        <Icon size={14} />
-      </div>
-      <input
-        type={type} placeholder={placeholder}
-        value={value} onChange={onChange} required={required}
-        style={styles.input}
-      />
-    </div>
-  );
 
   const activePhotoSrc = useDirectUrl ? directCoverUrl : coverPreview;
 
