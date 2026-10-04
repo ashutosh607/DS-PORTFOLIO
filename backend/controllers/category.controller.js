@@ -1,4 +1,5 @@
 const Category = require("../models/category.model");
+const Media = require("../models/media.model");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
@@ -263,6 +264,22 @@ const updateCategory = asyncHandler(async (req, res) => {
   if (order !== undefined) category.order = Number(order);
 
   const updatedCategory = await category.save();
+
+  // Sync any existing baseline cover overrides so that media queries immediately reflect the new cover
+  try {
+    const paddedOrder = category.order ? String(category.order).padStart(2, "0") : "";
+    const coverBaselineIds = [
+      `seed-cover-${category.slug}`,
+      `seed-cover-${category.order}`,
+      ...(paddedOrder ? [`seed-cover-${paddedOrder}`] : []),
+    ];
+    await Media.updateMany(
+      { baselineId: { $in: coverBaselineIds } },
+      { $set: { url: coverImage, publicId: publicId || "" } }
+    );
+  } catch (err) {
+    console.warn("Could not sync baseline cover override in Media:", err.message);
+  }
 
   return res.status(200).json(
     new ApiResponse(200, updatedCategory, "Category updated successfully")

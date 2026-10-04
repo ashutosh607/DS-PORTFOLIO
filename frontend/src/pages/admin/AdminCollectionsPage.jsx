@@ -159,6 +159,7 @@ export default function AdminCollectionsPage() {
 
   const handleCategoryUpdated = async (updatedCat) => {
     await refreshCategories();
+    fetchMedia();
   };
 
   const handleCategoryDeleted = async (deletedCat) => {

@@ -6,38 +6,83 @@ const CATEGORIES_EVENT = 'ds_categories_updated';
 
 /**
  * Normalizes a category object to guarantee all required properties exist
+ * and ensures baseline collections never lose their stable IDs or supporting photos.
  */
 function normalizeCategory(cat, index = 0) {
-  const slug = (cat.slug || cat.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || `cat-${index}`).toLowerCase();
-  const id = cat.id || cat._id || String(index + 1).padStart(2, '0');
-  
+  const slug = (
+    cat.slug ||
+    cat.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') ||
+    `cat-${index}`
+  ).toLowerCase();
+
+  // Find initial template category if it's one of the baseline collections
+  const initialMatch = INITIAL_CATEGORIES.find(
+    (c) => c.slug?.toLowerCase() === slug || (cat.id && c.id === cat.id)
+  );
+
+  // Preserve stable human-friendly ID ('01', '02', etc.) for baseline categories
+  const id = initialMatch?.id || cat.id || cat._id || String(index + 1).padStart(2, '0');
+
+  // Preserve supporting images: if cat has non-empty supporting array, use it;
+  // otherwise fallback to initialMatch supporting if available; else empty array
+  let supporting = [];
+  if (Array.isArray(cat.supporting) && cat.supporting.length > 0) {
+    supporting = cat.supporting;
+  } else if (initialMatch?.supporting && Array.isArray(initialMatch.supporting)) {
+    supporting = initialMatch.supporting;
+  }
+
+  const cardShapeStyle =
+    cat.cardShapeStyle ||
+    initialMatch?.cardShapeStyle ||
+    { borderRadius: '9999px 9999px 4px 4px' };
+
+  const cardTransform =
+    cat.cardTransform ||
+    initialMatch?.cardTransform ||
+    'perspective(1200px) rotateY(4deg) translateY(0px)';
+
+  const featured = {
+    ...(initialMatch?.featured || {}),
+    ...(cat.featured || {}),
+    image:
+      cat.coverImage ||
+      cat.featured?.image ||
+      initialMatch?.featured?.image ||
+      initialMatch?.coverImage ||
+      'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1400&auto=format&fit=crop',
+    title: cat.name || cat.featured?.title || initialMatch?.featured?.title || initialMatch?.name || 'Featured Work',
+    count: cat.featured?.count || initialMatch?.featured?.count || '01 / 01',
+    caption: cat.quote || cat.featured?.caption || initialMatch?.featured?.caption || '',
+    meta: cat.medium || cat.featured?.meta || initialMatch?.featured?.meta || '',
+  };
+
   return {
     id,
     _id: cat._id || id,
-    name: cat.name || 'Untitled Category',
+    name: cat.name || initialMatch?.name || 'Untitled Category',
     slug,
-    tagline: cat.tagline || 'Honest moments, beautifully preserved as they unfold.',
-    quote: cat.quote || 'A story in every frame.',
-    medium: cat.medium || 'Leica & Natural Light',
-    location: cat.location || 'Studio & Commission',
-    coverImage: cat.coverImage || cat.featured?.image || 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop',
+    tagline: cat.tagline || initialMatch?.tagline || 'Honest moments, beautifully preserved as they unfold.',
+    quote: cat.quote || initialMatch?.quote || 'A story in every frame.',
+    medium: cat.medium || initialMatch?.medium || 'Leica & Natural Light',
+    location: cat.location || initialMatch?.location || 'Studio & Commission',
+    coverImage:
+      cat.coverImage ||
+      cat.featured?.image ||
+      initialMatch?.coverImage ||
+      'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop',
     publicId: cat.publicId || '',
-    cardShapeStyle: cat.cardShapeStyle || { borderRadius: '9999px 9999px 4px 4px' },
-    cardTransform: cat.cardTransform || 'perspective(1200px) rotateY(4deg) translateY(0px)',
-    featured: cat.featured || {
-      image: cat.coverImage || 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1400&auto=format&fit=crop',
-      title: cat.name || 'Featured Work',
-      count: '01 / 01',
-      caption: cat.quote || '',
-      meta: cat.medium || '',
-    },
-    supporting: Array.isArray(cat.supporting) ? cat.supporting : [],
-    isCustom: Boolean(cat.isCustom || cat._id),
+    cardShapeStyle,
+    cardTransform,
+    featured,
+    supporting,
+    isCustom: Boolean(cat.isCustom || (!initialMatch && cat._id)),
   };
 }
 
 /**
- * Get current live categories from cache or initial seed
+ * Get current live categories from cache or initial seed.
+ * Automatically heals any cached categories that lost supporting photos or baseline IDs.
  */
 export function getLiveCategories() {
   try {
@@ -45,7 +90,37 @@ export function getLiveCategories() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map(normalizeCategory);
+        // Heal any cached categories that might have lost their supporting photos
+        // or had their stable ID corrupted by MongoDB ObjectId
+        const healed = parsed.map((cat, idx) => {
+          const initial = INITIAL_CATEGORIES.find(
+            (c) => c.slug?.toLowerCase() === cat.slug?.toLowerCase() || c.id === cat.id
+          );
+          if (initial) {
+            const hasSupporting = Array.isArray(cat.supporting) && cat.supporting.length > 0;
+            return normalizeCategory(
+              {
+                ...initial,
+                ...cat,
+                id: initial.id, // always preserve '01', '02', etc. for seed collections
+                supporting: hasSupporting ? cat.supporting : initial.supporting,
+                cardShapeStyle: cat.cardShapeStyle || initial.cardShapeStyle,
+                cardTransform: cat.cardTransform || initial.cardTransform,
+              },
+              idx
+            );
+          }
+          return normalizeCategory(cat, idx);
+        });
+
+        // Ensure all baseline categories from INITIAL_CATEGORIES are present in the list
+        INITIAL_CATEGORIES.forEach((initCat, idx) => {
+          if (!healed.some((c) => c.slug === initCat.slug || c.id === initCat.id)) {
+            healed.push(normalizeCategory(initCat, idx));
+          }
+        });
+
+        return healed;
       }
     }
   } catch (err) {
@@ -88,7 +163,7 @@ function getAuthToken(authHeaders = {}) {
 }
 
 /**
- * Fetch categories from backend API and merge with cache
+ * Fetch categories from backend API and merge with cache & initial baseline
  */
 export async function syncCategoriesWithBackend() {
   try {
@@ -98,14 +173,48 @@ export async function syncCategoriesWithBackend() {
       if (Array.isArray(json.data) && json.data.length > 0) {
         const live = getLiveCategories();
         const merged = json.data.map((bCat, idx) => {
-          const match = live.find((c) => c.slug === bCat.slug || c._id === bCat._id);
-          return {
-            ...normalizeCategory(bCat, idx),
-            supporting: (match?.supporting && match.supporting.length > 0) ? match.supporting : (bCat.supporting || []),
-            cardShapeStyle: match?.cardShapeStyle || { borderRadius: '9999px 9999px 4px 4px' },
-            cardTransform: match?.cardTransform || 'perspective(1200px) rotateY(4deg) translateY(0px)',
-          };
+          const initialMatch = INITIAL_CATEGORIES.find((c) => c.slug === bCat.slug);
+          const match = live.find(
+            (c) => c.slug === bCat.slug || c._id === bCat._id || (initialMatch && c.id === initialMatch.id)
+          );
+
+          const preservedId =
+            initialMatch?.id || match?.id || bCat.id || bCat._id || String(idx + 1).padStart(2, '0');
+
+          const preservedSupporting =
+            (match?.supporting && match.supporting.length > 0)
+              ? match.supporting
+              : (bCat.supporting && bCat.supporting.length > 0)
+              ? bCat.supporting
+              : (initialMatch?.supporting || []);
+
+          return normalizeCategory(
+            {
+              ...initialMatch,
+              ...match,
+              ...bCat,
+              id: preservedId,
+              supporting: preservedSupporting,
+              cardShapeStyle:
+                match?.cardShapeStyle ||
+                initialMatch?.cardShapeStyle ||
+                { borderRadius: '9999px 9999px 4px 4px' },
+              cardTransform:
+                match?.cardTransform ||
+                initialMatch?.cardTransform ||
+                'perspective(1200px) rotateY(4deg) translateY(0px)',
+            },
+            idx
+          );
         });
+
+        // Preserve any custom category that exists in live but not in backend response
+        live.forEach((liveCat) => {
+          if (!merged.some((m) => m.slug === liveCat.slug || m._id === liveCat._id || m.id === liveCat.id)) {
+            merged.push(liveCat);
+          }
+        });
+
         broadcastCategories(merged);
         return merged;
       }
@@ -162,7 +271,8 @@ export async function createCategory(categoryData, authHeaders = {}) {
 }
 
 /**
- * Update an existing category
+ * Update an existing category while strictly preserving its stable ID,
+ * supporting gallery photos, card styles, and animations.
  */
 export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
   const tokenHeader = getAuthToken(authHeaders);
@@ -200,13 +310,74 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
 
   const updatedCategory = json.data;
   const current = getLiveCategories();
-  const normalized = normalizeCategory(updatedCategory);
+
+  // Find the existing category to preserve existing client-side attributes (like supporting photos)
+  const existing =
+    current.find(
+      (c) =>
+        c.slug === updatedCategory.slug ||
+        c.id === idOrSlug ||
+        c._id === idOrSlug ||
+        c.slug === idOrSlug
+    ) || INITIAL_CATEGORIES.find((c) => c.slug === updatedCategory.slug || c.slug === idOrSlug);
+
+  const initialMatch = INITIAL_CATEGORIES.find(
+    (c) =>
+      c.slug === updatedCategory.slug ||
+      c.slug === idOrSlug ||
+      (existing && c.id === existing.id)
+  );
+
+  // Preserve supporting items, card shape style, transform, and stable ID
+  const preservedId =
+    initialMatch?.id || existing?.id || updatedCategory.id || updatedCategory._id;
+
+  const preservedSupporting =
+    (Array.isArray(existing?.supporting) && existing.supporting.length > 0)
+      ? existing.supporting
+      : (Array.isArray(updatedCategory.supporting) && updatedCategory.supporting.length > 0)
+      ? updatedCategory.supporting
+      : (initialMatch?.supporting || []);
+
+  const preservedCardShapeStyle =
+    existing?.cardShapeStyle ||
+    initialMatch?.cardShapeStyle ||
+    { borderRadius: '9999px 9999px 4px 4px' };
+
+  const preservedCardTransform =
+    existing?.cardTransform ||
+    initialMatch?.cardTransform ||
+    'perspective(1200px) rotateY(4deg) translateY(0px)';
+
+  const merged = {
+    ...initialMatch,
+    ...existing,
+    ...updatedCategory,
+    id: preservedId,
+    _id: updatedCategory._id || existing?._id || preservedId,
+    supporting: preservedSupporting,
+    cardShapeStyle: preservedCardShapeStyle,
+    cardTransform: preservedCardTransform,
+    featured: {
+      ...(initialMatch?.featured || {}),
+      ...(existing?.featured || {}),
+      image: updatedCategory.coverImage || existing?.coverImage || initialMatch?.coverImage,
+      title: updatedCategory.name || existing?.name || initialMatch?.name,
+    },
+  };
+
+  const normalized = normalizeCategory(merged);
 
   const updated = current.map((c) =>
-    c.slug === normalized.slug || c.id === idOrSlug || c._id === idOrSlug
+    c.slug === normalized.slug ||
+    c.id === idOrSlug ||
+    c._id === idOrSlug ||
+    c.slug === idOrSlug ||
+    c.id === normalized.id
       ? { ...c, ...normalized }
       : c
   );
+
   broadcastCategories(updated);
   return normalized;
 }
