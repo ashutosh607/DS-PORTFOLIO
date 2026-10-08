@@ -93,62 +93,110 @@ const PROJECTS = [
 export default function HeroSpotlightCarousel() {
   const total = PROJECTS.length;
 
-  // Continuous position for 60fps spring gesture tracking
+  // Continuous position for 60fps/120fps smooth continuous rotation and gesture tracking
   const [pos, setPos] = useState(1); // Start at 1 ('02 Velocity')
   const [isDragging, setIsDragging] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
   const posRef = useRef(1);
   const targetPosRef = useRef(1);
   const isDraggingRef = useRef(false);
+  const isHoveredRef = useRef(false);
+  const isSpringingRef = useRef(false);
+  const lastTimeRef = useRef(performance.now());
   const dragStartXRef = useRef(0);
   const dragStartPosRef = useRef(1);
   const lastPointerXRef = useRef(0);
   const lastPointerTimeRef = useRef(0);
   const pointerVelocityRef = useRef(0);
-  const animFrameIdRef = useRef(null);
 
   useEffect(() => {
     posRef.current = pos;
   }, [pos]);
 
-  // Silky 60fps spring animation
-  const startSpringAnimation = useCallback(() => {
-    if (animFrameIdRef.current) cancelAnimationFrame(animFrameIdRef.current);
+  useEffect(() => {
+    isHoveredRef.current = isHovered;
+  }, [isHovered]);
 
-    const step = () => {
-      if (isDraggingRef.current) return;
+  useEffect(() => {
+    isDraggingRef.current = isDragging;
+  }, [isDragging]);
 
-      const current = posRef.current;
-      const target = targetPosRef.current;
-      const diff = target - current;
+  // Main continuous, buttery-smooth 60fps/120fps rotation loop
+  useEffect(() => {
+    let animId;
+    lastTimeRef.current = performance.now();
 
-      if (Math.abs(diff) < 0.0005) {
-        posRef.current = target;
-        setPos(target);
-        animFrameIdRef.current = null;
-        return;
+    const loop = (now) => {
+      const dt = (now - lastTimeRef.current) / 1000;
+      lastTimeRef.current = now;
+
+      // Safe clamp to avoid jumps after tab focus
+      const clampedDt = Math.min(Math.max(dt, 0), 0.1);
+
+      if (!isDraggingRef.current) {
+        if (isSpringingRef.current) {
+          // Smooth glide toward user-clicked target (arrows, dots, cards)
+          const current = posRef.current;
+          const target = targetPosRef.current;
+          const diff = target - current;
+
+          if (Math.abs(diff) < 0.0006) {
+            posRef.current = target;
+            setPos(target);
+            isSpringingRef.current = false;
+          } else {
+            const nextPos = current + diff * 0.08;
+            posRef.current = nextPos;
+            setPos(nextPos);
+          }
+        } else if (!isHoveredRef.current && (typeof document === 'undefined' || !document.hidden)) {
+          // Continuous, slow, proper, smooth rotation (turntable) - does not stop per image
+          // 0.18 cards per second = ~5.5s per image, serene and graceful
+          const speed = 0.18;
+          const nextPos = posRef.current + speed * clampedDt;
+          posRef.current = nextPos;
+          setPos(nextPos);
+        }
       }
 
-      // Smooth damped spring interpolation
-      const nextPos = current + diff * 0.11;
-      posRef.current = nextPos;
-      setPos(nextPos);
-
-      animFrameIdRef.current = requestAnimationFrame(step);
+      animId = requestAnimationFrame(loop);
     };
 
-    animFrameIdRef.current = requestAnimationFrame(step);
+    animId = requestAnimationFrame(loop);
+
+    const handleVisibility = () => {
+      lastTimeRef.current = performance.now();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   // Arrow navigation with fluid circular rotation
   const handlePrev = useCallback(() => {
-    targetPosRef.current = Math.round(targetPosRef.current) - 1;
-    startSpringAnimation();
-  }, [startSpringAnimation]);
+    targetPosRef.current = Math.ceil(posRef.current) - 1;
+    isSpringingRef.current = true;
+  }, []);
 
   const handleNext = useCallback(() => {
-    targetPosRef.current = Math.round(targetPosRef.current) + 1;
-    startSpringAnimation();
-  }, [startSpringAnimation]);
+    targetPosRef.current = Math.floor(posRef.current) + 1;
+    isSpringingRef.current = true;
+  }, []);
+
+  // Shortest cyclic navigation to target dot index
+  const goToIndex = useCallback((targetIndex) => {
+    const currentRounded = Math.round(posRef.current);
+    const currentNormalized = ((currentRounded % total) + total) % total;
+    let diff = (targetIndex - currentNormalized) % total;
+    while (diff > total / 2) diff -= total;
+    while (diff < -total / 2) diff += total;
+    targetPosRef.current = currentRounded + diff;
+    isSpringingRef.current = true;
+  }, [total]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -165,7 +213,7 @@ export default function HeroSpotlightCarousel() {
 
   // Pointer drag & touch swipe
   const handlePointerDown = (e) => {
-    if (animFrameIdRef.current) cancelAnimationFrame(animFrameIdRef.current);
+    isSpringingRef.current = false;
     isDraggingRef.current = true;
     setIsDragging(true);
     const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
@@ -201,20 +249,15 @@ export default function HeroSpotlightCarousel() {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
     setIsDragging(false);
+    lastTimeRef.current = performance.now();
 
     // Natural flick inertia
     const v = pointerVelocityRef.current;
-    let target = posRef.current;
-
     if (Math.abs(v) > 0.4) {
       const flingDistance = Math.sign(-v) * Math.min(2, Math.max(1, Math.round(Math.abs(v) * 1.0)));
-      target = Math.round(posRef.current + flingDistance);
-    } else {
-      target = Math.round(posRef.current);
+      targetPosRef.current = Math.round(posRef.current + flingDistance);
+      isSpringingRef.current = true;
     }
-
-    targetPosRef.current = target;
-    startSpringAnimation();
   };
 
   // Active item synced to rounded carousel position
@@ -224,6 +267,8 @@ export default function HeroSpotlightCarousel() {
   return (
     <section
       id="gallery"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         position: 'relative',
         height: '100vh',
@@ -313,10 +358,14 @@ export default function HeroSpotlightCarousel() {
             MIDDLE SECTION: INWARD CONCAVE CURVED 3D GALLERY (CLEAN MINIMALIST)
             =================================================================== */}
         <div
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => {
+            handlePointerUp();
+            setIsHovered(false);
+          }}
           onMouseDown={handlePointerDown}
           onMouseMove={handlePointerMove}
           onMouseUp={handlePointerUp}
-          onMouseLeave={handlePointerUp}
           onTouchStart={handlePointerDown}
           onTouchMove={handlePointerMove}
           onTouchEnd={handlePointerUp}
@@ -373,10 +422,12 @@ export default function HeroSpotlightCarousel() {
             return (
               <div
                 key={item.id}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
                 onClick={() => {
                   if (absD >= 0.45 && isVisible) {
-                    targetPosRef.current = Math.round(targetPosRef.current + d);
-                    startSpringAnimation();
+                    targetPosRef.current = Math.round(posRef.current + d);
+                    isSpringingRef.current = true;
                   }
                 }}
                 style={{
@@ -509,10 +560,7 @@ export default function HeroSpotlightCarousel() {
             {PROJECTS.map((_, i) => (
               <button
                 key={i}
-                onClick={() => {
-                  targetPosRef.current = i;
-                  startSpringAnimation();
-                }}
+                onClick={() => goToIndex(i)}
                 aria-label={`Go to photo ${i + 1}`}
                 style={{
                   height: '5px',

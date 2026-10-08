@@ -27,13 +27,13 @@ export default function CollectionsRibbon({
   // Responsive sizing calculations
   const isMobile = containerWidth < 640;
   const isTablet = containerWidth >= 640 && containerWidth < 1024;
-  const CARD_GAP = isMobile ? 14 : 18;
+  const CARD_GAP = isMobile ? 12 : 18;
 
-  // On mobile (e.g. 360px - 440px), show ~2 to 2.2 cards so the arched window has proper 155-175px width
+  // On mobile (e.g. 360px - 440px), show exactly 2 cards properly centered (no 3rd card peeking)
   // On tablet, show ~3.8 cards
   // On desktop, show 6 cards
   const effectiveVisible = isMobile
-    ? (containerWidth < 380 ? 1.75 : 2.15)
+    ? 2
     : isTablet
       ? 3.8
       : VISIBLE_COUNT;
@@ -131,9 +131,11 @@ export default function CollectionsRibbon({
     }
   }, [isAnimating]);
 
-  const cardWidth = isCircular
-    ? Math.max(140, Math.min(185, (containerWidth - (effectiveVisible - 1) * CARD_GAP) / effectiveVisible))
-    : Math.min(175, (containerWidth - (N - 1) * CARD_GAP) / Math.max(1, N));
+  const cardWidth = isMobile
+    ? Math.max(120, (containerWidth - CARD_GAP) / 2)
+    : isCircular
+      ? Math.max(140, Math.min(185, (containerWidth - (effectiveVisible - 1) * CARD_GAP) / effectiveVisible))
+      : Math.min(175, (containerWidth - (N - 1) * CARD_GAP) / Math.max(1, N));
 
   const step = cardWidth + CARD_GAP;
 
@@ -296,7 +298,7 @@ export default function CollectionsRibbon({
           position: 'relative',
           maxWidth: '1280px',
           margin: '0 auto',
-          padding: isMobile ? '0 28px' : '0 54px',
+          padding: isMobile ? '0 34px' : '0 54px',
         }}
       >
         {/* Left Arrow Button (Infinite Rotation) */}
@@ -307,12 +309,12 @@ export default function CollectionsRibbon({
             aria-label="Previous categories"
             style={{
               position: 'absolute',
-              left: isMobile ? 0 : 4,
+              left: isMobile ? 1 : 4,
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 35,
-              width: isMobile ? 36 : 44,
-              height: isMobile ? 36 : 44,
+              width: isMobile ? 30 : 44,
+              height: isMobile ? 30 : 44,
               borderRadius: '50%',
               border: '1px solid rgba(210, 200, 184, 0.85)',
               backgroundColor: '#FFFFFF',
@@ -325,7 +327,7 @@ export default function CollectionsRibbon({
               transition: 'all 0.2s ease',
             }}
           >
-            <ChevronLeft size={isMobile ? 18 : 22} strokeWidth={2.4} />
+            <ChevronLeft size={isMobile ? 16 : 22} strokeWidth={2.4} />
           </button>
         )}
 
@@ -337,12 +339,12 @@ export default function CollectionsRibbon({
             aria-label="Next categories"
             style={{
               position: 'absolute',
-              right: isMobile ? 0 : 4,
+              right: isMobile ? 1 : 4,
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 35,
-              width: isMobile ? 36 : 44,
-              height: isMobile ? 36 : 44,
+              width: isMobile ? 30 : 44,
+              height: isMobile ? 30 : 44,
               borderRadius: '50%',
               border: '1px solid rgba(210, 200, 184, 0.85)',
               backgroundColor: '#FFFFFF',
@@ -355,7 +357,7 @@ export default function CollectionsRibbon({
               transition: 'all 0.2s ease',
             }}
           >
-            <ChevronRight size={isMobile ? 18 : 22} strokeWidth={2.4} />
+            <ChevronRight size={isMobile ? 16 : 22} strokeWidth={2.4} />
           </button>
         )}
 
@@ -378,7 +380,7 @@ export default function CollectionsRibbon({
             userSelect: 'none',
             WebkitUserSelect: 'none',
             touchAction: 'pan-y',
-            padding: '1.25rem 0.15rem',
+            padding: isMobile ? '1rem 0' : '1.25rem 0.15rem',
           }}
         >
           {/* Continuous Sliding Track */}

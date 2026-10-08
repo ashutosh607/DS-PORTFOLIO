@@ -48,12 +48,6 @@ export default function AboutSection({ imageUrl = null }) {
           <div className="about-portrait-col">
             <ScrollCardReveal yOffset={35} initialScale={0.95} blurAmount={10} hoverEffect={false} className="w-full">
               <div className="about-portrait-wrapper">
-                {/* Warm Nude/Ivory Accent Backdrop Block (Offset Top-Left) */}
-                <div
-                  className="about-accent-block"
-                  aria-hidden="true"
-                />
-
                 {/* Single Photographer Portrait Image */}
                 <div className="about-portrait-frame">
                   <div className="about-portrait-img-container">
@@ -233,40 +227,32 @@ export default function AboutSection({ imageUrl = null }) {
         .about-portrait-wrapper {
           position: relative;
           width: 100%;
-          padding-top: 24px;
-          padding-left: 24px;
         }
 
-        @media (max-width: 640px) {
-          .about-portrait-wrapper {
-            padding-top: 16px;
-            padding-left: 16px;
-          }
-        }
-
-        /* Offset Warm Nude Accent Block */
-        .about-accent-block {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 72%;
-          height: 72%;
-          background-color: var(--color-nude, #E3DBCC);
-          opacity: 0.75;
-          border-radius: 12px;
-          z-index: 1;
-        }
-
-        /* Main Portrait Frame with Subtle Rounded Corners */
+        /* Main Portrait Frame with Rich Luxury Depth Shadow */
         .about-portrait-frame {
           position: relative;
           z-index: 2;
           width: 100%;
-          border-radius: 14px;
+          border-radius: 18px;
           overflow: hidden;
-          box-shadow: 0 20px 45px -15px rgba(16, 16, 16, 0.08);
-          border: 1px solid var(--color-nude, #E3DBCC);
+          box-shadow: 
+            0 4px 6px -1px rgba(16, 16, 16, 0.04),
+            0 12px 28px -4px rgba(16, 16, 16, 0.08),
+            0 28px 56px -10px rgba(16, 16, 16, 0.12),
+            0 48px 90px -16px rgba(16, 16, 16, 0.15);
+          border: 1px solid rgba(227, 219, 204, 0.7);
           background-color: var(--color-ivory, #F3F0E9);
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .about-portrait-frame:hover {
+          transform: translateY(-4px);
+          box-shadow: 
+            0 8px 12px -2px rgba(16, 16, 16, 0.05),
+            0 20px 36px -6px rgba(16, 16, 16, 0.10),
+            0 36px 68px -10px rgba(16, 16, 16, 0.15),
+            0 60px 105px -18px rgba(16, 16, 16, 0.18);
         }
 
         .about-portrait-img-container {
