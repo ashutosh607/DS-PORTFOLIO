@@ -159,7 +159,7 @@ export default function EditMediaModal({
         throw new Error(data.message || 'Failed to update media');
       }
 
-      onSuccess(data.data || {
+      const updatedItem = data.data || {
         ...mediaItem,
         title: title.trim(),
         category,
@@ -167,7 +167,15 @@ export default function EditMediaModal({
         url: targetUrl || filePreview,
         caption: caption.trim(),
         meta: meta.trim(),
-      });
+      };
+
+      onSuccess(updatedItem);
+      try {
+        const cached = JSON.parse(localStorage.getItem('ds_portfolio_cached_media') || '[]');
+        const updatedList = cached.map((m) => (m._id === updatedItem._id ? { ...m, ...updatedItem } : m));
+        localStorage.setItem('ds_portfolio_cached_media', JSON.stringify(updatedList));
+      } catch {}
+      window.dispatchEvent(new CustomEvent('ds_media_updated', { detail: updatedItem }));
 
       onClose();
     } catch (err) {

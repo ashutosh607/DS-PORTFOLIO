@@ -19,7 +19,23 @@ export default function CollectionsPage({ onOpenInquiry }) {
   const { categories: rawCategories } = useCategories();
   const baseCategories = (rawCategories && rawCategories.length > 0) ? rawCategories : DEFAULT_CATEGORIES;
   const [activeCategoryId, setActiveCategoryId] = useState('01');
-  const [mediaList, setMediaList] = useState([]);
+  
+  // Initialize mediaList immediately from localStorage cache so uploaded images appear on frame 0
+  const [mediaList, setMediaList] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('ds_portfolio_cached_media');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (err) {
+        console.warn('Could not read cached media:', err);
+      }
+    }
+    return [];
+  });
+
   const categoriesRibbonRef = useRef(null);
   const galleryRevealRef = useRef(null);
 
@@ -68,36 +84,90 @@ export default function CollectionsPage({ onOpenInquiry }) {
     }
   }, [baseCategories, activeCategoryId, searchParams, setSearchParams]);
 
-  // Fetch dynamic collection media from backend API
+  // Fetch dynamic collection media with multi-endpoint fallback & automatic retries
   useEffect(() => {
     let isMounted = true;
-    async function loadMedia() {
+    let retryTimer = null;
+
+    async function loadMedia(attempt = 1) {
       try {
-        const res = await fetch('/api/media');
-        if (res.ok) {
-          const json = await res.json();
-          if (isMounted && Array.isArray(json.data)) {
-            setMediaList(json.data);
+        const endpoints = [
+          getApiUrl('/api/media'),
+          '/api/media',
+          'http://localhost:5000/api/media',
+        ];
+
+        let success = false;
+        for (const ep of endpoints) {
+          if (!ep) continue;
+          try {
+            const res = await fetch(ep);
+            if (res.ok) {
+              const json = await res.json();
+              if (isMounted && Array.isArray(json.data) && json.data.length > 0) {
+                setMediaList(json.data);
+                try {
+                  localStorage.setItem('ds_portfolio_cached_media', JSON.stringify(json.data));
+                } catch {}
+                success = true;
+                break;
+              }
+            }
+          } catch {
+            // Try next endpoint candidate
           }
         }
+
+        // If server is waking up from sleep, retry with progressive delay
+        if (!success && isMounted && attempt <= 3) {
+          retryTimer = setTimeout(() => {
+            if (isMounted) loadMedia(attempt + 1);
+          }, attempt * 1800);
+        }
       } catch {
-        // Fall back gracefully to static seed data
+        // Fall back gracefully to cache
       }
     }
+
     loadMedia();
+
+    // Listen for real-time media updates broadcast from admin modals
+    const handleMediaUpdated = (e) => {
+      if (e?.detail && Array.isArray(e.detail)) {
+        setMediaList(e.detail);
+      } else {
+        loadMedia(1);
+      }
+    };
+
+    window.addEventListener('ds_media_updated', handleMediaUpdated);
+
     return () => {
       isMounted = false;
+      if (retryTimer) clearTimeout(retryTimer);
+      window.removeEventListener('ds_media_updated', handleMediaUpdated);
     };
   }, []);
 
   // Dynamically augment categories with newly uploaded media
   const dynamicCategories = baseCategories.map((cat) => {
-    // Media belonging to this category
-    const categoryItems = mediaList.filter(
-      (m) =>
-        m.category?.toLowerCase() === cat.slug?.toLowerCase() ||
-        toCanonicalCategoryKey(m.category) === toCanonicalCategoryKey(cat.slug)
-    );
+    // Robust category matching across slug, name, and id variants
+    const categoryItems = mediaList.filter((m) => {
+      if (!m.category) return false;
+      const mCat = m.category.toLowerCase().trim();
+      const catSlug = (cat.slug || '').toLowerCase().trim();
+      const catName = (cat.name || '').toLowerCase().trim();
+      const catId = (cat.id || '').toLowerCase().trim();
+
+      return (
+        mCat === catSlug ||
+        mCat === catName ||
+        mCat === catId ||
+        toCanonicalCategoryKey(mCat) === toCanonicalCategoryKey(catSlug) ||
+        toCanonicalCategoryKey(mCat) === toCanonicalCategoryKey(catName) ||
+        toCanonicalCategoryKey(mCat) === toCanonicalCategoryKey(catId)
+      );
+    });
 
     const formattedCustom = categoryItems.map((item, idx) => ({
       id: item._id || `custom-${cat.id}-${idx}`,
@@ -126,10 +196,13 @@ export default function CollectionsPage({ onOpenInquiry }) {
     };
 
     // If custom uploads exist for this category, use ONLY the custom uploaded media
-    // No fake baseline specimens appended
     const featured = formattedCustom.length > 0 ? formattedCustom[0] : baseFeatured;
-    const supporting = formattedCustom.length > 1 ? formattedCustom.slice(1) : [];
-    const allMedia = formattedCustom.length > 0 ? formattedCustom : [baseFeatured];
+    const supporting = formattedCustom.length > 1
+      ? formattedCustom.slice(1)
+      : (formattedCustom.length === 0 && Array.isArray(cat.supporting) ? cat.supporting : []);
+    const allMedia = formattedCustom.length > 0
+      ? formattedCustom
+      : [baseFeatured, ...(Array.isArray(cat.supporting) ? cat.supporting : [])];
 
     return {
       ...cat,

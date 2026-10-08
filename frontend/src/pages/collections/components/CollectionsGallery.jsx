@@ -172,7 +172,7 @@ export default function CollectionsGallery({
   // Scroll container ref for right side
   const scrollContainerRef = useRef(null);
 
-  // Reset selected item and scroll to top when category changes
+  // Reset selected item and scroll to top when category changes or media loads
   useEffect(() => {
     const firstItem = allMedia[0] || activeCategory.featured;
     if (activeAnimRef.current) {
@@ -182,11 +182,21 @@ export default function CollectionsGallery({
     setFlipState(null);
     setIsExpanding(false);
     setOutgoingItem(null);
-    setSelectedItem(firstItem);
+
+    // Keep selected item valid if media loads or changes
+    const isCurrentInAll = allMedia.some(
+      (m) =>
+        (m.id && selectedItem?.id && m.id === selectedItem.id) ||
+        (m.image && selectedItem?.image && m.image === selectedItem.image)
+    );
+    if (!isCurrentInAll || !selectedItem) {
+      setSelectedItem(firstItem);
+    }
+
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
-  }, [activeCategory.id]);
+  }, [activeCategory.id, allMedia.length]);
 
   // Find index of selected item in the collection
   const selectedIndex = allMedia.findIndex(

@@ -253,6 +253,12 @@ export default function AddMediaModal({
       }
 
       onSuccess(data.data);
+      try {
+        const cached = JSON.parse(localStorage.getItem('ds_portfolio_cached_media') || '[]');
+        const updated = [data.data, ...cached.filter((m) => m._id !== data.data._id)];
+        localStorage.setItem('ds_portfolio_cached_media', JSON.stringify(updated));
+      } catch {}
+      window.dispatchEvent(new CustomEvent('ds_media_updated', { detail: data.data }));
       onClose();
     } catch (err) {
       setError(err.message || 'Error uploading media asset');

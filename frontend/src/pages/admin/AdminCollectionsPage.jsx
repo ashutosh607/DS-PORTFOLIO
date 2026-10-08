@@ -155,6 +155,12 @@ export default function AdminCollectionsPage() {
 
       if (res.ok) {
         setMediaList((prev) => prev.filter((item) => item._id !== deleteTarget._id));
+        try {
+          const cached = JSON.parse(localStorage.getItem('ds_portfolio_cached_media') || '[]');
+          const updated = cached.filter((m) => m._id !== deleteTarget._id);
+          localStorage.setItem('ds_portfolio_cached_media', JSON.stringify(updated));
+        } catch {}
+        window.dispatchEvent(new CustomEvent('ds_media_updated'));
         setDeleteTarget(null);
       }
     } catch (err) {
