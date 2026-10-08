@@ -43,6 +43,7 @@ export const StaggeredMenu = ({
   const toggleBtnRef = useRef(null);
   const busyRef = useRef(false);
   const itemEntranceTweenRef = useRef(null);
+  const isNavigatingRef = useRef(false);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -392,7 +393,15 @@ export const StaggeredMenu = ({
         document.body.style.position = originalPosition;
         document.body.style.top = originalTop;
         document.body.style.width = originalWidth;
-        window.scrollTo(0, scrollY);
+
+        if (isNavigatingRef.current) {
+          isNavigatingRef.current = false;
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        } else {
+          window.scrollTo(0, scrollY);
+        }
       };
     }
   }, [open]);
@@ -481,6 +490,7 @@ export const StaggeredMenu = ({
                     data-index={idx + 1}
                     onClick={(e) => {
                       e.preventDefault();
+                      isNavigatingRef.current = true;
                       closeMenu();
                       if (it.onClick) {
                         it.onClick();
@@ -507,6 +517,7 @@ export const StaggeredMenu = ({
             <button
               type="button"
               onClick={() => {
+                isNavigatingRef.current = true;
                 closeMenu();
                 if (onItemClick) {
                   onItemClick({ link: '/services?step=book#book', label: 'BOOK A SESSION', isBooking: true });

@@ -59,15 +59,26 @@ export function PageTransitionProvider({ children }) {
     setTimeout(() => {
       // 3. ROUTE CHANGE invisibly while screen is completely covered
       navigate(to);
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
 
       // 4. REVEAL NEW PAGE: Move curtain from translateY(0) to translateY(100%)
       setPhase('revealing');
+
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      });
 
       setTimeout(() => {
         // Reset overlay back to idle state
         setPhase('idle');
         isBusyRef.current = false;
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
       }, 720);
     }, 720);
   };

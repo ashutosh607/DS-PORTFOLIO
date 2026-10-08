@@ -39,6 +39,13 @@ export default function CollectionsPage({ onOpenInquiry }) {
   const categoriesRibbonRef = useRef(null);
   const galleryRevealRef = useRef(null);
 
+  // Guarantee page opens strictly at the very top from the start on mobile and desktop
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
   // Sync with URL query string (e.g. /collections?category=weddings&id=...) or path param (/collections/weddings)
   useEffect(() => {
     if (queryId) {

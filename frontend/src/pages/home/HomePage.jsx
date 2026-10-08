@@ -20,9 +20,11 @@ export default function HomePage() {
         }, 100);
       }
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     }
-  }, [location]);
+  }, [location.pathname, location.hash]);
 
   return (
     <>
