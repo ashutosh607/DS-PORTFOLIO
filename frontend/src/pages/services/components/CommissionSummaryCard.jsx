@@ -1,4 +1,5 @@
 import React from 'react';
+import { MapPin } from 'lucide-react';
 
 export default function CommissionSummaryCard({
   collection,
@@ -9,6 +10,12 @@ export default function CommissionSummaryCard({
   const categoryLabel = category
     ? category.charAt(0).toUpperCase() + category.slice(1)
     : 'Wedding';
+
+  const suiteTitle = collection?.title
+    ? /collection$/i.test(collection.title.trim())
+      ? collection.title.trim()
+      : `${collection.title.trim()} Collection`
+    : 'Bespoke Collection';
 
   const celebrationText =
     formData.eventType === 'Other' && formData.otherEventType?.trim()
@@ -139,14 +146,15 @@ export default function CommissionSummaryCard({
             </span>
             <span
               style={{
-                fontSize: '16px',
+                fontSize: '15px',
                 textAlign: 'right',
                 fontFamily: 'var(--font-serif)',
                 color: '#101010',
                 fontWeight: 500,
+                maxWidth: '220px',
               }}
             >
-              {collection?.title || 'Bespoke'} Collection
+              {suiteTitle}
             </span>
           </div>
 
@@ -222,42 +230,100 @@ export default function CommissionSummaryCard({
             </span>
           </div>
 
-          {/* Row 4: Primary Location */}
+          {/* Row 4: Primary Location / Venue */}
           <div
             data-testid="sidebar-info-row-3"
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'baseline',
               paddingTop: '16px',
               paddingBottom: '16px',
               borderBottom: '1px solid #E3DBCC',
             }}
           >
-            <span
+            <div
               style={{
-                fontSize: '11px',
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: '#7A7770',
-                fontFamily: 'var(--font-sans)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: formData.location ? '10px' : '0',
               }}
             >
-              PRIMARY LOCATION
-            </span>
-            <span
-              style={{
-                fontSize: '15px',
-                textAlign: 'right',
-                fontFamily: 'var(--font-sans)',
-                color: '#101010',
-                fontStyle: 'italic',
-                maxWidth: '220px',
-              }}
-              className="truncate"
-            >
-              {locationText}
-            </span>
+              <span
+                style={{
+                  fontSize: '11px',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: '#7A7770',
+                  fontFamily: 'var(--font-sans)',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <MapPin size={13} className="text-[#8C8070] shrink-0" />
+                PRIMARY LOCATION
+              </span>
+
+              {formData.location ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-sans font-medium bg-[#F3EFE6] text-[#55493A] border border-[#E3DBCC]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#3D7B54]"></span>
+                  Pinned
+                </span>
+              ) : (
+                <span
+                  style={{
+                    fontSize: '14px',
+                    textAlign: 'right',
+                    fontFamily: 'var(--font-sans)',
+                    color: '#8A857B',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  Pending Venue Entry
+                </span>
+              )}
+            </div>
+
+            {formData.location && (
+              <div
+                style={{
+                  background: '#F9F7F2',
+                  border: '1px solid #E3DBCC',
+                  borderRadius: '10px',
+                  padding: '12px 14px',
+                }}
+                className="transition-all shadow-[0_2px_8px_-4px_rgba(16,16,16,0.04)]"
+              >
+                <div className="flex items-start gap-2.5">
+                  <div className="w-6 h-6 rounded-full bg-[#EFE9DC] flex items-center justify-center shrink-0 mt-0.5 text-[#55493A]">
+                    <MapPin size={12} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-serif)',
+                        fontSize: '15px',
+                        lineHeight: 1.4,
+                        color: '#101010',
+                        fontWeight: 500,
+                        wordBreak: 'break-word',
+                        margin: 0,
+                      }}
+                    >
+                      {formData.location}
+                    </p>
+                    {formData.coordinates?.lat && (
+                      <p className="font-mono text-[10.5px] text-[#7A7770] mt-1.5 tracking-wide flex items-center gap-1">
+                        <span>Coordinates:</span>
+                        <span className="text-[#55493A]">
+                          {formData.coordinates.lat.toFixed(4)}°N, {formData.coordinates.lng.toFixed(4)}°E
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Row 5: Studio Investment */}
@@ -344,29 +410,6 @@ export default function CommissionSummaryCard({
           </ul>
         </div>
 
-        {/* 48-HOUR PROVISIONAL HOLD (24px internal padding, 24px margin above and below) */}
-        <div
-          data-testid="provisional-hold-box"
-          style={{
-            marginTop: '24px',
-            marginBottom: '24px',
-            padding: '24px',
-            border: '1px solid #E3DBCC',
-            borderRadius: '12px',
-            background: '#F3F0E9',
-            boxSizing: 'border-box',
-          }}
-        >
-          <div className="flex items-start gap-2.5">
-            <span className="text-base shrink-0 mt-0.5">🔒</span>
-            <div className="font-sans text-xs text-[#524436] leading-relaxed">
-              <span className="font-semibold text-[#101010] block mb-1 text-[13px]">
-                48-Hour Provisional Hold
-              </span>
-              Upon submission of this brief, your requested dates are locked provisionally on our master board with no immediate retainer.
-            </div>
-          </div>
-        </div>
 
         {/* Switch Suite Button */}
         <div
