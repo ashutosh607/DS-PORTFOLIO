@@ -315,7 +315,10 @@ export default function HeroSpotlightCarousel() {
         {/* ===================================================================
             TOP SECTION: EYEBROW & HEADING
             =================================================================== */}
-        <div style={{ flexShrink: 0, paddingTop: '0.25rem' }}>
+        <div
+          className="pt-10 sm:pt-6 md:pt-1"
+          style={{ flexShrink: 0 }}
+        >
           <div style={{ marginBottom: '0.45rem' }}>
             <div
               style={{
