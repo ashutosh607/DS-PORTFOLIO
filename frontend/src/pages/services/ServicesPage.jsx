@@ -11,6 +11,7 @@ import ConfirmationScreen from './components/ConfirmationScreen';
 import LocationMapSection from './components/LocationMapSection';
 import { handleWhatsAppSubmit } from '../../utils/whatsapp';
 import { handleEmailSubmit } from '../../utils/email';
+import { getApiUrl } from '../../utils/api';
 import TextBlurReveal from '../../components/common/TextBlurReveal';
 import ScrollCardReveal from '../../components/common/ScrollCardReveal';
 import SEOHead from '../../components/common/SEOHead';
@@ -427,12 +428,12 @@ export default function ServicesPage() {
 
     // 2. Background persistence resilience
     try {
-      fetch('/api/inquiries', {
+      fetch(getApiUrl('/api/inquiries'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           inquiryId: generatedRef,
-          collection: selectedCollection.title,
+          collection: selectedCollection?.title || 'Signature',
           channel,
           ...formData,
           createdAt: new Date().toISOString(),

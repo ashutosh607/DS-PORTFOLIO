@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { handleWhatsAppSubmit } from '../../utils/whatsapp';
 import { handleEmailSubmit } from '../../utils/email';
+import { getApiUrl } from '../../utils/api';
 
 export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
   const [name, setName] = useState('');
@@ -37,6 +38,22 @@ export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
       handleEmailSubmit({ formData: modalFormData, selectedCollection: modalCollection });
     } else {
       handleWhatsAppSubmit({ formData: modalFormData, selectedCollection: modalCollection });
+    }
+
+    // Background persistence & automatic email dispatch via server
+    try {
+      fetch(getApiUrl('/api/inquiries'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collection: scope,
+          channel,
+          ...modalFormData,
+          createdAt: new Date().toISOString(),
+        }),
+      }).catch(() => { });
+    } catch {
+      // Resilience
     }
 
     setIsSuccess(true);
