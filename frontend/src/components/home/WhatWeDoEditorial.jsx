@@ -37,12 +37,12 @@ const PHOTO_METADATA = [
  * Creates an exquisite, airy, balanced layout with ample negative space.
  */
 const DESKTOP_RESTING = [
-  { x: -290, y: -120, rotate: -3.0 }, // 0: Top-Left
-  { x: 280, y: -130, rotate: 2.5 },  // 1: Top-Right
-  { x: -170, y: 55, rotate: 1.5 },  // 2: Center-Left
-  { x: 165, y: 65, rotate: -2.0 }, // 3: Center-Right
-  { x: -350, y: 130, rotate: -3.5 }, // 4: Far-Left Lower
-  { x: 345, y: 120, rotate: 3.0 },  // 5: Far-Right Lower
+  { x: -260, y: -120, rotate: -3.0 }, // 0: Top-Left
+  { x: 250, y: -130, rotate: 2.5 },  // 1: Top-Right
+  { x: -150, y: 55, rotate: 1.5 },  // 2: Center-Left
+  { x: 145, y: 65, rotate: -2.0 }, // 3: Center-Right
+  { x: -300, y: 130, rotate: -3.5 }, // 4: Far-Left Lower
+  { x: 295, y: 120, rotate: 3.0 },  // 5: Far-Right Lower
   { x: 0, y: -15, rotate: -0.5 }, // 6: Center Finale
 ];
 
@@ -612,7 +612,7 @@ export default function WhatWeDoEditorial() {
         {/* =================================================================
             CENTRAL DECK STAGE CONTAINER
             ================================================================= */}
-        <div className="relative w-full max-w-[1400px] h-[390px] sm:h-[460px] md:h-[620px] flex items-center justify-center flex-none md:flex-1 md:my-auto overflow-visible">
+        <div className="relative w-full max-w-[1600px] h-[390px] sm:h-[460px] md:h-[620px] flex items-center justify-center flex-none md:flex-1 md:my-auto overflow-visible px-2 sm:px-4">
           {/* Deck Physical Stack Base / Mat Outline */}
           <div
             ref={matRef}
@@ -685,7 +685,7 @@ export default function WhatWeDoEditorial() {
           {/* =================================================================
               LEFT EDITORIAL TYPOGRAPHY FLANK (BLUR-TO-REAL SCROLL DRIVEN)
               ================================================================= */}
-          <div className="hidden md:block absolute left-2 lg:left-6 xl:left-10 top-1/2 -translate-y-1/2 z-20 pointer-events-none select-none max-w-[210px] lg:max-w-[260px] xl:max-w-[280px] text-left">
+          <div className="hidden md:block absolute left-0 lg:left-3 xl:left-6 top-1/2 -translate-y-1/2 z-20 pointer-events-none select-none max-w-[210px] lg:max-w-[245px] xl:max-w-[265px] text-left">
             {EDITORIAL_BEATS.map((beat) => (
               <div
                 key={`left-${beat.id}`}
@@ -715,7 +715,7 @@ export default function WhatWeDoEditorial() {
           {/* =================================================================
               RIGHT EDITORIAL TYPOGRAPHY FLANK (BLUR-TO-REAL SCROLL DRIVEN)
               ================================================================= */}
-          <div className="hidden md:block absolute right-2 lg:right-6 xl:right-10 top-1/2 -translate-y-1/2 z-20 pointer-events-none select-none max-w-[210px] lg:max-w-[260px] xl:max-w-[280px] text-right">
+          <div className="hidden md:block absolute right-0 lg:right-3 xl:right-6 top-1/2 -translate-y-1/2 z-20 pointer-events-none select-none max-w-[210px] lg:max-w-[245px] xl:max-w-[265px] text-right">
             {EDITORIAL_BEATS.map((beat) => (
               <div
                 key={`right-${beat.id}`}
