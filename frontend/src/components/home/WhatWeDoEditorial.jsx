@@ -47,13 +47,13 @@ const DESKTOP_RESTING = [
 ];
 
 const MOBILE_RESTING = [
-  { x: -62, y: -70, rotate: -2.5 }, // 0: Upper-Left
-  { x: 62, y: -60, rotate: 2.5 },  // 1: Upper-Right
-  { x: -60, y: 0, rotate: 1.5 },  // 2: Mid-Left
-  { x: 60, y: 10, rotate: -1.5 }, // 3: Mid-Right
-  { x: -62, y: 70, rotate: -2.5 }, // 4: Lower-Left
-  { x: 62, y: 80, rotate: 2.5 },  // 5: Lower-Right
-  { x: 0, y: 105, rotate: 0.0 },  // 6: Bottom Center
+  { x: -62, y: -135, rotate: -2.0 }, // 0: Upper-Left (Row 1 Left)
+  { x: 62, y: -112, rotate: 2.2 },  // 1: Upper-Right (Row 1 Right, staggered)
+  { x: -60, y: -38, rotate: 1.8 },  // 2: Mid-Left (Row 2 Left)
+  { x: 64, y: -16, rotate: -1.8 }, // 3: Mid-Right (Row 2 Right, staggered)
+  { x: -62, y: 60, rotate: -2.2 }, // 4: Lower-Left (Row 3 Left)
+  { x: 62, y: 82, rotate: 2.0 },  // 5: Lower-Right (Row 3 Right, staggered)
+  { x: 0, y: 136, rotate: -0.5 }, // 6: Hero Center Finale (in front & fully visible)
 ];
 
 /**
@@ -531,12 +531,27 @@ export default function WhatWeDoEditorial() {
             transform: translateY(-5px) rotate(-0.4deg);
           }
         }
+        @media (max-width: 768px) {
+          .editorial-photo-card {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+            border: none !important;
+            outline: none !important;
+            -webkit-box-reflect: none !important;
+          }
+          .editorial-photo-card::before,
+          .editorial-photo-card::after,
+          .editorial-photo-card *::before,
+          .editorial-photo-card *::after {
+            display: none !important;
+            content: none !important;
+          }
+        }
       `}</style>
 
       {/* Pinned 100vh Sticky Stage with End Defocus Blur */}
       <div
         ref={stageRef}
-        className="sticky top-0 h-screen w-full flex flex-col justify-between items-center overflow-hidden px-4 sm:px-8 pt-[86px] sm:pt-8 pb-5 sm:pb-8 will-change-transform"
+        className="sticky top-0 h-screen w-full flex flex-col justify-center md:justify-between items-center overflow-hidden px-4 sm:px-8 pt-3 pb-3 sm:pt-8 sm:pb-8 will-change-transform"
         style={{
           transition: 'opacity 0.2s ease-out, transform 0.2s ease-out',
         }}
@@ -544,7 +559,7 @@ export default function WhatWeDoEditorial() {
         {/* =================================================================
             TOP ARCHIVAL HEADER BAR: Dynamic Print Counter & Minimal Mark
             ================================================================= */}
-        <div className="w-full max-w-[1400px] flex items-center justify-between pointer-events-none z-30">
+        <div className="w-full max-w-[1400px] flex items-center justify-between pointer-events-none z-30 mb-1 md:mb-0">
           <div className="flex items-center gap-3 font-mono text-[0.6rem] sm:text-[0.66rem] tracking-[0.24em] text-[#7A7770] uppercase">
             <span className="w-6 sm:w-10 h-[1px] bg-[#E3DBCC]" />
             <span className="text-[#101010] font-medium tracking-[0.28em]">WHAT WE DO</span>
@@ -567,7 +582,7 @@ export default function WhatWeDoEditorial() {
         {/* =================================================================
             MOBILE TOP EDITORIAL TEXT (BLUR-TO-REAL SCROLL DRIVEN)
             ================================================================= */}
-        <div className="md:hidden w-full max-w-[360px] px-3 text-center pointer-events-none select-none z-20 relative min-h-[92px] flex items-center justify-center mt-3 mb-1 translate-y-[58px]">
+        <div className="md:hidden w-full max-w-[360px] px-3 text-center pointer-events-none select-none z-20 relative min-h-[82px] flex items-center justify-center mt-1 mb-1">
           {EDITORIAL_BEATS.map((beat) => (
             <div
               key={`mobile-top-${beat.id}`}
@@ -597,17 +612,18 @@ export default function WhatWeDoEditorial() {
         {/* =================================================================
             CENTRAL DECK STAGE CONTAINER
             ================================================================= */}
-        <div className="relative w-full max-w-[1400px] h-[300px] sm:h-[460px] md:h-[620px] flex items-center justify-center flex-1 my-auto">
+        <div className="relative w-full max-w-[1400px] h-[390px] sm:h-[460px] md:h-[620px] flex items-center justify-center flex-none md:flex-1 md:my-auto overflow-visible">
           {/* Deck Physical Stack Base / Mat Outline */}
           <div
             ref={matRef}
-            className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-lg bg-[#E3DBCC]/20 pointer-events-none -z-10 shadow-[0_8px_24px_-8px_rgba(16,14,12,0.08)] will-change-transform"
+            className="hidden md:block absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-lg bg-[#E3DBCC]/20 pointer-events-none -z-10 shadow-[0_8px_24px_-8px_rgba(16,14,12,0.08)] will-change-transform"
           />
 
           {/* Cards 0 through 6 */}
           {PHOTOS.map((src, i) => {
             const floatAnimation = `${i % 2 === 0 ? 'editorialDrift' : 'editorialDriftAlt'} ${5.5 + i * 0.6}s ease-in-out infinite`;
             const normalShadow = '0 24px 50px -10px rgba(16, 14, 12, 0.32), 0 12px 24px -6px rgba(16, 14, 12, 0.2), 0 3px 8px rgba(16, 14, 12, 0.1)';
+            const mobileShadow = '0 6px 16px rgba(0, 0, 0, 0.12)';
             const hoverShadow = '0 38px 75px -12px rgba(16, 14, 12, 0.44), 0 18px 36px -6px rgba(16, 14, 12, 0.28), 0 4px 12px rgba(16, 14, 12, 0.15)';
 
             return (
@@ -615,19 +631,24 @@ export default function WhatWeDoEditorial() {
                 key={i}
                 ref={(el) => (cardRefs.current[i] = el)}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.zIndex = '65';
-                  e.currentTarget.style.boxShadow = hoverShadow;
+                  if (!isMobileRef.current) {
+                    e.currentTarget.style.zIndex = '65';
+                    e.currentTarget.style.boxShadow = hoverShadow;
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.zIndex = `${10 + i}`;
-                  e.currentTarget.style.boxShadow = normalShadow;
+                  if (!isMobileRef.current) {
+                    e.currentTarget.style.zIndex = `${10 + i}`;
+                    e.currentTarget.style.boxShadow = normalShadow;
+                  }
                 }}
-                className="absolute w-[100px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-xl overflow-hidden will-change-transform group cursor-pointer"
+                className="editorial-photo-card absolute w-[88px] min-[375px]:w-[92px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-xl overflow-hidden will-change-transform group cursor-pointer border-0 outline-none"
                 style={{
                   opacity: i === 0 ? 1 : 0,
                   transform: 'translate3d(0, 0, 0)',
-                  boxShadow: normalShadow,
+                  boxShadow: isMobileRef.current ? mobileShadow : normalShadow,
                   transition: 'box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                  WebkitBoxReflect: 'none',
                 }}
               >
                 {/* Inner Breathing/Floating Drift Wrapper */}
@@ -648,11 +669,11 @@ export default function WhatWeDoEditorial() {
                     />
 
                     {/* Subtle Vignette on Hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none" />
+                    <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none" />
                   </div>
 
                   {/* Subtle Minimal Archival Plate Watermark on Hover */}
-                  <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between text-[0.45rem] font-mono tracking-widest text-white/90 uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <div className="hidden md:flex absolute bottom-1.5 left-2 right-2 items-center justify-between text-[0.45rem] font-mono tracking-widest text-white/90 uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                     <span>PLATE 0{i + 1}</span>
                     <span>ATELIER PROOF</span>
                   </div>
@@ -725,7 +746,7 @@ export default function WhatWeDoEditorial() {
         {/* =================================================================
             MOBILE BOTTOM EDITORIAL TEXT (BLUR-TO-REAL SCROLL DRIVEN)
             ================================================================= */}
-        <div className="md:hidden w-full max-w-[360px] px-3 text-center pointer-events-none select-none z-20 relative min-h-[92px] flex items-center justify-center mt-1 mb-8 -translate-y-[58px]">
+        <div className="md:hidden w-full max-w-[360px] px-3 text-center pointer-events-none select-none z-20 relative min-h-[82px] flex items-center justify-center mt-1 mb-2">
           {EDITORIAL_BEATS.map((beat) => (
             <div
               key={`mobile-bottom-${beat.id}`}
