@@ -19,9 +19,9 @@ export const SEO_CONFIG = {
 
   // NAP Data (Name, Address, Phone)
   contact: {
-    phone: '+91 90297 36973',
-    phoneRaw: '919029736973',
-    email: 'contact@dsphotography.com',
+    phone: '+91 90823 78510',
+    phoneRaw: '919082378510',
+    email: 'dishantshelar59@gmail.com',
     addressLocality: 'Mumbai',
     addressRegion: 'Maharashtra',
     postalCode: '400001',

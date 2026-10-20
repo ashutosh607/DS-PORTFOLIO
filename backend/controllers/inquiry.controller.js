@@ -42,7 +42,7 @@ exports.createInquiry = asyncHandler(async (req, res) => {
     message: message || "",
     source: source || "Website",
     channel: channel || "email",
-    recipientEmail: process.env.STUDIO_RECIPIENT_EMAIL || process.env.EMAIL_USER || "studio@dsphotography.com",
+    recipientEmail: process.env.STUDIO_RECIPIENT_EMAIL || process.env.EMAIL_USER || "dishantshelar59@gmail.com",
   });
 
   // Automatically dispatch email notification to studio recipient

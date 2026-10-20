@@ -1,6 +1,6 @@
 import { formatEventDate, formatTitleCase, getCollectionPrice, formatDisciplines } from './whatsapp';
 
-export const STUDIO_EMAIL = import.meta.env.VITE_STUDIO_EMAIL || 'contact@dsphotography.com';
+export const STUDIO_EMAIL = import.meta.env.VITE_STUDIO_EMAIL || 'dishantshelar59@gmail.com';
 
 /**
  * Mobile device detection

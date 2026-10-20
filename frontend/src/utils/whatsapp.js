@@ -1,6 +1,6 @@
 import { CREATIVE_DISCIPLINES } from '../pages/services/data/servicesData.js';
 
-export const WHATSAPP_PHONE_NUMBER = '919029736973';
+export const WHATSAPP_PHONE_NUMBER = import.meta.env.VITE_WHATSAPP_PHONE || '919082378510';
 
 /**
  * Format a string to Title Case (e.g., "SIGNATURE" -> "Signature")
