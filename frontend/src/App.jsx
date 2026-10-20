@@ -11,6 +11,7 @@ import SplashScreen from './components/common/SplashScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import NotFoundPage from './pages/error/NotFoundPage';
 import ErrorPage from './pages/error/ErrorPage';
+import SmoothScroll from './components/common/SmoothScroll';
 
 // Code-split routes for optimal performance and smaller initial JS bundle
 const TermsPage = lazy(() => import('./pages/terms/TermsPage'));
@@ -93,7 +94,8 @@ export default function App() {
   return (
     <ErrorBoundary>
       <AdminAuthProvider>
-        <PageTransitionProvider>
+        <SmoothScroll>
+          <PageTransitionProvider>
           {/* Initial Luxury Brand Intro Splash Screen */}
           {splashActive && !isAdminRoute && (
             <SplashScreen onComplete={() => setSplashActive(false)} />
@@ -163,7 +165,8 @@ export default function App() {
             )}
           </div>
         </PageTransitionProvider>
-      </AdminAuthProvider>
-    </ErrorBoundary>
+      </SmoothScroll>
+    </AdminAuthProvider>
+  </ErrorBoundary>
   );
 }

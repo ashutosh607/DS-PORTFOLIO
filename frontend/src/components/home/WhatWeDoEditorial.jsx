@@ -177,10 +177,18 @@ function calculateBeatStyle(progress, start, peakStart, peakEnd, end) {
   };
 }
 
-const PAUSE_DURATION = 0.035;
-const MOVE_DURATION = 0.095;
-const CARD_CYCLE = PAUSE_DURATION + MOVE_DURATION; // 0.13
-const BLUR_START = 0.925;
+// Harmonious, overlapping card flight schedule across 0.02 to 0.90 scroll progress.
+// Overlapping intervals guarantee continuous, liquid motion with ZERO frozen pause gaps.
+const CARD_SCHEDULE = [
+  { start: 0.02, end: 0.19 }, // 0: Top-Left
+  { start: 0.14, end: 0.31 }, // 1: Top-Right
+  { start: 0.26, end: 0.43 }, // 2: Center-Left
+  { start: 0.38, end: 0.55 }, // 3: Center-Right
+  { start: 0.50, end: 0.67 }, // 4: Far-Left Lower
+  { start: 0.62, end: 0.79 }, // 5: Far-Right Lower
+  { start: 0.74, end: 0.90 }, // 6: Center Finale
+];
+const BLUR_START = 0.93;
 
 export default function WhatWeDoEditorial() {
   const containerRef = useRef(null);
@@ -239,7 +247,9 @@ export default function WhatWeDoEditorial() {
     const measureLayout = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
-      const scrollY = window.scrollY || window.pageYOffset;
+      const scrollY = (window.lenis && typeof window.lenis.scroll === 'number')
+        ? window.lenis.scroll
+        : (window.scrollY || window.pageYOffset || 0);
       const top = rect.top + scrollY;
       const height = rect.height;
       const totalScroll = height - window.innerHeight;
@@ -269,21 +279,24 @@ export default function WhatWeDoEditorial() {
         matRef.current.style.transform = `translate3d(${mouse.x * 4}px, ${mouse.y * 3}px, 0)`;
       }
 
-      // 4. Odometer Card Count
-      const activeCount = Math.min(7, Math.max(1, Math.floor(progress / CARD_CYCLE) + 1));
+      // 4. Odometer Card Count: seamlessly updates as cards trigger
+      let activeCount = 1;
+      for (let j = 0; j < CARD_SCHEDULE.length; j++) {
+        if (progress >= CARD_SCHEDULE[j].start) {
+          activeCount = j + 1;
+        }
+      }
       if (counterRef.current && currentActiveCount.current !== activeCount) {
         currentActiveCount.current = activeCount;
         counterRef.current.textContent = `0${activeCount}`;
       }
 
-      // 5. Update 7 Cards
+      // 5. Update 7 Cards with overlapping, continuous fluid flight
       for (let i = 0; i < PHOTOS.length; i++) {
         const cardEl = cardRefs.current[i];
         if (!cardEl) continue;
 
-        const startCycle = i * CARD_CYCLE;
-        const startMove = startCycle + PAUSE_DURATION;
-        const endMove = startCycle + CARD_CYCLE;
+        const sched = CARD_SCHEDULE[i];
         const targetPos = restingPositions[i] || { x: 0, y: 0, rotate: 0 };
 
         let currentX = 0;
@@ -295,20 +308,20 @@ export default function WhatWeDoEditorial() {
 
         if (i === 0) {
           currentOpacity = 1;
-          if (progress < startMove) {
+          if (progress < sched.start) {
             currentX = 0;
             currentY = 0;
             currentRotate = 0;
             currentScale = 1;
             zIndex = 50;
-          } else if (progress <= endMove) {
-            const rawT = (progress - startMove) / MOVE_DURATION;
+          } else if (progress <= sched.end) {
+            const rawT = (progress - sched.start) / (sched.end - sched.start);
             const easedT = smootherStep(rawT);
             currentX = targetPos.x * easedT;
             currentY = targetPos.y * easedT;
             currentRotate = targetPos.rotate * easedT;
-            const liftArc = Math.sin(rawT * Math.PI);
-            currentScale = 1 + liftArc * 0.055;
+            const liftArc = Math.sin(easedT * Math.PI);
+            currentScale = 1 + liftArc * 0.045;
             zIndex = 45;
           } else {
             currentX = targetPos.x;
@@ -318,31 +331,32 @@ export default function WhatWeDoEditorial() {
             zIndex = 10 + i;
           }
         } else {
-          const predStartMove = (i - 1) * CARD_CYCLE + PAUSE_DURATION;
-          if (progress < predStartMove) {
+          // Soft pre-materialization onto deck so the card appears gracefully before taking flight
+          const appearStart = Math.max(0, sched.start - 0.08);
+          if (progress < appearStart) {
             currentOpacity = 0;
             currentX = 0;
             currentY = 0;
             currentRotate = 0;
-          } else if (progress < startMove) {
-            const fadeWindow = 0.02;
-            currentOpacity = progress < predStartMove + fadeWindow
-              ? (progress - predStartMove) / fadeWindow
-              : 1;
+            currentScale = 0.92;
+          } else if (progress < sched.start) {
+            const fadeProgress = (progress - appearStart) / (sched.start - appearStart);
+            const easedFade = smootherStep(fadeProgress);
+            currentOpacity = easedFade;
+            currentScale = 0.92 + easedFade * 0.08;
             currentX = 0;
             currentY = 0;
             currentRotate = 0;
-            currentScale = 1;
-            zIndex = 50;
-          } else if (progress <= endMove) {
+            zIndex = 35 + i;
+          } else if (progress <= sched.end) {
             currentOpacity = 1;
-            const rawT = (progress - startMove) / MOVE_DURATION;
+            const rawT = (progress - sched.start) / (sched.end - sched.start);
             const easedT = smootherStep(rawT);
             currentX = targetPos.x * easedT;
             currentY = targetPos.y * easedT;
             currentRotate = targetPos.rotate * easedT;
-            const liftArc = Math.sin(rawT * Math.PI);
-            currentScale = 1 + liftArc * 0.055;
+            const liftArc = Math.sin(easedT * Math.PI);
+            currentScale = 1 + liftArc * 0.045;
             zIndex = 45;
           } else {
             currentOpacity = 1;
@@ -363,65 +377,72 @@ export default function WhatWeDoEditorial() {
         cardEl.style.zIndex = zIndex;
       }
 
-      // 6. Update Editorial Typography Beats (Desktop & Mobile)
+      // 6. Update Editorial Typography Beats (Desktop & Mobile with GPU acceleration)
       EDITORIAL_BEATS.forEach((beat) => {
         const beatStyle = calculateBeatStyle(progress, beat.start, beat.peakStart, beat.peakEnd, beat.end);
 
         const leftEl = leftBeatRefs.current[beat.id];
         if (leftEl) {
           leftEl.style.opacity = beatStyle.visible ? beatStyle.opacity.toFixed(3) : '0';
-          leftEl.style.transform = beatStyle.visible ? `translateY(${beatStyle.y.toFixed(1)}px)` : 'translateY(18px)';
-          leftEl.style.filter = beatStyle.visible && beatStyle.blur > 0.1 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
+          leftEl.style.transform = beatStyle.visible ? `translate3d(0, ${beatStyle.y.toFixed(1)}px, 0)` : 'translate3d(0, 18px, 0)';
+          leftEl.style.filter = beatStyle.visible && beatStyle.blur > 0.4 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
         }
 
         const rightEl = rightBeatRefs.current[beat.id];
         if (rightEl) {
           rightEl.style.opacity = beatStyle.visible ? beatStyle.opacity.toFixed(3) : '0';
-          rightEl.style.transform = beatStyle.visible ? `translateY(${beatStyle.y.toFixed(1)}px)` : 'translateY(18px)';
-          rightEl.style.filter = beatStyle.visible && beatStyle.blur > 0.1 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
+          rightEl.style.transform = beatStyle.visible ? `translate3d(0, ${beatStyle.y.toFixed(1)}px, 0)` : 'translate3d(0, 18px, 0)';
+          rightEl.style.filter = beatStyle.visible && beatStyle.blur > 0.4 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
         }
 
         const mobileTopEl = mobileTopBeatRefs.current[beat.id];
         if (mobileTopEl) {
           mobileTopEl.style.opacity = beatStyle.visible ? beatStyle.opacity.toFixed(3) : '0';
-          mobileTopEl.style.transform = beatStyle.visible ? `translateY(${beatStyle.y.toFixed(1)}px)` : 'translateY(18px)';
-          mobileTopEl.style.filter = beatStyle.visible && beatStyle.blur > 0.1 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
+          mobileTopEl.style.transform = beatStyle.visible ? `translate3d(0, ${beatStyle.y.toFixed(1)}px, 0)` : 'translate3d(0, 18px, 0)';
+          mobileTopEl.style.filter = beatStyle.visible && beatStyle.blur > 0.4 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
         }
 
         const mobileBottomEl = mobileBottomBeatRefs.current[beat.id];
         if (mobileBottomEl) {
           mobileBottomEl.style.opacity = beatStyle.visible ? beatStyle.opacity.toFixed(3) : '0';
-          mobileBottomEl.style.transform = beatStyle.visible ? `translateY(${-beatStyle.y.toFixed(1)}px)` : 'translateY(-18px)';
-          mobileBottomEl.style.filter = beatStyle.visible && beatStyle.blur > 0.1 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
+          mobileBottomEl.style.transform = beatStyle.visible ? `translate3d(0, ${-beatStyle.y.toFixed(1)}px, 0)` : 'translate3d(0, -18px, 0)';
+          mobileBottomEl.style.filter = beatStyle.visible && beatStyle.blur > 0.4 ? `blur(${beatStyle.blur.toFixed(1)}px)` : 'none';
         }
       });
     };
 
-    // Smooth continuous animation frame loop
+    // Continuous, buttery-smooth 60fps-120fps animation loop
     const loop = () => {
       if (!isRunning) return;
 
+      // Real-time animated scroll sync from Lenis
+      const scrollY = (window.lenis && typeof window.lenis.scroll === 'number')
+        ? window.lenis.scroll
+        : (window.scrollY || window.pageYOffset || 0);
+
       const { top, totalScroll } = cachedMetrics.current;
       if (totalScroll > 0) {
-        const currentScroll = latestScrollY.current - top;
+        const currentScroll = scrollY - top;
         const progress = Math.max(0, Math.min(1, currentScroll / totalScroll));
         targetProgressRef.current = progress;
       }
 
-      // Responsive, fluid LERP damping (0.14 feels instantaneous yet silky smooth)
+      // Responsive, fluid LERP damping synchronized with Lenis
+      const isLenis = !!(window.lenis && typeof window.lenis.scroll === 'number');
+      const lerpSpeed = isLenis ? 0.16 : 0.07;
       const scrollDiff = targetProgressRef.current - currentProgressRef.current;
-      if (Math.abs(scrollDiff) > 0.00004) {
-        currentProgressRef.current += scrollDiff * 0.14;
+      if (Math.abs(scrollDiff) > 0.000008) {
+        currentProgressRef.current += scrollDiff * lerpSpeed;
       } else {
         currentProgressRef.current = targetProgressRef.current;
       }
 
-      // Mouse Parallax Damping (0.08)
+      // Mouse Parallax Damping (0.06)
       const mouseDiffX = targetMouseRef.current.x - currentMouseRef.current.x;
       const mouseDiffY = targetMouseRef.current.y - currentMouseRef.current.y;
-      if (Math.abs(mouseDiffX) > 0.0003 || Math.abs(mouseDiffY) > 0.0003) {
-        currentMouseRef.current.x += mouseDiffX * 0.08;
-        currentMouseRef.current.y += mouseDiffY * 0.08;
+      if (Math.abs(mouseDiffX) > 0.0002 || Math.abs(mouseDiffY) > 0.0002) {
+        currentMouseRef.current.x += mouseDiffX * 0.06;
+        currentMouseRef.current.y += mouseDiffY * 0.06;
       }
 
       // Mutate DOM elements directly for buttery-smooth 60fps-120fps motion
@@ -436,10 +457,19 @@ export default function WhatWeDoEditorial() {
 
     rafIdRef.current = requestAnimationFrame(loop);
 
-    // Passive scroll handler: records position without ANY layout reading!
+    // Passive scroll handler + Lenis scroll sync
     const handleScroll = () => {
-      latestScrollY.current = window.scrollY || window.pageYOffset;
+      latestScrollY.current = (window.lenis && typeof window.lenis.scroll === 'number')
+        ? window.lenis.scroll
+        : (window.scrollY || window.pageYOffset);
     };
+
+    let unsubLenis = null;
+    if (window.lenis && typeof window.lenis.on === 'function') {
+      unsubLenis = window.lenis.on('scroll', (e) => {
+        latestScrollY.current = e.scroll !== undefined ? e.scroll : window.scrollY;
+      });
+    }
 
     const handleResize = () => {
       measureLayout();
@@ -451,6 +481,7 @@ export default function WhatWeDoEditorial() {
     return () => {
       isRunning = false;
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      if (typeof unsubLenis === 'function') unsubLenis();
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
     };
@@ -642,13 +673,16 @@ export default function WhatWeDoEditorial() {
                     e.currentTarget.style.boxShadow = normalShadow;
                   }
                 }}
-                className="editorial-photo-card absolute w-[88px] min-[375px]:w-[92px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-xl overflow-hidden will-change-transform group cursor-pointer border-0 outline-none"
+                className="editorial-photo-card absolute w-[88px] min-[375px]:w-[92px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-xl overflow-hidden will-change-[transform,opacity] group cursor-pointer border-0 outline-none"
                 style={{
                   opacity: i === 0 ? 1 : 0,
                   transform: 'translate3d(0, 0, 0)',
                   boxShadow: isMobileRef.current ? mobileShadow : normalShadow,
                   transition: 'box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
                   WebkitBoxReflect: 'none',
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
+                  transformStyle: 'preserve-3d',
                 }}
               >
                 {/* Inner Breathing/Floating Drift Wrapper */}
