@@ -5,9 +5,13 @@ const {
   uploadSingleFile,
   uploadMultipleFiles,
   deleteFile,
+  getUploadSignature,
 } = require("../controllers/upload.controller");
 
 const router = express.Router();
+
+// Get upload signature for direct client-to-Cloudinary uploads
+router.get("/signature", verifyAdmin, getUploadSignature);
 
 // Upload single file (field name: "file")
 router.post("/single", verifyAdmin, upload.single("file"), uploadSingleFile);

@@ -2,6 +2,45 @@ const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
 const { uploadOnCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
+const { cloudinary } = require("../config/cloudinary");
+
+// Only allow folders inside the project's own Cloudinary folders
+const ALLOWED_FOLDER = /^(ds_portfolio(\/[a-z0-9_-]+)*|services)$/i;
+
+const getUploadSignature = asyncHandler(async (req, res) => {
+  const folder = String(req.query.folder || "ds_portfolio").trim();
+  if (!ALLOWED_FOLDER.test(folder) || folder.includes("..")) {
+    throw new ApiError(400, "Invalid upload folder");
+  }
+
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+  if (!apiSecret || !apiKey || !cloudName) {
+    throw new ApiError(500, "Cloudinary is not configured on the server");
+  }
+
+  const timestamp = Math.round(Date.now() / 1000);
+  const signature = cloudinary.utils.api_sign_request(
+    { timestamp, folder },
+    apiSecret
+  );
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        timestamp,
+        signature,
+        folder,
+        apiKey,
+        cloudName,
+      },
+      "Upload signature created"
+    )
+  );
+});
 
 const uploadSingleFile = asyncHandler(async (req, res) => {
   if (!req.file) {
@@ -71,4 +110,5 @@ module.exports = {
   uploadSingleFile,
   uploadMultipleFiles,
   deleteFile,
+  getUploadSignature,
 };
