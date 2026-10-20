@@ -15,7 +15,7 @@ export const SEO_CONFIG = {
   // Canonical Production Domain
   siteUrl: (typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost'))
     ? window.location.origin
-    : (import.meta.env.VITE_SITE_URL || 'https://dsphotography.com'),
+    : (import.meta.env.VITE_SITE_URL || 'https://dishantshelarphotography.in'),
 
   // NAP Data (Name, Address, Phone)
   contact: {
