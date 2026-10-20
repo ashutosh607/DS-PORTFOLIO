@@ -74,10 +74,16 @@ app.use(
         cleanOrigin.endsWith(".vercel.app") ||
         cleanOrigin.endsWith(".vercel.dev");
 
+      const isCustomDomain =
+        cleanOrigin === "https://dishantshelarphotography.in" ||
+        cleanOrigin === "https://www.dishantshelarphotography.in" ||
+        cleanOrigin.endsWith("dishantshelarphotography.in");
+
       const isAllowed =
         allowedOrigins.includes("*") ||
         allowedOrigins.includes(cleanOrigin) ||
-        isVercelDomain;
+        isVercelDomain ||
+        isCustomDomain;
 
       if (isAllowed) {
         return callback(null, true);
