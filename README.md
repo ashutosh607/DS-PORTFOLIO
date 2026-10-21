@@ -180,7 +180,7 @@ DB_NAME=ds_portfolio
 JWT_SECRET=your_super_secret_jwt_random_key_min_32_chars
 
 # Admin Initialization Credentials
-ADMIN_EMAIL=admin@dsphotography.com
+ADMIN_EMAIL=admin@dishantshelarphotography.in
 ADMIN_PASSWORD=YourSecureAdminPassword123!
 
 # Cloudinary Storage
@@ -234,7 +234,7 @@ npm run dev
 | `MONGODB_URI` | MongoDB Atlas or local MongoDB connection URI | `mongodb+srv://user:pass@cluster.net` |
 | `DB_NAME` | Target database collection name | `ds_portfolio` |
 | `JWT_SECRET` | Secret key for signing JWT auth tokens | `random_32_char_secret_key` |
-| `ADMIN_EMAIL` | Default administrator account email | `admin@dsphotography.com` |
+| `ADMIN_EMAIL` | Default administrator account email | `admin@dishantshelarphotography.in` |
 | `ADMIN_PASSWORD` | Administrator initial password (auto-hashed) | `StrongPassword@2026` |
 | `CLOUDINARY_CLOUD_NAME`| Cloudinary cloud instance identifier | `my-cloud-name` |
 | `CLOUDINARY_API_KEY` | Cloudinary API access key | `123456789012345` |

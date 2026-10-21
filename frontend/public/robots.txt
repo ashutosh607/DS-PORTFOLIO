@@ -17,4 +17,4 @@ Disallow: /api/
 Disallow: /error
 
 # Production Sitemap
-Sitemap: https://dishantshelarphotography.in/sitemap.xml
+Sitemap: https://www.dishantshelarphotography.in/sitemap.xml

@@ -71,9 +71,18 @@ export default function SEOHead({
 
     // 4. Canonical URL (cleans query params unless essential, ensures absolute URL)
     const baseSite = SEO_CONFIG.siteUrl.replace(/\/$/, '');
-    const cleanPath = location.pathname.replace(/\/$/, '') || '/';
-    const computedCanonical = canonicalUrl || `${baseSite}${cleanPath}`;
-    setLinkTag('canonical', computedCanonical);
+    const isNoIndex = robots && robots.includes('noindex');
+    let computedCanonical = null;
+
+    if (isNoIndex && !canonicalUrl) {
+      // Remove any pre-existing canonical link element when visiting private or noindex pages
+      const existingEl = document.querySelector('link[rel="canonical"]');
+      if (existingEl) existingEl.remove();
+    } else {
+      const cleanPath = location.pathname === '/' ? '/' : location.pathname.replace(/\/$/, '');
+      computedCanonical = canonicalUrl || `${baseSite}${cleanPath}`;
+      setLinkTag('canonical', computedCanonical);
+    }
 
     // 5. Open Graph
     const computedOgImage = ogImage
@@ -82,7 +91,7 @@ export default function SEOHead({
 
     setMetaTag('property', 'og:title', formattedTitle);
     setMetaTag('property', 'og:description', metaDesc);
-    setMetaTag('property', 'og:url', computedCanonical);
+    setMetaTag('property', 'og:url', computedCanonical || `${baseSite}${location.pathname}`);
     setMetaTag('property', 'og:type', ogType);
     setMetaTag('property', 'og:image', computedOgImage);
     setMetaTag('property', 'og:image:width', '1200');

@@ -12,10 +12,8 @@ export const SEO_CONFIG = {
   photographerRole: 'Lead Photographer, Cinematographer & Creative Director',
   tagline: 'Luxury Editorial Photography, Fine Art Cinematography & Portfolio',
   
-  // Canonical Production Domain
-  siteUrl: (typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost'))
-    ? window.location.origin
-    : (import.meta.env.VITE_SITE_URL || 'https://dishantshelarphotography.in'),
+  // Canonical Production Domain (Single source of truth for SEO canonical tags, Open Graph, and Structured Data)
+  siteUrl: (import.meta.env.VITE_SITE_URL || 'https://www.dishantshelarphotography.in').replace(/\/$/, ''),
 
   // NAP Data (Name, Address, Phone)
   contact: {
