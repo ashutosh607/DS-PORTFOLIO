@@ -332,6 +332,20 @@
 }
 
 @media (max-width: 1023px) {
+  .staggered-menu-header {
+    height: 60px;
+    padding: 0 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .sm-toggle {
+    height: 38px;
+    min-height: 38px;
+    padding: 0.42rem 1.05rem;
+    font-size: 0.725rem;
+    box-shadow: 0 2px 8px rgba(30, 27, 24, 0.06);
+  }
   .staggered-menu-panel {
     width: 100vw;
     width: 100dvw;

@@ -294,6 +294,17 @@ export default function Navbar({ onOpenInquiry }) {
           }
         }
         @media (max-width: 1023px) {
+          #site-navbar {
+            height: 60px !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+          }
+          #site-navbar > .container {
+            height: 100% !important;
+            padding-left: 1.15rem !important;
+            padding-right: 1.15rem !important;
+          }
           .desktop-nav {
             display: none !important;
           }
@@ -302,6 +313,20 @@ export default function Navbar({ onOpenInquiry }) {
           }
           .mobile-staggered-menu {
             display: block !important;
+          }
+          .staggered-menu-header {
+            height: 60px !important;
+            padding: 0 1.15rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+          }
+          .sm-toggle {
+            height: 38px !important;
+            min-height: 38px !important;
+            padding: 0.42rem 1.05rem !important;
+            font-size: 0.725rem !important;
+            box-shadow: 0 2px 8px rgba(30, 27, 24, 0.06) !important;
           }
         }
       `}</style>
