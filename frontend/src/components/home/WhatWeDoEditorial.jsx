@@ -1,12 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-import img01 from '../../assets/landing-down-animation/612A9674.jpg';
-import img02 from '../../assets/landing-down-animation/DSP09982.jpg';
-import img03 from '../../assets/landing-down-animation/IMG_1186.jpg';
-import img04 from '../../assets/landing-down-animation/IMG_7783.jpg';
-import img05 from '../../assets/landing-down-animation/IMG_7785.JPG';
-import img06 from '../../assets/landing-down-animation/_0005916.JPG';
-import img07 from '../../assets/landing-down-animation/_0006027.jpg';
+import img01 from '../../assets/landing-down-animation/612A9674.webp';
+import img02 from '../../assets/landing-down-animation/DSP09982.webp';
+import img03 from '../../assets/landing-down-animation/IMG_1186.webp';
+import img04 from '../../assets/landing-down-animation/IMG_7783.webp';
+import img05 from '../../assets/landing-down-animation/IMG_7785.webp';
+import img06 from '../../assets/landing-down-animation/_0005916.webp';
+import img07 from '../../assets/landing-down-animation/_0006027.webp';
 
 /**
  * 7 Curated atelier photographs from assets/landing-down-animation.
@@ -482,8 +482,10 @@ export default function WhatWeDoEditorial() {
                       alt={PHOTO_METADATA[i] || `Atelier Portfolio Print ${i + 1}`}
                       width="190"
                       height="253"
+                      style={{ aspectRatio: '3 / 4' }}
                       className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-700 ease-out group-hover:scale-105"
-                      loading={i <= 1 ? 'eager' : 'lazy'}
+                      loading="lazy"
+                      decoding="async"
                       draggable={false}
                     />
 

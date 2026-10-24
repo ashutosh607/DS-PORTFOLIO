@@ -2,13 +2,20 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PhotoPlaceholder from '../common/PhotoPlaceholder';
 import TextBlurReveal from '../common/TextBlurReveal';
 
-import img01 from '../../assets/landing-page-images/landing-01.png';
-import img02 from '../../assets/landing-page-images/landing-02.png';
-import img03 from '../../assets/landing-page-images/landing-03.png';
-import img04 from '../../assets/landing-page-images/landing-04.png';
-import img05 from '../../assets/landing-page-images/landing-05.png';
-import img06 from '../../assets/landing-page-images/landing-06.png';
-import img07 from '../../assets/landing-page-images/landing-07.png';
+import img01 from '../../assets/landing-page-images/landing-01.webp';
+import img01_400 from '../../assets/landing-page-images/landing-01-400w.webp';
+import img02 from '../../assets/landing-page-images/landing-02.webp';
+import img02_400 from '../../assets/landing-page-images/landing-02-400w.webp';
+import img03 from '../../assets/landing-page-images/landing-03.webp';
+import img03_400 from '../../assets/landing-page-images/landing-03-400w.webp';
+import img04 from '../../assets/landing-page-images/landing-04.webp';
+import img04_400 from '../../assets/landing-page-images/landing-04-400w.webp';
+import img05 from '../../assets/landing-page-images/landing-05.webp';
+import img05_400 from '../../assets/landing-page-images/landing-05-400w.webp';
+import img06 from '../../assets/landing-page-images/landing-06.webp';
+import img06_400 from '../../assets/landing-page-images/landing-06-400w.webp';
+import img07 from '../../assets/landing-page-images/landing-07.webp';
+import img07_400 from '../../assets/landing-page-images/landing-07-400w.webp';
 
 const PROJECTS = [
   {
@@ -20,6 +27,7 @@ const PROJECTS = [
     score: '★ 9.4',
     format: 'Hasselblad 100c · 80mm',
     image: img01,
+    image400: img01_400,
     alt: 'High fashion editorial monograph and candid bridal study in Mumbai by DS Photography',
   },
   {
@@ -31,6 +39,7 @@ const PROJECTS = [
     score: '★ 9.2',
     format: 'Medium Format 6x7',
     image: img02,
+    image400: img02_400,
     alt: 'Kinetic pre-wedding monograph and couple motion study by Dishant Shelar Mumbai',
   },
   {
@@ -42,6 +51,7 @@ const PROJECTS = [
     score: '★ 9.6',
     format: 'Large Format 4x5',
     image: img03,
+    image400: img03_400,
     alt: 'Fine art architectural chiaroscuro and spatial luxury monograph in Maharashtra',
   },
   {
@@ -53,6 +63,7 @@ const PROJECTS = [
     score: '★ 9.1',
     format: '35mm Tri-X 400',
     image: img04,
+    image400: img04_400,
     alt: '35mm monochrome candid portrait study by DS Photography & Films Mumbai',
   },
   {
@@ -64,6 +75,7 @@ const PROJECTS = [
     score: '★ 9.0',
     format: 'Leica Summilux 50mm',
     image: img05,
+    image400: img05_400,
     alt: 'Fine art portrait framed in natural ambient luminescence by Dishant Shelar',
   },
   {
@@ -75,6 +87,7 @@ const PROJECTS = [
     score: '★ 9.5',
     format: 'Hasselblad H6D',
     image: img06,
+    image400: img06_400,
     alt: 'Editorial monograph capture and subtle tonal geometry by DS Photography',
   },
   {
@@ -86,6 +99,7 @@ const PROJECTS = [
     score: '★ 9.3',
     format: 'Platinotype Gelatin Silver',
     image: img07,
+    image400: img07_400,
     alt: 'Archival platinotype print monograph and fine-art photographic proof',
   },
 ];
@@ -341,7 +355,7 @@ export default function HeroSpotlightCarousel() {
 
           <TextBlurReveal
             as="h1"
-            text="Wedding & Portrait Photographer in Mumbai"
+            text="Wedding & Portrait Photography in Mumbai, Crafted Around Your Story"
             blurAmount={12}
             stagger={0.06}
             delay={0.12}
@@ -501,12 +515,16 @@ export default function HeroSpotlightCarousel() {
                   {item.image ? (
                     <img
                       src={item.image}
+                      srcSet={`${item.image400} 400w, ${item.image} 800w`}
+                      sizes="(max-width: 768px) 180px, 200px"
                       alt={item.alt || `${item.title} — ${item.subtitle} by Dishant Shelar Mumbai`}
                       width="200"
                       height="290"
+                      style={{ aspectRatio: '200 / 290' }}
                       className="w-full h-full object-cover select-none pointer-events-none"
                       loading={Math.abs(d) <= 1 ? 'eager' : 'lazy'}
                       fetchPriority={Math.abs(d) === 0 ? 'high' : 'auto'}
+                      decoding={Math.abs(d) === 0 ? 'sync' : 'async'}
                       draggable={false}
                     />
                   ) : (
@@ -558,24 +576,36 @@ export default function HeroSpotlightCarousel() {
             =================================================================== */}
         <div style={{ flexShrink: 0, paddingBottom: '0.5rem' }}>
 
-          {/* 7 Minimalist Pagination Dots */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem', marginBottom: '0.55rem' }}>
+          {/* 7 Minimalist Pagination Dots with Touch-Friendly 44px Tap Targets */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.15rem', marginBottom: '0.35rem' }}>
             {PROJECTS.map((_, i) => (
               <button
                 key={i}
                 onClick={() => goToIndex(i)}
                 aria-label={`Go to photo ${i + 1}`}
                 style={{
-                  height: '5px',
-                  width: activeNormalizedIndex === i ? '22px' : '5px',
-                  borderRadius: '999px',
-                  backgroundColor: activeNormalizedIndex === i ? '#2B579A' : 'var(--color-nude)',
-                  transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-                  padding: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minWidth: '28px',
+                  minHeight: '44px',
+                  padding: '16px 2px',
+                  backgroundColor: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
                 }}
-              />
+              >
+                <span
+                  style={{
+                    display: 'block',
+                    height: '5px',
+                    width: activeNormalizedIndex === i ? '24px' : '5px',
+                    borderRadius: '999px',
+                    backgroundColor: activeNormalizedIndex === i ? '#2B579A' : 'var(--color-nude)',
+                    transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                />
+              </button>
             ))}
           </div>
 
@@ -620,9 +650,9 @@ export default function HeroSpotlightCarousel() {
                 onClick={handlePrev}
                 className="circle-nav-btn"
                 aria-label="Previous photo"
-                style={{ width: '38px', height: '38px' }}
+                style={{ width: '44px', height: '44px', minWidth: '44px', minHeight: '44px' }}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 18l-6-6 6-6" />
                 </svg>
               </button>
@@ -630,9 +660,9 @@ export default function HeroSpotlightCarousel() {
                 onClick={handleNext}
                 className="circle-nav-btn"
                 aria-label="Next photo"
-                style={{ width: '38px', height: '38px' }}
+                style={{ width: '44px', height: '44px', minWidth: '44px', minHeight: '44px' }}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 18l6-6-6-6" />
                 </svg>
               </button>

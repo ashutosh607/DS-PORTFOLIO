@@ -264,10 +264,54 @@ export default function CollectionsPage({ onOpenInquiry }) {
     handleSelectCategory(baseCategories[prevIndex].id);
   };
 
-  const catSlug = activeCategory?.slug || 'weddings';
+  const catSlug = activeCategory?.slug?.toLowerCase() || 'weddings';
   const catName = activeCategory?.name || 'Curated';
-  const pageTitle = `${catName} Photography Collection | DS Photography Mumbai`;
-  const pageDescription = `Explore curated ${catName.toLowerCase()} photography monographs by Dishant Shelar at DS Photography & Films in Mumbai. Fine-art aesthetic and timeless framing.`;
+
+  const CATEGORY_SEO_MAP = {
+    weddings: {
+      title: 'Wedding Photographer in Mumbai | DS Photography & Films',
+      description: 'Explore candid wedding stories and luxury wedding films in Mumbai by Dishant Shelar. Timeless editorial monographs and fine-art albums.',
+      keywords: 'wedding photographer in mumbai, candid wedding photographer in mumbai, wedding photography and films in mumbai, luxury wedding photography mumbai',
+    },
+    'pre-wedding': {
+      title: 'Pre-Wedding Photographer in Mumbai | DS Photography & Films',
+      description: 'Intimate pre-wedding photography and cinematic couple films across Mumbai, Alibaug, and destination estates by Dishant Shelar.',
+      keywords: 'pre-wedding photographer in mumbai, couple photoshoot mumbai, pre wedding films mumbai, candid couple photographer mumbai',
+    },
+    portraits: {
+      title: 'Portrait Photographer in Mumbai | DS Photography & Films',
+      description: 'Fine art editorial portraits, studio daylight monographs, and candid personal portraiture in Mumbai by Dishant Shelar.',
+      keywords: 'portrait photographer in mumbai, editorial portrait photography mumbai, studio photographer mumbai, fine art portraits mumbai',
+    },
+    birthdays: {
+      title: 'Birthday Celebration Photographer in Mumbai | DS Photography',
+      description: 'Atmospheric milestone birthday photography and intimate family celebration documentation in Mumbai by DS Photography & Films.',
+      keywords: 'birthday photographer mumbai, celebration photographer in mumbai, event photography mumbai, milestone birthday shoot',
+    },
+    events: {
+      title: 'Event Photographer in Mumbai | DS Photography & Films',
+      description: 'Luxury gala, cultural soirée, and private event photography in Mumbai capturing unscripted elegance by DS Photography & Films.',
+      keywords: 'event photographer in mumbai, corporate event photography mumbai, gala photography mumbai, soirée documentation mumbai',
+    },
+    commercial: {
+      title: 'Commercial Photography in Mumbai | DS Photography & Films',
+      description: 'Haute commercial brand campaigns, luxury product monographs, and fashion editorial photography in Mumbai by Dishant Shelar.',
+      keywords: 'commercial photography in mumbai, brand campaign photographer mumbai, editorial fashion photographer mumbai, product monograph',
+    },
+  };
+
+  const currentSeo = categorySlug && CATEGORY_SEO_MAP[catSlug]
+    ? CATEGORY_SEO_MAP[catSlug]
+    : {
+        title: 'Photography Collections & Monographs in Mumbai | DS Photography & Films',
+        description: 'Explore curated wedding, pre-wedding, portrait, event, and commercial photography collections in Mumbai by Dishant Shelar.',
+        keywords: 'photographer in mumbai, wedding photographer in mumbai, pre-wedding photographer in mumbai, portrait photographer in mumbai, event photographer in mumbai, ds photography collections',
+      };
+
+  const pageTitle = currentSeo.title;
+  const pageDescription = currentSeo.description;
+  const pageKeywords = currentSeo.keywords;
+
   const canonical = categorySlug
     ? `${SEO_CONFIG.siteUrl}/collections/${categorySlug}`
     : `${SEO_CONFIG.siteUrl}/collections`;
@@ -294,6 +338,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
       <SEOHead
         title={pageTitle}
         description={pageDescription}
+        keywords={pageKeywords}
         canonicalUrl={canonical}
         schema={schema}
         breadcrumbs={breadcrumbs}
@@ -304,6 +349,8 @@ export default function CollectionsPage({ onOpenInquiry }) {
         onSelectCategory={handleSelectCategory}
         onPrevCategory={handlePrevCategory}
         onNextCategory={handleNextCategory}
+        categorySlug={categorySlug}
+        activeCategory={activeCategory}
       />
 
       {/* 2. Category Cards 3D Ribbon */}

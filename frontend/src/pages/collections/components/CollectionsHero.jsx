@@ -7,6 +7,8 @@ export default function CollectionsHero({
   onSelectCategory,
   onPrevCategory,
   onNextCategory,
+  categorySlug,
+  activeCategory,
 }) {
   const shouldReduceMotion = useReducedMotion();
   const videoRef = useRef(null);
@@ -135,7 +137,7 @@ export default function CollectionsHero({
           defaultMuted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           onLoadedData={() => setIsVideoReady(true)}
           onPlaying={() => setIsVideoReady(true)}
           className="w-full h-full object-cover object-center pointer-events-none select-none"
@@ -234,39 +236,79 @@ export default function CollectionsHero({
             />
           </div>
 
-          {/* Main Heading: "Different moments. Same feeling." */}
-          <TextBlurReveal
-            as="h1"
-            text="Different moments. Same feeling."
-            blurAmount={12}
-            stagger={0.06}
-            delay={0.1}
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(2.5rem, 4.2vw, 3.85rem)',
-              lineHeight: 1.08,
-              fontWeight: 400,
-              letterSpacing: '-0.025em',
-              color: '#151515',
-              marginBottom: '1.4rem',
-            }}
-          />
+          {/* Main Heading: Dynamic for SEO or Default */}
+          {(() => {
+            const CATEGORY_HERO_MAP = {
+              weddings: {
+                heading: 'Luxury Wedding Photography in Mumbai',
+                subheading: 'Candid wedding stories and cinematic monographs captured across Mumbai, Alibaug, and destination estates.',
+              },
+              'pre-wedding': {
+                heading: 'Pre-Wedding Photography & Films in Mumbai',
+                subheading: 'Intimate, cinematic couple stories documented with editorial nuance across Mumbai and destination escapes.',
+              },
+              portraits: {
+                heading: 'Editorial Portrait Photography in Mumbai',
+                subheading: 'Fine-art daylight portraits, studio monographs, and timeless personal portraiture by Dishant Shelar.',
+              },
+              birthdays: {
+                heading: 'Milestone Celebration & Birthday Photography in Mumbai',
+                subheading: 'Atmospheric private party documentation, capturing heartfelt candid joy and unscripted memories.',
+              },
+              events: {
+                heading: 'Exclusive Event & Gala Photography in Mumbai',
+                subheading: 'Curated coverage of cultural soirées, luxury galas, and corporate celebrations in Mumbai.',
+              },
+              commercial: {
+                heading: 'Commercial & Fashion Editorial Photography in Mumbai',
+                subheading: 'Haute brand campaigns, product monographs, and fashion editorial storytelling with bespoke visual direction.',
+              },
+            };
 
-          {/* Description */}
-          <TextBlurReveal
-            as="p"
-            text="Explore our curated photography collections, each designed to tell a different story."
-            blurAmount={8}
-            delay={0.25}
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'clamp(0.95rem, 1.1vw, 1.05rem)',
-              lineHeight: 1.6,
-              color: '#47433C',
-              maxWidth: '410px',
-              marginBottom: '2.25rem',
-            }}
-          />
+            const heroInfo = (categorySlug && CATEGORY_HERO_MAP[categorySlug.toLowerCase()])
+              ? CATEGORY_HERO_MAP[categorySlug.toLowerCase()]
+              : {
+                  heading: 'Different moments. Same feeling.',
+                  subheading: 'Explore our curated photography collections, each designed to tell a different story.',
+                };
+
+            return (
+              <>
+                <TextBlurReveal
+                  key={`hero-h1-${heroInfo.heading}`}
+                  as="h1"
+                  text={heroInfo.heading}
+                  blurAmount={12}
+                  stagger={0.06}
+                  delay={0.1}
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: 'clamp(2.2rem, 3.8vw, 3.6rem)',
+                    lineHeight: 1.1,
+                    fontWeight: 400,
+                    letterSpacing: '-0.025em',
+                    color: '#151515',
+                    marginBottom: '1.4rem',
+                  }}
+                />
+                <TextBlurReveal
+                  key={`hero-desc-${heroInfo.subheading}`}
+                  as="p"
+                  text={heroInfo.subheading}
+                  blurAmount={8}
+                  delay={0.25}
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'clamp(0.95rem, 1.1vw, 1.05rem)',
+                    lineHeight: 1.6,
+                    color: '#47433C',
+                    maxWidth: '430px',
+                    marginBottom: '2.25rem',
+                  }}
+                />
+              </>
+            );
+          })()}
 
           {/* Subtle Scroll to explore widget */}
           <div

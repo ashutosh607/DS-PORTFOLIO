@@ -124,6 +124,10 @@ export default function App() {
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/terms" element={<TermsPage onOpenInquiry={handleOpenInquiry} />} />
 
+                {/* Legacy / Alias Public Route Redirection */}
+                <Route path="/portfolio" element={<Navigate to="/collections" replace />} />
+                <Route path="/portfolio/:categorySlug" element={<Navigate to="/collections/:categorySlug" replace />} />
+
                 {/* Dedicated Error Testing Route */}
                 <Route path="/error" element={<ErrorPage />} />
 

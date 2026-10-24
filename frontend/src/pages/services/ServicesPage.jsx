@@ -462,9 +462,9 @@ export default function ServicesPage() {
       }}
     >
       <SEOHead
-        title="Photography Services & Investment Tiers | DS Photography Mumbai"
-        description="Explore bespoke photography collections, service tiers, and consultation scheduling for weddings, pre-weddings, portraits, and events in Mumbai."
-        keywords="photography packages mumbai, wedding photography price mumbai, pre wedding packages mumbai, portrait session cost mumbai, event photographer pricing, ds photography"
+        title="Photography Services &amp; Investment | DS Photography &amp; Films Mumbai"
+        description="Explore bespoke wedding photography, pre-wedding films, portrait sessions, and event packages in Mumbai by Dishant Shelar. Request a tailored date consultation."
+        keywords="photographer in mumbai, wedding photographer in mumbai, photography packages mumbai, wedding photography price mumbai, pre-wedding packages mumbai, portrait photography mumbai, event photographer in mumbai"
         canonicalUrl={`${SEO_CONFIG.siteUrl}/services`}
         schema={buildServicesListSchema()}
         breadcrumbs={buildBreadcrumbSchema([
@@ -492,7 +492,7 @@ export default function ServicesPage() {
                 setStage(1);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 ${stage === 1 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
+              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 py-2.5 min-h-[44px] ${stage === 1 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
                 }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${stage === 1 ? 'bg-[#101010]' : 'bg-[#C5B9A5]'}`} />
@@ -507,7 +507,7 @@ export default function ServicesPage() {
                 setStage(2);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 ${stage === 2 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
+              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 py-2.5 min-h-[44px] ${stage === 2 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
                 }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${stage === 2 ? 'bg-[#101010]' : 'bg-transparent'}`} />
@@ -595,7 +595,7 @@ export default function ServicesPage() {
                         key={cat.id}
                         type="button"
                         onClick={() => handleCategorySelect(cat.id)}
-                        className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer pb-1.5 border-b ${isCatSelected
+                        className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer py-3 px-2 min-h-[44px] inline-flex items-center border-b ${isCatSelected
                           ? 'text-[#101010] font-semibold border-[#101010]'
                           : 'text-[#7A7770] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
                           }`}
@@ -715,7 +715,7 @@ export default function ServicesPage() {
 
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
                   <div>
-                    <h1
+                    <h2
                       style={{
                         fontFamily: 'var(--font-serif)',
                         fontSize: 'clamp(34px, 4.5vw, 56px)',
@@ -727,7 +727,7 @@ export default function ServicesPage() {
                       }}
                     >
                       LET'S MAKE IT OFFICIAL.
-                    </h1>
+                    </h2>
 
                     <p
                       style={{

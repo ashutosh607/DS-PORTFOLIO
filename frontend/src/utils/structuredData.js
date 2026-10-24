@@ -34,6 +34,14 @@ export function buildLocalBusinessSchema(currentUrl = SEO_CONFIG.siteUrl) {
       latitude: SEO_CONFIG.geo.latitude,
       longitude: SEO_CONFIG.geo.longitude,
     },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        opens: '09:00',
+        closes: '21:00',
+      },
+    ],
     founder: {
       '@type': 'Person',
       '@id': `${SEO_CONFIG.siteUrl}/#dishant`,
@@ -176,5 +184,21 @@ export function buildCollectionGallerySchema({ categoryName, categorySlug, media
       name: `${categoryName || 'Master'} Archive Gallery`,
       image: images,
     },
+  };
+}
+
+export function buildFaqSchema(faqItems = []) {
+  if (!faqItems || faqItems.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
   };
 }

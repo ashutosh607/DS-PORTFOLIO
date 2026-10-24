@@ -68,8 +68,8 @@ export default function Footer({ onOpenInquiry }) {
         {/* Main Balanced Multi-Column Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-14 pb-14 border-b border-[#E3DBCC]/10 items-start">
 
-          {/* Left Branding Block with Side-by-Side Logo (6 columns) */}
-          <div className="md:col-span-6 space-y-4 pr-0 lg:pr-12">
+          {/* Left Branding Block with Side-by-Side Logo (4 columns) */}
+          <div className="md:col-span-4 space-y-4 pr-0 lg:pr-6">
             {/* Side-by-Side Logo & Studio Identity */}
             <div className="flex items-center gap-4">
               <Logo variant="light" height={48} withText={false} />
@@ -104,8 +104,8 @@ export default function Footer({ onOpenInquiry }) {
             </div>
           </div>
 
-          {/* Navigation Column (3 columns) */}
-          <div className="md:col-span-3">
+          {/* Navigation Column (2 columns) */}
+          <div className="md:col-span-2">
             <span className="block font-sans text-[10px] font-semibold tracking-[0.2em] text-[#E3DBCC]/70 uppercase mb-4">
               Navigation
             </span>
@@ -117,7 +117,7 @@ export default function Footer({ onOpenInquiry }) {
               </li>
               <li>
                 <Link to="/collections" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
-                  Collections &amp; Portfolio
+                  Collections
                 </Link>
               </li>
               <li>
@@ -127,8 +127,7 @@ export default function Footer({ onOpenInquiry }) {
               </li>
               <li>
                 <Link to="/terms" className="text-[#F3F0E9]/90 font-medium hover:text-[#FDFCF8] transition-colors flex items-center gap-1.5">
-                  <span>Terms &amp; Conditions</span>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FAF8F5]/10 text-[#CBB9A4] uppercase tracking-wider">Policy</span>
+                  <span>Terms &amp; Policies</span>
                 </Link>
               </li>
               <li>
@@ -137,8 +136,47 @@ export default function Footer({ onOpenInquiry }) {
                   onClick={onOpenInquiry}
                   className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors cursor-pointer bg-transparent border-0 p-0 font-sans text-xs sm:text-[13px]"
                 >
-                  Direct Studio Inquiry
+                  Direct Inquiry
                 </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Portfolio Categories Column (3 columns) */}
+          <div className="md:col-span-3">
+            <span className="block font-sans text-[10px] font-semibold tracking-[0.2em] text-[#E3DBCC]/70 uppercase mb-4">
+              Photography
+            </span>
+            <ul className="space-y-2.5 font-sans text-xs sm:text-[13px]">
+              <li>
+                <Link to="/collections/weddings" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                  Wedding Photography
+                </Link>
+              </li>
+              <li>
+                <Link to="/collections/pre-wedding" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                  Pre-Wedding Films
+                </Link>
+              </li>
+              <li>
+                <Link to="/collections/portraits" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                  Editorial Portraits
+                </Link>
+              </li>
+              <li>
+                <Link to="/collections/birthdays" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                  Birthday Celebrations
+                </Link>
+              </li>
+              <li>
+                <Link to="/collections/events" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                  Events &amp; Galas
+                </Link>
+              </li>
+              <li>
+                <Link to="/collections/commercial" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                  Commercial &amp; Brands
+                </Link>
               </li>
             </ul>
           </div>
@@ -164,6 +202,21 @@ export default function Footer({ onOpenInquiry }) {
                   </a>
                 </li>
               ))}
+              <li>
+                <a
+                  href="https://wa.me/919082378510?text=Hi%20Dishant,%20I%20would%20like%20to%20inquire%20about%20photography%20services."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2.5 text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors group"
+                >
+                  <span className="text-[#CBB9A4] group-hover:text-[#FDFCF8] transition-colors">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.956.564 3.782 1.537 5.334L2.08 22l4.823-1.428c1.488.847 3.208 1.328 5.128 1.328 5.536 0 10.031-4.495 10.031-10.031C22.062 6.495 17.567 2 12.031 2zm0 18.286c-1.636 0-3.14-.475-4.432-1.298l-.318-.2-2.859.846.866-2.784-.207-.329A8.196 8.196 0 0 1 3.857 12.03c0-4.507 3.667-8.173 8.174-8.173 4.507 0 8.174 3.666 8.174 8.173 0 4.507-3.667 8.174-8.174 8.174zm4.48-6.136c-.246-.123-1.455-.718-1.68-.8-.226-.082-.39-.123-.554.123-.164.246-.636.8-.78 1-.144.123-.287.144-.533.021-.246-.123-1.04-.383-1.982-1.223-.733-.654-1.228-1.462-1.372-1.708-.144-.246-.015-.379.108-.501.111-.11.246-.287.369-.431.123-.144.164-.246.246-.41.082-.164.041-.308-.021-.431-.061-.123-.554-1.334-.76-1.826-.2-.48-.403-.415-.554-.423l-.472-.008c-.164 0-.431.062-.656.308-.226.246-.862.842-.862 2.053 0 1.21.882 2.38 1.005 2.544.123.164 1.736 2.651 4.205 3.717.588.254 1.047.406 1.405.52.59.188 1.128.161 1.553.098.473-.07 1.455-.595 1.66-1.169.205-.574.205-1.066.144-1.169-.062-.102-.226-.164-.472-.287z" />
+                    </svg>
+                  </span>
+                  <span>WhatsApp Booking</span>
+                </a>
+              </li>
             </ul>
           </div>
         </div>

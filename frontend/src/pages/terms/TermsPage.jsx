@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, Calendar, CreditCard, Clock, BookOpen, Camera, CheckCircle2, ArrowRight } from 'lucide-react';
 import Logo from '../../components/layout/Logo';
 import SEOHead from '../../components/common/SEOHead';
-import { buildBreadcrumbSchema } from '../../utils/structuredData';
+import { buildBreadcrumbSchema, buildFaqSchema } from '../../utils/structuredData';
 import { SEO_CONFIG } from '../../utils/seoConfig';
 
 /**
@@ -206,12 +206,33 @@ export default function TermsPage({ onOpenInquiry }) {
     },
   ];
 
+  const faqSchema = buildFaqSchema([
+    {
+      question: 'What is the booking fee and payment structure for photography commissions?',
+      answer: 'Dates are confirmed with a 50% advance booking retainer. 35% is payable on the event day, and the concluding 15% balance is due upon delivery of the handcrafted album and final cinematic video.',
+    },
+    {
+      question: 'What is the photo selection deadline for the wedding album?',
+      answer: 'Curated photo previews and raw proofs are retained in active studio storage for 3 months post-event. Clients are requested to complete selections within this window.',
+    },
+    {
+      question: 'How long does handcrafted archival album delivery take?',
+      answer: 'Fine-art handcrafted albums are printed, bound, quality-inspected, and delivered within 3 weeks following the client\'s finalized selection approval.',
+    },
+    {
+      question: 'When will the cinematic video and films be delivered?',
+      answer: 'Cinematic wedding teasers, full feature films, and color-graded highlights are edited in high fidelity and delivered alongside the final album package upon balance clearance.',
+    },
+  ]);
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1E1B18] pt-28 sm:pt-36 pb-24 selection:bg-[#E3DBCC] selection:text-[#101010]">
       <SEOHead
-        title="Studio Terms, Delivery Timelines & Policies | DS Photography"
-        description="Official client booking terms, payment schedules, copyright policy, and archival delivery timelines for DS Photography & Films commissions."
+        title="Client Terms, Delivery Timelines & Studio Policies | DS Photography & Films"
+        description="Official client booking terms, payment schedules, copyright policy, and archival delivery timelines for DS Photography & Films commissions in Mumbai."
+        keywords="photography terms, client policies, wedding photography delivery timeline, ds photography terms mumbai"
         canonicalUrl={`${SEO_CONFIG.siteUrl}/terms`}
+        schema={faqSchema}
         breadcrumbs={buildBreadcrumbSchema([
           { name: 'Home', url: '/' },
           { name: 'Terms & Conditions', url: '/terms' },

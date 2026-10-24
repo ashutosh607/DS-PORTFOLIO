@@ -46,7 +46,30 @@ export default function SEOHead({
       el.setAttribute('content', content);
     };
 
-    // Helper for upserting link tags
+    // Canonical Tag Helper: strictly ensures exactly ONE canonical tag in document.head
+    const removeAllCanonicals = () => {
+      const existingCanonicals = document.querySelectorAll('link[rel="canonical"]');
+      existingCanonicals.forEach((el) => el.remove());
+    };
+
+    const setCanonicalTag = (href) => {
+      if (!href) return;
+      const existingCanonicals = document.querySelectorAll('link[rel="canonical"]');
+      if (existingCanonicals.length === 0) {
+        const link = document.createElement('link');
+        link.setAttribute('rel', 'canonical');
+        link.setAttribute('href', href);
+        document.head.appendChild(link);
+      } else {
+        existingCanonicals[0].setAttribute('href', href);
+        // Strip any secondary duplicate canonical tags
+        for (let i = 1; i < existingCanonicals.length; i++) {
+          existingCanonicals[i].remove();
+        }
+      }
+    };
+
+    // Helper for upserting other link tags
     const setLinkTag = (rel, href) => {
       if (!href) return;
       let el = document.querySelector(`link[rel="${rel}"]`);
@@ -75,13 +98,36 @@ export default function SEOHead({
     let computedCanonical = null;
 
     if (isNoIndex && !canonicalUrl) {
-      // Remove any pre-existing canonical link element when visiting private or noindex pages
-      const existingEl = document.querySelector('link[rel="canonical"]');
-      if (existingEl) existingEl.remove();
+      // Remove all pre-existing canonical link elements when visiting private or noindex pages
+      removeAllCanonicals();
     } else {
-      const cleanPath = location.pathname === '/' ? '/' : location.pathname.replace(/\/$/, '');
-      computedCanonical = canonicalUrl || `${baseSite}${cleanPath}`;
-      setLinkTag('canonical', computedCanonical);
+      // Clean and normalize canonical URL to primary domain
+      let targetUrl = canonicalUrl;
+      if (!targetUrl) {
+        const cleanPath = location.pathname === '/' ? '/' : location.pathname.replace(/\/+$/, '');
+        targetUrl = `${baseSite}${cleanPath}`;
+      } else if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+        const cleanPath = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
+        targetUrl = `${baseSite}${cleanPath === '/' ? '/' : cleanPath.replace(/\/+$/, '')}`;
+      } else {
+        // Sanitize any legacy or non-www domains if explicitly passed
+        targetUrl = targetUrl
+          .replace(/^https?:\/\/(www\.)?dsphotography\.com/i, baseSite)
+          .replace(/^https?:\/\/dishantshelarphotography\.in/i, baseSite);
+        try {
+          const parsed = new URL(targetUrl);
+          if (parsed.pathname !== '/') {
+            parsed.pathname = parsed.pathname.replace(/\/+$/, '');
+          }
+          parsed.search = '';
+          parsed.hash = '';
+          targetUrl = parsed.toString();
+        } catch {
+          // keep sanitized targetUrl
+        }
+      }
+      computedCanonical = targetUrl;
+      setCanonicalTag(computedCanonical);
     }
 
     // 5. Open Graph

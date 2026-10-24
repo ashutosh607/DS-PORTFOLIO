@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import photographerImg from '../../assets/photographer.jpg';
+import photographerImg from '../../assets/photographer.webp';
+import photographerImg400 from '../../assets/photographer-400w.webp';
 import TextBlurReveal from '../common/TextBlurReveal';
 import ScrollCardReveal from '../common/ScrollCardReveal';
 
@@ -53,11 +54,15 @@ export default function AboutSection({ imageUrl = null }) {
                   <div className="about-portrait-img-container">
                     <img
                       src={activeImage}
+                      srcSet={imageUrl ? undefined : `${photographerImg400} 400w, ${photographerImg} 800w`}
+                      sizes="(max-width: 768px) 340px, 480px"
                       alt="Dishant Shelar — Lead Photographer & Cinematographer at DS Photography & Films, Mumbai"
                       width="480"
                       height="600"
+                      style={{ aspectRatio: '480 / 600' }}
                       className="about-portrait-img"
                       loading="lazy"
+                      decoding="async"
                     />
                     {/* Subtle inner editorial vignette / film border */}
                     <div className="about-portrait-overlay" aria-hidden="true" />

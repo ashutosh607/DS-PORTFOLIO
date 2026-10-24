@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getFramingStyle } from '../../../utils/mediaFraming';
@@ -313,8 +314,11 @@ export default function CollectionsRibbon({
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 35,
-              width: isMobile ? 30 : 44,
-              height: isMobile ? 30 : 44,
+              width: isMobile ? 42 : 44,
+              height: isMobile ? 42 : 44,
+              minWidth: '42px',
+              minHeight: '42px',
+              touchAction: 'manipulation',
               borderRadius: '50%',
               border: '1px solid rgba(210, 200, 184, 0.85)',
               backgroundColor: '#FFFFFF',
@@ -343,8 +347,11 @@ export default function CollectionsRibbon({
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 35,
-              width: isMobile ? 30 : 44,
-              height: isMobile ? 30 : 44,
+              width: isMobile ? 42 : 44,
+              height: isMobile ? 42 : 44,
+              minWidth: '42px',
+              minHeight: '42px',
+              touchAction: 'manipulation',
               borderRadius: '50%',
               border: '1px solid rgba(210, 200, 184, 0.85)',
               backgroundColor: '#FFFFFF',
@@ -411,76 +418,87 @@ export default function CollectionsRibbon({
                     width: `${cardWidth}px`,
                   }}
                 >
-                  <motion.div
-                    onClick={() => handleCardClick(cat.id)}
-                    whileHover={{
-                      y: -8,
-                      scale: 1.025,
-                      transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
+                  <Link
+                    to={`/collections/${cat.slug || cat.id}`}
+                    onClick={(e) => {
+                      if (!isDragging) {
+                        e.preventDefault();
+                        handleCardClick(cat.id);
+                      }
                     }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group relative w-full overflow-hidden flex flex-col justify-end cursor-pointer select-none bg-[#1A1816] border transition-all duration-350"
-                    style={{
-                      borderRadius: '9999px 9999px 4px 4px',
-                      height: 'clamp(280px, 24vw, 325px)',
-                      padding:
-                        'clamp(1.1rem, 1.5vw, 1.35rem) clamp(0.85rem, 1.2vw, 1.1rem) clamp(0.95rem, 1.3vw, 1.2rem)',
-                      borderColor: isActive ? '#101010' : '#2A2622',
-                      boxShadow: isActive
-                        ? '0 24px 44px -10px rgba(18, 16, 14, 0.48), 0 0 0 2px #101010'
-                        : '0 14px 32px -10px rgba(18, 16, 14, 0.22)',
-                    }}
+                    className="block text-inherit no-underline select-none"
+                    aria-label={`Explore ${cat.name} Photography Collection`}
                   >
-                    {/* Background Photograph */}
-                    <img
-                      src={cat.coverImage}
-                      alt={`${cat.name} Collection`}
-                      className="absolute inset-0 w-full h-full transition-[transform] duration-500 ease-out group-hover:scale-105 pointer-events-none"
-                      style={getFramingStyle(cat.coverDisplay || cat.display)}
-                      loading="lazy"
-                      draggable={false}
-                    />
-
-                    {/* Dark gradient overlay for typography readability */}
-                    <div
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background:
-                          'linear-gradient(to bottom, rgba(16, 16, 16, 0.05) 0%, rgba(16, 16, 16, 0.12) 40%, rgba(16, 16, 0.68) 75%, rgba(16, 16, 16, 0.95) 100%)',
+                    <motion.div
+                      whileHover={{
+                        y: -8,
+                        scale: 1.025,
+                        transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
                       }}
-                    />
+                      whileTap={{ scale: 0.98 }}
+                      className="group relative w-full overflow-hidden flex flex-col justify-end cursor-pointer select-none bg-[#1A1816] border transition-all duration-350"
+                      style={{
+                        borderRadius: '9999px 9999px 4px 4px',
+                        height: 'clamp(280px, 24vw, 325px)',
+                        padding:
+                          'clamp(1.1rem, 1.5vw, 1.35rem) clamp(0.85rem, 1.2vw, 1.1rem) clamp(0.95rem, 1.3vw, 1.2rem)',
+                        borderColor: isActive ? '#101010' : '#2A2622',
+                        boxShadow: isActive
+                          ? '0 24px 44px -10px rgba(18, 16, 14, 0.48), 0 0 0 2px #101010'
+                          : '0 14px 32px -10px rgba(18, 16, 14, 0.22)',
+                      }}
+                    >
+                      {/* Background Photograph */}
+                      <img
+                        src={cat.coverImage}
+                        alt={`${cat.name} Collection`}
+                        className="absolute inset-0 w-full h-full transition-[transform] duration-500 ease-out group-hover:scale-105 pointer-events-none"
+                        style={getFramingStyle(cat.coverDisplay || cat.display)}
+                        loading="lazy"
+                        draggable={false}
+                      />
 
-                    {/* Bottom: Category Name & Arrow (NO ID anywhere) */}
-                    <div className="relative z-10 pt-2 pb-0.5 pointer-events-none">
-                      <h3
+                      {/* Dark gradient overlay for typography readability */}
+                      <div
+                        className="absolute inset-0 pointer-events-none"
                         style={{
-                          fontFamily: 'var(--font-serif)',
-                          fontSize: 'clamp(1.05rem, 1.3vw, 1.35rem)',
-                          color: '#FFFFFF',
-                          fontWeight: 400,
-                          lineHeight: 1.15,
-                          marginBottom: '0.45rem',
-                          textShadow: '0 2px 8px rgba(0,0,0,0.85)',
+                          background:
+                            'linear-gradient(to bottom, rgba(16, 16, 16, 0.05) 0%, rgba(16, 16, 16, 0.12) 40%, rgba(16, 16, 0.68) 75%, rgba(16, 16, 16, 0.95) 100%)',
                         }}
-                      >
-                        {cat.name}
-                      </h3>
+                      />
 
-                      <div className="flex items-center gap-1.5 text-white/80 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-300">
-                        <span
+                      {/* Bottom: Category Name & Arrow (NO ID anywhere) */}
+                      <div className="relative z-10 pt-2 pb-0.5 pointer-events-none">
+                        <h3
                           style={{
-                            width: isActive ? 28 : 20,
-                            height: '1.5px',
-                            backgroundColor: isActive
-                              ? '#FFFFFF'
-                              : 'rgba(255,255,255,0.7)',
-                            transition: 'all 0.3s ease',
+                            fontFamily: 'var(--font-serif)',
+                            fontSize: 'clamp(1.05rem, 1.3vw, 1.35rem)',
+                            color: '#FFFFFF',
+                            fontWeight: 400,
+                            lineHeight: 1.15,
+                            marginBottom: '0.45rem',
+                            textShadow: '0 2px 8px rgba(0,0,0,0.85)',
                           }}
-                        />
-                        <span className="text-[10px] leading-none">→</span>
+                        >
+                          {cat.name}
+                        </h3>
+
+                        <div className="flex items-center gap-1.5 text-white/80 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-300">
+                          <span
+                            style={{
+                              width: isActive ? 28 : 20,
+                              height: '1.5px',
+                              backgroundColor: isActive
+                                ? '#FFFFFF'
+                                : 'rgba(255,255,255,0.7)',
+                              transition: 'all 0.3s ease',
+                            }}
+                          />
+                          <span className="text-[10px] leading-none">→</span>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
+                    </motion.div>
+                  </Link>
                 </div>
               );
             })}

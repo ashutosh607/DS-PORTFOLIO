@@ -5,9 +5,7 @@
   <!-- Homepage: DS Photography & Films (Wedding & Portrait Photographer in Mumbai) -->
   <url>
     <loc>https://www.dishantshelarphotography.in/</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-10-24</lastmod>
     <image:image>
       <image:loc>https://www.dishantshelarphotography.in/og-image.jpg</image:loc>
       <image:title>DS Photography &amp; Films — Wedding Photographer in Mumbai</image:title>
@@ -18,9 +16,7 @@
   <!-- Collections Overview -->
   <url>
     <loc>https://www.dishantshelarphotography.in/collections</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <lastmod>2026-10-24</lastmod>
     <image:image>
       <image:loc>https://www.dishantshelarphotography.in/og-image.jpg</image:loc>
       <image:title>Photography Collections &amp; Editorial Monographs</image:title>
@@ -31,9 +27,7 @@
   <!-- Wedding Photography Category -->
   <url>
     <loc>https://www.dishantshelarphotography.in/collections/weddings</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <lastmod>2026-10-24</lastmod>
     <image:image>
       <image:loc>https://www.dishantshelarphotography.in/og-image.jpg</image:loc>
       <image:title>Luxury Wedding Photography in Mumbai</image:title>
@@ -44,9 +38,7 @@
   <!-- Pre-Wedding Photography Category -->
   <url>
     <loc>https://www.dishantshelarphotography.in/collections/pre-wedding</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-24</lastmod>
     <image:image>
       <image:loc>https://www.dishantshelarphotography.in/og-image.jpg</image:loc>
       <image:title>Pre-Wedding Photography &amp; Couple Cinematography</image:title>
@@ -57,9 +49,7 @@
   <!-- Portraits Photography Category -->
   <url>
     <loc>https://www.dishantshelarphotography.in/collections/portraits</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-24</lastmod>
     <image:image>
       <image:loc>https://www.dishantshelarphotography.in/og-image.jpg</image:loc>
       <image:title>Fine Art Editorial Portraiture</image:title>
@@ -70,9 +60,7 @@
   <!-- Birthdays Photography Category -->
   <url>
     <loc>https://www.dishantshelarphotography.in/collections/birthdays</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <lastmod>2026-10-24</lastmod>
     <image:image>
       <image:loc>https://www.dishantshelarphotography.in/og-image.jpg</image:loc>
       <image:title>Milestone Birthday &amp; Celebration Photography</image:title>
@@ -83,9 +71,7 @@
   <!-- Events Photography Category -->
   <url>
     <loc>https://www.dishantshelarphotography.in/collections/events</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-24</lastmod>
     <image:image>
       <image:loc>https://www.dishantshelarphotography.in/og-image.jpg</image:loc>
       <image:title>Atmospheric Gala &amp; Event Photography</image:title>
@@ -96,9 +82,7 @@
   <!-- Commercial Photography Category -->
   <url>
     <loc>https://www.dishantshelarphotography.in/collections/commercial</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-24</lastmod>
     <image:image>
       <image:loc>https://www.dishantshelarphotography.in/og-image.jpg</image:loc>
       <image:title>Haute Commercial &amp; Editorial Brand Campaigns</image:title>
@@ -109,17 +93,13 @@
   <!-- Services & Investment Packages -->
   <url>
     <loc>https://www.dishantshelarphotography.in/services</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <lastmod>2026-10-24</lastmod>
   </url>
 
   <!-- Terms, Delivery Timelines & Studio Policies -->
   <url>
     <loc>https://www.dishantshelarphotography.in/terms</loc>
-    <lastmod>2026-10-21</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <lastmod>2026-10-24</lastmod>
   </url>
 
 </urlset>
