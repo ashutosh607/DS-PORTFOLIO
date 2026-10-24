@@ -2,19 +2,19 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/home/HomePage';
-import CollectionsPage from './pages/collections/CollectionsPage';
-import ServicesPage from './pages/services/ServicesPage';
 import Footer from './components/layout/Footer';
-import InquiryModal from './components/modals/InquiryModal';
 import { PageTransitionProvider } from './components/common/PageTransition';
 import SplashScreen from './components/common/SplashScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import NotFoundPage from './pages/error/NotFoundPage';
-import ErrorPage from './pages/error/ErrorPage';
 import SmoothScroll from './components/common/SmoothScroll';
 
-// Code-split routes for optimal performance and smaller initial JS bundle
+// Code-split routes and modals for optimal performance and smaller initial JS bundle
+const CollectionsPage = lazy(() => import('./pages/collections/CollectionsPage'));
+const ServicesPage = lazy(() => import('./pages/services/ServicesPage'));
+const InquiryModal = lazy(() => import('./components/modals/InquiryModal'));
 const TermsPage = lazy(() => import('./pages/terms/TermsPage'));
+const NotFoundPage = lazy(() => import('./pages/error/NotFoundPage'));
+import ErrorPage from './pages/error/ErrorPage';
 
 // Admin Panel lazy imports (excluded from public user bundle)
 import { AdminAuthProvider } from './pages/admin/context/AdminAuthContext';
@@ -44,21 +44,8 @@ function ScrollToTop() {
       return () => clearTimeout(timer);
     }
 
-    // Force instant scroll to (0, 0) across window, documentElement, and body
-    const resetScroll = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    };
-
-    resetScroll();
-    const rafId = requestAnimationFrame(resetScroll);
-    const timer = setTimeout(resetScroll, 60);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      clearTimeout(timer);
-    };
+    // Instant scroll to (0, 0) without triggering multiple layout reflows
+    window.scrollTo(0, 0);
   }, [pathname, hash]);
 
   return null;
@@ -156,16 +143,15 @@ export default function App() {
               </Routes>
             </Suspense>
 
-            {/* Minimal footer with CET studio time and social directory (only on public site) */}
-            {showPublicChrome && <Footer onOpenInquiry={() => handleOpenInquiry()} />}
-
-            {/* Interactive Consultation / Inquiry Modal (only on public site) */}
-            {showPublicChrome && (
-              <InquiryModal
-                isOpen={inquiryModalOpen}
-                onClose={handleCloseInquiry}
-                prefillTier={selectedTier}
-              />
+            {/* Interactive Consultation / Inquiry Modal (only on public site, loaded on demand) */}
+            {showPublicChrome && inquiryModalOpen && (
+              <Suspense fallback={null}>
+                <InquiryModal
+                  isOpen={inquiryModalOpen}
+                  onClose={handleCloseInquiry}
+                  prefillTier={selectedTier}
+                />
+              </Suspense>
             )}
           </div>
         </PageTransitionProvider>

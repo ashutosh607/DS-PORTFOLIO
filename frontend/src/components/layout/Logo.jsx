@@ -1,6 +1,8 @@
 import React from 'react';
-import dsLogoDark from '../../assets/ds-logo-dark.png';
-import dsLogoLight from '../../assets/ds-logo-light.png';
+import dsLogoDarkWebp from '../../assets/ds-logo-dark-opt.webp';
+import dsLogoDarkPng from '../../assets/ds-logo-dark-opt.png';
+import dsLogoLightWebp from '../../assets/ds-logo-light-opt.webp';
+import dsLogoLightPng from '../../assets/ds-logo-light-opt.png';
 
 /**
  * Theme-aware Logo Component
@@ -16,7 +18,10 @@ export default function Logo({
   imgStyle = {},
 }) {
   const isLight = variant === 'light';
-  const logoSrc = isLight ? dsLogoLight : dsLogoDark;
+  const webpSrc = isLight ? dsLogoLightWebp : dsLogoDarkWebp;
+  const pngSrc = isLight ? dsLogoLightPng : dsLogoDarkPng;
+  const numHeight = typeof height === 'number' ? height : parseInt(height, 10) || 42;
+  const intrinsicWidth = Math.round(numHeight * (240 / 173));
 
   return (
     <div
@@ -28,17 +33,25 @@ export default function Logo({
         ...style,
       }}
     >
-      <img
-        src={logoSrc}
-        alt="DS Photography & Films"
-        style={{
-          height: typeof height === 'number' ? `${height}px` : height,
-          width: 'auto',
-          objectFit: 'contain',
-          display: 'block',
-          ...imgStyle,
-        }}
-      />
+      <picture>
+        <source srcSet={webpSrc} type="image/webp" />
+        <img
+          src={pngSrc}
+          alt="DS Photography & Films"
+          width={intrinsicWidth}
+          height={numHeight}
+          loading="eager"
+          decoding="async"
+          style={{
+            height: `${numHeight}px`,
+            width: `${intrinsicWidth}px`,
+            aspectRatio: '240 / 173',
+            objectFit: 'contain',
+            display: 'block',
+            ...imgStyle,
+          }}
+        />
+      </picture>
       {withText && (
         <div
           className="hidden sm:flex flex-col justify-center"

@@ -1,11 +1,12 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * TextBlurReveal
  * High-end editorial word-by-word reveal inspired by motion.dev.
  * Each word transitions from an optical lens blur (blur(12px) -> blur(0px)),
- * subtle Y displacement (y -> 0), and opacity (0 -> 1) with silky staggering.
+ * subtle Y displacement (y -> 0), with full opacity maintained throughout
+ * so text meets WCAG AA contrast (>= 4.5:1) across every intermediate frame.
  */
 export default function TextBlurReveal({
   text,
@@ -21,32 +22,33 @@ export default function TextBlurReveal({
   once = true,
   margin = '-40px',
 }) {
+  const shouldReduceMotion = useReducedMotion();
   const rawText = text || (typeof children === 'string' ? children : '');
   const words = rawText ? rawText.split(' ') : [];
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: stagger,
-        delayChildren: delay,
+        staggerChildren: shouldReduceMotion ? 0 : stagger,
+        delayChildren: shouldReduceMotion ? 0 : delay,
       },
     },
   };
 
   const wordVariants = {
     hidden: {
-      opacity: 0,
-      filter: `blur(${blurAmount}px)`,
-      y: yOffset,
+      opacity: 1,
+      filter: shouldReduceMotion ? 'none' : `blur(${blurAmount}px)`,
+      y: shouldReduceMotion ? 0 : yOffset,
     },
     visible: {
       opacity: 1,
-      filter: 'blur(0px)',
+      filter: 'none',
       y: 0,
       transition: {
-        duration,
+        duration: shouldReduceMotion ? 0 : duration,
         ease: [0.16, 1, 0.3, 1],
       },
     },
@@ -67,7 +69,7 @@ export default function TextBlurReveal({
         initial="hidden"
         whileInView="visible"
         viewport={{ once, margin }}
-        style={{ display: 'inline' }}
+        style={{ display: 'inline', color: 'inherit' }}
       >
         {words.map((word, idx) => (
           <motion.span
@@ -75,7 +77,8 @@ export default function TextBlurReveal({
             variants={wordVariants}
             style={{
               display: 'inline-block',
-              willChange: 'transform, opacity, filter',
+              willChange: shouldReduceMotion ? 'auto' : 'transform, filter',
+              color: 'inherit',
             }}
           >
             {word}&nbsp;

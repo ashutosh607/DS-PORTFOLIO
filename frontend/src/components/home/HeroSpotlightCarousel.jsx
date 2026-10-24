@@ -39,7 +39,7 @@ const PROJECTS = [
     score: '★ 9.2',
     format: 'Medium Format 6x7',
     image: img02,
-    image400: img02_400,
+    image400: '/images/landing-02-400w.webp',
     alt: 'Kinetic pre-wedding monograph and couple motion study by Dishant Shelar Mumbai',
   },
   {
@@ -343,13 +343,20 @@ export default function HeroSpotlightCarousel() {
                 fontSize: '0.675rem',
                 letterSpacing: '0.22em',
                 textTransform: 'uppercase',
-                color: 'var(--color-obsidian-light)',
-                fontWeight: 500,
+                color: 'var(--color-obsidian)',
+                fontWeight: 600,
+                backgroundColor: 'var(--color-off-white)',
+                padding: '0.3rem 0.85rem',
+                borderRadius: '999px',
+                border: '1px solid var(--color-nude)',
+                boxShadow: '0 2px 10px -2px rgba(16, 16, 16, 0.04)',
+                position: 'relative',
+                zIndex: 2,
               }}
             >
-              <span style={{ width: '22px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
+              <span style={{ width: '20px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
               <TextBlurReveal text="The Spotlight Collection · Mumbai" blurAmount={6} delay={0.05} />
-              <span style={{ width: '22px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
+              <span style={{ width: '20px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
             </div>
           </div>
 
@@ -601,7 +608,7 @@ export default function HeroSpotlightCarousel() {
                     height: '5px',
                     width: activeNormalizedIndex === i ? '24px' : '5px',
                     borderRadius: '999px',
-                    backgroundColor: activeNormalizedIndex === i ? '#2B579A' : 'var(--color-nude)',
+                    backgroundColor: activeNormalizedIndex === i ? 'var(--color-obsidian)' : '#8C8474',
                     transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
                   }}
                 />
@@ -636,9 +643,9 @@ export default function HeroSpotlightCarousel() {
                 style={{
                   fontFamily: 'var(--font-sans)',
                   fontSize: '0.8rem',
-                  color: 'var(--color-obsidian-light)',
+                  color: 'var(--color-obsidian-muted)',
                   marginLeft: '0.35rem',
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 / {String(total).padStart(2, '0')}

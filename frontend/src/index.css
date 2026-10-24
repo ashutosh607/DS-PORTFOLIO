@@ -4,7 +4,7 @@
   --font-serif: 'Cormorant Garamond', Garamond, Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --color-ink: #181818;
-  --color-muted: #7A7367;
+  --color-muted: #4E4B45;
   --color-border-subtle: #EAE4DA;
   --color-accent: #9E8159;
 }
@@ -37,7 +37,7 @@
   --color-nude-subtle: rgba(227, 219, 204, 0.2);
   --color-ivory-warm: #FAF8F5;
   --color-obsidian-muted: #4A4844;
-  --color-obsidian-light: #7A7770;
+  --color-obsidian-light: #4E4B45;
   --color-obsidian-subtle: rgba(16, 16, 16, 0.06);
 
   /* Typography */

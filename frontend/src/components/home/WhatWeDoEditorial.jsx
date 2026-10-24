@@ -1,24 +1,31 @@
 import React, { useRef, useState, useEffect } from 'react';
 
 import img01 from '../../assets/landing-down-animation/612A9674.webp';
+import img01_300 from '../../assets/landing-down-animation/612A9674-300w.webp';
 import img02 from '../../assets/landing-down-animation/DSP09982.webp';
+import img02_300 from '../../assets/landing-down-animation/DSP09982-300w.webp';
 import img03 from '../../assets/landing-down-animation/IMG_1186.webp';
+import img03_300 from '../../assets/landing-down-animation/IMG_1186-300w.webp';
 import img04 from '../../assets/landing-down-animation/IMG_7783.webp';
+import img04_300 from '../../assets/landing-down-animation/IMG_7783-300w.webp';
 import img05 from '../../assets/landing-down-animation/IMG_7785.webp';
+import img05_300 from '../../assets/landing-down-animation/IMG_7785-300w.webp';
 import img06 from '../../assets/landing-down-animation/_0005916.webp';
+import img06_300 from '../../assets/landing-down-animation/_0005916-300w.webp';
 import img07 from '../../assets/landing-down-animation/_0006027.webp';
+import img07_300 from '../../assets/landing-down-animation/_0006027-300w.webp';
 
 /**
- * 7 Curated atelier photographs from assets/landing-down-animation.
+ * 7 Curated atelier photographs from assets/landing-down-animation with responsive sizes.
  */
 const PHOTOS = [
-  img01,
-  img02,
-  img03,
-  img04,
-  img05,
-  img06,
-  img07,
+  { full: img01, w300: img01_300 },
+  { full: img02, w300: img02_300 },
+  { full: img03, w300: img03_300 },
+  { full: img04, w300: img04_300 },
+  { full: img05, w300: img05_300 },
+  { full: img06, w300: img06_300 },
+  { full: img07, w300: img07_300 },
 ];
 
 const PHOTO_METADATA = [
@@ -285,8 +292,16 @@ export default function WhatWeDoEditorial() {
         currentMouseRef.current.y += mouseDiffY * 0.06;
       }
 
-      // Mutate DOM elements directly for buttery-smooth 60fps-120fps motion
-      updateDOM(currentProgressRef.current, currentMouseRef.current);
+      // Only mutate DOM elements if section is near viewport or state is actively changing
+      const isOutOfView = typeof window !== 'undefined' && (
+        scrollY < top - window.innerHeight || scrollY > top + totalScroll + window.innerHeight
+      );
+      const isProgressSettled = Math.abs(scrollDiff) <= 0.000008;
+      const isMouseSettled = Math.abs(mouseDiffX) <= 0.0002 && Math.abs(mouseDiffY) <= 0.0002;
+
+      if (!isOutOfView || !isProgressSettled || !isMouseSettled) {
+        updateDOM(currentProgressRef.current, currentMouseRef.current);
+      }
 
       rafIdRef.current = requestAnimationFrame(loop);
     };
@@ -475,10 +490,12 @@ export default function WhatWeDoEditorial() {
                   className="w-full h-full relative overflow-hidden rounded-xl"
                   style={{ animation: floatAnimation }}
                 >
-                  {/* Clean Borderless Archival Photograph */}
+                  {/* Clean Borderless Archival Photograph with responsive srcset */}
                   <div className="w-full h-full overflow-hidden rounded-xl relative">
                     <img
-                      src={src}
+                      src={src.w300}
+                      srcSet={`${src.w300} 300w, ${src.full} 600w`}
+                      sizes="(max-width: 768px) 100px, 190px"
                       alt={PHOTO_METADATA[i] || `Atelier Portfolio Print ${i + 1}`}
                       width="190"
                       height="253"

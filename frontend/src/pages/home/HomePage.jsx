@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { useLocation } from 'react-router-dom';
 import HeroSpotlightCarousel from '../../components/home/HeroSpotlightCarousel';
-import WhatWeDoEditorial from '../../components/home/WhatWeDoEditorial';
-import AboutSection from '../../components/home/AboutSection';
 import SEOHead from '../../components/common/SEOHead';
 import { buildLocalBusinessSchema, buildWebSiteSchema, buildServicesListSchema } from '../../utils/structuredData';
 import { SEO_CONFIG } from '../../utils/seoConfig';
+
+// Below-the-fold components lazy loaded on demand to minimize initial mobile JS bundle & LCP blocking
+const WhatWeDoEditorial = lazy(() => import('../../components/home/WhatWeDoEditorial'));
+const AboutSection = lazy(() => import('../../components/home/AboutSection'));
 
 export default function HomePage() {
   const location = useLocation();
@@ -42,14 +44,16 @@ export default function HomePage() {
       />
 
       <main>
-        {/* Hero Spotlight Gallery */}
+        {/* Hero Spotlight Gallery - Critical Above The Fold */}
         <HeroSpotlightCarousel />
 
-        {/* Spacious, Artistic Editorial Photography Section: What We Do */}
-        <WhatWeDoEditorial />
+        <Suspense fallback={<div className="min-h-[400px] bg-[var(--color-off-white)]" />}>
+          {/* Spacious, Artistic Editorial Photography Section: What We Do */}
+          <WhatWeDoEditorial />
 
-        {/* Studio About section with artist portrait, philosophy & exhibition history */}
-        <AboutSection />
+          {/* Studio About section with artist portrait, philosophy & exhibition history */}
+          <AboutSection />
+        </Suspense>
       </main>
     </>
   );

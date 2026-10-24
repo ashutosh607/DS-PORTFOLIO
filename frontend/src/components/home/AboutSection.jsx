@@ -342,7 +342,7 @@ export default function AboutSection({ imageUrl = null }) {
           line-height: 1.4;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: var(--color-obsidian-light, #7A7770);
+          color: var(--color-obsidian-light, #4E4B45);
           font-weight: 600;
         }
 
@@ -374,7 +374,7 @@ export default function AboutSection({ imageUrl = null }) {
           font-size: 0.725rem;
           text-transform: uppercase;
           letter-spacing: 0.24em;
-          color: var(--color-obsidian-light, #7A7770);
+          color: var(--color-obsidian-light, #4E4B45);
           font-weight: 600;
           display: inline-block;
         }
@@ -467,7 +467,7 @@ export default function AboutSection({ imageUrl = null }) {
           font-size: 0.65rem;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: var(--color-obsidian-light, #7A7770);
+          color: var(--color-obsidian-light, #4E4B45);
           font-weight: 600;
         }
 
@@ -503,7 +503,7 @@ export default function AboutSection({ imageUrl = null }) {
             font-family: var(--font-sans);
             font-size: 0.625rem;
             letter-spacing: 0.2em;
-            color: var(--color-obsidian-light, #7A7770);
+            color: var(--color-obsidian-light, #4E4B45);
             font-weight: 600;
             user-select: none;
           }

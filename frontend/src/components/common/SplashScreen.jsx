@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import dsLogoDark from '../../assets/ds-logo-dark.png';
+import dsLogoDark from '../../assets/ds-logo-dark-splash.webp';
 
 /**
  * Clean Studio Logo Splash Screen
@@ -89,10 +89,13 @@ export default function SplashScreen({ onComplete }) {
             <img
               src={dsLogoDark}
               alt="DS Photography & Films"
+              width="470"
+              height="340"
               className="object-contain w-auto select-none pointer-events-none"
               style={{
                 height: 'clamp(180px, 32vh, 340px)',
                 maxWidth: 'min(90vw, 560px)',
+                aspectRatio: '1415 / 1023',
                 display: 'block',
               }}
             />
