@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useLocation } from 'react-router-dom';
 import HeroSpotlightCarousel from '../../components/home/HeroSpotlightCarousel';
 import SEOHead from '../../components/common/SEOHead';
@@ -11,10 +11,12 @@ const AboutSection = lazy(() => import('../../components/home/AboutSection'));
 
 export default function HomePage() {
   const location = useLocation();
+  const [loadBelowTheFold, setLoadBelowTheFold] = useState(false);
 
   useEffect(() => {
-    // Smooth scroll to anchor if present in URL
+    // If navigated with hash (e.g. #what-we-do or #about), load immediately
     if (location.hash) {
+      setLoadBelowTheFold(true);
       const el = document.querySelector(location.hash);
       if (el) {
         setTimeout(() => {
@@ -25,6 +27,26 @@ export default function HomePage() {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
+
+      // Defer loading below-the-fold components for 3.5s or upon user scroll/touch to give 100% bandwidth & CPU to LCP hero image
+      const timer = setTimeout(() => {
+        setLoadBelowTheFold(true);
+      }, 3500);
+
+      const triggerLoad = () => {
+        setLoadBelowTheFold(true);
+        window.removeEventListener('scroll', triggerLoad);
+        window.removeEventListener('touchstart', triggerLoad);
+      };
+
+      window.addEventListener('scroll', triggerLoad, { passive: true, once: true });
+      window.addEventListener('touchstart', triggerLoad, { passive: true, once: true });
+
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', triggerLoad);
+        window.removeEventListener('touchstart', triggerLoad);
+      };
     }
   }, [location.pathname, location.hash]);
 
@@ -47,13 +69,15 @@ export default function HomePage() {
         {/* Hero Spotlight Gallery - Critical Above The Fold */}
         <HeroSpotlightCarousel />
 
-        <Suspense fallback={<div className="min-h-[400px] bg-[var(--color-off-white)]" />}>
-          {/* Spacious, Artistic Editorial Photography Section: What We Do */}
-          <WhatWeDoEditorial />
+        {loadBelowTheFold && (
+          <Suspense fallback={<div className="min-h-[400px] bg-[var(--color-off-white)]" />}>
+            {/* Spacious, Artistic Editorial Photography Section: What We Do */}
+            <WhatWeDoEditorial />
 
-          {/* Studio About section with artist portrait, philosophy & exhibition history */}
-          <AboutSection />
-        </Suspense>
+            {/* Studio About section with artist portrait, philosophy & exhibition history */}
+            <AboutSection />
+          </Suspense>
+        )}
       </main>
     </>
   );

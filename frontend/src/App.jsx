@@ -143,6 +143,9 @@ export default function App() {
               </Routes>
             </Suspense>
 
+            {/* Minimal footer with CET studio time and social directory (only on public site) */}
+            {showPublicChrome && <Footer onOpenInquiry={() => handleOpenInquiry()} />}
+
             {/* Interactive Consultation / Inquiry Modal (only on public site, loaded on demand) */}
             {showPublicChrome && inquiryModalOpen && (
               <Suspense fallback={null}>
