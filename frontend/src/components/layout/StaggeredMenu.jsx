@@ -63,6 +63,7 @@ export const StaggeredMenu = ({
 
       const offscreen = position === 'left' ? -100 : 100;
       gsap.set([panel, ...preLayers], { xPercent: offscreen, opacity: 1 });
+      gsap.set(panel, { visibility: 'hidden', pointerEvents: 'none' });
       if (preContainer) {
         gsap.set(preContainer, { xPercent: 0, opacity: 1 });
       }
@@ -112,6 +113,8 @@ export const StaggeredMenu = ({
     if (bottomCta) {
       gsap.set(bottomCta, { y: 20, opacity: 0 });
     }
+
+    gsap.set(panel, { visibility: 'visible', pointerEvents: 'auto' });
 
     const tl = gsap.timeline({ paused: true });
 
@@ -248,6 +251,7 @@ export const StaggeredMenu = ({
         const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
         if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
         if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
+        gsap.set(panel, { visibility: 'hidden', pointerEvents: 'none' });
         busyRef.current = false;
       },
     });
@@ -339,7 +343,7 @@ export const StaggeredMenu = ({
     animateText(target);
   }, [playOpen, playClose, animateIcon, animateColor, animateText, onMenuOpen, onMenuClose]);
 
-  const closeMenu = useCallback(() => {
+  const closeMenu = useCallback((restoreFocus = false) => {
     if (openRef.current) {
       openRef.current = false;
       setOpen(false);
@@ -348,8 +352,67 @@ export const StaggeredMenu = ({
       animateIcon(false);
       animateColor(false);
       animateText(false);
+      if (restoreFocus) {
+        setTimeout(() => {
+          toggleBtnRef.current?.focus();
+        }, 50);
+      }
     }
   }, [playClose, animateIcon, animateColor, animateText, onMenuClose]);
+
+  // Handle keyboard interaction (Escape to close, Tab trapping, focus restoration)
+  useEffect(() => {
+    if (!open) return;
+
+    // Focus the first interactive element when the menu opens
+    const focusTimer = setTimeout(() => {
+      const firstFocusable = panelRef.current?.querySelector('.sm-panel-item');
+      firstFocusable?.focus();
+    }, 280);
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeMenu(true);
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const focusableElements = panelRef.current?.querySelectorAll(
+          'a[href]:not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"])'
+        );
+        if (!focusableElements || focusableElements.length === 0) return;
+
+        const firstEl = focusableElements[0];
+        const lastEl = focusableElements[focusableElements.length - 1];
+        const toggleBtn = toggleBtnRef.current;
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstEl) {
+            e.preventDefault();
+            toggleBtn?.focus();
+          } else if (document.activeElement === toggleBtn) {
+            e.preventDefault();
+            lastEl?.focus();
+          }
+        } else {
+          if (document.activeElement === lastEl) {
+            e.preventDefault();
+            toggleBtn?.focus();
+          } else if (document.activeElement === toggleBtn) {
+            e.preventDefault();
+            firstEl?.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open, closeMenu]);
 
   useEffect(() => {
     if (!closeOnClickAway || !open) return;
@@ -477,7 +540,13 @@ export const StaggeredMenu = ({
         </button>
       </header>
 
-      <aside id="staggered-menu-panel" ref={panelRef} className="staggered-menu-panel" aria-hidden={!open}>
+      <aside
+        id="staggered-menu-panel"
+        ref={panelRef}
+        className="staggered-menu-panel"
+        aria-hidden={!open}
+        inert={!open ? '' : undefined}
+      >
         <div className="sm-panel-inner">
           <ul className="sm-panel-list" role="list" data-numbering={displayItemNumbering || undefined}>
             {items && items.length ? (
@@ -486,12 +555,13 @@ export const StaggeredMenu = ({
                   <a
                     className="sm-panel-item"
                     href={it.link}
+                    tabIndex={open ? 0 : -1}
                     aria-label={it.ariaLabel}
                     data-index={idx + 1}
                     onClick={(e) => {
                       e.preventDefault();
                       isNavigatingRef.current = true;
-                      closeMenu();
+                      closeMenu(true);
                       if (it.onClick) {
                         it.onClick();
                       } else if (onItemClick) {
@@ -516,9 +586,10 @@ export const StaggeredMenu = ({
           <div className="sm-panel-cta pt-2">
             <button
               type="button"
+              tabIndex={open ? 0 : -1}
               onClick={() => {
                 isNavigatingRef.current = true;
-                closeMenu();
+                closeMenu(true);
                 if (onItemClick) {
                   onItemClick({ link: '/services?step=book#book', label: 'BOOK A SESSION', isBooking: true });
                 }
@@ -540,6 +611,7 @@ export const StaggeredMenu = ({
                   <li key={s.label + i} className="sm-socials-item">
                     <a
                       href={s.link}
+                      tabIndex={open ? 0 : -1}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="sm-socials-link"
