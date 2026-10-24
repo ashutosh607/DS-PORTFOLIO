@@ -56,11 +56,15 @@ export default function CollectionsRibbon({
   const [withTransition, setWithTransition] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Mouse & Touch Dragging State
+  // Mouse & Touch Dragging State with Velocity Tracking
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartX = useRef(0);
   const dragStartY = useRef(0);
+  const dragStartTime = useRef(0);
+  const lastTouchX = useRef(0);
+  const lastTouchTime = useRef(0);
+  const touchVelocity = useRef(0);
   const hasDragged = useRef(false);
   const isHorizontalScroll = useRef(false);
 
@@ -142,18 +146,14 @@ export default function CollectionsRibbon({
 
   /* ── Navigation Handlers ── */
   const handleNext = useCallback(() => {
-    if (isAnimating) return;
-    setIsAnimating(true);
     setWithTransition(true);
     setCurrentIndex((prev) => prev + 1);
-  }, [isAnimating]);
+  }, []);
 
   const handlePrev = useCallback(() => {
-    if (isAnimating) return;
-    setIsAnimating(true);
     setWithTransition(true);
     setCurrentIndex((prev) => prev - 1);
-  }, [isAnimating]);
+  }, []);
 
   /* ── Infinite Teleport on Transition End ── */
   const handleTransitionEnd = () => {
@@ -171,11 +171,15 @@ export default function CollectionsRibbon({
     }
   };
 
-  /* ── Drag / Swipe Handlers ── */
+  /* ── Drag / Swipe Handlers with Momentum Physics ── */
   const handleMouseDown = (e) => {
-    if (e.button !== 0 || isAnimating || !isCircular) return;
+    if (e.button !== 0 || !isCircular) return;
     setIsDragging(true);
     dragStartX.current = e.pageX;
+    lastTouchX.current = e.pageX;
+    dragStartTime.current = performance.now();
+    lastTouchTime.current = performance.now();
+    touchVelocity.current = 0;
     hasDragged.current = false;
     setDragOffset(0);
   };
@@ -186,16 +190,24 @@ export default function CollectionsRibbon({
     if (Math.abs(diff) > 5) {
       hasDragged.current = true;
     }
+    const now = performance.now();
+    const dt = now - lastTouchTime.current;
+    if (dt > 8) {
+      touchVelocity.current = (e.pageX - lastTouchX.current) / dt;
+      lastTouchX.current = e.pageX;
+      lastTouchTime.current = now;
+    }
     setDragOffset(diff);
   };
 
   const handleMouseUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    const threshold = 35;
-    if (dragOffset < -threshold) {
+    const threshold = 30;
+    const vel = touchVelocity.current;
+    if (dragOffset < -threshold || vel < -0.28) {
       handleNext();
-    } else if (dragOffset > threshold) {
+    } else if (dragOffset > threshold || vel > 0.28) {
       handlePrev();
     }
     setDragOffset(0);
@@ -208,10 +220,14 @@ export default function CollectionsRibbon({
   };
 
   const handleTouchStart = (e) => {
-    if (isAnimating || !isCircular) return;
+    if (!isCircular) return;
     const touch = e.touches[0];
     dragStartX.current = touch.clientX;
     dragStartY.current = touch.clientY;
+    lastTouchX.current = touch.clientX;
+    dragStartTime.current = performance.now();
+    lastTouchTime.current = performance.now();
+    touchVelocity.current = 0;
     hasDragged.current = false;
     isHorizontalScroll.current = false;
     setIsDragging(true);
@@ -226,10 +242,10 @@ export default function CollectionsRibbon({
 
     // Detect if movement is primarily horizontal or vertical
     if (!hasDragged.current) {
-      if (Math.abs(diffX) > 8 && Math.abs(diffX) > Math.abs(diffY)) {
+      if (Math.abs(diffX) > 6 && Math.abs(diffX) > Math.abs(diffY)) {
         hasDragged.current = true;
         isHorizontalScroll.current = true;
-      } else if (Math.abs(diffY) > 8) {
+      } else if (Math.abs(diffY) > 6) {
         // Vertical scroll - let browser handle page scrolling
         setIsDragging(false);
         setDragOffset(0);
@@ -238,6 +254,13 @@ export default function CollectionsRibbon({
     }
 
     if (isHorizontalScroll.current) {
+      const now = performance.now();
+      const dt = now - lastTouchTime.current;
+      if (dt > 8) {
+        touchVelocity.current = (touch.clientX - lastTouchX.current) / dt;
+        lastTouchX.current = touch.clientX;
+        lastTouchTime.current = now;
+      }
       setDragOffset(diffX);
     }
   };
@@ -245,10 +268,11 @@ export default function CollectionsRibbon({
   const handleTouchEnd = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    const threshold = 35;
-    if (dragOffset < -threshold) {
+    const threshold = 30;
+    const vel = touchVelocity.current;
+    if (dragOffset < -threshold || vel < -0.28) {
       handleNext();
-    } else if (dragOffset > threshold) {
+    } else if (dragOffset > threshold || vel > 0.28) {
       handlePrev();
     }
     setDragOffset(0);
@@ -402,7 +426,7 @@ export default function CollectionsRibbon({
               transition:
                 isDragging || !withTransition
                   ? 'none'
-                  : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                  : 'transform 0.65s cubic-bezier(0.2, 0.95, 0.3, 1)',
               willChange: 'transform',
             }}
           >
@@ -436,7 +460,7 @@ export default function CollectionsRibbon({
                         transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
                       }}
                       whileTap={{ scale: 0.98 }}
-                      className="group relative w-full overflow-hidden flex flex-col justify-end cursor-pointer select-none bg-[#1A1816] border transition-all duration-350"
+                      className="group relative w-full overflow-hidden flex flex-col justify-end cursor-pointer select-none bg-[#1A1816] border transition-[border-color,box-shadow] duration-300"
                       style={{
                         borderRadius: '9999px 9999px 4px 4px',
                         height: 'clamp(280px, 24vw, 325px)',

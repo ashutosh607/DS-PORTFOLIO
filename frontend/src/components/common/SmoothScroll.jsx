@@ -14,11 +14,6 @@ export default function SmoothScroll({ children }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Use native GPU-accelerated touch momentum on mobile screens
-    if (window.innerWidth < 768) {
-      return;
-    }
-
     // Respect user preference for reduced motion
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return;
@@ -29,14 +24,19 @@ export default function SmoothScroll({ children }) {
       return;
     }
 
+    const isMobile = window.innerWidth < 768;
+
     const lenis = new Lenis({
-      duration: 1.35,
+      duration: isMobile ? 1.15 : 1.35,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Deep exponential ease-out for velvet glide
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 0.88, // Soft, controlled wheel stroke eliminating harsh notch jumps
-      touchMultiplier: 1.5,
+      wheelMultiplier: 0.88,
+      touchMultiplier: isMobile ? 1.3 : 1.5,
+      syncTouch: isMobile,
+      syncTouchLerp: 0.085,
+      touchInertiaExponent: 1.75,
       infinite: false,
     });
 
