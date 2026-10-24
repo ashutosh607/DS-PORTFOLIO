@@ -62,7 +62,7 @@ export const StaggeredMenu = ({
       preLayerElsRef.current = preLayers;
 
       const offscreen = position === 'left' ? -100 : 100;
-      gsap.set([panel, ...preLayers], { xPercent: offscreen, opacity: 1, visibility: 'hidden' });
+      gsap.set([panel, ...preLayers], { xPercent: offscreen, opacity: 1 });
       if (preContainer) {
         gsap.set(preContainer, { xPercent: 0, opacity: 1 });
       }
@@ -114,9 +114,6 @@ export const StaggeredMenu = ({
     }
 
     const tl = gsap.timeline({ paused: true });
-
-    // Make elements visible immediately at start of opening timeline
-    tl.set([panel, ...layers.map((l) => l.el)], { visibility: 'visible' }, 0);
 
     layerStates.forEach((ls, i) => {
       tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.5, ease: 'power4.out' }, i * 0.07);
@@ -239,7 +236,6 @@ export const StaggeredMenu = ({
       ease: 'power3.in',
       overwrite: 'auto',
       onComplete: () => {
-        gsap.set(all, { visibility: 'hidden' });
         const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel'));
         if (itemEls.length) {
           gsap.set(itemEls, { yPercent: 140, rotate: 10 });
@@ -375,74 +371,6 @@ export const StaggeredMenu = ({
     };
   }, [closeOnClickAway, open, closeMenu]);
 
-  // Accessibility: Focus management, Escape-to-close, and keyboard trap when modal is open
-  useEffect(() => {
-    if (!open) return;
-
-    const previouslyFocused = document.activeElement;
-
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' || e.key === 'Esc') {
-        e.preventDefault();
-        closeMenu();
-        if (toggleBtnRef.current) {
-          toggleBtnRef.current.focus();
-        }
-        return;
-      }
-
-      if (e.key === 'Tab') {
-        const panel = panelRef.current;
-        const toggleBtn = toggleBtnRef.current;
-        if (!panel) return;
-
-        const focusableInPanel = Array.from(
-          panel.querySelectorAll('a[href], button:not([disabled]), [tabindex="0"]')
-        ).filter((el) => el.offsetParent !== null || el.getClientRects().length > 0);
-
-        const focusables = toggleBtn ? [toggleBtn, ...focusableInPanel] : focusableInPanel;
-        if (focusables.length === 0) return;
-
-        const firstElement = focusables[0];
-        const lastElement = focusables[focusables.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          if (document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-          }
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    // Initial focus into modal on open
-    const focusTimer = setTimeout(() => {
-      const firstItem = panelRef.current?.querySelector('.sm-panel-item');
-      if (firstItem && typeof firstItem.focus === 'function') {
-        firstItem.focus();
-      } else if (toggleBtnRef.current) {
-        toggleBtnRef.current.focus();
-      }
-    }, 150);
-
-    return () => {
-      clearTimeout(focusTimer);
-      document.removeEventListener('keydown', handleKeyDown);
-      if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
-        previouslyFocused.focus();
-      } else if (toggleBtnRef.current) {
-        toggleBtnRef.current.focus();
-      }
-    };
-  }, [open, closeMenu]);
-
   // Lock body scroll completely when mobile menu is open
   useEffect(() => {
     if (open) {
@@ -549,19 +477,7 @@ export const StaggeredMenu = ({
         </button>
       </header>
 
-      <aside
-        id="staggered-menu-panel"
-        ref={panelRef}
-        className="staggered-menu-panel"
-        aria-hidden={!open}
-        inert={!open ? '' : undefined}
-        style={{
-          visibility: open ? 'visible' : 'hidden',
-        }}
-        role="dialog"
-        aria-modal={open ? 'true' : undefined}
-        aria-label="Mobile navigation"
-      >
+      <aside id="staggered-menu-panel" ref={panelRef} className="staggered-menu-panel" aria-hidden={!open}>
         <div className="sm-panel-inner">
           <ul className="sm-panel-list" role="list" data-numbering={displayItemNumbering || undefined}>
             {items && items.length ? (
@@ -570,7 +486,6 @@ export const StaggeredMenu = ({
                   <a
                     className="sm-panel-item"
                     href={it.link}
-                    tabIndex={open ? 0 : -1}
                     aria-label={it.ariaLabel}
                     data-index={idx + 1}
                     onClick={(e) => {
@@ -601,7 +516,6 @@ export const StaggeredMenu = ({
           <div className="sm-panel-cta pt-2">
             <button
               type="button"
-              tabIndex={open ? 0 : -1}
               onClick={() => {
                 isNavigatingRef.current = true;
                 closeMenu();
@@ -626,7 +540,6 @@ export const StaggeredMenu = ({
                   <li key={s.label + i} className="sm-socials-item">
                     <a
                       href={s.link}
-                      tabIndex={open ? 0 : -1}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="sm-socials-link"
