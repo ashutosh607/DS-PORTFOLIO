@@ -14,6 +14,11 @@ export default function SmoothScroll({ children }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // Use native GPU-accelerated touch momentum on mobile screens
+    if (window.innerWidth < 768) {
+      return;
+    }
+
     // Respect user preference for reduced motion
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return;

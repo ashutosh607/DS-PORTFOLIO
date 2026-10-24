@@ -54,10 +54,12 @@ export default function TextBlurReveal({
     },
   };
 
-  if (!words.length) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  if (!words.length || isMobile || shouldReduceMotion) {
     return (
       <Component className={className} style={style}>
-        {children}
+        {rawText || children}
       </Component>
     );
   }

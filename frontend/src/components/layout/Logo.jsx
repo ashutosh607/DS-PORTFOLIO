@@ -18,8 +18,8 @@ export default function Logo({
   imgStyle = {},
 }) {
   const isLight = variant === 'light';
-  const webpSrc = isLight ? dsLogoLightWebp : dsLogoDarkWebp;
-  const pngSrc = isLight ? dsLogoLightPng : dsLogoDarkPng;
+  const webpSrc = isLight ? dsLogoLightWebp : '/ds-logo-dark-opt.webp';
+  const pngSrc = isLight ? dsLogoLightPng : '/ds-logo-dark-opt.png';
   const numHeight = typeof height === 'number' ? height : parseInt(height, 10) || 42;
   const intrinsicWidth = Math.round(numHeight * (240 / 173));
 

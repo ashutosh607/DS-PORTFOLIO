@@ -9,27 +9,14 @@ import dsLogoDark from '../../assets/ds-logo-dark-splash.webp';
  * and then smoothly fades out to reveal the website.
  */
 export default function SplashScreen({ onComplete }) {
-  const [isVisible, setIsVisible] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    // Bypass splash screen immediately for crawlers, audit bots, and returning sessions
-    const isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse/i.test(navigator.userAgent);
-    const hasSeen = sessionStorage.getItem('ds_splash_shown');
-    return !isBot && !hasSeen;
-  });
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    if (!isVisible) {
-      if (onComplete) onComplete();
-      return;
-    }
-
-    sessionStorage.setItem('ds_splash_shown', '1');
-
     // Prevent background scrolling while splash is active
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    // Start smooth fade-out after 750ms (responsive, snappy luxury intro without blocking LCP)
+    // Start smooth fade-out after 750ms
     const timer = setTimeout(() => {
       setIsVisible(false);
     }, 750);
@@ -46,7 +33,7 @@ export default function SplashScreen({ onComplete }) {
       window.removeEventListener('keydown', handleDismiss);
       document.body.style.overflow = originalOverflow;
     };
-  }, [isVisible, onComplete]);
+  }, []);
 
   const handleAnimationComplete = () => {
     if (!isVisible) {

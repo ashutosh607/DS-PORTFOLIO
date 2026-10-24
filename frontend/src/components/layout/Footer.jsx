@@ -2,8 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Logo from './Logo';
+import { useCategories } from '../../utils/categoryManager';
 
 export default function Footer({ onOpenInquiry }) {
+  const { categories } = useCategories();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -148,36 +151,51 @@ export default function Footer({ onOpenInquiry }) {
               Photography
             </span>
             <ul className="space-y-2.5 font-sans text-xs sm:text-[13px]">
-              <li>
-                <Link to="/collections/weddings" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
-                  Wedding Photography
-                </Link>
-              </li>
-              <li>
-                <Link to="/collections/pre-wedding" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
-                  Pre-Wedding Films
-                </Link>
-              </li>
-              <li>
-                <Link to="/collections/portraits" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
-                  Editorial Portraits
-                </Link>
-              </li>
-              <li>
-                <Link to="/collections/birthdays" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
-                  Birthday Celebrations
-                </Link>
-              </li>
-              <li>
-                <Link to="/collections/events" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
-                  Events &amp; Galas
-                </Link>
-              </li>
-              <li>
-                <Link to="/collections/commercial" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
-                  Commercial &amp; Brands
-                </Link>
-              </li>
+              {categories && categories.length > 0 ? (
+                categories.map((cat) => (
+                  <li key={cat.slug || cat._id || cat.id}>
+                    <Link
+                      to={`/collections/${cat.slug}`}
+                      className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors"
+                    >
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li>
+                    <Link to="/collections/weddings" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                      Wedding Photography
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/collections/pre-wedding" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                      Pre-Wedding Films
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/collections/portraits" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                      Editorial Portraits
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/collections/birthdays" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                      Birthday Celebrations
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/collections/events" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                      Events &amp; Galas
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/collections/commercial" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                      Commercial &amp; Brands
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 

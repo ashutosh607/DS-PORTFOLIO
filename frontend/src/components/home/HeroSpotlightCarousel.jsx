@@ -136,7 +136,7 @@ export default function HeroSpotlightCarousel() {
     isDraggingRef.current = isDragging;
   }, [isDragging]);
 
-  // Main continuous, buttery-smooth 60fps/120fps rotation loop
+  // Main continuous, buttery-smooth 60fps/120fps rotation loop across all devices (phone & desktop)
   useEffect(() => {
     let animId;
     lastTimeRef.current = performance.now();
@@ -165,7 +165,7 @@ export default function HeroSpotlightCarousel() {
             setPos(nextPos);
           }
         } else if (!isHoveredRef.current && (typeof document === 'undefined' || !document.hidden)) {
-          // Continuous, slow, proper, smooth rotation (turntable) - does not stop per image
+          // Continuous, slow, proper, smooth rotation (turntable) - auto-rotates smoothly on phones and desktops
           // 0.18 cards per second = ~5.5s per image, serene and graceful
           const speed = 0.18;
           const nextPos = posRef.current + speed * clampedDt;
@@ -529,9 +529,9 @@ export default function HeroSpotlightCarousel() {
                       height="290"
                       style={{ aspectRatio: '200 / 290' }}
                       className="w-full h-full object-cover select-none pointer-events-none"
-                      loading={Math.abs(d) <= 1 ? 'eager' : 'lazy'}
-                      fetchPriority={Math.abs(d) === 0 ? 'high' : 'auto'}
-                      decoding={Math.abs(d) === 0 ? 'sync' : 'async'}
+                      loading={idx === 1 ? 'eager' : 'lazy'}
+                      fetchPriority={idx === 1 ? 'high' : 'auto'}
+                      decoding={idx === 1 ? 'sync' : 'async'}
                       draggable={false}
                     />
                   ) : (
