@@ -54,13 +54,20 @@ const DESKTOP_RESTING = [
 ];
 
 const MOBILE_RESTING = [
-  { x: -62, y: -135, rotate: -2.0 }, // 0: Upper-Left (Row 1 Left)
-  { x: 62, y: -112, rotate: 2.2 },  // 1: Upper-Right (Row 1 Right, staggered)
-  { x: -60, y: -38, rotate: 1.8 },  // 2: Mid-Left (Row 2 Left)
-  { x: 64, y: -16, rotate: -1.8 }, // 3: Mid-Right (Row 2 Right, staggered)
-  { x: -62, y: 60, rotate: -2.2 }, // 4: Lower-Left (Row 3 Left)
-  { x: 62, y: 82, rotate: 2.0 },  // 5: Lower-Right (Row 3 Right, staggered)
-  { x: 0, y: 136, rotate: -0.5 }, // 6: Hero Center Finale (in front & fully visible)
+  // 0: Top-Left (Woman in blue saree) - increased size to close gap
+  { x: -75, y: -178, rotate: 0, scale: 1.18, zIndex: 12, vwX: -19.0, vhY: -21.0 },
+  // 1: Top-Right (Mehendi hands photo) - increased size to close gap
+  { x: 78, y: -168, rotate: 0, scale: 1.18, zIndex: 12, vwX: 20.0, vhY: -20.0 },
+  // 2: Middle-Left (Toddler boy photo)
+  { x: -125, y: 10, rotate: 0, scale: 0.88, zIndex: 10, vwX: -32.0, vhY: 1.2 },
+  // 3: Middle-Right (Hand with ring & henna)
+  { x: 128, y: 10, rotate: 0, scale: 0.88, zIndex: 10, vwX: 32.5, vhY: 1.2 },
+  // 4: Bottom-Left (Couple standing outdoors) - increased size to close gap
+  { x: -75, y: 198, rotate: 0, scale: 1.18, zIndex: 14, vwX: -19.0, vhY: 23.5 },
+  // 5: Bottom-Right (Couple on wooden balcony) - increased size to close gap
+  { x: 78, y: 198, rotate: 0, scale: 1.18, zIndex: 14, vwX: 20.0, vhY: 23.5 },
+  // 6: Hero Center Finale (Couple in white holding hands: large centerpiece, highest z-index)
+  { x: 0, y: 0, rotate: 0, scale: 1.26, zIndex: 25, vwX: 0.0, vhY: 0.0 },
 ];
 
 /**
@@ -177,6 +184,23 @@ export default function WhatWeDoEditorial() {
         const sched = CARD_SCHEDULE[i];
         const targetPos = restingPositions[i] || { x: 0, y: 0, rotate: 0 };
 
+        let targetX = targetPos.x;
+        let targetY = targetPos.y;
+        if (isMobile) {
+          const vw = window.innerWidth / 100;
+          const vh = window.innerHeight / 100;
+          if (targetPos.vwX !== undefined) {
+            targetX = targetPos.vwX * vw;
+          }
+          if (targetPos.vhY !== undefined) {
+            const maxOffset = vh * 32;
+            const computedY = targetPos.vhY * vh;
+            targetY = Math.max(-maxOffset, Math.min(maxOffset, computedY));
+          }
+        }
+        const targetScale = isMobile ? (targetPos.scale ?? 1) : 1;
+        const targetZ = isMobile ? (targetPos.zIndex ?? (10 + i)) : (10 + i);
+
         let currentX = 0;
         let currentY = 0;
         let currentRotate = 0;
@@ -195,18 +219,18 @@ export default function WhatWeDoEditorial() {
           } else if (progress <= sched.end) {
             const rawT = (progress - sched.start) / (sched.end - sched.start);
             const easedT = smootherStep(rawT);
-            currentX = targetPos.x * easedT;
-            currentY = targetPos.y * easedT;
+            currentX = targetX * easedT;
+            currentY = targetY * easedT;
             currentRotate = targetPos.rotate * easedT;
             const liftArc = Math.sin(easedT * Math.PI);
-            currentScale = 1 + liftArc * 0.045;
+            currentScale = (1 + (targetScale - 1) * easedT) + liftArc * 0.045;
             zIndex = 45;
           } else {
-            currentX = targetPos.x;
-            currentY = targetPos.y;
+            currentX = targetX;
+            currentY = targetY;
             currentRotate = targetPos.rotate;
-            currentScale = 1;
-            zIndex = 10 + i;
+            currentScale = targetScale;
+            zIndex = targetZ;
           }
         } else {
           // Soft pre-materialization onto deck so the card appears gracefully before taking flight
@@ -221,7 +245,7 @@ export default function WhatWeDoEditorial() {
             const fadeProgress = (progress - appearStart) / (sched.start - appearStart);
             const easedFade = smootherStep(fadeProgress);
             currentOpacity = easedFade;
-            currentScale = 0.92 + easedFade * 0.08;
+            currentScale = 0.92 + easedFade * (targetScale * 0.08);
             currentX = 0;
             currentY = 0;
             currentRotate = 0;
@@ -230,19 +254,19 @@ export default function WhatWeDoEditorial() {
             currentOpacity = 1;
             const rawT = (progress - sched.start) / (sched.end - sched.start);
             const easedT = smootherStep(rawT);
-            currentX = targetPos.x * easedT;
-            currentY = targetPos.y * easedT;
+            currentX = targetX * easedT;
+            currentY = targetY * easedT;
             currentRotate = targetPos.rotate * easedT;
             const liftArc = Math.sin(easedT * Math.PI);
-            currentScale = 1 + liftArc * 0.045;
+            currentScale = (1 + (targetScale - 1) * easedT) + liftArc * 0.045;
             zIndex = 45;
           } else {
             currentOpacity = 1;
-            currentX = targetPos.x;
-            currentY = targetPos.y;
+            currentX = targetX;
+            currentY = targetY;
             currentRotate = targetPos.rotate;
-            currentScale = 1;
-            zIndex = 10 + i;
+            currentScale = targetScale;
+            zIndex = targetZ;
           }
         }
 
@@ -419,10 +443,19 @@ export default function WhatWeDoEditorial() {
         }
         @media (max-width: 768px) {
           .editorial-photo-card {
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+            width: clamp(100px, min(29vw, 21vh), 136px) !important;
+            box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.08) !important;
+            border-radius: 18px !important;
             border: none !important;
             outline: none !important;
             -webkit-box-reflect: none !important;
+          }
+          .editorial-photo-card > div,
+          .editorial-photo-card img {
+            border-radius: 18px !important;
+          }
+          .editorial-photo-card > div {
+            animation: none !important;
           }
           .editorial-photo-card::before,
           .editorial-photo-card::after,
@@ -473,7 +506,7 @@ export default function WhatWeDoEditorial() {
                     e.currentTarget.style.boxShadow = normalShadow;
                   }
                 }}
-                className="editorial-photo-card absolute w-[88px] min-[375px]:w-[92px] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-xl overflow-hidden will-change-[transform,opacity] group cursor-pointer border-0 outline-none"
+                className="editorial-photo-card absolute w-[clamp(100px,min(29vw,21vh),136px)] sm:w-[145px] md:w-[190px] aspect-[3/4] rounded-[18px] overflow-hidden will-change-[transform,opacity] group cursor-pointer border-0 outline-none"
                 style={{
                   opacity: i === 0 ? 1 : 0,
                   transform: 'translate3d(0, 0, 0)',
@@ -495,7 +528,7 @@ export default function WhatWeDoEditorial() {
                     <img
                       src={src.w300}
                       srcSet={`${src.w300} 300w, ${src.full} 600w`}
-                      sizes="(max-width: 768px) 100px, 190px"
+                      sizes="(max-width: 768px) 140px, 190px"
                       alt={PHOTO_METADATA[i] || `Atelier Portfolio Print ${i + 1}`}
                       width="190"
                       height="253"
