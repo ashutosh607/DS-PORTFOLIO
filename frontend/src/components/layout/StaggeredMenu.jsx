@@ -4,6 +4,7 @@ import Logo from './Logo';
 import './StaggeredMenu.css';
 
 export const StaggeredMenu = ({
+  autoOpen = false,
   position = 'right',
   colors = ['#E6DAC8', '#CBB9A4', '#8C7764'],
   items = [],
@@ -342,6 +343,12 @@ export const StaggeredMenu = ({
     animateColor(target);
     animateText(target);
   }, [playOpen, playClose, animateIcon, animateColor, animateText, onMenuOpen, onMenuClose]);
+
+  useEffect(() => {
+    if (autoOpen && !openRef.current) {
+      toggleMenu();
+    }
+  }, [autoOpen, toggleMenu]);
 
   const closeMenu = useCallback((restoreFocus = false) => {
     if (openRef.current) {

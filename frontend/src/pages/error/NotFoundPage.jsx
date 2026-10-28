@@ -68,7 +68,7 @@ export default function NotFoundPage() {
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#E3DBCC] bg-[#FDFCF8] text-[11px] font-mono tracking-[0.22em] text-[#7A6E5D] uppercase mb-6 shadow-sm"
         >
           <Compass size={13} strokeWidth={1.5} className="text-[#A48D78]" />
-          <span>DISPLACED IN THE ARCHIVE</span>
+          <span>404 // ARCHIVE LOCATION UNRESOLVED</span>
         </motion.div>
 
         {/* Large Aesthetic 404 Headline */}
@@ -96,15 +96,25 @@ export default function NotFoundPage() {
           </div>
         </motion.div>
 
-        {/* Title */}
+        {/* Clear 404 - Page Not Found Title */}
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#1E1B18] font-normal tracking-[0.06em] uppercase mt-2 mb-4 leading-tight"
+          className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#1E1B18] font-normal tracking-[0.06em] uppercase mt-2 mb-3 leading-tight"
         >
-          THE MONOGRAPH CANNOT BE FOUND
+          404 &mdash; PAGE NOT FOUND
         </motion.h1>
+
+        {/* Editorial Sub-eyebrow */}
+        <motion.p
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          className="font-serif text-sm sm:text-base tracking-[0.16em] text-[#7A6E5D] uppercase mb-4"
+        >
+          The Monograph Cannot Be Found
+        </motion.p>
 
         {/* Description */}
         <motion.p
@@ -115,7 +125,7 @@ export default function NotFoundPage() {
         >
           The folio, collection gallery, or page you are seeking has been archived,
           relocated, or never existed in our active catalog. Let us guide you back to
-          our master collections.
+          our master portfolio and booking atelier.
         </motion.p>
 
         {/* Luxury Divider */}
@@ -136,10 +146,10 @@ export default function NotFoundPage() {
           <button
             type="button"
             onClick={() => handleNav('/', 'HOME')}
-            className="inline-flex items-center gap-2.5 px-6 py-3 bg-[#1E1B18] text-[#FAF8F5] text-[12px] font-sans font-medium tracking-[0.16em] uppercase rounded-full hover:bg-[#34302B] hover:shadow-lg transition-all duration-300 cursor-pointer"
+            className="inline-flex items-center gap-2.5 px-6 py-3 bg-[#101010] text-[#FAF8F5] text-[12px] font-sans font-medium tracking-[0.16em] uppercase rounded-full hover:bg-[#2A2724] hover:shadow-lg transition-all duration-300 cursor-pointer"
           >
             <Home size={14} strokeWidth={1.8} />
-            <span>Return to Sanctuary</span>
+            <span>Back to Home</span>
           </button>
 
           <button
@@ -153,11 +163,11 @@ export default function NotFoundPage() {
 
           <button
             type="button"
-            onClick={() => handleNav('/services', 'SERVICES')}
+            onClick={() => handleNav('/services?step=book#book', 'BOOKING')}
             className="inline-flex items-center gap-2 px-5 py-3 text-[#5A544C] hover:text-[#1E1B18] text-[11px] font-mono tracking-[0.18em] uppercase transition-colors cursor-pointer"
           >
             <Sparkles size={13} strokeWidth={1.6} />
-            <span>Services &amp; Pricing</span>
+            <span>Book a Session</span>
           </button>
         </motion.div>
       </main>

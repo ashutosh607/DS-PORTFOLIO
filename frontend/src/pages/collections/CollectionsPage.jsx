@@ -239,11 +239,21 @@ export default function CollectionsPage({ onOpenInquiry }) {
         { replace: true }
       );
     }
-    if (galleryRevealRef.current) {
-      setTimeout(() => {
-        galleryRevealRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
+
+    const scrollToGallery = () => {
+      const el = galleryRevealRef.current || document.getElementById('collection-gallery-detail');
+      if (!el) return;
+      if (window.lenis && typeof window.lenis.scrollTo === 'function') {
+        window.lenis.scrollTo(el, { offset: -70, duration: 1.1, immediate: false });
+      } else {
+        const yOffset = -70;
+        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      }
+    };
+
+    scrollToGallery();
+    setTimeout(scrollToGallery, 120);
   };
 
   const handleScrollToExplore = () => {

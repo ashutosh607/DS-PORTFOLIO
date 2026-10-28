@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>404 — Page Not Found | DS Photography &amp; Films</title>
+  <meta name="description"
+    content="The requested folio, collection, or page could not be located in our active catalog." />
+  <meta name="robots" content="noindex, follow" />
+  <meta name="theme-color" content="#101010" />
+
+  <link rel="icon" type="image/png" href="/ds-logo-dark-opt.png" />
+  <link rel="apple-touch-icon" href="/ds-logo-dark-opt.png" />
+
+  <!-- Google Fonts Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --color-off-white: #FDFCF8;
+      --color-ivory: #F3F0E9;
+      --color-ivory-warm: #FAF8F5;
+      --color-nude: #E3DBCC;
+      --color-nude-dark: #D6CBB9;
+      --color-obsidian: #101010;
+      --color-muted: #5A544C;
+      --color-accent: #7A6E5D;
+      --font-serif: 'Cormorant Garamond', Garamond, Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-script: 'Caveat', cursive, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--color-off-white);
+      color: var(--color-obsidian);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 1rem;
+      position: relative;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Warm Lighting */
+    .ambient-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.7;
+      background: radial-gradient(ellipse at 50% 30%, rgba(227, 219, 204, 0.45) 0%, rgba(250, 249, 246, 0) 75%);
+      z-index: 0;
+    }
+
+    /* Header */
+    .brand-header {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1240px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.25s ease;
+    }
+
+    .brand-link:hover {
+      opacity: 0.8;
+    }
+
+    .brand-logo-img {
+      height: 36px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand-title {
+      font-family: var(--font-serif);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      color: #1E1B18;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.24em;
+      color: var(--color-muted);
+      text-transform: uppercase;
+    }
+
+    .status-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #C5B9A5;
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Main Container */
+    main {
+      position: relative;
+      z-index: 10;
+      margin: auto 0;
+      padding: 3rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 760px;
+      width: 100%;
+    }
+
+    /* Eyebrow Pill */
+    .eyebrow-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid var(--color-nude);
+      background-color: var(--color-off-white);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      color: var(--color-accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .eyebrow-icon {
+      width: 13px;
+      height: 13px;
+      stroke: #A48D78;
+    }
+
+    /* Large 404 Visual */
+    .numeral-wrapper {
+      position: relative;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .numeral-watermark {
+      display: block;
+      font-family: var(--font-serif);
+      font-size: clamp(100px, 18vw, 190px);
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      color: rgba(30, 27, 24, 0.08);
+      pointer-events: none;
+    }
+
+    .script-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-script);
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      color: var(--color-accent);
+      transform: rotate(-4deg);
+      letter-spacing: 0.02em;
+      pointer-events: none;
+    }
+
+    /* Headings */
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.6rem, 4vw, 2.35rem);
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-obsidian);
+      margin-top: 0.5rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.15;
+    }
+
+    .sub-eyebrow {
+      font-family: var(--font-serif);
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 1.25rem;
+    }
+
+    .description {
+      font-size: clamp(13px, 1.8vw, 15px);
+      line-height: 1.7;
+      color: var(--color-muted);
+      max-width: 540px;
+      margin-bottom: 2rem;
+    }
+
+    /* Divider */
+    .divider {
+      width: 64px;
+      height: 1px;
+      background-color: var(--color-nude-dark);
+      margin-bottom: 2rem;
+    }
+
+    /* Actions */
+    .actions-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.875rem;
+      width: 100%;
+      max-width: 580px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.8rem 1.65rem;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 9999px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background-color: var(--color-obsidian);
+      color: #FAF8F5;
+      border: 1px solid var(--color-obsidian);
+      box-shadow: 0 4px 14px rgba(16, 16, 16, 0.12);
+    }
+
+    .btn-primary:hover {
+      background-color: #2A2724;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 16, 16, 0.18);
+    }
+
+    .btn-secondary {
+      background-color: var(--color-off-white);
+      color: var(--color-obsidian);
+      border: 1px solid var(--color-nude-dark);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--color-ivory-warm);
+      border-color: #BAAA94;
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: var(--color-muted);
+      padding: 0.75rem 1.25rem;
+      text-decoration: none;
+      transition: color 0.25s ease;
+    }
+
+    .btn-ghost:hover {
+      color: var(--color-obsidian);
+    }
+
+    .btn-icon {
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1240px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-top: 1px solid #E8E0D2;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.2em;
+      color: #8C8070;
+      text-transform: uppercase;
+    }
+
+    @media (min-width: 640px) {
+      footer {
+        flex-direction: row;
+      }
+      .brand-title {
+        display: inline;
+      }
+    }
+
+    @media (max-width: 639px) {
+      .brand-title {
+        display: none;
+      }
+    }
+
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font: inherit;
+      letter-spacing: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.25s ease;
+    }
+
+    .back-btn:hover {
+      color: var(--color-obsidian);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="brand-header">
+    <a href="/" class="brand-link" aria-label="DS Photography &amp; Films Home">
+      <img src="/ds-logo-dark-opt.png" alt="DS Logo" class="brand-logo-img" width="36" height="36" />
+      <span class="brand-title">DS PHOTOGRAPHY &amp; FILMS</span>
+    </a>
+
+    <div class="status-badge">
+      <span class="status-pulse" aria-hidden="true"></span>
+      <span>STATUS // 404 UNRESOLVED</span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="eyebrow-pill">
+      <svg class="eyebrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+      </svg>
+      <span>404 // ARCHIVE LOCATION UNRESOLVED</span>
+    </div>
+
+    <div class="numeral-wrapper">
+      <span class="numeral-watermark" aria-hidden="true">404</span>
+      <div class="script-overlay" aria-hidden="true">a frame lost to time&hellip;</div>
+    </div>
+
+    <h1>404 &mdash; PAGE NOT FOUND</h1>
+    <p class="sub-eyebrow">The Monograph Cannot Be Found</p>
+
+    <p class="description">
+      The folio, collection gallery, or page you are seeking has been archived, relocated,
+      or never existed in our active catalog. Let us guide you back to our master portfolio
+      and booking atelier.
+    </p>
+
+    <div class="divider" aria-hidden="true"></div>
+
+    <div class="actions-grid">
+      <a href="/" class="btn btn-primary">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Back to Home</span>
+      </a>
+
+      <a href="/collections" class="btn btn-secondary">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
+          <circle cx="12" cy="13" r="3"></circle>
+        </svg>
+        <span>Explore Collections</span>
+      </a>
+
+      <a href="/services?step=book#book" class="btn btn-ghost">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+        </svg>
+        <span>Book a Session</span>
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <span>&copy; <script>document.write(new Date().getFullYear())</script> DS PHOTOGRAPHY &amp; FILMS</span>
+    <button type="button" class="back-btn" onclick="if(history.length>1){history.back();}else{window.location.href='/';}">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>GO BACK PREVIOUS FRAME</span>
+    </button>
+  </footer>
+</body>
+
+</html>

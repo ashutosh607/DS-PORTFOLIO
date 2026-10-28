@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
-import ErrorPage from '../../pages/error/ErrorPage';
+import React, { Component, lazy, Suspense } from 'react';
+
+const ErrorPage = lazy(() => import('../../pages/error/ErrorPage'));
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -22,10 +23,18 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <ErrorPage
-          error={this.state.error}
-          resetErrorBoundary={this.handleReset}
-        />
+        <Suspense
+          fallback={
+            <div className="min-h-screen bg-[#FAF9F6] p-8 flex items-center justify-center font-serif text-lg text-[#101010]">
+              A temporary anomaly occurred. Please reload the page.
+            </div>
+          }
+        >
+          <ErrorPage
+            error={this.state.error}
+            resetErrorBoundary={this.handleReset}
+          />
+        </Suspense>
       );
     }
 

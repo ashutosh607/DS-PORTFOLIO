@@ -1,37 +1,41 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useRef } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/home/HomePage';
-import Footer from './components/layout/Footer';
 import { PageTransitionProvider } from './components/common/PageTransition';
 import SplashScreen from './components/common/SplashScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import SmoothScroll from './components/common/SmoothScroll';
 
-// Code-split routes and modals for optimal performance and smaller initial JS bundle
+// Code-split routes, footer, modals and admin portal for optimal performance and smaller initial JS bundle
+const Footer = lazy(() => import('./components/layout/Footer'));
 const CollectionsPage = lazy(() => import('./pages/collections/CollectionsPage'));
 const ServicesPage = lazy(() => import('./pages/services/ServicesPage'));
 const InquiryModal = lazy(() => import('./components/modals/InquiryModal'));
 const TermsPage = lazy(() => import('./pages/terms/TermsPage'));
 const NotFoundPage = lazy(() => import('./pages/error/NotFoundPage'));
-import ErrorPage from './pages/error/ErrorPage';
+const ErrorPage = lazy(() => import('./pages/error/ErrorPage'));
 
-// Admin Panel lazy imports (excluded from public user bundle)
-import { AdminAuthProvider } from './pages/admin/context/AdminAuthContext';
-import AdminProtectedRoute from './pages/admin/components/AdminProtectedRoute';
-const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
-const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'));
-const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
-const AdminCollectionsPage = lazy(() => import('./pages/admin/AdminCollectionsPage'));
-const AdminServicesPage = lazy(() => import('./pages/admin/AdminServicesPage'));
+// Admin Panel bundle completely isolated and lazy loaded on demand
+const AdminRoot = lazy(() => import('./pages/admin/AdminRoot'));
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
+  const prevPathRef = useRef(pathname);
 
   useEffect(() => {
     // Disable browser automatic scroll restoration so it never jumps back
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
+    }
+
+    const wasCollections = prevPathRef.current.startsWith('/collections');
+    const isCollections = pathname.startsWith('/collections');
+    prevPathRef.current = pathname;
+
+    // Preserve scroll position when transitioning between collection sub-paths
+    if (wasCollections && isCollections) {
+      return;
     }
 
     if (hash) {
@@ -80,9 +84,8 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <AdminAuthProvider>
-        <SmoothScroll>
-          <PageTransitionProvider>
+      <SmoothScroll>
+        <PageTransitionProvider>
           {/* Initial Luxury Brand Intro Splash Screen */}
           {splashActive && !isAdminRoute && (
             <SplashScreen onComplete={() => setSplashActive(false)} />
@@ -118,25 +121,8 @@ export default function App() {
                 {/* Dedicated Error Testing Route */}
                 <Route path="/error" element={<ErrorPage />} />
 
-                {/* Admin Authentication */}
-                <Route path="/admin/login" element={<AdminLoginPage />} />
-
-                {/* Protected Admin Panel */}
-                <Route
-                  path="/admin"
-                  element={
-                    <AdminProtectedRoute>
-                      <AdminLayout />
-                    </AdminProtectedRoute>
-                  }
-                >
-                  <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                  <Route path="dashboard" element={<AdminDashboardPage />} />
-                  <Route path="collections" element={<AdminCollectionsPage />} />
-                  <Route path="collections/:category" element={<AdminCollectionsPage />} />
-                  <Route path="services" element={<AdminServicesPage />} />
-                  <Route path="services/:category" element={<AdminServicesPage />} />
-                </Route>
+                {/* Isolated Admin Management Portal */}
+                <Route path="/admin/*" element={<AdminRoot />} />
 
                 {/* 404 Page Not Found Route */}
                 <Route path="*" element={<NotFoundPage />} />
@@ -144,7 +130,11 @@ export default function App() {
             </Suspense>
 
             {/* Minimal footer with CET studio time and social directory (only on public site) */}
-            {showPublicChrome && <Footer onOpenInquiry={() => handleOpenInquiry()} />}
+            {showPublicChrome && (
+              <Suspense fallback={<div className="min-h-[200px] bg-[#101010]" />}>
+                <Footer onOpenInquiry={() => handleOpenInquiry()} />
+              </Suspense>
+            )}
 
             {/* Interactive Consultation / Inquiry Modal (only on public site, loaded on demand) */}
             {showPublicChrome && inquiryModalOpen && (
@@ -159,7 +149,6 @@ export default function App() {
           </div>
         </PageTransitionProvider>
       </SmoothScroll>
-    </AdminAuthProvider>
-  </ErrorBoundary>
+    </ErrorBoundary>
   );
 }

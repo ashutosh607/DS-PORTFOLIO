@@ -67,6 +67,13 @@ export default function CollectionsRibbon({
   const touchVelocity = useRef(0);
   const hasDragged = useRef(false);
   const isHorizontalScroll = useRef(false);
+  const dragResetTimer = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (dragResetTimer.current) clearTimeout(dragResetTimer.current);
+    };
+  }, []);
 
   // Update container width on resize
   useEffect(() => {
@@ -211,6 +218,11 @@ export default function CollectionsRibbon({
       handlePrev();
     }
     setDragOffset(0);
+    // Keep hasDragged flag intact across immediate click event, then reset
+    if (dragResetTimer.current) clearTimeout(dragResetTimer.current);
+    dragResetTimer.current = setTimeout(() => {
+      hasDragged.current = false;
+    }, 120);
   };
 
   const handleMouseLeave = () => {
@@ -276,11 +288,15 @@ export default function CollectionsRibbon({
       handlePrev();
     }
     setDragOffset(0);
+    // Keep hasDragged flag intact across immediate tap/click event, then reset
+    if (dragResetTimer.current) clearTimeout(dragResetTimer.current);
+    dragResetTimer.current = setTimeout(() => {
+      hasDragged.current = false;
+    }, 120);
   };
 
   const handleCardClick = (catId) => {
     if (hasDragged.current) {
-      hasDragged.current = false;
       return;
     }
     onSelectCategory(catId);
@@ -443,14 +459,16 @@ export default function CollectionsRibbon({
                   }}
                 >
                   <Link
-                    to={`/collections/${cat.slug || cat.id}`}
+                    to={`/collections?category=${cat.slug || cat.name?.toLowerCase() || cat.id}&id=${cat.id}`}
                     onClick={(e) => {
-                      if (!isDragging) {
+                      if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
                         e.preventDefault();
+                      }
+                      if (!hasDragged.current) {
                         handleCardClick(cat.id);
                       }
                     }}
-                    className="block text-inherit no-underline select-none"
+                    className="block text-inherit no-underline select-none cursor-pointer"
                     aria-label={`Explore ${cat.name} Photography Collection`}
                   >
                     <motion.div
