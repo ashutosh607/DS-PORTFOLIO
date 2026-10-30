@@ -449,6 +449,8 @@ export default function CollectionsRibbon({
           >
             {items.map((cat, index) => {
               const isActive = cat.id === activeCategoryId;
+              const catDisplay = cat.coverDisplay || cat.display;
+              const isContainCard = catDisplay?.fit === 'contain' || catDisplay?.fit === 'fit';
 
               return (
                 <div
@@ -489,7 +491,7 @@ export default function CollectionsRibbon({
                         boxShadow: isActive
                           ? '0 24px 44px -10px rgba(18, 16, 14, 0.48), 0 0 0 2px #101010'
                           : '0 14px 32px -10px rgba(18, 16, 14, 0.22)',
-                        ...getFramingContainerStyle(cat.coverDisplay || cat.display),
+                        ...getFramingContainerStyle(catDisplay),
                       }}
                     >
                       {/* Background Photograph */}
@@ -497,7 +499,7 @@ export default function CollectionsRibbon({
                         src={getApiUrl(cat.coverImage || cat.featured?.image)}
                         alt={`${cat.name} Collection`}
                         className="absolute inset-0 w-full h-full transition-[transform] duration-500 ease-out group-hover:scale-105 pointer-events-none"
-                        style={getFramingStyle(cat.coverDisplay || cat.display)}
+                        style={getFramingStyle(catDisplay)}
                         loading="lazy"
                         draggable={false}
                       />
@@ -506,8 +508,9 @@ export default function CollectionsRibbon({
                       <div
                         className="absolute inset-0 pointer-events-none"
                         style={{
-                          background:
-                            'linear-gradient(to bottom, rgba(16, 16, 16, 0.05) 0%, rgba(16, 16, 16, 0.12) 40%, rgba(16, 16, 0.68) 75%, rgba(16, 16, 16, 0.95) 100%)',
+                          background: isContainCard
+                            ? 'linear-gradient(to bottom, rgba(16, 16, 16, 0) 0%, rgba(16, 16, 16, 0) 58%, rgba(16, 16, 16, 0.55) 82%, rgba(16, 16, 16, 0.90) 100%)'
+                            : 'linear-gradient(to bottom, rgba(16, 16, 16, 0.05) 0%, rgba(16, 16, 16, 0.12) 40%, rgba(16, 16, 16, 0.68) 75%, rgba(16, 16, 16, 0.95) 100%)',
                         }}
                       />
 
@@ -612,4 +615,3 @@ export default function CollectionsRibbon({
     </section>
   );
 }
-

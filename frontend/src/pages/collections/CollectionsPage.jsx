@@ -6,6 +6,11 @@ import CollectionsRibbon from './components/CollectionsRibbon';
 import CollectionsGallery from './components/CollectionsGallery';
 import { CATEGORIES as DEFAULT_CATEGORIES } from './data/collectionsData';
 import { getApiUrl } from '../../utils/api';
+import {
+  hasCustomFraming,
+  extractFramingFromUrl,
+  stripFramingHash,
+} from '../../utils/mediaFraming';
 import SEOHead from '../../components/common/SEOHead';
 import { buildCollectionGallerySchema, buildBreadcrumbSchema } from '../../utils/structuredData';
 import { SEO_CONFIG } from '../../utils/seoConfig';
@@ -27,7 +32,10 @@ export default function CollectionsPage({ onOpenInquiry }) {
         const cached = localStorage.getItem('ds_portfolio_cached_media');
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) {
+            const valid = parsed.filter((m) => m && (m.url || m.category));
+            if (valid.length > 0) return valid;
+          }
         }
       } catch (err) {
         console.warn('Could not read cached media:', err);
@@ -111,7 +119,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
             const res = await fetch(ep);
             if (res.ok) {
               const json = await res.json();
-              if (isMounted && Array.isArray(json.data) && json.data.length > 0) {
+              if (isMounted && Array.isArray(json.data)) {
                 setMediaList(json.data);
                 try {
                   localStorage.setItem('ds_portfolio_cached_media', JSON.stringify(json.data));
@@ -141,10 +149,23 @@ export default function CollectionsPage({ onOpenInquiry }) {
     // Listen for real-time media updates broadcast from admin modals or cross-tab storage
     const handleMediaUpdated = (e) => {
       if (e?.detail && Array.isArray(e.detail)) {
-        setMediaList(e.detail);
-      } else {
-        loadMedia(1);
+        const validMedia = e.detail.filter((m) => m && (m.url || m.category));
+        if (validMedia.length > 0 || e.detail.length === 0) {
+          setMediaList(validMedia);
+          return;
+        }
+      } else if (e?.detail && typeof e.detail === 'object' && e.detail._id && (e.detail.url || e.detail.category)) {
+        setMediaList((prev) =>
+          prev.some((m) => m._id === e.detail._id)
+            ? prev.map((m) => (m._id === e.detail._id ? { ...m, ...e.detail } : m))
+            : prev
+        );
       }
+      loadMedia(1);
+    };
+
+    const handleCategoriesUpdated = () => {
+      loadMedia(1);
     };
 
     const handleStorageOrFocus = (e) => {
@@ -153,7 +174,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
     };
 
     window.addEventListener('ds_media_updated', handleMediaUpdated);
-    window.addEventListener('ds_categories_updated', handleMediaUpdated);
+    window.addEventListener('ds_categories_updated', handleCategoriesUpdated);
     window.addEventListener('storage', handleStorageOrFocus);
     window.addEventListener('focus', handleStorageOrFocus);
 
@@ -161,7 +182,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
       isMounted = false;
       if (retryTimer) clearTimeout(retryTimer);
       window.removeEventListener('ds_media_updated', handleMediaUpdated);
-      window.removeEventListener('ds_categories_updated', handleMediaUpdated);
+      window.removeEventListener('ds_categories_updated', handleCategoriesUpdated);
       window.removeEventListener('storage', handleStorageOrFocus);
       window.removeEventListener('focus', handleStorageOrFocus);
     };
@@ -188,19 +209,26 @@ export default function CollectionsPage({ onOpenInquiry }) {
     });
 
     const effectiveCoverImage = getApiUrl(cat.coverImage || cat.featured?.image);
-    const effectiveCoverDisplay = cat.coverDisplay || cat.display || cat.featured?.display;
-    const hasCustomCoverFraming = Boolean(
-      effectiveCoverDisplay &&
-      (effectiveCoverDisplay.fit === 'contain' ||
-        effectiveCoverDisplay.fit === 'fit' ||
-        (typeof effectiveCoverDisplay.zoom === 'number' && effectiveCoverDisplay.zoom !== 1) ||
-        (typeof effectiveCoverDisplay.position?.x === 'number' && effectiveCoverDisplay.position.x !== 50) ||
-        (typeof effectiveCoverDisplay.position?.y === 'number' && effectiveCoverDisplay.position.y !== 50))
-    );
+    const bareEffectiveCoverImage = stripFramingHash(effectiveCoverImage);
+    const urlCoverFraming = extractFramingFromUrl(effectiveCoverImage);
+    const effectiveCoverDisplay = hasCustomFraming(cat.coverDisplay)
+      ? cat.coverDisplay
+      : hasCustomFraming(cat.display)
+        ? cat.display
+        : hasCustomFraming(cat.featured?.display)
+          ? cat.featured.display
+          : (urlCoverFraming || cat.coverDisplay || cat.display || cat.featured?.display);
+    const hasCustomCoverFraming = hasCustomFraming(effectiveCoverDisplay);
 
     const formattedCustom = categoryItems.map((item, idx) => {
       const itemUrl = getApiUrl(item.url);
-      const isMatchingCover = Boolean(effectiveCoverImage && itemUrl === effectiveCoverImage);
+      const bareItemUrl = stripFramingHash(itemUrl);
+      const isMatchingCover = Boolean(bareEffectiveCoverImage && bareItemUrl === bareEffectiveCoverImage);
+      const itemUrlFraming = extractFramingFromUrl(itemUrl);
+      const resolvedItemDisplay = hasCustomFraming(item.display)
+        ? item.display
+        : (itemUrlFraming || item.display);
+      const itemHasOwnFraming = hasCustomFraming(resolvedItemDisplay);
       return {
         id: item._id || `custom-${cat.id}-${idx}`,
         image: itemUrl,
@@ -212,7 +240,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
         isCustom: true,
         display: isMatchingCover && hasCustomCoverFraming
           ? effectiveCoverDisplay
-          : (item.display || (isMatchingCover ? effectiveCoverDisplay : undefined)),
+          : (itemHasOwnFraming ? resolvedItemDisplay : (isMatchingCover ? effectiveCoverDisplay : resolvedItemDisplay)),
       };
     });
 
@@ -230,22 +258,29 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
     const baselineCat = findBaselineCategory(cat.id) || findBaselineCategory(cat.slug);
     const isEditedCoverImage = Boolean(
-      effectiveCoverImage &&
-      (!baselineCat || ( effectiveCoverImage !== baselineCat.coverImage && effectiveCoverImage !== baselineCat.featured?.image ))
+      bareEffectiveCoverImage &&
+      (!baselineCat ||
+        (bareEffectiveCoverImage !== stripFramingHash(baselineCat.coverImage) &&
+          bareEffectiveCoverImage !== stripFramingHash(baselineCat.featured?.image)))
     );
-    const customAlreadyIncludesCover = formattedCustom.some((m) => m.image === effectiveCoverImage);
+    const customCoverIndex = formattedCustom.findIndex(
+      (m) => stripFramingHash(m.image) === bareEffectiveCoverImage
+    );
 
     let combinedCustom = formattedCustom;
-    if (formattedCustom.length > 0) {
-      if ((isEditedCoverImage || hasCustomCoverFraming) && !customAlreadyIncludesCover && effectiveCoverImage) {
-        if (isEditedCoverImage) {
-          combinedCustom = [baseFeatured, ...formattedCustom];
-        } else if (hasCustomCoverFraming && !formattedCustom[0].display) {
-          combinedCustom = [
-            { ...formattedCustom[0], display: effectiveCoverDisplay },
-            ...formattedCustom.slice(1),
-          ];
-        }
+    if (formattedCustom.length > 0 && (isEditedCoverImage || hasCustomCoverFraming) && effectiveCoverImage) {
+      if (customCoverIndex >= 0) {
+        const matchedItem = {
+          ...formattedCustom[customCoverIndex],
+          display: hasCustomCoverFraming ? effectiveCoverDisplay : formattedCustom[customCoverIndex].display,
+        };
+        combinedCustom = [
+          matchedItem,
+          ...formattedCustom.slice(0, customCoverIndex),
+          ...formattedCustom.slice(customCoverIndex + 1),
+        ];
+      } else {
+        combinedCustom = [baseFeatured, ...formattedCustom];
       }
     }
 

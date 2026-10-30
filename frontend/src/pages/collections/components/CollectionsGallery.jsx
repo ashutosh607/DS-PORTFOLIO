@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Image as ImageIcon } from 'lucide-react';
+import { Play } from 'lucide-react';
 import TextBlurReveal from '../../../components/common/TextBlurReveal';
 import { getFramingStyle, getFramingContainerStyle } from '../../../utils/mediaFraming';
 
@@ -116,7 +116,7 @@ function FlipFlyingClone({ flipState, onFinish }) {
         {item.type === 'video' ? (
           <video
             src={item.image}
-            className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+            className="w-full h-full filter brightness-[0.98] contrast-[1.02]"
             style={getFramingStyle(item.display, { disableZoom: true })}
             autoPlay
             muted
@@ -127,7 +127,7 @@ function FlipFlyingClone({ flipState, onFinish }) {
           <img
             src={item.image}
             alt=""
-            className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+            className="w-full h-full filter brightness-[0.98] contrast-[1.02]"
             style={getFramingStyle(item.display, { disableZoom: true })}
             loading="eager"
             decoding="sync"
@@ -172,9 +172,13 @@ export default function CollectionsGallery({
   // Scroll container ref for right side
   const scrollContainerRef = useRef(null);
 
+  // Track whether user manually picked a secondary thumbnail vs staying on lead featured frame
+  const userPickedSecondaryRef = useRef(false);
+
   // Reset selected item and scroll to top when category changes
   useEffect(() => {
     const firstItem = allMedia[0] || activeCategory.featured;
+    userPickedSecondaryRef.current = false;
     if (activeAnimRef.current) {
       activeAnimRef.current.cancel();
       activeAnimRef.current = null;
@@ -193,7 +197,7 @@ export default function CollectionsGallery({
   useEffect(() => {
     const firstItem = allMedia[0] || activeCategory.featured;
     setSelectedItem((prev) => {
-      if (!prev) return firstItem;
+      if (!prev || !userPickedSecondaryRef.current) return firstItem;
       const matched = allMedia.find(
         (m) =>
           (m.id && prev.id && m.id === prev.id) ||
@@ -221,6 +225,7 @@ export default function CollectionsGallery({
   }, []);
 
   const handleThumbnailClick = (item, idx) => {
+    userPickedSecondaryRef.current = idx > 0;
     const isCurrent =
       (item.id && selectedItem?.id && item.id === selectedItem.id) ||
       item.image === selectedItem?.image;
@@ -318,6 +323,9 @@ export default function CollectionsGallery({
     }
   };
 
+  const isMasterContain =
+    selectedItem?.display?.fit === 'contain' || selectedItem?.display?.fit === 'fit';
+
   return (
     <section
       ref={galleryRef}
@@ -397,7 +405,7 @@ export default function CollectionsGallery({
                       {outgoingItem.type === 'video' ? (
                         <video
                           src={outgoingItem.image}
-                          className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+                          className="w-full h-full filter brightness-[0.98] contrast-[1.02]"
                           style={getFramingStyle(outgoingItem.display)}
                           autoPlay
                           muted
@@ -408,7 +416,7 @@ export default function CollectionsGallery({
                         <img
                           src={outgoingItem.image}
                           alt=""
-                          className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+                          className="w-full h-full filter brightness-[0.98] contrast-[1.02]"
                           style={getFramingStyle(outgoingItem.display)}
                         />
                       )}
@@ -434,7 +442,7 @@ export default function CollectionsGallery({
                         {selectedItem?.type === 'video' ? (
                           <video
                             src={selectedItem.image}
-                            className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02]"
+                            className="w-full h-full filter brightness-[0.98] contrast-[1.02]"
                             style={getFramingStyle(selectedItem.display)}
                             autoPlay
                             muted
@@ -447,7 +455,7 @@ export default function CollectionsGallery({
                             alt={`${selectedItem?.title || selectedItem?.tag || activeCategory.name} — ${activeCategory.name} photography in Mumbai by DS Photography & Films`}
                             width="800"
                             height="600"
-                            className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.02] group-hover:scale-[1.015] transition-all duration-700 ease-out"
+                            className="w-full h-full filter brightness-[0.98] contrast-[1.02] group-hover:scale-[1.015] transition-all duration-700 ease-out"
                             style={getFramingStyle(selectedItem?.display)}
                             loading="eager"
                           />
@@ -457,7 +465,14 @@ export default function CollectionsGallery({
                   </div>
 
                   {/* Gradient Overlay at Bottom */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,16,16,0.85)] via-[rgba(16,16,16,0.2)] to-transparent pointer-events-none z-10" />
+                  <div
+                    className="absolute inset-0 pointer-events-none z-10"
+                    style={{
+                      background: isMasterContain
+                        ? 'linear-gradient(to top, rgba(16, 16, 16, 0.58) 0%, rgba(16, 16, 16, 0.12) 22%, rgba(16, 16, 16, 0) 42%)'
+                        : 'linear-gradient(to top, rgba(16, 16, 16, 0.85) 0%, rgba(16, 16, 16, 0.2) 50%, rgba(16, 16, 16, 0) 100%)',
+                    }}
+                  />
 
                   {/* Bottom Metadata Overlay inside Master Frame */}
                   <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex items-end justify-between text-white pointer-events-none z-20">
@@ -662,4 +677,3 @@ export default function CollectionsGallery({
     </section>
   );
 }
-

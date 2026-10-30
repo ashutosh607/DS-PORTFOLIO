@@ -19,7 +19,7 @@ const sanitizeDisplay = (input) => {
   const fit = parsed.fit === "contain" || parsed.fit === "fit" ? "contain" : "cover";
   const posX = typeof parsed.position?.x === "number" ? Math.max(0, Math.min(100, Math.round(parsed.position.x * 10) / 10)) : 50;
   const posY = typeof parsed.position?.y === "number" ? Math.max(0, Math.min(100, Math.round(parsed.position.y * 10) / 10)) : 50;
-  const zoom = typeof parsed.zoom === "number" ? Math.max(1, Math.min(3, Math.round(parsed.zoom * 100) / 100)) : 1;
+  const zoom = typeof parsed.zoom === "number" ? Math.max(0.5, Math.min(3, Math.round(parsed.zoom * 100) / 100)) : 1;
   return {
     fit,
     position: { x: posX, y: posY },
@@ -229,7 +229,10 @@ const updateMedia = asyncHandler(async (req, res) => {
   if (title !== undefined) existingMedia.title = title.trim();
   if (caption !== undefined) existingMedia.caption = caption.trim();
   if (meta !== undefined) existingMedia.meta = meta.trim();
-  if (cleanDisplay) existingMedia.display = cleanDisplay;
+  if (cleanDisplay) {
+    existingMedia.display = cleanDisplay;
+    existingMedia.markModified("display");
+  }
 
   const updated = await existingMedia.save();
   return res.status(200).json(
@@ -261,6 +264,7 @@ const updateMediaDisplay = asyncHandler(async (req, res) => {
   }
 
   existingMedia.display = cleanDisplay;
+  existingMedia.markModified("display");
   const updated = await existingMedia.save();
   return res.status(200).json(
     new ApiResponse(200, updated, "Media display framing updated successfully")

@@ -8,7 +8,14 @@ import {
 import { updateCategory } from '../../../utils/categoryManager';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { optimizeImageFile } from '../../../utils/imageOptimizer';
-import { DEFAULT_DISPLAY, getFramingStyle } from '../../../utils/mediaFraming';
+import {
+  DEFAULT_DISPLAY,
+  getFramingStyle,
+  appendFramingToUrl,
+  extractFramingFromUrl,
+  stripFramingHash,
+  hasCustomFraming,
+} from '../../../utils/mediaFraming';
 import '../AdminDashboard.css';
 
 const PRESETS = [
@@ -179,13 +186,22 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       setLocation(category.location || '');
       
       const photoUrl = category.coverImage || category.featured?.image || '';
-      setCoverPreview(photoUrl);
-      setDirectCoverUrl(category.coverImage || '');
+      const cleanPhotoUrl = stripFramingHash(photoUrl) || photoUrl;
+      setCoverPreview(cleanPhotoUrl);
+      setDirectCoverUrl(cleanPhotoUrl);
       setCoverFile(null);
       setUseDirectUrl(false);
       setError('');
 
-      const rawDisplay = category.display || category.coverDisplay || category.featured?.display;
+      const urlFraming = extractFramingFromUrl(photoUrl);
+      const rawDisplay = hasCustomFraming(category.display)
+        ? category.display
+        : hasCustomFraming(category.coverDisplay)
+          ? category.coverDisplay
+          : hasCustomFraming(category.featured?.display)
+            ? category.featured.display
+            : (urlFraming || category.display || category.coverDisplay || category.featured?.display);
+
       if (rawDisplay && typeof rawDisplay === 'object') {
         setDisplay({
           fit: rawDisplay.fit === 'contain' || rawDisplay.fit === 'fit' ? 'contain' : 'cover',
@@ -193,7 +209,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
             x: typeof rawDisplay.position?.x === 'number' ? rawDisplay.position.x : 50,
             y: typeof rawDisplay.position?.y === 'number' ? rawDisplay.position.y : 50,
           },
-          zoom: typeof rawDisplay.zoom === 'number' && rawDisplay.zoom >= 1 ? rawDisplay.zoom : 1,
+          zoom: typeof rawDisplay.zoom === 'number' && rawDisplay.zoom >= 0.5 ? rawDisplay.zoom : 1,
         });
       } else {
         setDisplay({ fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 });
@@ -219,9 +235,9 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
 
     const deltaX = clientX - dragStartRef.current.startX;
     const deltaY = clientY - dragStartRef.current.startY;
-    const currentZoom = typeof display.zoom === 'number' && display.zoom >= 1 ? display.zoom : 1;
-    const sensitivity = (100 / rect.width) * (1 / Math.max(1, currentZoom * 0.7));
-    const direction = display.fit === 'contain' && currentZoom <= 1 ? 1 : -1;
+    const currentZoom = typeof display.zoom === 'number' && display.zoom > 0 ? display.zoom : 1;
+    const sensitivity = (100 / rect.width) * (1 / Math.max(0.75, currentZoom * 0.7));
+    const direction = display.fit === 'contain' ? 1 : -1;
 
     let nextX = dragStartRef.current.initialPosX + direction * deltaX * sensitivity;
     let nextY = dragStartRef.current.initialPosY + direction * deltaY * sensitivity;
@@ -267,7 +283,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
   const handleZoomStep = (delta) => {
     setDisplay((prev) => {
       const current = typeof prev.zoom === 'number' ? prev.zoom : 1;
-      const next = Math.max(1, Math.min(2.5, Math.round((current + delta) * 10) / 10));
+      const next = Math.max(0.5, Math.min(2.5, Math.round((current + delta) * 10) / 10));
       return { ...prev, zoom: next };
     });
   };
@@ -345,6 +361,9 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
         payload = new FormData();
         payload.append('name', name.trim());
         payload.append('slug', finalSlug);
+        if (category._id) payload.append('_id', String(category._id));
+        if (category.id) payload.append('id', String(category.id));
+        if (category.slug) payload.append('oldSlug', String(category.slug));
         payload.append('coverFile', uploadCover, coverFile.name || 'cover.jpg');
         payload.append('tagline', tagline.trim());
         payload.append('quote', quote.trim());
@@ -362,10 +381,15 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
           }));
         }
       } else {
+        const rawCoverUrl = useDirectUrl ? directCoverUrl.trim() : coverPreview;
+        const framedCoverUrl = appendFramingToUrl(rawCoverUrl, display);
         payload = {
+          _id: category._id || undefined,
+          id: category.id || undefined,
+          oldSlug: category.slug || undefined,
           name: name.trim(),
           slug: finalSlug,
-          coverImage: useDirectUrl ? directCoverUrl.trim() : coverPreview,
+          coverImage: framedCoverUrl,
           tagline: tagline.trim(),
           quote: quote.trim(),
           medium: medium.trim(),
@@ -375,11 +399,15 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
           supporting: category.supporting || [],
           featured: {
             ...(category.featured || {}),
+            image: framedCoverUrl,
             display,
           },
         };
       }
-      const targetCatId = category.slug || category._id || category.id;
+      const isValidObjectId = typeof category._id === 'string' && /^[a-f\d]{24}$/i.test(category._id);
+      const targetCatId = isValidObjectId
+        ? category._id
+        : (category.slug || category.id || category._id);
       const updated = await updateCategory(targetCatId, payload, getAuthHeaders());
       if (onSuccess) onSuccess(updated);
       onClose();
@@ -678,7 +706,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
 
                         <input
                           type="range"
-                          min="1"
+                          min="0.5"
                           max="2.5"
                           step="0.05"
                           value={display.zoom || 1}
@@ -697,8 +725,8 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
                       </div>
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8.5, fontFamily: 'monospace', color: '#9C9488', marginTop: 3, padding: '0 2px' }}>
+                        <span>0.5x</span>
                         <span>1.0x (Normal)</span>
-                        <span>1.75x</span>
                         <span>2.5x (Close)</span>
                       </div>
                     </div>

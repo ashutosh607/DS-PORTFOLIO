@@ -172,7 +172,7 @@ const createCategory = asyncHandler(async (req, res) => {
             x: typeof candidate.position?.x === "number" ? Math.max(0, Math.min(100, candidate.position.x)) : 50,
             y: typeof candidate.position?.y === "number" ? Math.max(0, Math.min(100, candidate.position.y)) : 50,
           },
-          zoom: typeof candidate.zoom === "number" && candidate.zoom >= 1 ? Math.min(3, candidate.zoom) : 1,
+          zoom: typeof candidate.zoom === "number" && candidate.zoom >= 0.5 ? Math.min(3, candidate.zoom) : 1,
         };
       }
     } catch {
@@ -209,16 +209,37 @@ const updateCategory = asyncHandler(async (req, res) => {
   const { name, tagline, quote, medium, location, order } = req.body;
   const mongoose = require("mongoose");
 
-  let category = null;
-  if (mongoose.Types.ObjectId.isValid(id)) {
-    category = await Category.findById(id);
-  }
-  if (!category) {
-    category = await Category.findOne({ slug: id.toLowerCase().trim() });
-  }
-  if (!category && !isNaN(Number(id))) {
-    category = await Category.findOne({ order: Number(id) });
-  }
+  const lookupCategory = async () => {
+    let found = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      found = await Category.findById(id);
+    }
+    if (!found && req.body._id && mongoose.Types.ObjectId.isValid(req.body._id)) {
+      found = await Category.findById(req.body._id);
+    }
+    if (!found && id) {
+      found = await Category.findOne({ slug: id.toLowerCase().trim() });
+    }
+    if (!found && req.body.oldSlug) {
+      found = await Category.findOne({ slug: String(req.body.oldSlug).toLowerCase().trim() });
+    }
+    if (!found && req.body.slug) {
+      found = await Category.findOne({ slug: String(req.body.slug).toLowerCase().trim() });
+    }
+    if (!found && !isNaN(Number(id))) {
+      found = await Category.findOne({ order: Number(id) });
+    }
+    if (!found && req.body.id && !isNaN(Number(req.body.id))) {
+      found = await Category.findOne({ order: Number(req.body.id) });
+    }
+    if (!found && name && name.trim()) {
+      const escapedName = name.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      found = await Category.findOne({ name: { $regex: `^${escapedName}$`, $options: "i" } });
+    }
+    return found;
+  };
+
+  let category = await lookupCategory();
 
   // If categories not yet seeded in MongoDB (or this specific baseline category wasn't seeded yet), auto-seed and try finding again
   if (!category) {
@@ -227,10 +248,16 @@ const updateCategory = asyncHandler(async (req, res) => {
       await Category.insertMany(DEFAULT_SEED_CATEGORIES);
     } else {
       const normalizedId = id.toLowerCase().trim();
+      const candidateOrder = !isNaN(Number(id))
+        ? Number(id)
+        : !isNaN(Number(req.body.id))
+          ? Number(req.body.id)
+          : NaN;
       const matchingSeed = DEFAULT_SEED_CATEGORIES.find(
         (seed) =>
           seed.slug === normalizedId ||
-          (!isNaN(Number(id)) && seed.order === Number(id)) ||
+          (req.body.oldSlug && seed.slug === String(req.body.oldSlug).toLowerCase().trim()) ||
+          (!isNaN(candidateOrder) && seed.order === candidateOrder) ||
           seed.name.toLowerCase() === normalizedId
       );
       if (matchingSeed) {
@@ -244,16 +271,32 @@ const updateCategory = asyncHandler(async (req, res) => {
     }
 
     if (!category) {
-      if (mongoose.Types.ObjectId.isValid(id)) {
-        category = await Category.findById(id);
-      }
-      if (!category) {
-        category = await Category.findOne({ slug: id.toLowerCase().trim() });
-      }
-      if (!category && !isNaN(Number(id))) {
-        category = await Category.findOne({ order: Number(id) });
-      }
+      category = await lookupCategory();
     }
+  }
+
+  // Fallback: if category was stored only in client cache and not yet in MongoDB, create it on the fly
+  if (!category && name && name.trim()) {
+    const fallbackSlug = (req.body.slug || id || name)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+    const highestOrderCat = await Category.findOne().sort({ order: -1 });
+    const fallbackOrder =
+      order !== undefined
+        ? Number(order)
+        : !isNaN(Number(req.body.id))
+          ? Number(req.body.id)
+          : highestOrderCat && highestOrderCat.order
+            ? highestOrderCat.order + 1
+            : 10;
+    category = new Category({
+      name: name.trim(),
+      slug: fallbackSlug,
+      coverImage: req.body.coverImage ? req.body.coverImage.trim() : "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop",
+      order: fallbackOrder,
+    });
   }
 
   if (!category) {
@@ -347,7 +390,7 @@ const updateCategory = asyncHandler(async (req, res) => {
             x: typeof parsedDisplay.position?.x === 'number' ? Math.max(0, Math.min(100, parsedDisplay.position.x)) : 50,
             y: typeof parsedDisplay.position?.y === 'number' ? Math.max(0, Math.min(100, parsedDisplay.position.y)) : 50,
           },
-          zoom: typeof parsedDisplay.zoom === 'number' && parsedDisplay.zoom >= 1 ? Math.min(3, parsedDisplay.zoom) : 1,
+          zoom: typeof parsedDisplay.zoom === 'number' && parsedDisplay.zoom >= 0.5 ? Math.min(3, parsedDisplay.zoom) : 1,
         };
         category.display = sanitizedDisplay;
         category.coverDisplay = sanitizedDisplay;

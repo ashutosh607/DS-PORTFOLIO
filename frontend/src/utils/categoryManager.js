@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CATEGORIES as INITIAL_CATEGORIES } from '../pages/collections/data/collectionsData.js';
 import { getApiUrl } from './api';
+import {
+  appendFramingToUrl,
+  extractFramingFromUrl,
+  hasCustomFraming,
+} from './mediaFraming';
 
 const STORAGE_KEY = 'ds_portfolio_dynamic_categories';
 const CATEGORIES_EVENT = 'ds_categories_updated';
@@ -32,6 +37,23 @@ export const findBaselineCategory = (slugOrId) => {
     return false;
   });
 };
+
+/**
+ * Resolves the most specific framing display object from candidates and URL hash
+ */
+function resolveFramingDisplay(...candidates) {
+  for (const candidate of candidates) {
+    if (hasCustomFraming(candidate)) {
+      return candidate;
+    }
+  }
+  for (const candidate of candidates) {
+    if (candidate && typeof candidate === 'object' && candidate.fit) {
+      return candidate;
+    }
+  }
+  return { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 };
+}
 
 /**
  * Normalizes a category object to guarantee all required properties exist
@@ -97,23 +119,33 @@ export function normalizeCategory(cat, index = 0) {
     initialMatch?.cardTransform ||
     'perspective(1200px) rotateY(4deg) translateY(0px)';
 
-  const resolvedDisplay =
-    cat.display ||
-    cat.coverDisplay ||
-    cat.featured?.display ||
-    initialMatch?.display ||
-    initialMatch?.coverDisplay ||
-    { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 };
+  const rawCoverImage =
+    cat.coverImage ||
+    cat.featured?.image ||
+    initialMatch?.coverImage ||
+    'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop';
+
+  const urlFraming =
+    extractFramingFromUrl(cat.coverImage) ||
+    extractFramingFromUrl(cat.featured?.image);
+
+  const resolvedDisplay = resolveFramingDisplay(
+    cat.display,
+    cat.coverDisplay,
+    cat.featured?.display,
+    urlFraming,
+    initialMatch?.display,
+    initialMatch?.coverDisplay
+  );
+
+  const effectiveCoverImage = hasCustomFraming(resolvedDisplay)
+    ? appendFramingToUrl(rawCoverImage, resolvedDisplay)
+    : rawCoverImage;
 
   const featured = {
     ...(initialMatch?.featured || {}),
     ...(cat.featured || {}),
-    image:
-      cat.coverImage ||
-      cat.featured?.image ||
-      initialMatch?.featured?.image ||
-      initialMatch?.coverImage ||
-      'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1400&auto=format&fit=crop',
+    image: effectiveCoverImage,
     title: cat.name || cat.featured?.title || initialMatch?.featured?.title || initialMatch?.name || 'Featured Work',
     count: cat.featured?.count || initialMatch?.featured?.count || '01 / 01',
     caption: cat.quote || cat.featured?.caption || initialMatch?.featured?.caption || '',
@@ -130,18 +162,14 @@ export function normalizeCategory(cat, index = 0) {
     quote: cat.quote || initialMatch?.quote || 'A story in every frame.',
     medium: cat.medium || initialMatch?.medium || 'Leica & Natural Light',
     location: cat.location || initialMatch?.location || 'Studio & Commission',
-    coverImage:
-      cat.coverImage ||
-      cat.featured?.image ||
-      initialMatch?.coverImage ||
-      'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop',
+    coverImage: effectiveCoverImage,
     publicId: cat.publicId || '',
     cardShapeStyle,
     cardTransform,
     featured,
     supporting,
     display: resolvedDisplay,
-    coverDisplay: cat.coverDisplay || cat.display || resolvedDisplay,
+    coverDisplay: resolvedDisplay,
     isCustom: Boolean(cat.isCustom || (!initialMatch && cat._id)),
   };
 }
@@ -272,15 +300,24 @@ export async function syncCategoriesWithBackend() {
               ? bCat.supporting
               : (initialMatch?.supporting || []);
 
-          const preservedDisplay =
-            bCat.display ||
-            bCat.coverDisplay ||
-            bCat.featured?.display ||
-            match?.display ||
-            match?.coverDisplay ||
-            initialMatch?.display ||
-            initialMatch?.coverDisplay ||
-            { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 };
+          const bCatUrlFraming =
+            extractFramingFromUrl(bCat.coverImage) ||
+            extractFramingFromUrl(bCat.featured?.image);
+          const matchUrlFraming =
+            extractFramingFromUrl(match?.coverImage) ||
+            extractFramingFromUrl(match?.featured?.image);
+
+          const preservedDisplay = resolveFramingDisplay(
+            bCat.display,
+            bCat.coverDisplay,
+            bCat.featured?.display,
+            bCatUrlFraming,
+            match?.display,
+            match?.coverDisplay,
+            matchUrlFraming,
+            initialMatch?.display,
+            initialMatch?.coverDisplay
+          );
 
           return normalizeCategory(
             {
@@ -290,7 +327,7 @@ export async function syncCategoriesWithBackend() {
               id: preservedId,
               supporting: preservedSupporting,
               display: preservedDisplay,
-              coverDisplay: bCat.coverDisplay || bCat.display || preservedDisplay,
+              coverDisplay: preservedDisplay,
               cardShapeStyle:
                 match?.cardShapeStyle ||
                 initialMatch?.cardShapeStyle ||
@@ -378,37 +415,6 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
     headers.Authorization = tokenHeader;
   }
 
-  const endpoint = getApiUrl(`/api/categories/${idOrSlug}`) || `/api/categories/${idOrSlug}`;
-  let res;
-  if (updateData instanceof FormData) {
-    res = await fetch(endpoint, {
-      method: 'PUT',
-      headers,
-      body: updateData,
-      credentials: 'include',
-    });
-  } else {
-    res = await fetch(endpoint, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-      body: JSON.stringify(updateData),
-      credentials: 'include',
-    });
-  }
-
-  const json = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    const errorMsg = json.message || `Failed to update category (${res.status})`;
-    throw new Error(errorMsg);
-  }
-
-  const updatedCategory = json.data;
-  const current = getLiveCategories();
-
   let formDisplay = null;
   if (updateData instanceof FormData) {
     const rawFormDisplay = updateData.get('display') || updateData.get('coverDisplay');
@@ -422,6 +428,66 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
   } else if (updateData && typeof updateData === 'object') {
     formDisplay = updateData.display || updateData.coverDisplay || null;
   }
+
+  const endpoint = getApiUrl(`/api/categories/${idOrSlug}`) || `/api/categories/${idOrSlug}`;
+  let res;
+  if (updateData instanceof FormData) {
+    res = await fetch(endpoint, {
+      method: 'PUT',
+      headers,
+      body: updateData,
+      credentials: 'include',
+    });
+  } else {
+    const bodyPayload = { ...updateData };
+    if (bodyPayload.coverImage && formDisplay) {
+      bodyPayload.coverImage = appendFramingToUrl(bodyPayload.coverImage, formDisplay);
+    }
+    res = await fetch(endpoint, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers,
+      },
+      body: JSON.stringify(bodyPayload),
+      credentials: 'include',
+    });
+  }
+
+  const json = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    const errorMsg = json.message || `Failed to update category (${res.status})`;
+    throw new Error(errorMsg);
+  }
+
+  const updatedCategory = json.data || {};
+
+  // If a new file was uploaded via FormData and framing settings were configured,
+  // also persist the framing hash on the newly generated Cloudinary coverImage URL
+  if (updateData instanceof FormData && updatedCategory.coverImage && formDisplay) {
+    const framedCoverUrl = appendFramingToUrl(updatedCategory.coverImage, formDisplay);
+    updatedCategory.coverImage = framedCoverUrl;
+    const followUpId = updatedCategory._id || updatedCategory.slug || idOrSlug;
+    const followUpEndpoint = getApiUrl(`/api/categories/${followUpId}`) || `/api/categories/${followUpId}`;
+    fetch(followUpEndpoint, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers,
+      },
+      body: JSON.stringify({
+        name: updatedCategory.name,
+        slug: updatedCategory.slug,
+        coverImage: framedCoverUrl,
+        display: formDisplay,
+        coverDisplay: formDisplay,
+      }),
+      credentials: 'include',
+    }).catch(() => {});
+  }
+
+  const current = getLiveCategories();
 
   const initialMatch =
     findBaselineCategory(updatedCategory.slug) ||
@@ -463,14 +529,22 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
     'perspective(1200px) rotateY(4deg) translateY(0px)';
 
   const resolvedDisplay =
-    updatedCategory.display ||
-    updatedCategory.coverDisplay ||
     formDisplay ||
-    existing?.display ||
-    existing?.coverDisplay ||
-    initialMatch?.display ||
-    initialMatch?.coverDisplay ||
-    { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 };
+    resolveFramingDisplay(
+      updatedCategory.display,
+      updatedCategory.coverDisplay,
+      extractFramingFromUrl(updatedCategory.coverImage),
+      existing?.display,
+      existing?.coverDisplay,
+      initialMatch?.display,
+      initialMatch?.coverDisplay
+    );
+
+  const rawResolvedCover =
+    updatedCategory.coverImage || existing?.coverImage || initialMatch?.coverImage;
+  const resolvedCoverImage = resolvedDisplay
+    ? appendFramingToUrl(rawResolvedCover, resolvedDisplay)
+    : rawResolvedCover;
 
   const merged = {
     ...initialMatch,
@@ -480,6 +554,7 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
     _id: updatedCategory._id || existing?._id || preservedId,
     name: updatedCategory.name || existing?.name,
     slug: updatedCategory.slug || existing?.slug,
+    coverImage: resolvedCoverImage,
     supporting: preservedSupporting,
     cardShapeStyle: preservedCardShapeStyle,
     cardTransform: preservedCardTransform,
@@ -488,7 +563,7 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
     featured: {
       ...(initialMatch?.featured || {}),
       ...(existing?.featured || {}),
-      image: updatedCategory.coverImage || existing?.coverImage || initialMatch?.coverImage,
+      image: resolvedCoverImage,
       title: updatedCategory.name || existing?.name || initialMatch?.name,
       display: resolvedDisplay,
     },
