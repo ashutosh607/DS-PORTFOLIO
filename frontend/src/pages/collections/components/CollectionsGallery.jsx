@@ -453,6 +453,7 @@ export default function CollectionsGallery({
                           <img
                             src={selectedItem?.image}
                             alt={`${selectedItem?.title || selectedItem?.tag || activeCategory.name} — ${activeCategory.name} photography in Mumbai by DS Photography & Films`}
+                            title={`${selectedItem?.title || activeCategory.name} — ${activeCategory.name} Photographer in Mumbai | DS Photography & Films`}
                             width="800"
                             height="600"
                             className="w-full h-full filter brightness-[0.98] contrast-[1.02] group-hover:scale-[1.015] transition-all duration-700 ease-out"
@@ -591,6 +592,7 @@ export default function CollectionsGallery({
                               <img
                                 src={item.image}
                                 alt={`${item.tag || item.title || `Specimen ${globalIdx}`} — ${activeCategory.name} photography in Mumbai`}
+                                title={`${item.title || item.tag || activeCategory.name} — ${activeCategory.name} Photography in Mumbai`}
                                 width="300"
                                 height="225"
                                 className="w-full h-full filter brightness-[0.98] contrast-[1.02] group-hover:scale-105 transition-transform duration-500 ease-out"

@@ -19,16 +19,35 @@ const RAW_API_URL =
 export const API_BASE_URL = RAW_API_URL.replace(/\/$/, '');
 
 /**
- * Normalizes relative API/asset paths to full URLs in production
- * @param {string} path - e.g. '/api/media' or '/uploads/...'
- * @returns {string}
+ * Automatically applies Cloudinary f_auto,q_auto transformations and responsive sizing
+ * @param {string} url - Image source URL
+ * @param {object} options - { width, quality, format }
+ * @returns {string} Optimized URL
  */
-export const getApiUrl = (path = '') => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    return path;
+export const optimizeCloudinaryUrl = (url = '', { width, quality = 'auto', format = 'auto' } = {}) => {
+  if (!url || typeof url !== 'string') return url;
+  if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
+    if (url.includes('/f_auto') || url.includes('/q_auto')) return url;
+    const transforms = [`f_${format}`, `q_${quality}`];
+    if (width) transforms.push(`w_${width}`);
+    return url.replace('/upload/', `/upload/${transforms.join(',')}/`);
   }
-  const normalized = path.startsWith('/') ? path : `/${path}`;
-  return API_BASE_URL ? `${API_BASE_URL}${normalized}` : normalized;
+  return url;
 };
 
+/**
+ * Normalizes relative API/asset paths to full URLs in production
+ * and applies automatic modern image format and quality compression for Cloudinary media.
+ * @param {string} path - e.g. '/api/media' or '/uploads/...'
+ * @param {object} options - Optional { width, quality, format }
+ * @returns {string}
+ */
+export const getApiUrl = (path = '', options = {}) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return optimizeCloudinaryUrl(path, options);
+  }
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  const full = API_BASE_URL ? `${API_BASE_URL}${normalized}` : normalized;
+  return optimizeCloudinaryUrl(full, options);
+};

@@ -75,7 +75,8 @@ export default function CollectionsModal({
                     ) : (
                       <img
                         src={activeCategory.featured.image}
-                        alt={activeCategory.featured.title}
+                        alt={`${activeCategory.featured.title || activeCategory.name} — ${activeCategory.name} Photography in Mumbai`}
+                        title={`${activeCategory.name} Photography in Mumbai | DS Photography & Films`}
                         className="w-full h-full object-cover"
                       />
                     )}
@@ -98,7 +99,8 @@ export default function CollectionsModal({
                       ) : (
                         <img
                           src={sup.image}
-                          alt={sup.tag}
+                          alt={`${sup.tag || activeCategory.name} — ${activeCategory.name} Photographer in Mumbai`}
+                          title={`${sup.tag || activeCategory.name} — Photography in Mumbai`}
                           className="w-full h-full object-cover"
                         />
                       )}
@@ -114,7 +116,8 @@ export default function CollectionsModal({
                   <div className="relative aspect-[4/3] rounded-[3px] overflow-hidden bg-[#1A1917] border border-[#E0D8CA]">
                     <img
                       src={activeCategory.coverImage}
-                      alt="Archival Close"
+                      alt={`${activeCategory.name} Archival Portfolio — Mumbai Photography by Dishant Shelar`}
+                      title={`${activeCategory.name} Collection Archival Cover — Mumbai Studio`}
                       className="w-full h-full object-cover"
                     />
                   </div>

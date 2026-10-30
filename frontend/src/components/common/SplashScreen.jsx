@@ -81,7 +81,8 @@ export default function SplashScreen({ onComplete }) {
           >
             <img
               src={dsLogoDark}
-              alt="DS Photography & Films"
+              alt="DS Photography & Films — Photographer in Mumbai"
+              title="DS Photography & Films — Fine Art Wedding & Portrait Studio in Mumbai"
               width="470"
               height="340"
               className="object-contain w-auto select-none pointer-events-none"

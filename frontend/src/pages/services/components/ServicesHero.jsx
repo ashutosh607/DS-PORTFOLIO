@@ -124,7 +124,8 @@ export default function ServicesHero({ onScrollToForm, onStartBooking }) {
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#ECE7DC] rounded-[1px]">
                   <img
                     src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop"
-                    alt="Couple on coastal mountain at golden hour"
+                    alt="Fine art wedding photography and couple session in Mumbai by DS Photography & Films"
+                    title="Wedding Photographer in Mumbai – DS Photography & Films"
                     className="w-full h-full object-cover object-center filter brightness-[1.01] contrast-[1.03]"
                     loading="eager"
                   />

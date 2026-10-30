@@ -28,6 +28,16 @@ const PHOTOS = [
   { full: img07, w300: img07_300 },
 ];
 
+const PHOTO_TITLES = [
+  'Fine Art Bridal Photography in Mumbai – DS Photography & Films',
+  'Candid Wedding Photographer in Mumbai – Dishant Shelar',
+  'Intimate Pre-Wedding Photography Shoot in Mumbai',
+  'Editorial Bridal Portrait Details – Mumbai Wedding Photographer',
+  'Emotional Wedding Photography Moments in Mumbai',
+  'Atmospheric Celebration & Event Photography in Mumbai',
+  'Sunset Couple Portrait Photography in Mumbai – DS Photography',
+];
+
 const PHOTO_METADATA = [
   'Fine art bridal portrait and wedding ceremony in Mumbai by DS Photography',
   'Candid wedding monograph and bridal moment in Maharashtra by Dishant Shelar',
@@ -396,6 +406,7 @@ export default function WhatWeDoEditorial() {
                 <img
                   src={src}
                   alt={PHOTO_METADATA[idx] || `Editorial Print ${idx + 1}`}
+                  title={PHOTO_TITLES[idx] || `Photography in Mumbai – Frame 0${idx + 1}`}
                   width="190"
                   height="253"
                   className="w-full h-full object-cover select-none"
@@ -531,6 +542,7 @@ export default function WhatWeDoEditorial() {
                       srcSet={`${src.w300} 300w, ${src.full} 600w`}
                       sizes="(max-width: 768px) 140px, 190px"
                       alt={PHOTO_METADATA[i] || `Atelier Portfolio Print ${i + 1}`}
+                      title={PHOTO_TITLES[i] || `Wedding & Portrait Photography in Mumbai – Frame 0${i + 1}`}
                       width="190"
                       height="253"
                       style={{ aspectRatio: '3 / 4' }}

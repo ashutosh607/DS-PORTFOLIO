@@ -37,7 +37,8 @@ export default function Logo({
         <source srcSet={webpSrc} type="image/webp" />
         <img
           src={pngSrc}
-          alt="DS Photography & Films"
+          alt="DS Photography & Films — Professional Photographer in Mumbai"
+          title="DS Photography & Films — Photographer in Mumbai"
           width={intrinsicWidth}
           height={numHeight}
           loading="eager"

@@ -497,7 +497,8 @@ export default function CollectionsRibbon({
                       {/* Background Photograph */}
                       <img
                         src={getApiUrl(cat.coverImage || cat.featured?.image)}
-                        alt={`${cat.name} Collection`}
+                        alt={`${cat.name} photography in Mumbai by Dishant Shelar – DS Photography & Films`}
+                        title={`${cat.name} Photography in Mumbai | DS Photography & Films`}
                         className="absolute inset-0 w-full h-full transition-[transform] duration-500 ease-out group-hover:scale-105 pointer-events-none"
                         style={getFramingStyle(catDisplay)}
                         loading="lazy"

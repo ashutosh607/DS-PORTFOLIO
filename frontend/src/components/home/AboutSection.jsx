@@ -57,6 +57,7 @@ export default function AboutSection({ imageUrl = null }) {
                       srcSet={imageUrl ? undefined : `${photographerImg400} 400w, ${photographerImg} 800w`}
                       sizes="(max-width: 768px) 340px, 480px"
                       alt="Dishant Shelar — Lead Photographer & Cinematographer at DS Photography & Films, Mumbai"
+                      title="Dishant Shelar – Lead Photographer in Mumbai | DS Photography & Films"
                       width="480"
                       height="600"
                       style={{ aspectRatio: '480 / 600' }}

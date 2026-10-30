@@ -29,6 +29,7 @@ const PROJECTS = [
     image: img01,
     image400: img01_400,
     alt: 'High fashion editorial monograph and candid bridal study in Mumbai by DS Photography',
+    imgTitle: 'Editorial & Wedding Photographer in Mumbai – DS Photography & Films',
   },
   {
     id: '02',
@@ -39,8 +40,9 @@ const PROJECTS = [
     score: '★ 9.2',
     format: 'Medium Format 6x7',
     image: img02,
-    image400: '/images/landing-02-400w.webp',
-    alt: 'Kinetic pre-wedding monograph and couple motion study by Dishant Shelar Mumbai',
+    image400: '/images/wedding-photographer-in-mumbai-400w.webp',
+    alt: 'Kinetic pre-wedding monograph and couple motion study in Mumbai by Dishant Shelar',
+    imgTitle: 'Pre-Wedding Photographer in Mumbai – DS Photography & Films',
   },
   {
     id: '03',
@@ -52,7 +54,8 @@ const PROJECTS = [
     format: 'Large Format 4x5',
     image: img03,
     image400: img03_400,
-    alt: 'Fine art architectural chiaroscuro and spatial luxury monograph in Maharashtra',
+    alt: 'Fine art architectural chiaroscuro and spatial luxury monograph in Mumbai Maharashtra',
+    imgTitle: 'Fine Art & Architecture Photographer in Mumbai – Dishant Shelar',
   },
   {
     id: '04',
@@ -65,6 +68,7 @@ const PROJECTS = [
     image: img04,
     image400: img04_400,
     alt: '35mm monochrome candid portrait study by DS Photography & Films Mumbai',
+    imgTitle: 'Professional Portrait Photographer in Mumbai – DS Photography',
   },
   {
     id: '05',
@@ -76,7 +80,8 @@ const PROJECTS = [
     format: 'Leica Summilux 50mm',
     image: img05,
     image400: img05_400,
-    alt: 'Fine art portrait framed in natural ambient luminescence by Dishant Shelar',
+    alt: 'Fine art portrait framed in natural ambient luminescence by Dishant Shelar in Mumbai',
+    imgTitle: 'Portrait Photography in Mumbai – Dishant Shelar Studio',
   },
   {
     id: '06',
@@ -88,7 +93,8 @@ const PROJECTS = [
     format: 'Hasselblad H6D',
     image: img06,
     image400: img06_400,
-    alt: 'Editorial monograph capture and subtle tonal geometry by DS Photography',
+    alt: 'Editorial monograph capture and subtle tonal geometry by DS Photography in Mumbai',
+    imgTitle: 'Commercial & Editorial Photographer in Mumbai – DS Photography',
   },
   {
     id: '07',
@@ -100,7 +106,8 @@ const PROJECTS = [
     format: 'Platinotype Gelatin Silver',
     image: img07,
     image400: img07_400,
-    alt: 'Archival platinotype print monograph and fine-art photographic proof',
+    alt: 'Archival platinotype print monograph and fine-art photographic proof by Mumbai photographer',
+    imgTitle: 'Fine Art Monograph Photography in Mumbai – DS Photography & Films',
   },
 ];
 
@@ -506,6 +513,7 @@ export default function HeroSpotlightCarousel() {
                       srcSet={`${item.image400} 400w, ${item.image} 800w`}
                       sizes="(max-width: 768px) 180px, 200px"
                       alt={item.alt || `${item.title} — ${item.subtitle} by Dishant Shelar Mumbai`}
+                      title={item.imgTitle || `${item.title} — Photographer in Mumbai | DS Photography & Films`}
                       width="200"
                       height="290"
                       style={{ aspectRatio: '200 / 290' }}

@@ -274,6 +274,7 @@ export default function CollectionTierCard({
               <img
                 src={imageSrc}
                 alt={`${title} — ${subtitle || 'Photography package'} by DS Photography Mumbai`}
+                title={`${title} – Photography Commission in Mumbai | DS Photography & Films`}
                 width="400"
                 height="300"
                 style={{
