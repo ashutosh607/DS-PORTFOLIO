@@ -40,7 +40,7 @@ export default function HomePage() {
     <>
       <SEOHead
         title="Photographer in Mumbai | Wedding & Portrait Photography – DS Photography"
-        description="DS Photography & Films offers bespoke wedding, pre-wedding, and portrait photography in Mumbai. Candid moments and cinematic films crafted by Dishant Shelar."
+        description="Leading photographer in Mumbai, DS Photography & Films captures bespoke weddings, candid pre-wedding shoots, and fine-art portraits by Dishant Shelar."
         keywords="photographer in mumbai, wedding photographer in mumbai, pre wedding photographer in mumbai, professional photographer in mumbai, portrait photographer in mumbai, event photographer in mumbai, wedding photography in mumbai, photography studio in mumbai, candid wedding photographer mumbai, dishant shelar"
         canonicalUrl={`${SEO_CONFIG.siteUrl}/`}
         ogType="website"
