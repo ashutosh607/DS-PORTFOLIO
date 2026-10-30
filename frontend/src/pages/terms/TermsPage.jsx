@@ -243,7 +243,7 @@ export default function TermsPage({ onOpenInquiry }) {
         {/* ===================================================================
             BREADCRUMB & BACK LINK
             =================================================================== */}
-        <BlurFadeIn delay={0.05} y={10} blur={6} className="mb-10 flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#7A6E5D]">
+        <BlurFadeIn delay={0.05} y={10} blur={6} className="mb-10 flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#625D55]">
           <Link to="/" className="hover:text-[#1E1B18] transition-colors">Home</Link>
           <span>/</span>
           <span className="text-[#1E1B18] font-semibold">Terms &amp; Conditions</span>
@@ -282,7 +282,7 @@ export default function TermsPage({ onOpenInquiry }) {
               delay={0.28}
               stagger={0.04}
               blur={8}
-              className="font-sans text-[11px] sm:text-xs tracking-[0.26em] uppercase text-[#7A6E5D] font-medium"
+              className="font-sans text-[11px] sm:text-xs tracking-[0.26em] uppercase text-[#625D55] font-medium"
             />
 
             {/* Divider Hairline with ScaleX Reveal */}
@@ -350,7 +350,7 @@ export default function TermsPage({ onOpenInquiry }) {
                     >
                       {item.percentage}
                     </motion.span>
-                    <span className="text-[10px] font-mono tracking-widest uppercase px-2.5 py-1 rounded-full bg-[#FAF7F0] border border-[#E3D9CA] text-[#7A6E5D]">
+                    <span className="text-[10px] font-mono tracking-widest uppercase px-2.5 py-1 rounded-full bg-[#FAF7F0] border border-[#E3D9CA] text-[#625D55]">
                       {item.status}
                     </span>
                   </div>
@@ -522,7 +522,7 @@ export default function TermsPage({ onOpenInquiry }) {
             delay={0.08}
             stagger={0.03}
             blur={8}
-            className="font-sans text-xs tracking-widest uppercase text-[#7A6E5D] mb-5"
+            className="font-sans text-xs tracking-widest uppercase text-[#625D55] mb-5"
           />
 
           <BlurFadeIn delay={0.2} y={15} className="flex flex-col sm:flex-row items-center justify-center gap-4">

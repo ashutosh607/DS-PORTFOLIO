@@ -82,13 +82,13 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8">
         {/* Section Header */}
         <div className="max-w-2xl mb-12 sm:mb-16">
-          <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#7A756D] block mb-3">
+          <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-3 font-medium">
             FREQUENTLY ASKED QUESTIONS · AEO
           </span>
           <h2 className="font-serif text-[32px] sm:text-[42px] font-normal text-[#101010] leading-tight mb-4">
             Answers to Inquiries Before Your Date.
           </h2>
-          <p className="text-[14px] sm:text-[15px] text-[#5C5852] leading-relaxed">
+          <p className="text-[14px] sm:text-[15px] text-[#4A463F] leading-relaxed">
             Direct, factual guidance on wedding coverage, booking timelines, destination commissions, and archival delivery with Dishant Shelar.
           </p>
         </div>
@@ -104,14 +104,16 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                   onClick={() => toggleFaq(faq.id)}
                   aria-expanded={isOpen}
                   aria-controls={`faq-answer-${faq.id}`}
-                  className="w-full flex items-start justify-between gap-4 text-left cursor-pointer group"
+                  className="w-full flex items-start justify-between gap-4 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101010] focus-visible:ring-offset-2 rounded-xs"
                 >
-                  <span className="font-serif text-[18px] sm:text-[21px] text-[#101010] font-normal leading-snug group-hover:text-[#554E45] transition-colors">
+                  <span className="font-serif text-[18px] sm:text-[21px] text-[#101010] font-normal leading-snug group-hover:text-[#3D3A35] transition-colors">
                     {faq.question}
                   </span>
                   <span
-                    className={`mt-1 w-6 h-6 rounded-full border border-[#D5CDC0] flex items-center justify-center shrink-0 transition-transform duration-300 ${
-                      isOpen ? 'rotate-180 bg-[#101010] text-white border-[#101010]' : 'text-[#7A756D] group-hover:border-[#101010]'
+                    className={`mt-1 w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-all duration-300 ${
+                      isOpen
+                        ? 'rotate-180 bg-[#101010] text-[#FAF8F5] border-[#101010]'
+                        : 'text-[#625D55] border-[#C5B9A5] group-hover:border-[#101010] group-hover:text-[#101010]'
                     }`}
                   >
                     <ChevronDown size={14} />
@@ -128,7 +130,7 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                       transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="pt-3.5 pr-8 text-[13.5px] sm:text-[14.5px] text-[#554E45] leading-relaxed font-sans max-w-3xl">
+                      <p className="pt-3.5 pr-8 text-[13.5px] sm:text-[14.5px] text-[#4A463F] leading-relaxed font-sans max-w-3xl">
                         {faq.answer}
                       </p>
                     </motion.div>
@@ -141,21 +143,21 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
 
         {/* Helpful Footer CTAs */}
         <div className="mt-12 pt-8 border-t border-[#E3DBCC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p className="text-[13px] text-[#7A756D]">
+          <p className="text-[13px] text-[#625D55]">
             Have a custom destination wedding or date in mind?
           </p>
           <div className="flex items-center gap-4 flex-wrap">
             <Link
               to="/services"
-              className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.15em] font-semibold text-[#101010] hover:text-[#554E45] transition-colors"
+              className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.15em] font-semibold text-[#101010] hover:text-[#3D3A35] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#101010]"
             >
               <span>Explore Services &amp; Pricing</span>
               <ArrowRight size={13} />
             </Link>
-            <span className="text-[#D5CDC0]">•</span>
+            <span className="text-[#9E9587]" aria-hidden="true">•</span>
             <Link
               to="/terms"
-              className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.15em] font-semibold text-[#101010] hover:text-[#554E45] transition-colors"
+              className="inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.15em] font-semibold text-[#101010] hover:text-[#3D3A35] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#101010]"
             >
               <span>View Client Terms</span>
               <ArrowRight size={13} />
@@ -166,4 +168,3 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
     </section>
   );
 }
-

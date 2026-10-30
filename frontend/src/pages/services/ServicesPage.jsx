@@ -493,7 +493,7 @@ export default function ServicesPage() {
                 setStage(1);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 py-2.5 min-h-[44px] ${stage === 1 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
+              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 py-2.5 min-h-[44px] ${stage === 1 ? 'font-semibold text-[#101010]' : 'text-[#625D55] hover:text-[#101010]'
                 }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${stage === 1 ? 'bg-[#101010]' : 'bg-[#C5B9A5]'}`} />
@@ -508,7 +508,7 @@ export default function ServicesPage() {
                 setStage(2);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 py-2.5 min-h-[44px] ${stage === 2 ? 'font-semibold text-[#101010]' : 'text-[#7A7770] hover:text-[#101010]'
+              className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors cursor-pointer flex items-center gap-2 py-2.5 min-h-[44px] ${stage === 2 ? 'font-semibold text-[#101010]' : 'text-[#625D55] hover:text-[#101010]'
                 }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${stage === 2 ? 'bg-[#101010]' : 'bg-transparent'}`} />
@@ -525,7 +525,7 @@ export default function ServicesPage() {
             )}
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 text-[#7A7770] font-sans text-[11px] tracking-[0.2em] uppercase">
+          <div className="hidden sm:flex items-center gap-2 text-[#625D55] font-sans text-[11px] tracking-[0.2em] uppercase">
             <span>ATELIER SCHEDULE OPEN</span>
             <span className="text-[#C5B9A5]">•</span>
             <span>2025–2026</span>
@@ -547,7 +547,7 @@ export default function ServicesPage() {
             >
               {/* Hero Header Section */}
               <div className="text-center mb-6">
-                <span className="font-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] text-[#7A7770] uppercase block mb-4">
+                <span className="font-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] text-[#625D55] uppercase block mb-4">
                   STAGE 01 · COMMISSION SELECTION
                 </span>
 
@@ -598,7 +598,7 @@ export default function ServicesPage() {
                         onClick={() => handleCategorySelect(cat.id)}
                         className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer py-3 px-2 min-h-[44px] inline-flex items-center border-b ${isCatSelected
                           ? 'text-[#101010] font-semibold border-[#101010]'
-                          : 'text-[#7A7770] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
+                          : 'text-[#625D55] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
                           }`}
                       >
                         {cat.label}
@@ -672,7 +672,7 @@ export default function ServicesPage() {
                   ) : (
                     <div className="col-span-full py-20 text-center">
                       <p className="font-serif text-2xl text-[#1E1B18] mb-2">No active collections in this category</p>
-                      <p className="text-sm text-[#7A7770]">Please select another category or check back soon.</p>
+                      <p className="text-sm text-[#625D55]">Please select another category or check back soon.</p>
                     </div>
                   )}
                 </motion.div>
@@ -712,7 +712,7 @@ export default function ServicesPage() {
                   <button
                     type="button"
                     onClick={handleBackToCollections}
-                    className="text-[#7A7770] hover:text-[#101010] font-sans text-xs font-semibold uppercase tracking-[0.16em] flex items-center gap-1.5 cursor-pointer transition-colors"
+                    className="text-[#625D55] hover:text-[#101010] font-sans text-xs font-semibold uppercase tracking-[0.16em] flex items-center gap-1.5 cursor-pointer transition-colors"
                   >
                     <span>←</span>
                     <span>RETURN TO COLLECTIONS</span>
@@ -749,7 +749,7 @@ export default function ServicesPage() {
                     </p>
                   </div>
 
-                  <div className="font-sans text-xs text-[#7A7770] tracking-[0.14em] uppercase shrink-0 pb-1">
+                  <div className="font-sans text-xs text-[#625D55] tracking-[0.14em] uppercase shrink-0 pb-1">
                     Autumn / Spring Cadence · 18 Commissions Per Cycle
                   </div>
                 </div>

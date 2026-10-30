@@ -380,7 +380,7 @@ export default function CollectionsGallery({
               </div>
 
               {/* Minimal Frame Count Indicator */}
-              <div className="flex items-center gap-3 font-mono text-[0.72rem] tracking-[0.2em] uppercase text-[#7A756D]">
+              <div className="flex items-center gap-3 font-mono text-[0.72rem] tracking-[0.2em] uppercase text-[#625D55]">
                 <span className="w-2 h-2 rounded-full bg-[#101010]/40 inline-block animate-pulse" />
                 <span>
                   {displayIndex < 10 ? `0${displayIndex}` : displayIndex}—
@@ -511,7 +511,7 @@ export default function CollectionsGallery({
                 </div>
 
                 {/* Sub-label under master photo on mobile */}
-                <div className="mt-3 flex items-center justify-between text-[11px] font-sans text-[#7A756D] px-1 lg:hidden">
+                <div className="mt-3 flex items-center justify-between text-[11px] font-sans text-[#625D55] px-1 lg:hidden">
                   <span>Selected: {selectedItem?.tag || selectedItem?.title || 'Specimen'}</span>
                   <span>Tap any thumbnail below to preview</span>
                 </div>
@@ -520,7 +520,7 @@ export default function CollectionsGallery({
               {/* ─── RIGHT: Independently Scrollable Grid of All Collection Photos (5 Cols) ─── */}
               <div className="lg:col-span-5 flex flex-col">
                 {/* Scroll pane header */}
-                <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#E2DACD]/60 text-[#7A756D]">
+                <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#E2DACD]/60 text-[#625D55]">
                   <span className="font-mono text-[0.68rem] tracking-[0.18em] uppercase flex items-center gap-1.5 font-medium">
                     <span>BROWSE COLLECTION</span>
                   </span>
@@ -648,13 +648,13 @@ export default function CollectionsGallery({
             </div>
 
             {/* ─── FOOTER BAR: Collection Archive Information ─── */}
-            <div className="mt-8 sm:mt-10 pt-5 border-t border-[#E2DACD] flex flex-col sm:flex-row items-center justify-between gap-4 text-[#7A756D]">
+            <div className="mt-8 sm:mt-10 pt-5 border-t border-[#E2DACD] flex flex-col sm:flex-row items-center justify-between gap-4 text-[#625D55]">
               <div className="flex items-center gap-3">
                 <span className="font-mono text-[0.7rem] tracking-[0.2em] uppercase text-[#141414] font-semibold">
                   COLLECTION ARCHIVE
                 </span>
                 <span className="text-[#C5BCAB] text-[0.75rem]">/</span>
-                <span className="font-mono text-[0.68rem] tracking-[0.15em] uppercase text-[#7A756D]">
+                <span className="font-mono text-[0.68rem] tracking-[0.15em] uppercase text-[#625D55]">
                   {activeCategory.name}
                 </span>
                 <span className="font-mono text-[0.62rem] tracking-[0.14em] text-[#5C5852] bg-[#EBE4D8] px-2.5 py-0.5 rounded-full font-medium">
@@ -662,7 +662,7 @@ export default function CollectionsGallery({
                 </span>
               </div>
 
-              <div className="flex items-center gap-3 font-mono text-[0.68rem] tracking-[0.16em] uppercase text-[#7A756D]">
+              <div className="flex items-center gap-3 font-mono text-[0.68rem] tracking-[0.16em] uppercase text-[#625D55]">
                 <span>CLICK ANY THUMBNAIL TO SPOTLIGHT</span>
               </div>
             </div>

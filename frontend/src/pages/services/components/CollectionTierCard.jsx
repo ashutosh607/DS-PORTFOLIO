@@ -169,12 +169,12 @@ export default function CollectionTierCard({
                 <span>Selected Collection</span>
               </span>
             ) : isRecommended ? (
-              <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase flex items-center gap-1.5">
+              <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#625D55] uppercase flex items-center gap-1.5">
                 <span className="text-[#C2A378]">★</span>
                 <span>Recommended</span>
               </span>
             ) : (
-              <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase">
+              <span className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#625D55] uppercase">
                 {collection.tier || 'The Collection'}
               </span>
             )}
@@ -182,7 +182,7 @@ export default function CollectionTierCard({
 
           {isAdmin && (
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#7A7770]">
+              <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#625D55]">
                 Folio 0{index + 1}
               </span>
               <button
@@ -242,7 +242,7 @@ export default function CollectionTierCard({
           style={{
             marginBottom: '24px',
           }}
-          className="font-serif italic text-xs sm:text-[13px] text-[#7A7770] leading-relaxed truncate"
+          className="font-serif italic text-xs sm:text-[13px] text-[#625D55] leading-relaxed truncate"
         >
           {subtitle || 'Archival commission suite'}
         </p>
@@ -306,7 +306,7 @@ export default function CollectionTierCard({
             display: 'block',
             marginBottom: '8px',
           }}
-          className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase"
+          className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#625D55] uppercase"
         >
           Commission Investment
         </span>
@@ -336,7 +336,7 @@ export default function CollectionTierCard({
           style={{
             lineHeight: '1.5',
           }}
-          className="font-sans text-[11px] text-[#7A7770] break-words"
+          className="font-sans text-[11px] text-[#625D55] break-words"
         >
           {descriptionLine}
         </p>
@@ -361,7 +361,7 @@ export default function CollectionTierCard({
               display: 'block',
               marginBottom: '12px',
             }}
-            className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#7A7770] uppercase"
+            className="font-sans text-[10px] font-medium tracking-[0.22em] text-[#625D55] uppercase"
           >
             Included Deliverables
           </span>
@@ -405,7 +405,7 @@ export default function CollectionTierCard({
           }}
           className="flex items-center justify-between gap-3"
         >
-          <span className="font-mono text-[10.5px] tracking-[0.16em] uppercase text-[#7A7770] font-medium">
+          <span className="font-mono text-[10.5px] tracking-[0.16em] uppercase text-[#625D55] font-medium">
             ORDER #{index + 1}
           </span>
 

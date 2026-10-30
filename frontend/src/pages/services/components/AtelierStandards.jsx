@@ -59,7 +59,7 @@ export default function AtelierStandards() {
           text="Regardless of your selected suite, every client receives sovereign attention and artisanal laboratory post-production."
           blurAmount={8}
           delay={0.25}
-          className="font-serif italic text-sm sm:text-base text-[#7A7770] leading-relaxed max-w-md mx-auto"
+          className="font-serif italic text-sm sm:text-base text-[#625D55] leading-relaxed max-w-md mx-auto"
         />
       </div>
 
@@ -74,7 +74,7 @@ export default function AtelierStandards() {
             blurAmount={8}
             className="space-y-3 p-5 rounded-2xl bg-[#FAF8F5]/60 border border-[#E3DBCC]/50 shadow-xs hover:shadow-md transition-shadow"
           >
-            <span className="font-sans text-xs font-semibold text-[#7A7770] tracking-[0.2em] block">
+            <span className="font-sans text-xs font-semibold text-[#625D55] tracking-[0.2em] block">
               [{item.num}]
             </span>
             <h3
@@ -88,7 +88,7 @@ export default function AtelierStandards() {
             >
               {item.title}
             </h3>
-            <p className="font-sans text-xs sm:text-[13px] text-[#5C5852] leading-relaxed">
+            <p className="font-sans text-xs sm:text-[13px] text-[#4A463F] leading-relaxed">
               {item.description}
             </p>
           </ScrollCardReveal>
