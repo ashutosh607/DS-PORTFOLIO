@@ -1,14 +1,12 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Logo from './Logo';
 import { usePageTransition } from '../common/PageTransition';
+import StaggeredMenu from './StaggeredMenu';
 import './StaggeredMenu.css';
-
-const StaggeredMenu = lazy(() => import('./StaggeredMenu'));
 
 export default function Navbar({ onOpenInquiry }) {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuMounted, setMobileMenuMounted] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { navigateWithTransition } = usePageTransition();
@@ -264,66 +262,21 @@ export default function Navbar({ onOpenInquiry }) {
             </svg>
           </button>
 
-          {/* StaggeredMenu from React Bits for Small Devices */}
+          {/* StaggeredMenu for Mobile Devices */}
           <div className="mobile-staggered-menu">
-            {mobileMenuMounted ? (
-              <Suspense
-                fallback={
-                  <div className="staggered-menu-wrapper fixed-wrapper" data-position="right">
-                    <header className="staggered-menu-header" style={{ justifyContent: 'flex-end' }}>
-                      <button className="sm-toggle" aria-label="Loading menu" type="button">
-                        <span className="sm-toggle-textWrap">
-                          <span className="sm-toggle-textInner">
-                            <span className="sm-toggle-line">Menu</span>
-                          </span>
-                        </span>
-                        <span className="sm-icon" aria-hidden="true">
-                          <span className="sm-icon-line" />
-                          <span className="sm-icon-line sm-icon-line-v" />
-                        </span>
-                      </button>
-                    </header>
-                  </div>
-                }
-              >
-                <StaggeredMenu
-                  autoOpen={true}
-                  position="right"
-                  items={mobileMenuItems}
-                  socialItems={socialItems}
-                  displaySocials={true}
-                  displayItemNumbering={true}
-                  showLogo={false}
-                  menuButtonColor="#1E1B18"
-                  openMenuButtonColor="#1E1B18"
-                  accentColor="#685444"
-                  colors={['#E6DAC8', '#CBB9A4', '#8C7764']}
-                  onItemClick={handleMobileMenuClick}
-                  onMenuClose={() => {
-                    setTimeout(() => setMobileMenuMounted(false), 450);
-                  }}
-                />
-              </Suspense>
-            ) : (
-              <button
-                className="sm-toggle"
-                aria-label="Open menu"
-                type="button"
-                onClick={() => setMobileMenuMounted(true)}
-                onPointerEnter={() => import('./StaggeredMenu')}
-                onTouchStart={() => setMobileMenuMounted(true)}
-              >
-                <span className="sm-toggle-textWrap">
-                  <span className="sm-toggle-textInner">
-                    <span className="sm-toggle-line">Menu</span>
-                  </span>
-                </span>
-                <span className="sm-icon" aria-hidden="true">
-                  <span className="sm-icon-line" />
-                  <span className="sm-icon-line sm-icon-line-v" />
-                </span>
-              </button>
-            )}
+            <StaggeredMenu
+              position="right"
+              items={mobileMenuItems}
+              socialItems={socialItems}
+              displaySocials={true}
+              displayItemNumbering={true}
+              showLogo={false}
+              menuButtonColor="#1E1B18"
+              openMenuButtonColor="#1E1B18"
+              accentColor="#685444"
+              colors={['#E6DAC8', '#CBB9A4', '#8C7764']}
+              onItemClick={handleMobileMenuClick}
+            />
           </div>
         </div>
       </div>

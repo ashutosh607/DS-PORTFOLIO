@@ -395,3 +395,10 @@
     gap: 0.75rem;
   }
 }
+
+
+@media (min-width: 1024px) {
+  .staggered-menu-wrapper {
+    display: none !important;
+  }
+}

@@ -436,41 +436,29 @@ export const StaggeredMenu = ({
     };
 
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
   }, [closeOnClickAway, open, closeMenu]);
 
-  // Lock body scroll completely when mobile menu is open
+  // Lock body scroll cleanly when mobile menu is open, harmonized with Lenis
   useEffect(() => {
     if (open) {
-      const scrollY = window.scrollY;
+      window.lenis?.stop();
       const originalBodyOverflow = document.body.style.overflow;
-      const originalHtmlOverflow = document.documentElement.style.overflow;
-      const originalPosition = document.body.style.position;
-      const originalTop = document.body.style.top;
-      const originalWidth = document.body.style.width;
-
       document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
 
       return () => {
         document.body.style.overflow = originalBodyOverflow;
-        document.documentElement.style.overflow = originalHtmlOverflow;
-        document.body.style.position = originalPosition;
-        document.body.style.top = originalTop;
-        document.body.style.width = originalWidth;
+        window.lenis?.start();
 
         if (isNavigatingRef.current) {
           isNavigatingRef.current = false;
           window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
           document.documentElement.scrollTop = 0;
           document.body.scrollTop = 0;
-        } else {
-          window.scrollTo(0, scrollY);
         }
       };
     }
