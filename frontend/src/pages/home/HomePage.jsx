@@ -13,7 +13,7 @@ import EditorialFaqSection, { HOMEPAGE_FAQS } from '../../components/home/Editor
 
 // Below-the-fold components lazily loaded via React Suspense
 const WhatWeDoEditorial = lazy(() => import('../../components/home/WhatWeDoEditorial'));
-const AboutSection = lazy(() => import('../../components/home/AboutSection'));
+const EditorialDisciplinesSection = lazy(() => import('../../components/home/EditorialDisciplinesSection'));
 
 export default function HomePage() {
   const location = useLocation();
@@ -39,9 +39,9 @@ export default function HomePage() {
   return (
     <>
       <SEOHead
-        title="Wedding Photographer in Mumbai | DS Photography &amp; Films"
-        description="DS Photography &amp; Films captures weddings, pre-wedding moments and portraits in Mumbai through timeless photography and cinematic films. Enquire today."
-        keywords="photographer in mumbai, wedding photographer in mumbai, pre-wedding photographer in mumbai, candid wedding photographer in mumbai, portrait photographer in mumbai, event photographer in mumbai, wedding photography and films in mumbai, ds photography, dishant shelar"
+        title="Photographer in Mumbai | DS Photography & Films"
+        description="DS Photography & Films is a Mumbai photographer specializing in weddings, pre-wedding shoots, portraits and cinematic films. Explore our portfolio and enquire today."
+        keywords="photographer in mumbai, wedding photographer in mumbai, pre wedding photographer in mumbai, professional photographer in mumbai, portrait photographer in mumbai, event photographer in mumbai, wedding photography in mumbai, photography studio in mumbai, candid wedding photographer mumbai, dishant shelar"
         canonicalUrl={`${SEO_CONFIG.siteUrl}/`}
         ogType="website"
         schema={[
@@ -60,8 +60,8 @@ export default function HomePage() {
           {/* Spacious, Artistic Editorial Photography Section: What We Do */}
           <WhatWeDoEditorial />
 
-          {/* Studio About section with artist portrait, philosophy & identity */}
-          <AboutSection />
+          {/* Editorial Photography Disciplines & Atelier Standards */}
+          <EditorialDisciplinesSection />
 
           {/* Answer Engine Optimization (AEO) Editorial FAQ Section */}
           <EditorialFaqSection />

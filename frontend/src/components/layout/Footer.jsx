@@ -129,6 +129,11 @@ export default function Footer({ onOpenInquiry }) {
                 </Link>
               </li>
               <li>
+                <Link to="/about" className="text-[#F3F0E9]/65 hover:text-[#FDFCF8] transition-colors">
+                  About Dishant Shelar
+                </Link>
+              </li>
+              <li>
                 <Link to="/terms" className="text-[#F3F0E9]/90 font-medium hover:text-[#FDFCF8] transition-colors flex items-center gap-1.5">
                   <span>Terms &amp; Policies</span>
                 </Link>
@@ -248,6 +253,10 @@ export default function Footer({ onOpenInquiry }) {
             <span className="text-[#E3DBCC]/20">•</span>
             <Link to="/terms" className="text-[#E3DBCC]/70 hover:text-[#FDFCF8] transition-colors underline-offset-4 hover:underline">
               Payment Terms &amp; Delivery Timeline
+            </Link>
+            <span className="text-[#E3DBCC]/20">•</span>
+            <Link to="/terms" className="text-[#E3DBCC]/70 hover:text-[#FDFCF8] transition-colors underline-offset-4 hover:underline">
+              Privacy Policy
             </Link>
           </div>
 

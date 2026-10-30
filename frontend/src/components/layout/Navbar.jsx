@@ -13,6 +13,7 @@ export default function Navbar({ onOpenInquiry }) {
 
   const mobileMenuItems = [
     { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
+    { label: 'About', ariaLabel: 'About Dishant Shelar & Studio', link: '/about' },
     { label: 'Collections', ariaLabel: 'Explore photo collections', link: '/collections' },
     { label: 'Services', ariaLabel: 'Photographer services & pricing', link: '/services' },
   ];
@@ -76,6 +77,11 @@ export default function Navbar({ onOpenInquiry }) {
       label: 'Home',
       to: '/',
       isActive: location.pathname === '/' && !location.hash,
+    },
+    {
+      label: 'About',
+      to: '/about',
+      isActive: location.pathname === '/about',
     },
     {
       label: 'Collections',

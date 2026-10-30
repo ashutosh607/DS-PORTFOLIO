@@ -12,6 +12,7 @@ const Footer = lazy(() => import('./components/layout/Footer'));
 const CollectionsPage = lazy(() => import('./pages/collections/CollectionsPage'));
 const ServicesPage = lazy(() => import('./pages/services/ServicesPage'));
 const InquiryModal = lazy(() => import('./components/modals/InquiryModal'));
+const AboutPage = lazy(() => import('./pages/about/AboutPage'));
 const TermsPage = lazy(() => import('./pages/terms/TermsPage'));
 const NotFoundPage = lazy(() => import('./pages/error/NotFoundPage'));
 const ErrorPage = lazy(() => import('./pages/error/ErrorPage'));
@@ -62,12 +63,21 @@ export default function App() {
   const location = useLocation();
 
   const isAdminRoute = location.pathname.startsWith('/admin');
+
+  useEffect(() => {
+    // If navigating to admin panel, dismiss static HTML splash screen immediately
+    if (isAdminRoute) {
+      const staticSplash = document.getElementById('initial-splash-screen');
+      if (staticSplash) staticSplash.remove();
+    }
+  }, [isAdminRoute]);
   const isErrorOrNotFoundRoute =
     location.pathname === '/error' ||
     (!isAdminRoute &&
       location.pathname !== '/' &&
       !location.pathname.startsWith('/collections') &&
       location.pathname !== '/services' &&
+      location.pathname !== '/about' &&
       location.pathname !== '/terms');
 
   const showPublicChrome = !isAdminRoute && !isErrorOrNotFoundRoute;
@@ -112,6 +122,7 @@ export default function App() {
                   element={<CollectionsPage onOpenInquiry={handleOpenInquiry} />}
                 />
                 <Route path="/services" element={<ServicesPage />} />
+                <Route path="/about" element={<AboutPage onOpenInquiry={handleOpenInquiry} />} />
                 <Route path="/terms" element={<TermsPage onOpenInquiry={handleOpenInquiry} />} />
 
                 {/* Legacy / Alias Public Route Redirection */}

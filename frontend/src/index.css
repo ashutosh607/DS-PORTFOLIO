@@ -282,17 +282,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-ivory);
-  border: 1px solid var(--color-nude);
+  background-color: #FFFFFF;
+  border: 1.5px solid #1E1B18;
   color: var(--color-obsidian);
+  box-shadow: 0 4px 14px rgba(16, 16, 16, 0.1);
   transition: all 0.25s ease;
 }
 
 .circle-nav-btn:hover {
   background-color: var(--color-obsidian);
-  color: var(--color-off-white);
+  color: #FFFFFF;
   border-color: var(--color-obsidian);
-  transform: scale(1.05);
+  transform: scale(1.08);
+  box-shadow: 0 6px 18px rgba(16, 16, 16, 0.18);
+}
+
+.circle-nav-btn:active {
+  transform: scale(0.96);
 }
 
 .circle-nav-btn:disabled {

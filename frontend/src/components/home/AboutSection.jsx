@@ -100,7 +100,8 @@ export default function AboutSection({ imageUrl = null }) {
             <div className="about-header-row">
               <div className="about-label-wrap">
                 <TextBlurReveal
-                  text="ABOUT THE PHOTOGRAPHER"
+                  as="h2"
+                  text="The Art and Approach Behind Our Photography"
                   blurAmount={6}
                   delay={0.05}
                   className="about-section-label"
@@ -110,7 +111,7 @@ export default function AboutSection({ imageUrl = null }) {
 
             {/* Primary Editorial Heading */}
             <TextBlurReveal
-              as="h2"
+              as="h3"
               text="Hi, I’m Dishant."
               blurAmount={12}
               stagger={0.06}

@@ -285,12 +285,13 @@ export default function HeroSpotlightCarousel() {
       onMouseLeave={() => setIsHovered(false)}
       style={{
         position: 'relative',
-        height: '100vh',
+        height: '100dvh',
+        minHeight: '620px',
         minHeight: '660px',
         maxHeight: '1080px',
         boxSizing: 'border-box',
         paddingTop: 'clamp(4.25rem, 6.5vh, 5.25rem)',
-        paddingBottom: 'clamp(1rem, 2vh, 1.75rem)',
+        paddingBottom: 'clamp(1.25rem, 2.5vh, 2rem)',
         overflow: 'hidden',
         backgroundColor: 'var(--color-off-white)',
         display: 'flex',
@@ -333,49 +334,29 @@ export default function HeroSpotlightCarousel() {
           className="pt-10 sm:pt-6 md:pt-1"
           style={{ flexShrink: 0 }}
         >
-          <div style={{ marginBottom: '0.45rem' }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.675rem',
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-                color: 'var(--color-obsidian)',
-                fontWeight: 600,
-                backgroundColor: 'var(--color-off-white)',
-                padding: '0.3rem 0.85rem',
-                borderRadius: '999px',
-                border: '1px solid var(--color-nude)',
-                boxShadow: '0 2px 10px -2px rgba(16, 16, 16, 0.04)',
-                position: 'relative',
-                zIndex: 2,
-              }}
-            >
-              <span style={{ width: '20px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
-              <TextBlurReveal text="The Spotlight Collection · Mumbai" blurAmount={6} delay={0.05} />
-              <span style={{ width: '20px', height: '1px', backgroundColor: 'var(--color-nude)' }} />
-            </div>
-          </div>
+          
 
           <TextBlurReveal
             as="h1"
-            text="Wedding & Portrait Photography in Mumbai, Crafted Around Your Story"
+            text="Photographer in Mumbai – DS Photography & Films"
             blurAmount={12}
             stagger={0.06}
             delay={0.12}
             style={{
-              maxWidth: '820px',
+              maxWidth: '860px',
               margin: '0 auto',
-              lineHeight: 1.1,
+              lineHeight: 1.15,
               color: 'var(--color-obsidian)',
               fontSize: 'clamp(1.85rem, 3.2vw, 2.75rem)',
               letterSpacing: '-0.015em',
               fontWeight: 400,
             }}
           />
+          <p
+            className="text-[13px] sm:text-[14.5px] text-[#5A544C] max-w-2xl mx-auto mt-2.5 px-4 font-sans leading-relaxed"
+          >
+            DS Photography &amp; Films is an editorial wedding and portrait photography studio in Mumbai led by lead photographer and cinematographer Dishant Shelar. We document heartfelt weddings, intimate pre-wedding stories, and portraits across Mumbai and destination venues worldwide.
+          </p>
         </div>
 
         {/* ===================================================================
@@ -618,6 +599,7 @@ export default function HeroSpotlightCarousel() {
 
           {/* Bottom Bar: Slide Counter (Left) & Minimal Circular Navigation Arrows (Right) */}
           <div
+            className="px-4 sm:px-6"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -657,9 +639,19 @@ export default function HeroSpotlightCarousel() {
                 onClick={handlePrev}
                 className="circle-nav-btn"
                 aria-label="Previous photo"
-                style={{ width: '44px', height: '44px', minWidth: '44px', minHeight: '44px' }}
+                style={{
+                  width: '46px',
+                  height: '46px',
+                  minWidth: '46px',
+                  minHeight: '46px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1.5px solid #1E1B18',
+                  color: '#101010',
+                  boxShadow: '0 4px 14px rgba(16, 16, 16, 0.12)',
+                  cursor: 'pointer',
+                }}
               >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 18l-6-6 6-6" />
                 </svg>
               </button>
@@ -667,9 +659,19 @@ export default function HeroSpotlightCarousel() {
                 onClick={handleNext}
                 className="circle-nav-btn"
                 aria-label="Next photo"
-                style={{ width: '44px', height: '44px', minWidth: '44px', minHeight: '44px' }}
+                style={{
+                  width: '46px',
+                  height: '46px',
+                  minWidth: '46px',
+                  minHeight: '46px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1.5px solid #1E1B18',
+                  color: '#101010',
+                  boxShadow: '0 4px 14px rgba(16, 16, 16, 0.12)',
+                  cursor: 'pointer',
+                }}
               >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 18l6-6-6-6" />
                 </svg>
               </button>

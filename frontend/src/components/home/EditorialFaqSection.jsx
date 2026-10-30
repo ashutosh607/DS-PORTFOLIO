@@ -41,6 +41,12 @@ export const HOMEPAGE_FAQS = [
       'Our commissions include comprehensive ritual documentation, unscripted candid moments, fine-art bridal portraiture, color-graded high-resolution master photographs, private online delivery, and bespoke handcrafted leather-bound heirloom albums based on your selected package.',
   },
   {
+    id: 'view-portfolio',
+    question: 'How can I view the photography portfolio?',
+    answer:
+      'You can explore our complete photography portfolio across all collections—including weddings, pre-wedding sessions, portraits, events, and commercial commissions—directly on our Collections page at https://www.dishantshelarphotography.in/collections.',
+  },
+  {
     id: 'pre-wedding',
     question: 'Does DS Photography & Films offer pre-wedding shoots?',
     answer:
@@ -86,7 +92,7 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
             FREQUENTLY ASKED QUESTIONS · AEO
           </span>
           <h2 className="font-serif text-[32px] sm:text-[42px] font-normal text-[#101010] leading-tight mb-4">
-            Answers to Inquiries Before Your Date.
+            Frequently Asked Questions
           </h2>
           <p className="text-[14px] sm:text-[15px] text-[#4A463F] leading-relaxed">
             Direct, factual guidance on wedding coverage, booking timelines, destination commissions, and archival delivery with Dishant Shelar.
@@ -106,9 +112,9 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                   aria-controls={`faq-answer-${faq.id}`}
                   className="w-full flex items-start justify-between gap-4 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101010] focus-visible:ring-offset-2 rounded-xs"
                 >
-                  <span className="font-serif text-[18px] sm:text-[21px] text-[#101010] font-normal leading-snug group-hover:text-[#3D3A35] transition-colors">
+                  <h3 className="font-serif text-[18px] sm:text-[21px] text-[#101010] font-normal leading-snug group-hover:text-[#3D3A35] transition-colors m-0 p-0 inline-block">
                     {faq.question}
-                  </span>
+                  </h3>
                   <span
                     className={`mt-1 w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-all duration-300 ${
                       isOpen

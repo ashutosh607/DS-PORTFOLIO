@@ -12,6 +12,12 @@ export default function SplashScreen({ onComplete }) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
+    // Immediately remove static HTML splash screen so React Framer Motion takes over seamlessly
+    const staticSplash = document.getElementById('initial-splash-screen');
+    if (staticSplash) {
+      staticSplash.remove();
+    }
+
     // Prevent background scrolling while splash is active
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
