@@ -1,6 +1,7 @@
 # DS Photography & Films — Production Robots Configuration
-# https://www.dishantshelarphotography.in/
+# Canonical Domain: https://www.dishantshelarphotography.in/
 
+# Default Crawlers (Googlebot, Bingbot, Standard Search Engines)
 User-agent: *
 Allow: /
 Allow: /collections
@@ -11,25 +12,60 @@ Allow: /assets/
 Allow: /images/
 Allow: /videos/
 
-# Disallow private administrative, API, and error routes
+# Disallow private administrative, API, and internal error routes
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api
 Disallow: /api/
 Disallow: /error
 
-# Generative Engine Optimization (GEO) / AI Search Bot Directives
+# Google Search Engine
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+# Microsoft Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+# OpenAI Search & Retrieval (ChatGPT Search)
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /admin
 Disallow: /api
 
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+# Anthropic Claude Search & Retrieval
 User-agent: Claude-SearchBot
 Allow: /
 Disallow: /admin
 Disallow: /api
 
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+# Perplexity AI Search Engine
 User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+# Google AI Extended Services
+User-agent: Google-Extended
 Allow: /
 Disallow: /admin
 Disallow: /api

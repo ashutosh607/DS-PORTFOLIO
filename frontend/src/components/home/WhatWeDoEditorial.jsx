@@ -543,10 +543,10 @@ export default function WhatWeDoEditorial() {
                     <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none" />
                   </div>
 
-                  {/* Subtle Minimal Archival Plate Watermark on Hover */}
+                  {/* Editorial Frame Index on Hover */}
                   <div className="hidden md:flex absolute bottom-1.5 left-2 right-2 items-center justify-between text-[0.45rem] font-mono tracking-widest text-white/90 uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                    <span>PLATE 0{i + 1}</span>
-                    <span>ATELIER PROOF</span>
+                    <span>FRAME 0{i + 1}</span>
+                    <span>ARCHIVE</span>
                   </div>
                 </div>
               </div>

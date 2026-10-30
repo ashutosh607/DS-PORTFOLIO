@@ -109,7 +109,7 @@ export function buildWebSiteSchema() {
     publisher: {
       '@id': `${SEO_CONFIG.siteUrl}/#organization`,
     },
-    inLanguage: 'en-US',
+    inLanguage: 'en-IN',
   };
 }
 

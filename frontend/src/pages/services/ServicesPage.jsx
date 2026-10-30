@@ -9,13 +9,14 @@ import CommissionSummaryCard from './components/CommissionSummaryCard';
 import BookingBriefForm from './components/BookingBriefForm';
 import ConfirmationScreen from './components/ConfirmationScreen';
 import LocationMapSection from './components/LocationMapSection';
+import EditorialFaqSection, { HOMEPAGE_FAQS } from '../../components/home/EditorialFaqSection';
 import { handleWhatsAppSubmit } from '../../utils/whatsapp';
 import { handleEmailSubmit } from '../../utils/email';
 import { getApiUrl } from '../../utils/api';
 import TextBlurReveal from '../../components/common/TextBlurReveal';
 import ScrollCardReveal from '../../components/common/ScrollCardReveal';
 import SEOHead from '../../components/common/SEOHead';
-import { buildServicesListSchema, buildBreadcrumbSchema } from '../../utils/structuredData';
+import { buildServicesListSchema, buildBreadcrumbSchema, buildFaqSchema } from '../../utils/structuredData';
 import { SEO_CONFIG } from '../../utils/seoConfig';
 
 const SERVICES_CACHE_KEY = 'ds_portfolio_cached_services';
@@ -466,7 +467,7 @@ export default function ServicesPage() {
         description="Explore bespoke wedding photography, pre-wedding films, portrait sessions, and event packages in Mumbai by Dishant Shelar. Request a tailored date consultation."
         keywords="photographer in mumbai, wedding photographer in mumbai, photography packages mumbai, wedding photography price mumbai, pre-wedding packages mumbai, portrait photography mumbai, event photographer in mumbai"
         canonicalUrl={`${SEO_CONFIG.siteUrl}/services`}
-        schema={buildServicesListSchema()}
+        schema={[buildServicesListSchema(), buildFaqSchema(HOMEPAGE_FAQS)]}
         breadcrumbs={buildBreadcrumbSchema([
           { name: 'Home', url: '/' },
           { name: 'Services & Pricing', url: '/services' },
@@ -686,6 +687,11 @@ export default function ServicesPage() {
                 coordinates={formData.coordinates}
                 venue={formData.venue}
               />
+
+              {/* Editorial FAQ Section for Conversational & AEO Readiness */}
+              <div className="mt-20">
+                <EditorialFaqSection />
+              </div>
             </motion.div>
           )}
 

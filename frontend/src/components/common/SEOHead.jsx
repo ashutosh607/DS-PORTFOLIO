@@ -143,7 +143,7 @@ export default function SEOHead({
     setMetaTag('property', 'og:image:width', '1200');
     setMetaTag('property', 'og:image:height', '630');
     setMetaTag('property', 'og:site_name', SEO_CONFIG.brandName);
-    setMetaTag('property', 'og:locale', 'en_US');
+    setMetaTag('property', 'og:locale', 'en_IN');
 
     // 6. Twitter / X Cards
     setMetaTag('name', 'twitter:card', 'summary_large_image');
