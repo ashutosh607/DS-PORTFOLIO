@@ -241,7 +241,7 @@ export default function Navbar({ onOpenInquiry }) {
         </nav>
 
         {/* Right CTA Button & Mobile StaggeredMenu */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', height: '100%', gap: '1.25rem' }}>
           <button
             onClick={() => {
               if (location.pathname === '/services') {
@@ -269,7 +269,7 @@ export default function Navbar({ onOpenInquiry }) {
             {mobileMenuMounted ? (
               <Suspense
                 fallback={
-                  <div className="staggered-menu-wrapper" data-position="right">
+                  <div className="staggered-menu-wrapper fixed-wrapper" data-position="right">
                     <header className="staggered-menu-header" style={{ justifyContent: 'flex-end' }}>
                       <button className="sm-toggle" aria-label="Loading menu" type="button">
                         <span className="sm-toggle-textWrap">
@@ -305,28 +305,24 @@ export default function Navbar({ onOpenInquiry }) {
                 />
               </Suspense>
             ) : (
-              <div className="staggered-menu-wrapper" data-position="right">
-                <header className="staggered-menu-header" style={{ justifyContent: 'flex-end' }}>
-                  <button
-                    className="sm-toggle"
-                    aria-label="Open menu"
-                    type="button"
-                    onClick={() => setMobileMenuMounted(true)}
-                    onPointerEnter={() => import('./StaggeredMenu')}
-                    onTouchStart={() => setMobileMenuMounted(true)}
-                  >
-                    <span className="sm-toggle-textWrap">
-                      <span className="sm-toggle-textInner">
-                        <span className="sm-toggle-line">Menu</span>
-                      </span>
-                    </span>
-                    <span className="sm-icon" aria-hidden="true">
-                      <span className="sm-icon-line" />
-                      <span className="sm-icon-line sm-icon-line-v" />
-                    </span>
-                  </button>
-                </header>
-              </div>
+              <button
+                className="sm-toggle"
+                aria-label="Open menu"
+                type="button"
+                onClick={() => setMobileMenuMounted(true)}
+                onPointerEnter={() => import('./StaggeredMenu')}
+                onTouchStart={() => setMobileMenuMounted(true)}
+              >
+                <span className="sm-toggle-textWrap">
+                  <span className="sm-toggle-textInner">
+                    <span className="sm-toggle-line">Menu</span>
+                  </span>
+                </span>
+                <span className="sm-icon" aria-hidden="true">
+                  <span className="sm-icon-line" />
+                  <span className="sm-icon-line sm-icon-line-v" />
+                </span>
+              </button>
             )}
           </div>
         </div>
@@ -356,6 +352,9 @@ export default function Navbar({ onOpenInquiry }) {
             height: 100% !important;
             padding-left: 1.15rem !important;
             padding-right: 1.15rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
           }
           .desktop-nav {
             display: none !important;
@@ -364,7 +363,9 @@ export default function Navbar({ onOpenInquiry }) {
             display: none !important;
           }
           .mobile-staggered-menu {
-            display: block !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
           }
           .staggered-menu-header {
             height: 60px !important;
