@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Plus,
@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { useAdminAuth } from './context/AdminAuthContext';
 import { useCategories } from '../../utils/categoryManager';
+import { getApiUrl } from '../../utils/api';
+import { getFramingStyle, getFramingContainerStyle } from '../../utils/mediaFraming';
 import AddEditServiceModal from './components/AddEditServiceModal';
 import AddCategoryModal from './components/AddCategoryModal';
 import EditCategoryModal from './components/EditCategoryModal';
@@ -56,6 +58,10 @@ const CATEGORY_THUMBNAILS = {
   maternity: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=400&auto=format&fit=crop',
   bab: 'https://images.unsplash.com/photo-1522771930-78848d9293e8?q=80&w=400&auto=format&fit=crop',
   yagyat: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=400&auto=format&fit=crop',
+  'baby-shower': 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=600&auto=format&fit=crop',
+  babyshower: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=600&auto=format&fit=crop',
+  baby_shower: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=600&auto=format&fit=crop',
+  engagement: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=600&auto=format&fit=crop',
 };
 
 const CATEGORY_ICONS = {
@@ -71,6 +77,9 @@ const CATEGORY_ICONS = {
   commercial: Briefcase,
   baby: Baby,
   maternity: Sparkles,
+  'baby-shower': Baby,
+  babyshower: Baby,
+  engagement: Gem,
 };
 
 const invalidateServicesCache = () => {
@@ -87,8 +96,8 @@ export default function AdminServicesPage() {
   const { categories: dynamicCategories, refresh: refreshCategories } = useCategories();
   const [backendCategories, setBackendCategories] = useState([]);
 
-  useEffect(() => {
-    fetch('/api/categories')
+  const fetchBackendCategories = useCallback(() => {
+    fetch(getApiUrl('/api/categories'))
       .then((res) => res.json())
       .then((json) => {
         if (Array.isArray(json.data) && json.data.length > 0) {
@@ -98,11 +107,16 @@ export default function AdminServicesPage() {
       .catch((err) => console.warn('Categories fetch failed:', err));
   }, []);
 
-  // Merge default categories with custom dynamic categories (strictly deduplicated)
-  const categoriesList = React.useMemo(() => {
-    const base = [...DEFAULT_CATEGORIES];
-    const sourcePool = [...(dynamicCategories || []), ...(backendCategories || [])];
+  useEffect(() => {
+    fetchBackendCategories();
+    window.addEventListener('ds_categories_updated', fetchBackendCategories);
+    return () => {
+      window.removeEventListener('ds_categories_updated', fetchBackendCategories);
+    };
+  }, [fetchBackendCategories]);
 
+  // Merge default categories with custom dynamic categories (strictly deduplicated and with real cover artwork)
+  const categoriesList = React.useMemo(() => {
     // Canonical key generator for matching categories regardless of plurals or trailing dashes
     const toCanonicalKey = (str) =>
       (str || '')
@@ -110,6 +124,41 @@ export default function AdminServicesPage() {
         .trim()
         .replace(/[^a-z0-9]/g, '')
         .replace(/s$/, '');
+
+    const sourcePool = [...(dynamicCategories || []), ...(backendCategories || [])];
+
+    const findInPool = (idOrSlug, label) => {
+      const targetKey = toCanonicalKey(idOrSlug || label);
+      return sourcePool.find((sc) => {
+        const scSlug = (sc.slug || sc.id || '').toLowerCase().trim();
+        const scName = (sc.name || '').toLowerCase().trim();
+        return (
+          scSlug === idOrSlug ||
+          sc.id === idOrSlug ||
+          toCanonicalKey(scSlug) === targetKey ||
+          toCanonicalKey(scName) === targetKey
+        );
+      });
+    };
+
+    const base = DEFAULT_CATEGORIES.map((defCat) => {
+      const match = findInPool(defCat.slug || defCat.id, defCat.label);
+      const cover =
+        match?.coverImage ||
+        match?.featured?.image ||
+        match?.image ||
+        match?.imageUrl ||
+        CATEGORY_THUMBNAILS[defCat.id] ||
+        CATEGORY_THUMBNAILS[defCat.slug];
+
+      return {
+        ...defCat,
+        coverImage: cover,
+        display: match?.coverDisplay || match?.display || match?.featured?.display,
+        coverDisplay: match?.coverDisplay || match?.display,
+        fullCategory: match || defCat,
+      };
+    });
 
     sourcePool.forEach((cat) => {
       const slug = (
@@ -122,18 +171,31 @@ export default function AdminServicesPage() {
 
       const key = toCanonicalKey(slug);
       const exists = base.some(
-        (c) => toCanonicalKey(c.id) === key || toCanonicalKey(c.label) === key
+        (c) => toCanonicalKey(c.id) === key || toCanonicalKey(c.label) === key || toCanonicalKey(c.slug) === key
       );
 
       if (!exists) {
         const rawName = (cat.name || slug).trim();
+        const cover =
+          cat.coverImage ||
+          cat.featured?.image ||
+          cat.image ||
+          cat.imageUrl ||
+          CATEGORY_THUMBNAILS[slug] ||
+          CATEGORY_THUMBNAILS[key];
+
         base.push({
           id: slug,
+          slug,
           label: rawName.charAt(0).toUpperCase() + rawName.slice(1),
-          image: cat.image || cat.imageUrl,
+          coverImage: cover,
+          display: cat.coverDisplay || cat.display || cat.featured?.display,
+          coverDisplay: cat.coverDisplay || cat.display,
+          fullCategory: cat,
         });
       }
     });
+
     return base;
   }, [dynamicCategories, backendCategories]);
 
@@ -628,9 +690,17 @@ export default function AdminServicesPage() {
               const count = serviceCountsByCategory[cat.id] || 0;
               const isLive = count > 0 && (categoryLiveStatus[cat.id] ?? true);
               const thumb =
+                cat.coverImage ||
+                cat.featured?.image ||
                 cat.image ||
+                cat.imageUrl ||
+                cat.fullCategory?.coverImage ||
+                cat.fullCategory?.featured?.image ||
                 CATEGORY_THUMBNAILS[cat.id] ||
-                CATEGORY_THUMBNAILS[cat.slug];
+                CATEGORY_THUMBNAILS[cat.slug] ||
+                CATEGORY_THUMBNAILS[toCanonicalKey(cat.id)] ||
+                CATEGORY_THUMBNAILS[toCanonicalKey(cat.slug)];
+              const thumbUrl = thumb ? getApiUrl(thumb) : '';
               const isCurrent = activeCategory === cat.id;
               const IconComponent = CATEGORY_ICONS[cat.id] || Sparkles;
 
@@ -651,20 +721,30 @@ export default function AdminServicesPage() {
                         onClick={() => handleCategorySelect(cat.id, true)}
                         title={`View ${cat.label} packages`}
                       >
-                        {thumb ? (
-                          <img
-                            src={thumb}
-                            alt={cat.label}
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                            }}
-                            className="w-14 h-14 rounded-lg object-cover shrink-0 border border-[#EAE4DA]"
-                          />
-                        ) : (
-                          <div className="w-14 h-14 rounded-lg bg-[#F1ECE3] border border-[#EAE4DA] flex items-center justify-center shrink-0 text-[#7A7367]">
+                        <div
+                          className="w-14 h-14 rounded-lg overflow-hidden shrink-0 border border-[#EAE4DA] bg-[#F1ECE3] relative"
+                          style={getFramingContainerStyle(cat.display || cat.coverDisplay, thumbUrl)}
+                        >
+                          {thumbUrl ? (
+                            <img
+                              src={thumbUrl}
+                              alt={cat.label}
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const fallbackEl = e.currentTarget.nextElementSibling;
+                                if (fallbackEl) fallbackEl.style.display = 'flex';
+                              }}
+                              className="w-full h-full object-cover"
+                              style={getFramingStyle(cat.display || cat.coverDisplay, { url: thumbUrl })}
+                            />
+                          ) : null}
+                          <div
+                            className="w-full h-full flex items-center justify-center text-[#7A7367]"
+                            style={{ display: thumbUrl ? 'none' : 'flex' }}
+                          >
                             <IconComponent size={22} strokeWidth={1.5} />
                           </div>
-                        )}
+                        </div>
 
                         <div className="min-w-0 flex-1">
                           <h3 className="font-display text-[21px] font-normal text-[#181818] leading-tight truncate group-hover:text-black transition-colors">
@@ -704,8 +784,17 @@ export default function AdminServicesPage() {
                                   (dynamicCategories || []).find((c) =>
                                     c.slug === cat.slug ||
                                     c.id === cat.id ||
-                                    toCanonicalKey(c.slug) === toCanonicalKey(cat.id || cat.slug)
-                                  ) || cat;
+                                    toCanonicalKey(c.slug) === toCanonicalKey(cat.id || cat.slug) ||
+                                    toCanonicalKey(c.name) === toCanonicalKey(cat.label || cat.id)
+                                  ) ||
+                                  (backendCategories || []).find((c) =>
+                                    c.slug === cat.slug ||
+                                    c.id === cat.id ||
+                                    toCanonicalKey(c.slug) === toCanonicalKey(cat.id || cat.slug) ||
+                                    toCanonicalKey(c.name) === toCanonicalKey(cat.label || cat.id)
+                                  ) ||
+                                  cat.fullCategory ||
+                                  cat;
                                 setEditCategoryTarget(fullCat);
                               }}
                               className="w-full px-3 py-1.5 text-left text-[12px] text-[#181818] hover:bg-[#FAF8F5] flex items-center gap-2 cursor-pointer font-medium"
@@ -1104,6 +1193,7 @@ export default function AdminServicesPage() {
           onSuccess={() => {
             setEditCategoryTarget(null);
             if (refreshCategories) refreshCategories();
+            fetchBackendCategories();
             fetchAllServices();
             showToast('Category updated successfully.');
           }}

@@ -177,15 +177,15 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
 
   useEffect(() => {
     if (category) {
-      setName(category.name || '');
-      setSlug(category.slug || '');
+      setName(category.name || category.label || '');
+      setSlug(category.slug || category.id || '');
       setIsSlugCustomized(false);
       setTagline(category.tagline || '');
       setQuote(category.quote || '');
       setMedium(category.medium || '');
       setLocation(category.location || '');
       
-      const photoUrl = category.coverImage || category.featured?.image || '';
+      const photoUrl = category.coverImage || category.featured?.image || category.image || category.imageUrl || '';
       const cleanPhotoUrl = stripFramingHash(photoUrl) || photoUrl;
       setCoverPreview(cleanPhotoUrl);
       setDirectCoverUrl(cleanPhotoUrl);
@@ -297,8 +297,8 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       const generatedSlug = val
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '');
+        .replace(/[^a-z0-9_-]+/g, '-')
+        .replace(/(^[-_]|[-_]$)+/g, '');
       setSlug(generatedSlug);
     }
   };
@@ -338,8 +338,8 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
     const finalSlug = (slug || name)
       .toLowerCase()
       .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)+/g, '');
+      .replace(/[^a-z0-9_-]+/g, '-')
+      .replace(/(^[-_]|[-_]$)+/g, '');
     if (!finalSlug) {
       setError('Category URL slug cannot be empty.');
       return;

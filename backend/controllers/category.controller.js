@@ -120,8 +120,8 @@ const createCategory = asyncHandler(async (req, res) => {
   }
 
   // Validate slug format
-  if (!/^[a-z0-9-]+$/.test(slug)) {
-    throw new ApiError(400, "Invalid slug format: lowercase alphanumeric characters and hyphens only");
+  if (!/^[a-z0-9_-]+$/.test(slug)) {
+    throw new ApiError(400, "Invalid slug format: lowercase alphanumeric characters, hyphens, and underscores only");
   }
 
   // Check if category slug already exists
@@ -218,10 +218,24 @@ const updateCategory = asyncHandler(async (req, res) => {
       found = await Category.findById(req.body._id);
     }
     if (!found && id) {
-      found = await Category.findOne({ slug: id.toLowerCase().trim() });
+      const normalizedSlug = id.toLowerCase().trim();
+      found = await Category.findOne({
+        $or: [
+          { slug: normalizedSlug },
+          { slug: normalizedSlug.replace(/_/g, '-') },
+          { slug: normalizedSlug.replace(/-/g, '_') },
+        ],
+      });
     }
     if (!found && req.body.oldSlug) {
-      found = await Category.findOne({ slug: String(req.body.oldSlug).toLowerCase().trim() });
+      const oldSlugNormalized = String(req.body.oldSlug).toLowerCase().trim();
+      found = await Category.findOne({
+        $or: [
+          { slug: oldSlugNormalized },
+          { slug: oldSlugNormalized.replace(/_/g, '-') },
+          { slug: oldSlugNormalized.replace(/-/g, '_') },
+        ],
+      });
     }
     if (!found && req.body.slug) {
       found = await Category.findOne({ slug: String(req.body.slug).toLowerCase().trim() });
@@ -339,9 +353,9 @@ const updateCategory = asyncHandler(async (req, res) => {
 
   let slugChanged = false;
   if (targetSlug && targetSlug !== oldSlug) {
-    if (!/^[a-z0-9-]+$/.test(targetSlug)) {
-      throw new ApiError(400, "Invalid slug format: lowercase alphanumeric characters and hyphens only");
-    }
+    if (!/^[a-z0-9_-]+$/.test(targetSlug)) {
+    throw new ApiError(400, "Invalid slug format: lowercase alphanumeric characters, hyphens, and underscores only");
+  }
     const duplicate = await Category.findOne({ slug: targetSlug, _id: { $ne: category._id } });
     if (duplicate) {
       throw new ApiError(400, `Category slug "${targetSlug}" already exists`);
