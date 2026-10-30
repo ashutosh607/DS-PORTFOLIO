@@ -13,6 +13,17 @@
     </image:image>
   </url>
 
+  <!-- Dedicated Location Landing: Photographer in Mumbai -->
+  <url>
+    <loc>https://www.dishantshelarphotography.in/photographer-in-mumbai</loc>
+    <lastmod>2026-10-30</lastmod>
+    <image:image>
+      <image:loc>https://www.dishantshelarphotography.in/og-image.jpg</image:loc>
+      <image:title>Photographer in Mumbai | Wedding &amp; Portrait Photography – DS Photography</image:title>
+      <image:caption>Bespoke fine-art wedding, pre-wedding, and portrait photography services across South Mumbai, Bandra, and destination venues</image:caption>
+    </image:image>
+  </url>
+
   <!-- Collections Overview -->
   <url>
     <loc>https://www.dishantshelarphotography.in/collections</loc>

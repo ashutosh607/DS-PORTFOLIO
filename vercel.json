@@ -85,6 +85,14 @@
       "destination": "/index.html"
     },
     {
+      "source": "/photographer-in-mumbai",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/photographer-in-mumbai/:path*",
+      "destination": "/index.html"
+    },
+    {
       "source": "/terms",
       "destination": "/index.html"
     },

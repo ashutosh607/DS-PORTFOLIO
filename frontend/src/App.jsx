@@ -13,6 +13,7 @@ const CollectionsPage = lazy(() => import('./pages/collections/CollectionsPage')
 const ServicesPage = lazy(() => import('./pages/services/ServicesPage'));
 const InquiryModal = lazy(() => import('./components/modals/InquiryModal'));
 const AboutPage = lazy(() => import('./pages/about/AboutPage'));
+const PhotographerInMumbaiPage = lazy(() => import('./pages/landing/PhotographerInMumbaiPage'));
 const TermsPage = lazy(() => import('./pages/terms/TermsPage'));
 const NotFoundPage = lazy(() => import('./pages/error/NotFoundPage'));
 const ErrorPage = lazy(() => import('./pages/error/ErrorPage'));
@@ -78,6 +79,7 @@ export default function App() {
       !location.pathname.startsWith('/collections') &&
       location.pathname !== '/services' &&
       location.pathname !== '/about' &&
+      location.pathname !== '/photographer-in-mumbai' &&
       location.pathname !== '/terms');
 
   const showPublicChrome = !isAdminRoute && !isErrorOrNotFoundRoute;
@@ -123,6 +125,7 @@ export default function App() {
                 />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/about" element={<AboutPage onOpenInquiry={handleOpenInquiry} />} />
+                <Route path="/photographer-in-mumbai" element={<PhotographerInMumbaiPage onOpenInquiry={handleOpenInquiry} />} />
                 <Route path="/terms" element={<TermsPage onOpenInquiry={handleOpenInquiry} />} />
 
                 {/* Legacy / Alias Public Route Redirection */}
