@@ -72,15 +72,16 @@ export default function App() {
       if (staticSplash) staticSplash.remove();
     }
   }, [isAdminRoute]);
+  const normalizedPath = location.pathname.replace(/\/+$/, '') || '/';
   const isErrorOrNotFoundRoute =
-    location.pathname === '/error' ||
+    normalizedPath === '/error' ||
     (!isAdminRoute &&
-      location.pathname !== '/' &&
-      !location.pathname.startsWith('/collections') &&
-      location.pathname !== '/services' &&
-      location.pathname !== '/about' &&
-      location.pathname !== '/photographer-in-mumbai' &&
-      location.pathname !== '/terms');
+      normalizedPath !== '/' &&
+      !normalizedPath.startsWith('/collections') &&
+      normalizedPath !== '/services' &&
+      normalizedPath !== '/about' &&
+      normalizedPath !== '/photographer-in-mumbai' &&
+      normalizedPath !== '/terms');
 
   const showPublicChrome = !isAdminRoute && !isErrorOrNotFoundRoute;
 
@@ -125,7 +126,9 @@ export default function App() {
                 />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/about" element={<AboutPage onOpenInquiry={handleOpenInquiry} />} />
+                <Route path="/about/*" element={<AboutPage onOpenInquiry={handleOpenInquiry} />} />
                 <Route path="/photographer-in-mumbai" element={<PhotographerInMumbaiPage onOpenInquiry={handleOpenInquiry} />} />
+                <Route path="/photographer-in-mumbai/*" element={<PhotographerInMumbaiPage onOpenInquiry={handleOpenInquiry} />} />
                 <Route path="/terms" element={<TermsPage onOpenInquiry={handleOpenInquiry} />} />
 
                 {/* Legacy / Alias Public Route Redirection */}
