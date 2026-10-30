@@ -157,6 +157,29 @@ const createCategory = asyncHandler(async (req, res) => {
     categoryOrder = highestOrderCat && highestOrderCat.order ? highestOrderCat.order + 1 : 10;
   }
 
+  let parsedCreateDisplay = { fit: "cover", position: { x: 50, y: 50 }, zoom: 1 };
+  const rawCreateDisplay = req.body.display ?? req.body.coverDisplay;
+  if (rawCreateDisplay !== undefined) {
+    try {
+      const candidate =
+        typeof rawCreateDisplay === "string"
+          ? JSON.parse(rawCreateDisplay)
+          : rawCreateDisplay;
+      if (candidate && typeof candidate === "object") {
+        parsedCreateDisplay = {
+          fit: candidate.fit === "contain" || candidate.fit === "fit" ? "contain" : "cover",
+          position: {
+            x: typeof candidate.position?.x === "number" ? Math.max(0, Math.min(100, candidate.position.x)) : 50,
+            y: typeof candidate.position?.y === "number" ? Math.max(0, Math.min(100, candidate.position.y)) : 50,
+          },
+          zoom: typeof candidate.zoom === "number" && candidate.zoom >= 1 ? Math.min(3, candidate.zoom) : 1,
+        };
+      }
+    } catch {
+      // Keep default display
+    }
+  }
+
   const newCategory = await Category.create({
     name: name.trim(),
     slug,
@@ -167,6 +190,8 @@ const createCategory = asyncHandler(async (req, res) => {
     medium: medium ? medium.trim() : "",
     location: location ? location.trim() : "",
     order: categoryOrder,
+    display: parsedCreateDisplay,
+    coverDisplay: parsedCreateDisplay,
   });
 
   return res.status(201).json(
@@ -195,11 +220,30 @@ const updateCategory = asyncHandler(async (req, res) => {
     category = await Category.findOne({ order: Number(id) });
   }
 
-  // If categories not yet seeded in MongoDB, auto-seed and try finding again
+  // If categories not yet seeded in MongoDB (or this specific baseline category wasn't seeded yet), auto-seed and try finding again
   if (!category) {
     const totalCount = await Category.countDocuments();
     if (totalCount === 0) {
       await Category.insertMany(DEFAULT_SEED_CATEGORIES);
+    } else {
+      const normalizedId = id.toLowerCase().trim();
+      const matchingSeed = DEFAULT_SEED_CATEGORIES.find(
+        (seed) =>
+          seed.slug === normalizedId ||
+          (!isNaN(Number(id)) && seed.order === Number(id)) ||
+          seed.name.toLowerCase() === normalizedId
+      );
+      if (matchingSeed) {
+        const existingSeed = await Category.findOne({ slug: matchingSeed.slug });
+        if (!existingSeed) {
+          category = await Category.create(matchingSeed);
+        } else {
+          category = existingSeed;
+        }
+      }
+    }
+
+    if (!category) {
       if (mongoose.Types.ObjectId.isValid(id)) {
         category = await Category.findById(id);
       }
@@ -216,6 +260,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Category not found");
   }
 
+  const oldCoverImage = category.coverImage;
   let coverImage = req.body.coverImage ? req.body.coverImage.trim() : category.coverImage;
   let publicId = category.publicId;
 
@@ -274,6 +319,7 @@ const updateCategory = asyncHandler(async (req, res) => {
       category.supporting = typeof req.body.supporting === 'string'
         ? JSON.parse(req.body.supporting)
         : req.body.supporting;
+      category.markModified("supporting");
     } catch {
       // Keep existing supporting
     }
@@ -283,18 +329,38 @@ const updateCategory = asyncHandler(async (req, res) => {
       category.featured = typeof req.body.featured === 'string'
         ? JSON.parse(req.body.featured)
         : req.body.featured;
+      category.markModified("featured");
     } catch {
       // Keep existing featured
     }
   }
-  if (req.body.display !== undefined) {
+  const rawDisplayInput = req.body.display ?? req.body.coverDisplay;
+  if (rawDisplayInput !== undefined) {
     try {
-      const parsedDisplay = typeof req.body.display === 'string'
-        ? JSON.parse(req.body.display)
-        : req.body.display;
+      const parsedDisplay = typeof rawDisplayInput === 'string'
+        ? JSON.parse(rawDisplayInput)
+        : rawDisplayInput;
       if (parsedDisplay && typeof parsedDisplay === 'object') {
-        category.display = parsedDisplay;
-        category.coverDisplay = parsedDisplay;
+        const sanitizedDisplay = {
+          fit: parsedDisplay.fit === 'contain' || parsedDisplay.fit === 'fit' ? 'contain' : 'cover',
+          position: {
+            x: typeof parsedDisplay.position?.x === 'number' ? Math.max(0, Math.min(100, parsedDisplay.position.x)) : 50,
+            y: typeof parsedDisplay.position?.y === 'number' ? Math.max(0, Math.min(100, parsedDisplay.position.y)) : 50,
+          },
+          zoom: typeof parsedDisplay.zoom === 'number' && parsedDisplay.zoom >= 1 ? Math.min(3, parsedDisplay.zoom) : 1,
+        };
+        category.display = sanitizedDisplay;
+        category.coverDisplay = sanitizedDisplay;
+        category.markModified("display");
+        category.markModified("coverDisplay");
+        if (category.featured && typeof category.featured === 'object') {
+          category.featured = {
+            ...category.featured,
+            image: coverImage,
+            display: sanitizedDisplay,
+          };
+          category.markModified("featured");
+        }
       }
     } catch {
       // Keep existing display
@@ -334,7 +400,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     }
   }
 
-  // Sync any existing baseline cover overrides so that media queries immediately reflect the new cover
+  // Sync any existing baseline cover overrides or matching cover media items so media queries immediately reflect the new cover & framing
   try {
     const paddedOrder = category.order ? String(category.order).padStart(2, "0") : "";
     const coverBaselineIds = [
@@ -343,10 +409,33 @@ const updateCategory = asyncHandler(async (req, res) => {
       `seed-cover-${category.order}`,
       ...(paddedOrder ? [`seed-cover-${paddedOrder}`] : []),
     ];
+    const mediaSetFields = {
+      url: coverImage,
+      publicId: publicId || "",
+    };
+    if (category.display && typeof category.display === "object") {
+      mediaSetFields.display = category.display;
+    }
     await Media.updateMany(
       { baselineId: { $in: coverBaselineIds } },
-      { $set: { url: coverImage, publicId: publicId || "" } }
+      { $set: mediaSetFields }
     );
+
+    const coverUrls = [oldCoverImage, coverImage].filter(Boolean);
+    const catSlugs = [category.slug, oldSlug].filter(Boolean);
+    if (coverUrls.length > 0 && catSlugs.length > 0) {
+      await Media.updateMany(
+        { category: { $in: catSlugs }, url: { $in: coverUrls } },
+        {
+          $set: {
+            url: coverImage,
+            ...(category.display && typeof category.display === "object"
+              ? { display: category.display }
+              : {}),
+          },
+        }
+      );
+    }
   } catch (err) {
     console.warn("Could not sync baseline cover override in Media:", err.message);
   }

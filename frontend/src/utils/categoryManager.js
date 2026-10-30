@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CATEGORIES as INITIAL_CATEGORIES } from '../pages/collections/data/collectionsData.js';
+import { getApiUrl } from './api';
 
 const STORAGE_KEY = 'ds_portfolio_dynamic_categories';
 const CATEGORIES_EVENT = 'ds_categories_updated';
@@ -96,6 +97,14 @@ export function normalizeCategory(cat, index = 0) {
     initialMatch?.cardTransform ||
     'perspective(1200px) rotateY(4deg) translateY(0px)';
 
+  const resolvedDisplay =
+    cat.display ||
+    cat.coverDisplay ||
+    cat.featured?.display ||
+    initialMatch?.display ||
+    initialMatch?.coverDisplay ||
+    { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 };
+
   const featured = {
     ...(initialMatch?.featured || {}),
     ...(cat.featured || {}),
@@ -109,6 +118,7 @@ export function normalizeCategory(cat, index = 0) {
     count: cat.featured?.count || initialMatch?.featured?.count || '01 / 01',
     caption: cat.quote || cat.featured?.caption || initialMatch?.featured?.caption || '',
     meta: cat.medium || cat.featured?.meta || initialMatch?.featured?.meta || '',
+    display: resolvedDisplay,
   };
 
   return {
@@ -130,8 +140,8 @@ export function normalizeCategory(cat, index = 0) {
     cardTransform,
     featured,
     supporting,
-    display: cat.display || cat.coverDisplay || initialMatch?.display || { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 },
-    coverDisplay: cat.coverDisplay || cat.display || initialMatch?.coverDisplay || { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 },
+    display: resolvedDisplay,
+    coverDisplay: cat.coverDisplay || cat.display || resolvedDisplay,
     isCustom: Boolean(cat.isCustom || (!initialMatch && cat._id)),
   };
 }
@@ -223,8 +233,22 @@ function getAuthToken(authHeaders = {}) {
  */
 export async function syncCategoriesWithBackend() {
   try {
-    const res = await fetch('/api/categories');
-    if (res.ok) {
+    const endpoints = [getApiUrl('/api/categories'), '/api/categories'];
+    let res = null;
+    for (const ep of endpoints) {
+      if (!ep) continue;
+      try {
+        const candidate = await fetch(ep);
+        if (candidate.ok) {
+          res = candidate;
+          break;
+        }
+      } catch {
+        // Try next candidate
+      }
+    }
+
+    if (res && res.ok) {
       const json = await res.json();
       if (Array.isArray(json.data) && json.data.length > 0) {
         const live = getLiveCategories();
@@ -248,6 +272,16 @@ export async function syncCategoriesWithBackend() {
               ? bCat.supporting
               : (initialMatch?.supporting || []);
 
+          const preservedDisplay =
+            bCat.display ||
+            bCat.coverDisplay ||
+            bCat.featured?.display ||
+            match?.display ||
+            match?.coverDisplay ||
+            initialMatch?.display ||
+            initialMatch?.coverDisplay ||
+            { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 };
+
           return normalizeCategory(
             {
               ...initialMatch,
@@ -255,6 +289,8 @@ export async function syncCategoriesWithBackend() {
               ...bCat,
               id: preservedId,
               supporting: preservedSupporting,
+              display: preservedDisplay,
+              coverDisplay: bCat.coverDisplay || bCat.display || preservedDisplay,
               cardShapeStyle:
                 match?.cardShapeStyle ||
                 initialMatch?.cardShapeStyle ||
@@ -295,16 +331,17 @@ export async function createCategory(categoryData, authHeaders = {}) {
     headers.Authorization = tokenHeader;
   }
 
+  const endpoint = getApiUrl('/api/categories') || '/api/categories';
   let res;
   if (categoryData instanceof FormData) {
-    res = await fetch('/api/categories', {
+    res = await fetch(endpoint, {
       method: 'POST',
       headers,
       body: categoryData,
       credentials: 'include',
     });
   } else {
-    res = await fetch('/api/categories', {
+    res = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -341,16 +378,17 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
     headers.Authorization = tokenHeader;
   }
 
+  const endpoint = getApiUrl(`/api/categories/${idOrSlug}`) || `/api/categories/${idOrSlug}`;
   let res;
   if (updateData instanceof FormData) {
-    res = await fetch(`/api/categories/${idOrSlug}`, {
+    res = await fetch(endpoint, {
       method: 'PUT',
       headers,
       body: updateData,
       credentials: 'include',
     });
   } else {
-    res = await fetch(`/api/categories/${idOrSlug}`, {
+    res = await fetch(endpoint, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -370,6 +408,20 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
 
   const updatedCategory = json.data;
   const current = getLiveCategories();
+
+  let formDisplay = null;
+  if (updateData instanceof FormData) {
+    const rawFormDisplay = updateData.get('display') || updateData.get('coverDisplay');
+    if (rawFormDisplay) {
+      try {
+        formDisplay = typeof rawFormDisplay === 'string' ? JSON.parse(rawFormDisplay) : rawFormDisplay;
+      } catch {
+        formDisplay = null;
+      }
+    }
+  } else if (updateData && typeof updateData === 'object') {
+    formDisplay = updateData.display || updateData.coverDisplay || null;
+  }
 
   const initialMatch =
     findBaselineCategory(updatedCategory.slug) ||
@@ -410,6 +462,16 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
     initialMatch?.cardTransform ||
     'perspective(1200px) rotateY(4deg) translateY(0px)';
 
+  const resolvedDisplay =
+    updatedCategory.display ||
+    updatedCategory.coverDisplay ||
+    formDisplay ||
+    existing?.display ||
+    existing?.coverDisplay ||
+    initialMatch?.display ||
+    initialMatch?.coverDisplay ||
+    { fit: 'cover', position: { x: 50, y: 50 }, zoom: 1 };
+
   const merged = {
     ...initialMatch,
     ...existing,
@@ -421,29 +483,20 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
     supporting: preservedSupporting,
     cardShapeStyle: preservedCardShapeStyle,
     cardTransform: preservedCardTransform,
-    display:
-      updatedCategory.display ||
-      updateData?.display ||
-      existing?.display ||
-      initialMatch?.display,
-    coverDisplay:
-      updatedCategory.coverDisplay ||
-      updatedCategory.display ||
-      updateData?.coverDisplay ||
-      updateData?.display ||
-      existing?.coverDisplay ||
-      existing?.display ||
-      initialMatch?.coverDisplay,
+    display: resolvedDisplay,
+    coverDisplay: resolvedDisplay,
     featured: {
       ...(initialMatch?.featured || {}),
       ...(existing?.featured || {}),
       image: updatedCategory.coverImage || existing?.coverImage || initialMatch?.coverImage,
       title: updatedCategory.name || existing?.name || initialMatch?.name,
+      display: resolvedDisplay,
     },
   };
 
   const normalized = normalizeCategory(merged);
 
+  let matchedInList = false;
   const updated = current.map((c) => {
     const isTarget =
       c.slug === normalized.slug ||
@@ -453,8 +506,13 @@ export async function updateCategory(idOrSlug, updateData, authHeaders = {}) {
       c.id === normalized.id ||
       c._id === normalized._id ||
       (existing && (c.slug === existing.slug || c.id === existing.id || c._id === existing._id));
+    if (isTarget) matchedInList = true;
     return isTarget ? { ...c, ...normalized, supporting: preservedSupporting } : c;
   });
+
+  if (!matchedInList) {
+    updated.push(normalized);
+  }
 
   broadcastCategories(updated);
   return normalized;
@@ -470,7 +528,8 @@ export async function deleteCategory(idOrSlug, authHeaders = {}) {
     headers.Authorization = tokenHeader;
   }
 
-  const res = await fetch(`/api/categories/${idOrSlug}`, {
+  const endpoint = getApiUrl(`/api/categories/${idOrSlug}`) || `/api/categories/${idOrSlug}`;
+  const res = await fetch(endpoint, {
     method: 'DELETE',
     headers,
     credentials: 'include',
@@ -514,16 +573,33 @@ export function useCategories() {
     });
 
     const handleUpdate = (e) => {
-      if (Array.isArray(e.detail)) {
+      if (Array.isArray(e?.detail)) {
         setCategories(e.detail);
       } else {
         setCategories(getLiveCategories());
       }
     };
 
+    const handleStorage = (e) => {
+      if (!e.key || e.key === STORAGE_KEY) {
+        setCategories(getLiveCategories());
+      }
+    };
+
+    const handleFocus = () => {
+      setCategories(getLiveCategories());
+      syncCategoriesWithBackend().then((data) => {
+        if (Array.isArray(data)) setCategories(data);
+      });
+    };
+
     window.addEventListener(CATEGORIES_EVENT, handleUpdate);
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('focus', handleFocus);
     return () => {
       window.removeEventListener(CATEGORIES_EVENT, handleUpdate);
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('focus', handleFocus);
     };
   }, []);
 

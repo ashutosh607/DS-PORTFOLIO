@@ -138,7 +138,7 @@ export default function CollectionsPage({ onOpenInquiry }) {
 
     loadMedia();
 
-    // Listen for real-time media updates broadcast from admin modals
+    // Listen for real-time media updates broadcast from admin modals or cross-tab storage
     const handleMediaUpdated = (e) => {
       if (e?.detail && Array.isArray(e.detail)) {
         setMediaList(e.detail);
@@ -147,12 +147,23 @@ export default function CollectionsPage({ onOpenInquiry }) {
       }
     };
 
+    const handleStorageOrFocus = (e) => {
+      if (e?.type === 'storage' && e.key && e.key !== 'ds_portfolio_cached_media') return;
+      loadMedia(1);
+    };
+
     window.addEventListener('ds_media_updated', handleMediaUpdated);
+    window.addEventListener('ds_categories_updated', handleMediaUpdated);
+    window.addEventListener('storage', handleStorageOrFocus);
+    window.addEventListener('focus', handleStorageOrFocus);
 
     return () => {
       isMounted = false;
       if (retryTimer) clearTimeout(retryTimer);
       window.removeEventListener('ds_media_updated', handleMediaUpdated);
+      window.removeEventListener('ds_categories_updated', handleMediaUpdated);
+      window.removeEventListener('storage', handleStorageOrFocus);
+      window.removeEventListener('focus', handleStorageOrFocus);
     };
   }, []);
 
@@ -176,19 +187,34 @@ export default function CollectionsPage({ onOpenInquiry }) {
       );
     });
 
-    const formattedCustom = categoryItems.map((item, idx) => ({
-      id: item._id || `custom-${cat.id}-${idx}`,
-      image: getApiUrl(item.url),
-      title: item.title || `${cat.name} Specimen`,
-      tag: item.title || `${cat.name} Specimen`,
-      meta: item.caption || item.meta || cat.medium || 'Atelier Master Archive',
-      caption: item.caption || item.meta || cat.tagline || 'Atelier Master Archive',
-      type: item.type || 'photo',
-      isCustom: true,
-      display: item.display,
-    }));
+    const effectiveCoverImage = getApiUrl(cat.coverImage || cat.featured?.image);
+    const effectiveCoverDisplay = cat.coverDisplay || cat.display || cat.featured?.display;
+    const hasCustomCoverFraming = Boolean(
+      effectiveCoverDisplay &&
+      (effectiveCoverDisplay.fit === 'contain' ||
+        effectiveCoverDisplay.fit === 'fit' ||
+        (typeof effectiveCoverDisplay.zoom === 'number' && effectiveCoverDisplay.zoom !== 1) ||
+        (typeof effectiveCoverDisplay.position?.x === 'number' && effectiveCoverDisplay.position.x !== 50) ||
+        (typeof effectiveCoverDisplay.position?.y === 'number' && effectiveCoverDisplay.position.y !== 50))
+    );
 
-    const effectiveCoverImage = cat.coverImage || cat.featured?.image;
+    const formattedCustom = categoryItems.map((item, idx) => {
+      const itemUrl = getApiUrl(item.url);
+      const isMatchingCover = Boolean(effectiveCoverImage && itemUrl === effectiveCoverImage);
+      return {
+        id: item._id || `custom-${cat.id}-${idx}`,
+        image: itemUrl,
+        title: item.title || `${cat.name} Specimen`,
+        tag: item.title || `${cat.name} Specimen`,
+        meta: item.caption || item.meta || cat.medium || 'Atelier Master Archive',
+        caption: item.caption || item.meta || cat.tagline || 'Atelier Master Archive',
+        type: item.type || 'photo',
+        isCustom: true,
+        display: isMatchingCover && hasCustomCoverFraming
+          ? effectiveCoverDisplay
+          : (item.display || (isMatchingCover ? effectiveCoverDisplay : undefined)),
+      };
+    });
 
     const baseFeatured = {
       id: `${cat.id}-featured`,
@@ -199,26 +225,47 @@ export default function CollectionsPage({ onOpenInquiry }) {
       caption: cat.quote || cat.tagline || 'A story in every frame.',
       meta: cat.medium || 'Medium Format Film / 35mm',
       type: 'photo',
-      display: cat.coverDisplay || cat.display || cat.featured?.display,
+      display: effectiveCoverDisplay,
     };
 
-    // If custom uploads exist for this category, use ONLY the custom uploaded media
-    const featured = formattedCustom.length > 0 ? formattedCustom[0] : baseFeatured;
-    const supporting = formattedCustom.length > 1
-      ? formattedCustom.slice(1)
-      : (formattedCustom.length === 0 && Array.isArray(cat.supporting) ? cat.supporting : []);
-    const allMedia = formattedCustom.length > 0
-      ? formattedCustom
+    const baselineCat = findBaselineCategory(cat.id) || findBaselineCategory(cat.slug);
+    const isEditedCoverImage = Boolean(
+      effectiveCoverImage &&
+      (!baselineCat || ( effectiveCoverImage !== baselineCat.coverImage && effectiveCoverImage !== baselineCat.featured?.image ))
+    );
+    const customAlreadyIncludesCover = formattedCustom.some((m) => m.image === effectiveCoverImage);
+
+    let combinedCustom = formattedCustom;
+    if (formattedCustom.length > 0) {
+      if ((isEditedCoverImage || hasCustomCoverFraming) && !customAlreadyIncludesCover && effectiveCoverImage) {
+        if (isEditedCoverImage) {
+          combinedCustom = [baseFeatured, ...formattedCustom];
+        } else if (hasCustomCoverFraming && !formattedCustom[0].display) {
+          combinedCustom = [
+            { ...formattedCustom[0], display: effectiveCoverDisplay },
+            ...formattedCustom.slice(1),
+          ];
+        }
+      }
+    }
+
+    const featured = combinedCustom.length > 0 ? combinedCustom[0] : baseFeatured;
+    const supporting = combinedCustom.length > 1
+      ? combinedCustom.slice(1)
+      : (combinedCustom.length === 0 && Array.isArray(cat.supporting) ? cat.supporting : []);
+    const allMedia = combinedCustom.length > 0
+      ? combinedCustom
       : [baseFeatured, ...(Array.isArray(cat.supporting) ? cat.supporting : [])];
 
     return {
       ...cat,
       coverImage: effectiveCoverImage,
-      coverDisplay: cat.coverDisplay || cat.display,
+      coverDisplay: effectiveCoverDisplay,
+      display: effectiveCoverDisplay,
       featured,
       supporting,
       allMedia,
-      customMedia: formattedCustom,
+      customMedia: combinedCustom,
     };
   });
 

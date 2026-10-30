@@ -172,7 +172,7 @@ export default function CollectionsGallery({
   // Scroll container ref for right side
   const scrollContainerRef = useRef(null);
 
-  // Reset selected item and scroll to top when category changes or media loads
+  // Reset selected item and scroll to top when category changes
   useEffect(() => {
     const firstItem = allMedia[0] || activeCategory.featured;
     if (activeAnimRef.current) {
@@ -182,21 +182,26 @@ export default function CollectionsGallery({
     setFlipState(null);
     setIsExpanding(false);
     setOutgoingItem(null);
-
-    // Keep selected item valid if media loads or changes
-    const isCurrentInAll = allMedia.some(
-      (m) =>
-        (m.id && selectedItem?.id && m.id === selectedItem.id) ||
-        (m.image && selectedItem?.image && m.image === selectedItem.image)
-    );
-    if (!isCurrentInAll || !selectedItem) {
-      setSelectedItem(firstItem);
-    }
+    setSelectedItem(firstItem);
 
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
-  }, [activeCategory.id, allMedia.length]);
+  }, [activeCategory.id]);
+
+  // Keep selected item synchronized whenever media list, cover image, or framing display settings update
+  useEffect(() => {
+    const firstItem = allMedia[0] || activeCategory.featured;
+    setSelectedItem((prev) => {
+      if (!prev) return firstItem;
+      const matched = allMedia.find(
+        (m) =>
+          (m.id && prev.id && m.id === prev.id) ||
+          (m.image && prev.image && m.image === prev.image)
+      );
+      return matched || firstItem;
+    });
+  }, [allMedia, activeCategory.featured, activeCategory.coverImage, activeCategory.display, activeCategory.coverDisplay]);
 
   // Find index of selected item in the collection
   const selectedIndex = allMedia.findIndex(

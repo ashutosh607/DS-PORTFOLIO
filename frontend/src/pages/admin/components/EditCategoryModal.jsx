@@ -221,9 +221,10 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
     const deltaY = clientY - dragStartRef.current.startY;
     const currentZoom = typeof display.zoom === 'number' && display.zoom >= 1 ? display.zoom : 1;
     const sensitivity = (100 / rect.width) * (1 / Math.max(1, currentZoom * 0.7));
+    const direction = display.fit === 'contain' && currentZoom <= 1 ? 1 : -1;
 
-    let nextX = dragStartRef.current.initialPosX - deltaX * sensitivity;
-    let nextY = dragStartRef.current.initialPosY - deltaY * sensitivity;
+    let nextX = dragStartRef.current.initialPosX + direction * deltaX * sensitivity;
+    let nextY = dragStartRef.current.initialPosY + direction * deltaY * sensitivity;
 
     nextX = Math.max(0, Math.min(100, Math.round(nextX * 10) / 10));
     nextY = Math.max(0, Math.min(100, Math.round(nextY * 10) / 10));
@@ -232,7 +233,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       ...prev,
       position: { x: nextX, y: nextY },
     }));
-  }, [isDragging, display.zoom]);
+  }, [isDragging, display.zoom, display.fit]);
 
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
@@ -304,6 +305,7 @@ export default function EditCategoryModal({ isOpen, onClose, onSuccess, category
       return;
     }
     setCoverFile(file);
+    setUseDirectUrl(false);
     setError('');
     const reader = new FileReader();
     reader.onload = (ev) => setCoverPreview(ev.target.result);

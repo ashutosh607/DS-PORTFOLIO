@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { getFramingStyle } from '../../../utils/mediaFraming';
+import { getFramingStyle, getFramingContainerStyle } from '../../../utils/mediaFraming';
+import { getApiUrl } from '../../../utils/api';
 
 const VISIBLE_COUNT = 6;
 
@@ -488,11 +489,12 @@ export default function CollectionsRibbon({
                         boxShadow: isActive
                           ? '0 24px 44px -10px rgba(18, 16, 14, 0.48), 0 0 0 2px #101010'
                           : '0 14px 32px -10px rgba(18, 16, 14, 0.22)',
+                        ...getFramingContainerStyle(cat.coverDisplay || cat.display),
                       }}
                     >
                       {/* Background Photograph */}
                       <img
-                        src={cat.coverImage}
+                        src={getApiUrl(cat.coverImage || cat.featured?.image)}
                         alt={`${cat.name} Collection`}
                         className="absolute inset-0 w-full h-full transition-[transform] duration-500 ease-out group-hover:scale-105 pointer-events-none"
                         style={getFramingStyle(cat.coverDisplay || cat.display)}

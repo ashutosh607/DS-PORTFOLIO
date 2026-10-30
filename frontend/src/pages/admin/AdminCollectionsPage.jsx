@@ -180,6 +180,7 @@ export default function AdminCollectionsPage() {
 
   const handleCategoryUpdated = async (updatedCat) => {
     await refreshCategories();
+    window.dispatchEvent(new CustomEvent('ds_media_updated'));
     if (updatedCat?.slug && updatedCat.slug !== activeCategorySlug && activeCategorySlug !== 'all') {
       handleCategorySelect(updatedCat.slug);
     } else {
@@ -399,9 +400,12 @@ export default function AdminCollectionsPage() {
       {activeCategorySlug !== 'all' && currentCategoryObj && (
         <div className="p-5 rounded-2xl border border-[#E8E2D6] bg-white flex flex-col md:flex-row md:items-center justify-between gap-5 shadow-xs -mt-4">
           <div className="flex items-center gap-4 min-w-0">
-            <div className="w-16 h-16 rounded-xl overflow-hidden border border-[#E8E2D6] shrink-0 bg-[#FAF8F5]">
+            <div
+              className="w-16 h-16 rounded-xl overflow-hidden border border-[#E8E2D6] shrink-0 bg-[#FAF8F5]"
+              style={getFramingContainerStyle(currentCategoryObj.display || currentCategoryObj.coverDisplay)}
+            >
               <img
-                src={currentCategoryObj.coverImage || currentCategoryObj.featured?.image}
+                src={getApiUrl(currentCategoryObj.coverImage || currentCategoryObj.featured?.image)}
                 alt={currentCategoryObj.name}
                 className="w-full h-full"
                 style={getFramingStyle(currentCategoryObj.display || currentCategoryObj.coverDisplay)}

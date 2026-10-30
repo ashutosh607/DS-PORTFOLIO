@@ -7,6 +7,7 @@ import AddMediaModal from './components/AddMediaModal';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import { useAdminAuth } from './context/AdminAuthContext';
 import { getApiUrl } from '../../utils/api';
+import { getFramingStyle, getFramingContainerStyle } from '../../utils/mediaFraming';
 import './AdminDashboard.css';
 
 export default function AdminDashboardPage() {
@@ -218,10 +219,11 @@ export default function AdminDashboardPage() {
               className="admin-collection-row"
             >
               {/* Thumbnail */}
-              <div className="thumb">
+              <div className="thumb" style={getFramingContainerStyle(cat.display || cat.coverDisplay)}>
                 <img
-                  src={cat.coverImage || cat.featured?.image}
+                  src={getApiUrl(cat.coverImage || cat.featured?.image)}
                   alt={cat.name}
+                  style={getFramingStyle(cat.display || cat.coverDisplay)}
                 />
               </div>
 
