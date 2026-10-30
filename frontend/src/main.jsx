@@ -5,6 +5,16 @@ import './index.css'
 import App from './App.jsx'
 import { API_BASE_URL } from './utils/api.js'
 
+// SPA redirect recovery (restores deep link if routed through 404 fallback)
+if (typeof window !== 'undefined') {
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectTarget = searchParams.get('p');
+  if (redirectTarget) {
+    const cleanUrl = decodeURIComponent(redirectTarget);
+    window.history.replaceState(null, '', cleanUrl);
+  }
+}
+
 // In production (Vercel), automatically route relative /api, /uploads, and /categories to Render backend URL
 if (typeof window !== 'undefined') {
   const originalFetch = window.fetch;

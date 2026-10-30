@@ -49,12 +49,12 @@
   ],
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://ds-portfolio-backend.onrender.com/api/$1"
+      "source": "/api/:path*",
+      "destination": "https://ds-portfolio-backend.onrender.com/api/:path*"
     },
     {
-      "source": "/uploads/(.*)",
-      "destination": "https://ds-portfolio-backend.onrender.com/uploads/$1"
+      "source": "/uploads/:path*",
+      "destination": "https://ds-portfolio-backend.onrender.com/uploads/:path*"
     },
     {
       "source": "/",
@@ -65,7 +65,7 @@
       "destination": "/index.html"
     },
     {
-      "source": "/about/(.*)",
+      "source": "/about/:path*",
       "destination": "/index.html"
     },
     {
@@ -73,7 +73,7 @@
       "destination": "/index.html"
     },
     {
-      "source": "/collections/(.*)",
+      "source": "/collections/:path*",
       "destination": "/index.html"
     },
     {
@@ -81,7 +81,7 @@
       "destination": "/index.html"
     },
     {
-      "source": "/services/(.*)",
+      "source": "/services/:path*",
       "destination": "/index.html"
     },
     {
@@ -89,11 +89,15 @@
       "destination": "/index.html"
     },
     {
-      "source": "/photographer-in-mumbai/(.*)",
+      "source": "/photographer-in-mumbai/:path*",
       "destination": "/index.html"
     },
     {
       "source": "/terms",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/terms/:path*",
       "destination": "/index.html"
     },
     {
@@ -105,11 +109,11 @@
       "destination": "/index.html"
     },
     {
-      "source": "/admin/(.*)",
+      "source": "/admin/:path*",
       "destination": "/index.html"
     },
     {
-      "source": "/((?!assets|images|videos|favicon|robots|sitemap|llms|ai-catalog|site\\.webmanifest|.*\\..*).*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ],
