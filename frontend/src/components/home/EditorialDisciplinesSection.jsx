@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Shield, Heart, Film, Camera } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import ScrollCardReveal from '../common/ScrollCardReveal';
+import WhyChooseSection from './WhyChooseSection';
 
 export default function EditorialDisciplinesSection() {
   const disciplines = [
@@ -44,34 +45,6 @@ export default function EditorialDisciplinesSection() {
       link: '/collections/events',
       linkLabel: 'Explore Event Portfolio',
       badge: 'Events & Commercial',
-    },
-  ];
-
-  const pillars = [
-    {
-      icon: <Camera className="w-5 h-5 text-[#8C7764]" />,
-      title: 'Direct Creative Leadership',
-      text: 'Dishant Shelar personally directs and shoots principal coverage for every single atelier commission, guaranteeing uncompromising artistic quality.',
-    },
-    {
-      icon: <Film className="w-5 h-5 text-[#8C7764]" />,
-      title: 'Medium-Format Film Tonality',
-      text: 'Soft highlight rolloff, organic film grain, and subtle color palettes inspired by archival medium-format photography.',
-    },
-    {
-      icon: <Heart className="w-5 h-5 text-[#8C7764]" />,
-      title: 'Unobtrusive Storytelling',
-      text: 'Quiet, observant candid documentation that allows you and your families to be fully present and enjoy your celebration freely.',
-    },
-    {
-      icon: <Shield className="w-5 h-5 text-[#8C7764]" />,
-      title: 'Archival Heirlooms & Delivery',
-      text: 'Color-graded high-resolution digital master files and handcrafted Italian leather-bound albums delivered within 3 weeks of selection.',
-    },
-    {
-      icon: <Sparkles className="w-5 h-5 text-[#8C7764]" />,
-      title: 'Mumbai & Destination Coverage',
-      text: 'Extensive on-location expertise across South Mumbai, Bandra, Juhu, Thane, Alibaug, Goa, Rajasthan, and international destination estates.',
     },
   ];
 
@@ -146,60 +119,7 @@ export default function EditorialDisciplinesSection() {
         </div>
 
         {/* Section 7: Why Choose DS Photography & Films? */}
-        <div className="pt-16 border-t border-[#E3DBCC]">
-          <div className="max-w-2xl mb-12">
-            <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-3 font-semibold">
-              ATELIER STANDARDS &amp; PHILOSOPHY
-            </span>
-            <h2 className="font-serif text-[30px] sm:text-[40px] font-normal text-[#101010] leading-tight mb-4">
-              Why Choose DS Photography &amp; Films?
-            </h2>
-            <p className="text-[14px] sm:text-[15px] text-[#4A463F] leading-relaxed font-sans">
-              We accept a limited number of commissions each calendar year to ensure every couple and client receives our undivided creative focus, prompt archival delivery, and bespoke attention.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {pillars.map((pillar, i) => (
-              <div
-                key={pillar.title}
-                className="bg-[#FDFCF8] border border-[#E3DBCC] rounded-xl p-6 sm:p-7 flex flex-col justify-start"
-              >
-                <div className="w-10 h-10 rounded-full bg-[#FAF8F5] border border-[#E3DBCC] flex items-center justify-center mb-4">
-                  {pillar.icon}
-                </div>
-                <h3 className="font-serif text-lg sm:text-xl font-normal text-[#101010] mb-2">
-                  {pillar.title}
-                </h3>
-                <p className="text-xs sm:text-[13px] text-[#4A463F] leading-relaxed font-sans">
-                  {pillar.text}
-                </p>
-              </div>
-            ))}
-
-            {/* CTA Tile */}
-            <div className="bg-[#101010] text-[#FDFCF8] rounded-xl p-6 sm:p-7 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#CBB9A4] block mb-2">
-                  DATE RESERVATION
-                </span>
-                <h3 className="font-serif text-xl sm:text-2xl font-normal text-[#FDFCF8] mb-3">
-                  Reserve Your Date
-                </h3>
-                <p className="text-xs text-[#E3DBCC]/80 leading-relaxed font-sans mb-6">
-                  Peak wedding dates across Mumbai, Goa, and Maharashtra reserve 4 to 9 months in advance. Share your celebration plans with us.
-                </p>
-              </div>
-              <Link
-                to="/services#book"
-                className="inline-flex items-center justify-center gap-2 bg-[#FDFCF8] text-[#101010] py-3 px-5 rounded-full font-mono text-[11px] font-semibold uppercase tracking-widest hover:bg-[#E3DBCC] transition-colors"
-              >
-                <span>Check Availability</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-        </div>
+        <WhyChooseSection />
       </div>
     </section>
   );
