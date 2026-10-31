@@ -72,6 +72,76 @@ export const HOMEPAGE_FAQS = [
   },
 ];
 
+/**
+ * Animated word-by-word reveal component.
+ * When the accordion panel opens, each word glides up smoothly with subtle blur dissolve.
+ */
+function AnimatedAnswer({ text }) {
+  const words = text.split(' ');
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.016,
+        delayChildren: 0.06,
+      },
+    },
+  };
+
+  const wordVariants = {
+    hidden: {
+      opacity: 0,
+      y: 10,
+      filter: 'blur(4px)',
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: {
+        duration: 0.32,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
+
+  return (
+    <motion.p
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="pt-3.5 pr-4 sm:pr-8 text-[13.5px] sm:text-[14.5px] text-[#4A463F] leading-relaxed font-sans max-w-3xl flex flex-wrap"
+    >
+      {words.map((word, i) => {
+        const isUrl = word.startsWith('http://') || word.startsWith('https://');
+        return (
+          <span key={i} className="inline-block overflow-hidden mr-[0.28em] py-0.5">
+            <motion.span
+              variants={wordVariants}
+              className="inline-block will-change-transform"
+            >
+              {isUrl ? (
+                <a
+                  href={word}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#101010] underline underline-offset-4 hover:text-[#7A746B] transition-colors"
+                >
+                  {word}
+                </a>
+              ) : (
+                word
+              )}
+            </motion.span>
+          </span>
+        );
+      })}
+    </motion.p>
+  );
+}
+
 export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
   const [openId, setOpenId] = useState(faqs[0]?.id || null);
 
@@ -87,7 +157,13 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
     >
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8">
         {/* Section Header */}
-        <div className="max-w-2xl mb-12 sm:mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 22, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-2xl mb-12 sm:mb-16"
+        >
           <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-3 font-medium">
             FREQUENTLY ASKED QUESTIONS · AEO
           </span>
@@ -97,14 +173,30 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
           <p className="text-[14px] sm:text-[15px] text-[#4A463F] leading-relaxed">
             Direct, factual guidance on wedding coverage, booking timelines, destination commissions, and archival delivery with Dishant Shelar.
           </p>
-        </div>
+        </motion.div>
 
-        {/* FAQ Accordion List */}
-        <div className="divide-y divide-[#E3DBCC] border-y border-[#E3DBCC]">
+        {/* FAQ Accordion List with Pop-up Item Entrances */}
+        <div className="flex flex-col gap-2.5 sm:gap-3">
           {faqs.map((faq, index) => {
             const isOpen = openId === faq.id;
             return (
-              <div key={faq.id || index} className="py-5 sm:py-6 transition-colors">
+              <motion.div
+                key={faq.id || index}
+                layout
+                initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{
+                  duration: 0.45,
+                  delay: Math.min(index * 0.04, 0.35),
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className={`transition-all duration-350 ease-out rounded-2xl ${
+                  isOpen
+                    ? 'bg-[#FAF7F2] p-5 sm:p-6 border border-[#E3DBCC] shadow-[0_8px_30px_-6px_rgba(20,18,15,0.06)]'
+                    : 'p-4 sm:p-5 hover:bg-[#FAF7F2]/60 border border-[#E3DBCC]/60'
+                }`}
+              >
                 <button
                   type="button"
                   onClick={() => toggleFaq(faq.id)}
@@ -112,18 +204,28 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                   aria-controls={`faq-answer-${faq.id}`}
                   className="w-full flex items-start justify-between gap-4 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101010] focus-visible:ring-offset-2 rounded-xs"
                 >
-                  <h3 className="font-serif text-[18px] sm:text-[21px] text-[#101010] font-normal leading-snug group-hover:text-[#3D3A35] transition-colors m-0 p-0 inline-block">
-                    {faq.question}
-                  </h3>
-                  <span
-                    className={`mt-1 w-6 h-6 rounded-full border flex items-center justify-center shrink-0 transition-all duration-300 ${
+                  <h3
+                    className={`font-serif text-[18px] sm:text-[21px] leading-snug transition-colors m-0 p-0 inline-block ${
                       isOpen
-                        ? 'rotate-180 bg-[#101010] text-[#FAF8F5] border-[#101010]'
-                        : 'text-[#625D55] border-[#C5B9A5] group-hover:border-[#101010] group-hover:text-[#101010]'
+                        ? 'text-[#101010] font-medium'
+                        : 'text-[#2C2722] font-normal group-hover:text-[#101010]'
                     }`}
                   >
+                    {faq.question}
+                  </h3>
+                  <motion.span
+                    animate={{
+                      rotate: isOpen ? 180 : 0,
+                      backgroundColor: isOpen ? '#101010' : '#FAF8F5',
+                      borderColor: isOpen ? '#101010' : '#C5B9A5',
+                      color: isOpen ? '#FAF8F5' : '#625D55',
+                      scale: isOpen ? 1.05 : 1,
+                    }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    className="mt-1 w-7 h-7 rounded-full border flex items-center justify-center shrink-0 group-hover:border-[#101010] group-hover:text-[#101010]"
+                  >
                     <ChevronDown size={14} />
-                  </span>
+                  </motion.span>
                 </button>
 
                 <AnimatePresence initial={false}>
@@ -133,16 +235,14 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="pt-3.5 pr-8 text-[13.5px] sm:text-[14.5px] text-[#4A463F] leading-relaxed font-sans max-w-3xl">
-                        {faq.answer}
-                      </p>
+                      <AnimatedAnswer text={faq.answer} />
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             );
           })}
         </div>
