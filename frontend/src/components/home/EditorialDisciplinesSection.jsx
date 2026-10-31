@@ -52,7 +52,7 @@ export default function EditorialDisciplinesSection() {
     <section
       id="disciplines"
       aria-label="Photography Disciplines & Atelier Services"
-      className="w-full bg-[#FAF8F5] text-[#101010] py-20 sm:py-28 lg:py-32 border-t border-[#E3DBCC]"
+      className="w-full bg-[#FAF8F5] text-[#101010] pt-20 sm:pt-28 lg:pt-32 pb-4 sm:pb-6 border-t border-[#E3DBCC]"
     >
       <div className="max-w-[1440px] mx-auto px-5 sm:px-8 md:px-10 lg:px-10 xl:px-16">
         {/* Section Header */}

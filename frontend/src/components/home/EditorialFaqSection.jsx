@@ -153,7 +153,7 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
     <section
       id="faq"
       aria-label="Frequently Asked Questions"
-      className="w-full bg-[#FAF8F5] text-[#101010] py-20 sm:py-28 border-t border-[#E3DBCC]"
+      className="w-full bg-[#FAF8F5] text-[#101010] pt-10 sm:pt-14 pb-20 sm:pb-28 border-t border-[#E3DBCC]"
     >
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8">
         {/* Section Header */}

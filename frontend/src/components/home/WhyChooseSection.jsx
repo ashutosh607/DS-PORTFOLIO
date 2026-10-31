@@ -179,7 +179,7 @@ export default function WhyChooseSection() {
     <div
       id="why-choose"
       ref={sectionRef}
-      className="relative py-14 sm:py-20 lg:py-24 border-t border-[#E3DBCC] overflow-hidden"
+      className="relative pt-14 sm:pt-20 lg:pt-24 pb-4 sm:pb-6 border-t border-[#E3DBCC] overflow-hidden"
     >
       {/* Decorative top-right curved arc line */}
       <svg
