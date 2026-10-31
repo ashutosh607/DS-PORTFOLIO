@@ -48,7 +48,7 @@ export default function ServicesPage() {
       .replace(/s$/, '');
 
   useEffect(() => {
-    fetch('/api/categories')
+    fetch(getApiUrl('/api/categories'))
       .then((res) => res.json())
       .then((json) => {
         if (Array.isArray(json.data) && json.data.length > 0) {
@@ -61,7 +61,7 @@ export default function ServicesPage() {
   // Fetch all active services to determine which categories are published
   const fetchAllServices = React.useCallback(async () => {
     try {
-      const res = await fetch('/api/services');
+      const res = await fetch(getApiUrl('/api/services'));
       if (res.ok) {
         const json = await res.json();
         if (Array.isArray(json.data)) {
@@ -90,63 +90,91 @@ export default function ServicesPage() {
     };
   }, [fetchAllServices]);
 
-  // Live dynamic categories from useCategories (single source of truth across Collections & Services)
-  const candidateCategories = React.useMemo(() => {
-    const sourcePool = [...(dynamicCategories || []), ...(backendCategories || [])];
+  // Formatter for category tabs
+  const formatCategoryLabel = (catStr) => {
+    const raw = (catStr || '').trim();
+    const lower = raw.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    if (lower === 'wedding' || lower === 'weddings') return 'WEDDINGS';
+    if (lower === 'pre-wedding' || lower === 'prewedding') return 'PRE-WEDDING';
+    if (lower === 'birthday' || lower === 'birthdays') return 'BIRTHDAYS';
+    if (lower === 'portrait' || lower === 'portraits') return 'PORTRAITS';
+    if (lower === 'event' || lower === 'events') return 'EVENTS';
+    if (lower === 'commercial') return 'COMMERCIAL';
+    if (lower === 'baby') return 'BABY';
+    if (lower === 'maternity') return 'MATERNITY';
+    return raw.toUpperCase();
+  };
 
-    if (sourcePool.length > 0) {
-      const seen = new Set();
-      const list = [];
-      sourcePool.forEach((cat) => {
-        const slug = (cat.slug || cat.id || cat.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
-        // Exclude legacy 'events' category from public services offerings
-        if (!slug || slug === 'event' || slug === 'events') return;
-        const key = toCanonicalKey(slug);
-        if (!seen.has(key)) {
-          seen.add(key);
-          list.push({
-            id: slug,
-            slug: slug,
-            label: (cat.name || slug).toUpperCase(),
-            name: cat.name || slug,
-          });
-        }
-      });
-      if (list.length > 0) return list;
-    }
-
-    // Default clean categories without legacy 'event'
-    return [
-      { id: 'weddings', label: 'WEDDINGS', slug: 'weddings' },
-      { id: 'pre-wedding', label: 'PRE-WEDDING', slug: 'pre-wedding' },
-      { id: 'birthdays', label: 'BIRTHDAYS', slug: 'birthdays' },
-      { id: 'portraits', label: 'PORTRAITS', slug: 'portraits' },
-      { id: 'commercial', label: 'COMMERCIAL', slug: 'commercial' },
-    ];
-  }, [dynamicCategories, backendCategories]);
-
-  // CORE RULE: A category with 0 services must NEVER show publicly.
-  // Perform an explicit length/count check (> 0) on associated active services.
+  // Derive categories dynamically from:
+  // 1. Live active services (what admin configured in DB)
+  // 2. Dynamic collection categories
+  // 3. Backend categories
   const categories = React.useMemo(() => {
     const servicePool = allActiveServices.filter((s) => s.isActive !== false);
 
-    // If completely initial cold start with zero cached services yet, allow candidates so nav isn't empty
+    const standardBaselines = [
+      { id: 'wedding', label: 'WEDDINGS', slug: 'wedding' },
+      { id: 'pre-wedding', label: 'PRE-WEDDING', slug: 'pre-wedding' },
+      { id: 'birthday', label: 'BIRTHDAYS', slug: 'birthday' },
+      { id: 'portrait', label: 'PORTRAITS', slug: 'portrait' },
+      { id: 'event', label: 'EVENTS', slug: 'event' },
+      { id: 'commercial', label: 'COMMERCIAL', slug: 'commercial' },
+    ];
+
+    const pool = [];
+    const seen = new Set();
+
+    const addCategory = (id, label, slug, name) => {
+      const canonical = toCanonicalKey(id || slug || label);
+      if (!canonical || seen.has(canonical)) return;
+      seen.add(canonical);
+      pool.push({
+        id: id || slug,
+        slug: slug || id,
+        label: label || formatCategoryLabel(id || slug),
+        name: name || label || id,
+      });
+    };
+
+    // Standard baselines first for clean ordering
+    standardBaselines.forEach((b) => addCategory(b.id, b.label, b.slug, b.label));
+
+    // Dynamic categories from collections
+    (dynamicCategories || []).forEach((c) => {
+      const slug = (c.slug || c.id || c.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
+      if (slug) addCategory(slug, formatCategoryLabel(c.name || slug), slug, c.name);
+    });
+
+    // Backend categories
+    (backendCategories || []).forEach((c) => {
+      const slug = (c.slug || c.id || c.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
+      if (slug) addCategory(slug, formatCategoryLabel(c.name || slug), slug, c.name);
+    });
+
+    // Custom categories created on services directly in Admin!
+    servicePool.forEach((s) => {
+      if (s.category) {
+        const slug = s.category.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+        addCategory(slug, formatCategoryLabel(s.category), slug, s.category);
+      }
+    });
+
+    // If initial loading state before services response arrived, return pool
     if (!servicesLoaded && servicePool.length === 0) {
-      return candidateCategories;
+      return pool;
     }
 
-    return candidateCategories.filter((cat) => {
+    // STRICT RULE: Only display categories that actually have at least 1 active service in DB!
+    return pool.filter((cat) => {
       const catKey = toCanonicalKey(cat.id);
       const catLabelKey = toCanonicalKey(cat.label);
-      const matchingServices = servicePool.filter((s) => {
+      return servicePool.some((s) => {
         if (s.isActive === false) return false;
         const sCat = toCanonicalKey(s.category);
         return sCat === catKey || sCat === catLabelKey;
       });
-      // Strict length check: must have at least one active service
-      return Array.isArray(matchingServices) && matchingServices.length > 0;
     });
-  }, [candidateCategories, allActiveServices, servicesLoaded]);
+  }, [allActiveServices, dynamicCategories, backendCategories, servicesLoaded]);
 
   const [stage, setStage] = useState(queryStep === 'book' || (typeof window !== 'undefined' && window.location.hash === '#book') ? 2 : 1); // 1 = Collections, 2 = Booking Form, 3 = Confirmation
   const [selectedCategoryId, setSelectedCategoryId] = useState('wedding');
@@ -281,10 +309,12 @@ export default function ServicesPage() {
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategoryId(categoryId);
-    const matched = categories.find((c) => c.id === categoryId);
+    const matched = categories.find(
+      (c) => toCanonicalKey(c.id) === toCanonicalKey(categoryId) || toCanonicalKey(c.label) === toCanonicalKey(categoryId)
+    );
     if (matched) {
       updateFormData({
-        eventType: matched.label === 'WEDDING' ? 'Wedding' : matched.label,
+        eventType: matched.label === 'WEDDINGS' || matched.label === 'WEDDING' ? 'Wedding' : matched.label,
       });
     }
     // Auto-select the signature or first collection for the newly selected category from real active services
@@ -310,8 +340,9 @@ export default function ServicesPage() {
   };
 
   const activeCategoryObj =
-    categories.find((c) => c.id === selectedCategoryId) ||
-    categories[0];
+    categories.find(
+      (c) => toCanonicalKey(c.id) === toCanonicalKey(selectedCategoryId) || toCanonicalKey(c.label) === toCanonicalKey(selectedCategoryId)
+    ) || categories[0];
 
   // Derive active collections for selectedCategoryId directly from live active services
   const activeCollections = React.useMemo(() => {
@@ -622,7 +653,7 @@ export default function ServicesPage() {
               >
                 <div className="flex items-center justify-start md:justify-center min-w-max gap-6 sm:gap-9 px-6 sm:px-8">
                   {categories.map((cat) => {
-                    const isCatSelected = selectedCategoryId === cat.id;
+                    const isCatSelected = toCanonicalKey(selectedCategoryId) === toCanonicalKey(cat.id);
                     return (
                       <button
                         key={cat.id}

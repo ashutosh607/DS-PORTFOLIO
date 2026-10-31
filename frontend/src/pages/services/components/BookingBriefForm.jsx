@@ -35,12 +35,12 @@ export default function BookingBriefForm({
   const collectionNames = collectionsPool
     .map((c) => (typeof c === 'object' && c !== null ? (c.name || c.label || c.title) : String(c || '')))
     .filter((n) => typeof n === 'string' && n.trim().length > 0)
-    .filter((n) => !['events', 'event', 'commercial'].includes(n.toLowerCase().trim()));
+    .filter((n) => !['commercial'].includes(n.toLowerCase().trim()));
 
   const baseEventNames =
     collectionNames.length > 0
       ? collectionNames
-      : ['Weddings', 'Pre-Wedding', 'Engagement', 'Birthdays', 'Baby Shower', 'Portraits'];
+      : ['Weddings', 'Pre-Wedding', 'Engagement', 'Events', 'Birthdays', 'Baby Shower', 'Portraits'];
 
   const celebrationTypes = Array.from(new Set([...baseEventNames, 'Other']));
 
