@@ -834,8 +834,8 @@ export default function ServicesPage() {
                 }}
                 className="lg:!grid-cols-[38%_calc(62%-64px)]"
               >
-                {/* Left Column (Commission Summary: 38% - Natural smooth scroll, never stuck or attached) */}
-                <div className="w-full">
+                {/* Left Column (Sticky Commission Summary: 38%) */}
+                <div className="w-full lg:sticky lg:top-24">
                   <CommissionSummaryCard
                     collection={selectedCollection}
                     category={selectedCategoryId}
