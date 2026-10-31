@@ -82,7 +82,7 @@ export default function SEOHead({
     };
 
     // 2. Standard Meta
-    const metaDesc = description || `${SEO_CONFIG.brandName} — Fine art wedding photography, candid pre-wedding cinematography, and editorial monographs in Mumbai by Dishant Shelar.`;
+    const metaDesc = description || `Leading photographer in Mumbai, DS Photography & Films captures bespoke weddings, candid pre-wedding shoots, and fine-art portraits by Dishant Shelar.`;
     setMetaTag('name', 'description', metaDesc);
 
     const metaKeywords = keywords || 'wedding photographer mumbai, photographer in mumbai, pre wedding photographer mumbai, candid wedding photography, fine art wedding cinematography, portrait photographer mumbai, ds photography, dishant shelar';

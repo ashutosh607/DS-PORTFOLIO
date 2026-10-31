@@ -316,7 +316,7 @@ const DEFAULT_SEED_SERVICES = [
       "High-res archive with commercial press rights",
     ],
     order: 1,
-    isActive: true,
+    isActive: false,
     isRecommended: false,
   },
   {
@@ -339,7 +339,7 @@ const DEFAULT_SEED_SERVICES = [
       "Full high-res catalog with unlimited publication rights",
     ],
     order: 2,
-    isActive: true,
+    isActive: false,
     isRecommended: true,
   },
   {
@@ -362,7 +362,7 @@ const DEFAULT_SEED_SERVICES = [
       "Archival master hard drive containing categorized raw assets",
     ],
     order: 3,
-    isActive: true,
+    isActive: false,
     isRecommended: false,
   },
 

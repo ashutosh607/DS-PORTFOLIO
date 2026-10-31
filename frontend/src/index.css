@@ -342,3 +342,40 @@
 .animate-fade-in {
   animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ==========================================================================
+   iOS Mobile Form Zoom & Viewport Overflow Prevention (Apple WebKit 16px Rule)
+   Prevents iOS Safari / Chrome from auto-zooming when focusing inputs, selects,
+   or textareas, and eliminates horizontal layout blowout when typing on mobile.
+   ========================================================================== */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+@media screen and (max-width: 768px) {
+  input[type='text'],
+  input[type='email'],
+  input[type='tel'],
+  input[type='number'],
+  input[type='date'],
+  input[type='password'],
+  input[type='search'],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+
+/* ==========================================================================
+   Smooth Horizontal Rail & Scrollbar Hiding Utilities
+   ========================================================================== */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

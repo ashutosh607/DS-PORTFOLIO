@@ -144,7 +144,7 @@ export default function YourEventStep({
                       type="date"
                       value={formData.eventDate || ''}
                       onChange={(e) => updateFormData({ eventDate: e.target.value })}
-                      className="w-full bg-transparent border-b border-[#CBB9A4] focus:border-[#1E1B18] py-2 text-sm text-[#1E1B18] font-mono outline-none"
+                      className="w-full bg-transparent border-b border-[#CBB9A4] focus:border-[#1E1B18] py-2 text-base text-[#1E1B18] font-mono outline-none"
                     />
                   </div>
 
@@ -153,7 +153,7 @@ export default function YourEventStep({
                     <select
                       value={formData.days || '2 Days'}
                       onChange={(e) => updateFormData({ days: e.target.value })}
-                      className="w-full bg-transparent border-b border-[#CBB9A4] focus:border-[#1E1B18] py-2 text-sm text-[#1E1B18] outline-none cursor-pointer"
+                      className="w-full bg-transparent border-b border-[#CBB9A4] focus:border-[#1E1B18] py-2 text-base text-[#1E1B18] outline-none cursor-pointer"
                     >
                       {DAYS_OPTIONS.map((opt) => (
                         <option key={opt} value={opt}>{opt}</option>

@@ -34,12 +34,13 @@ export default function BookingBriefForm({
 
   const collectionNames = collectionsPool
     .map((c) => c.name || c.label)
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((n) => !['events', 'event', 'commercial'].includes(n.toLowerCase().trim()));
 
   const baseEventNames =
     collectionNames.length > 0
       ? collectionNames
-      : ['Weddings', 'Pre-Wedding', 'Baby Shower', 'Portraits', 'Engagement', 'Haldi'];
+      : ['Weddings', 'Pre-Wedding', 'Engagement', 'Birthdays', 'Baby Shower', 'Portraits'];
 
   const celebrationTypes = Array.from(new Set([...baseEventNames, 'Other']));
 
@@ -194,11 +195,11 @@ export default function BookingBriefForm({
               border: '1px solid #E3DBCC',
               borderRadius: '8px',
               background: '#FDFCF8',
-              fontSize: '15px',
+              fontSize: '16px',
               color: '#101010',
               boxSizing: 'border-box',
             }}
-            className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
+            className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F] text-base"
           />
           {errors.name && (
             <p className="font-sans text-xs text-[#992E2E] mt-1.5">{errors.name}</p>
@@ -209,7 +210,7 @@ export default function BookingBriefForm({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))',
             gap: '24px',
           }}
         >
@@ -244,11 +245,11 @@ export default function BookingBriefForm({
                 border: '1px solid #E3DBCC',
                 borderRadius: '8px',
                 background: '#FDFCF8',
-                fontSize: '15px',
+                fontSize: '16px',
                 color: '#101010',
                 boxSizing: 'border-box',
               }}
-              className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
+              className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F] text-base"
             />
             {errors.email && (
               <p className="font-sans text-xs text-[#992E2E] mt-1.5">{errors.email}</p>
@@ -270,7 +271,7 @@ export default function BookingBriefForm({
             >
               PHONE / WHATSAPP *
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full max-w-full">
               <select
                 value={formData.countryCode || '+91'}
                 onChange={(e) => updateFormData({ countryCode: e.target.value })}
@@ -280,11 +281,11 @@ export default function BookingBriefForm({
                   border: '1px solid #E3DBCC',
                   borderRadius: '8px',
                   background: '#FDFCF8',
-                  fontSize: '14px',
+                  fontSize: '16px',
                   color: '#101010',
                   boxSizing: 'border-box',
                 }}
-                className="outline-none transition-colors focus:border-[#101010] shrink-0 cursor-pointer"
+                className="outline-none transition-colors focus:border-[#101010] shrink-0 cursor-pointer text-base"
               >
                 {COUNTRY_CODES.map((item) => (
                   <option key={item.code} value={item.code}>
@@ -303,17 +304,19 @@ export default function BookingBriefForm({
                 }}
                 placeholder="98765 43210"
                 style={{
+                  flex: '1 1 0%',
+                  minWidth: 0,
                   width: '100%',
                   minHeight: '52px',
                   padding: '14px 16px',
                   border: '1px solid #E3DBCC',
                   borderRadius: '8px',
                   background: '#FDFCF8',
-                  fontSize: '15px',
+                  fontSize: '16px',
                   color: '#101010',
                   boxSizing: 'border-box',
                 }}
-                className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F]"
+                className="outline-none transition-colors focus:border-[#101010] placeholder-[#A59C8F] flex-1 min-w-0 text-base"
               />
             </div>
             {errors.phone && (
@@ -449,7 +452,7 @@ export default function BookingBriefForm({
                   borderRadius: '8px',
                   border: '1px solid #101010',
                   background: '#FDFCF8',
-                  fontSize: '13.5px',
+                  fontSize: '16px',
                   fontFamily: 'var(--font-sans)',
                   color: '#101010',
                   boxSizing: 'border-box',
@@ -465,7 +468,7 @@ export default function BookingBriefForm({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))',
             gap: '24px',
             marginBottom: '28px',
           }}
@@ -500,12 +503,12 @@ export default function BookingBriefForm({
                 border: '1px solid #E3DBCC',
                 borderRadius: '8px',
                 background: '#FDFCF8',
-                fontSize: '15px',
+                fontSize: '16px',
                 color: '#101010',
                 fontFamily: 'monospace',
                 boxSizing: 'border-box',
               }}
-              className="outline-none transition-colors focus:border-[#101010] cursor-pointer"
+              className="outline-none transition-colors focus:border-[#101010] cursor-pointer text-base"
             />
             {errors.eventDate && (
               <p className="font-sans text-xs text-[#992E2E] mt-1.5">{errors.eventDate}</p>
@@ -657,7 +660,7 @@ export default function BookingBriefForm({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))',
               gap: '20px',
             }}
           >

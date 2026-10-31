@@ -64,7 +64,7 @@ export default function CompareMatrixModal({
           </div>
 
           {/* Table Container */}
-          <div className="overflow-x-auto p-6 sm:p-10 flex-1">
+          <div data-lenis-prevent style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }} className="overflow-x-auto p-6 sm:p-10 flex-1 no-scrollbar">
             <table className="w-full text-left border-collapse min-w-[650px]">
               <thead>
                 <tr className="border-b border-[#E3D9CC]">

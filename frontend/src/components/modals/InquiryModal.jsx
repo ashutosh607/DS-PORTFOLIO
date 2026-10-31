@@ -138,7 +138,7 @@ export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
             <h3 style={{ marginBottom: '0.5rem', color: 'var(--color-obsidian)' }}>
               Transmission Received
             </h3>
-            <p style={{ color: 'var(--color-obsidian-muted)', fontSize: '0.95rem', marginBottom: '2rem' }}>
+            <p style={{ color: 'var(--color-obsidian-muted)', fontSize: '16px', marginBottom: '2rem' }}>
               Thank you for reaching out to Maison Édouard. Our atelier director will review your inquiry and follow up within 24 hours.
             </p>
             <button
@@ -192,7 +192,7 @@ export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
                   borderRadius: '10px',
                   color: 'var(--color-obsidian)',
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '0.95rem',
+                  fontSize: '16px',
                   outline: 'none',
                 }}
               />
@@ -227,7 +227,7 @@ export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
                   borderRadius: '10px',
                   color: 'var(--color-obsidian)',
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '0.95rem',
+                  fontSize: '16px',
                   outline: 'none',
                 }}
               />
@@ -259,7 +259,7 @@ export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
                   borderRadius: '10px',
                   color: 'var(--color-obsidian)',
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '0.9rem',
+                  fontSize: '16px',
                   outline: 'none',
                 }}
               >
@@ -298,7 +298,7 @@ export default function InquiryModal({ isOpen, onClose, prefillTier = '' }) {
                   borderRadius: '10px',
                   color: 'var(--color-obsidian)',
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '0.95rem',
+                  fontSize: '16px',
                   outline: 'none',
                   resize: 'none',
                 }}

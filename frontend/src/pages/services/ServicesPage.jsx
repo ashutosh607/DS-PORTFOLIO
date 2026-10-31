@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useCategories } from '../../utils/categoryManager';
@@ -38,6 +38,23 @@ export default function ServicesPage() {
   const [backendCategories, setBackendCategories] = useState([]);
   const [allActiveServices, setAllActiveServices] = useState([]);
   const [servicesLoaded, setServicesLoaded] = useState(false);
+
+  // Horizontal category nav swipe & centering refs
+  const categoryNavRef = useRef(null);
+  const activeCategoryBtnRef = useRef(null);
+
+  // Smoothly center the active category pill into view on mobile
+  useEffect(() => {
+    if (activeCategoryBtnRef.current && categoryNavRef.current) {
+      const container = categoryNavRef.current;
+      const btn = activeCategoryBtnRef.current;
+      const targetScrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
+      container.scrollTo({
+        left: Math.max(0, targetScrollLeft),
+        behavior: 'smooth',
+      });
+    }
+  }, [selectedCategoryId]);
 
   // Canonical category matcher
   const toCanonicalKey = (str) =>
@@ -90,35 +107,39 @@ export default function ServicesPage() {
     };
   }, [fetchAllServices]);
 
-  // Base pool of candidate categories
+  // Live dynamic categories from useCategories (single source of truth across Collections & Services)
   const candidateCategories = React.useMemo(() => {
-    const base = [
-      { id: 'wedding', label: 'WEDDING' },
-      { id: 'pre-wedding', label: 'PRE-WEDDING' },
-      { id: 'birthday', label: 'BIRTHDAY' },
-      { id: 'portrait', label: 'PORTRAIT' },
-      { id: 'event', label: 'EVENT' },
-      { id: 'commercial', label: 'COMMERCIAL' },
-    ];
     const sourcePool = [...(dynamicCategories || []), ...(backendCategories || [])];
-    if (sourcePool.length === 0) return base;
 
-    const list = [...base];
-    sourcePool.forEach((cat) => {
-      const slug = (cat.slug || cat.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
-      if (!slug) return;
-      const key = toCanonicalKey(slug);
-      const exists = list.some(
-        (c) => toCanonicalKey(c.id) === key || toCanonicalKey(c.label) === key
-      );
-      if (!exists) {
-        list.push({
-          id: slug,
-          label: (cat.name || slug).toUpperCase(),
-        });
-      }
-    });
-    return list;
+    if (sourcePool.length > 0) {
+      const seen = new Set();
+      const list = [];
+      sourcePool.forEach((cat) => {
+        const slug = (cat.slug || cat.id || cat.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
+        // Exclude legacy 'events' category from public services offerings
+        if (!slug || slug === 'event' || slug === 'events') return;
+        const key = toCanonicalKey(slug);
+        if (!seen.has(key)) {
+          seen.add(key);
+          list.push({
+            id: slug,
+            slug: slug,
+            label: (cat.name || slug).toUpperCase(),
+            name: cat.name || slug,
+          });
+        }
+      });
+      if (list.length > 0) return list;
+    }
+
+    // Default clean categories without legacy 'event'
+    return [
+      { id: 'weddings', label: 'WEDDINGS', slug: 'weddings' },
+      { id: 'pre-wedding', label: 'PRE-WEDDING', slug: 'pre-wedding' },
+      { id: 'birthdays', label: 'BIRTHDAYS', slug: 'birthdays' },
+      { id: 'portraits', label: 'PORTRAITS', slug: 'portraits' },
+      { id: 'commercial', label: 'COMMERCIAL', slug: 'commercial' },
+    ];
   }, [dynamicCategories, backendCategories]);
 
   // CORE RULE: A category with 0 services must NEVER show publicly.
@@ -586,17 +607,29 @@ export default function ServicesPage() {
                 />
               </div>
 
-              {/* Category Navigation with 55px top / 45px bottom margin and thin underline */}
-              <div style={{ marginTop: '55px', marginBottom: '45px' }} className="w-full overflow-x-auto no-scrollbar">
-                <div className="flex items-center justify-center min-w-max gap-6 sm:gap-9 px-4">
+              {/* Category Navigation with smooth iOS kinetic touch-swipe & active centering */}
+              <div
+                data-lenis-prevent
+                ref={categoryNavRef}
+                style={{
+                  marginTop: '55px',
+                  marginBottom: '45px',
+                  WebkitOverflowScrolling: 'touch',
+                  touchAction: 'pan-x',
+                  overscrollBehaviorX: 'contain',
+                }}
+                className="w-full overflow-x-auto no-scrollbar scroll-smooth"
+              >
+                <div className="flex items-center justify-start md:justify-center min-w-max gap-6 sm:gap-9 px-6 sm:px-8">
                   {categories.map((cat) => {
                     const isCatSelected = selectedCategoryId === cat.id;
                     return (
                       <button
                         key={cat.id}
                         type="button"
+                        ref={isCatSelected ? activeCategoryBtnRef : null}
                         onClick={() => handleCategorySelect(cat.id)}
-                        className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer py-3 px-2 min-h-[44px] inline-flex items-center border-b ${isCatSelected
+                        className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer py-3 px-2 min-h-[44px] inline-flex items-center shrink-0 border-b select-none ${isCatSelected
                           ? 'text-[#101010] font-semibold border-[#101010]'
                           : 'text-[#625D55] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
                           }`}

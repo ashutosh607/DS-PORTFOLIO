@@ -1076,7 +1076,7 @@ export default function LocationSearchInput({
             border: error ? '1px solid #992E2E' : '1px solid #E3DBCC',
             borderRadius: '10px',
             background: '#FDFCF8',
-            fontSize: '14.5px',
+            fontSize: '16px',
             color: '#101010',
             fontFamily: 'var(--font-sans)',
             boxShadow: '0 1px 2px rgba(0,0,0,0.02)',

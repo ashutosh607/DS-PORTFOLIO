@@ -140,7 +140,7 @@ export default function AboutYouStep({
                 <select
                   value={formData.countryCode || '+91'}
                   onChange={(e) => updateFormData({ countryCode: e.target.value })}
-                  className="bg-[#EFE9DF] font-mono text-xs font-semibold text-[#1E1B18] px-3 py-1.5 rounded outline-none cursor-pointer border border-[#D5CBB9]"
+                  className="bg-[#EFE9DF] font-mono text-base font-semibold text-[#1E1B18] px-3 py-1.5 rounded outline-none cursor-pointer border border-[#D5CBB9]"
                 >
                   <option value="+91">+91 (IN)</option>
                   <option value="+1">+1 (US)</option>
