@@ -33,8 +33,8 @@ export default function BookingBriefForm({
       : DEFAULT_COLLECTIONS_CATEGORIES;
 
   const collectionNames = collectionsPool
-    .map((c) => c.name || c.label)
-    .filter(Boolean)
+    .map((c) => (typeof c === 'object' && c !== null ? (c.name || c.label || c.title) : String(c || '')))
+    .filter((n) => typeof n === 'string' && n.trim().length > 0)
     .filter((n) => !['events', 'event', 'commercial'].includes(n.toLowerCase().trim()));
 
   const baseEventNames =

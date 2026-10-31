@@ -39,23 +39,6 @@ export default function ServicesPage() {
   const [allActiveServices, setAllActiveServices] = useState([]);
   const [servicesLoaded, setServicesLoaded] = useState(false);
 
-  // Horizontal category nav swipe & centering refs
-  const categoryNavRef = useRef(null);
-  const activeCategoryBtnRef = useRef(null);
-
-  // Smoothly center the active category pill into view on mobile
-  useEffect(() => {
-    if (activeCategoryBtnRef.current && categoryNavRef.current) {
-      const container = categoryNavRef.current;
-      const btn = activeCategoryBtnRef.current;
-      const targetScrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
-      container.scrollTo({
-        left: Math.max(0, targetScrollLeft),
-        behavior: 'smooth',
-      });
-    }
-  }, [selectedCategoryId]);
-
   // Canonical category matcher
   const toCanonicalKey = (str) =>
     (str || '')
@@ -171,6 +154,23 @@ export default function ServicesPage() {
   const [compareMatrixOpen, setCompareMatrixOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inquiryId, setInquiryId] = useState('RL-2025-D98');
+
+  // Horizontal category nav swipe & centering refs
+  const categoryNavRef = useRef(null);
+  const activeCategoryBtnRef = useRef(null);
+
+  // Smoothly center the active category pill into view on mobile
+  useEffect(() => {
+    if (activeCategoryBtnRef.current && categoryNavRef.current) {
+      const container = categoryNavRef.current;
+      const btn = activeCategoryBtnRef.current;
+      const targetScrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
+      container.scrollTo({
+        left: Math.max(0, targetScrollLeft),
+        behavior: 'smooth',
+      });
+    }
+  }, [selectedCategoryId]);
 
   const location = useLocation();
 
