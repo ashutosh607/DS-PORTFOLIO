@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy, useRef } from 'react';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate, useParams } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/home/HomePage';
 import { PageTransitionProvider } from './components/common/PageTransition';
@@ -55,6 +55,11 @@ function ScrollToTop() {
   }, [pathname, hash]);
 
   return null;
+}
+
+function PortfolioCategoryRedirect() {
+  const { categorySlug } = useParams();
+  return <Navigate to={categorySlug ? `/collections/${categorySlug}` : '/collections'} replace />;
 }
 
 export default function App() {
@@ -133,7 +138,7 @@ export default function App() {
 
                 {/* Legacy / Alias Public Route Redirection */}
                 <Route path="/portfolio" element={<Navigate to="/collections" replace />} />
-                <Route path="/portfolio/:categorySlug" element={<Navigate to="/collections/:categorySlug" replace />} />
+                <Route path="/portfolio/:categorySlug" element={<PortfolioCategoryRedirect />} />
 
                 {/* Dedicated Error Testing Route */}
                 <Route path="/error" element={<ErrorPage />} />

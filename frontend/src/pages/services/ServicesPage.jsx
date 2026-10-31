@@ -770,9 +770,9 @@ export default function ServicesPage() {
           {stage === 2 && (
             <motion.div
               key="stage-02"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
             >
               {/* Top Page Header (60px bottom spacing) */}
@@ -834,8 +834,8 @@ export default function ServicesPage() {
                 }}
                 className="lg:!grid-cols-[38%_calc(62%-64px)]"
               >
-                {/* Left Column (Sticky Commission Summary: 38%) */}
-                <div className="w-full lg:sticky lg:top-24">
+                {/* Left Column (Commission Summary: 38% - Natural smooth scroll, never stuck or attached) */}
+                <div className="w-full">
                   <CommissionSummaryCard
                     collection={selectedCollection}
                     category={selectedCategoryId}

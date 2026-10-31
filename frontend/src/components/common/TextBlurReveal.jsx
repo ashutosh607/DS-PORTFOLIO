@@ -20,7 +20,7 @@ export default function TextBlurReveal({
   yOffset = 12,
   duration = 0.5,
   once = true,
-  margin = '-40px',
+  margin = '0px',
 }) {
   const shouldReduceMotion = useReducedMotion();
   const rawText = text || (typeof children === 'string' ? children : '');

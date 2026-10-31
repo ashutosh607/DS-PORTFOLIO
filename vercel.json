@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
+  "cleanUrls": false,
   "trailingSlash": false,
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
@@ -67,15 +67,11 @@
       "destination": "/index.html"
     },
     {
-      "source": "/about/:path*",
-      "destination": "/index.html"
-    },
-    {
       "source": "/collections",
       "destination": "/index.html"
     },
     {
-      "source": "/collections/:path*",
+      "source": "/collections/:slug",
       "destination": "/index.html"
     },
     {
@@ -83,23 +79,11 @@
       "destination": "/index.html"
     },
     {
-      "source": "/services/:path*",
-      "destination": "/index.html"
-    },
-    {
       "source": "/photographer-in-mumbai",
       "destination": "/index.html"
     },
     {
-      "source": "/photographer-in-mumbai/:path*",
-      "destination": "/index.html"
-    },
-    {
       "source": "/terms",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/terms/:path*",
       "destination": "/index.html"
     },
     {
@@ -112,10 +96,6 @@
     },
     {
       "source": "/admin/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/:path*",
       "destination": "/index.html"
     }
   ],

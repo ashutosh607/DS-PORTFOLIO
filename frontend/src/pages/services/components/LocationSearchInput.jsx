@@ -1092,7 +1092,7 @@ export default function LocationSearchInput({
           onFocus={() => {
             if (suggestions.length > 0) setIsOpen(true);
           }}
-          placeholder="Search any city, district (e.g. Raigad), venue, hotel, or destination..."
+          placeholder="Search any city, district, venue, hotel, or destination..."
           style={{
             width: '100%',
             height: '52px',

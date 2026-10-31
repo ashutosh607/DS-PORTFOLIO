@@ -40,7 +40,7 @@ const PROJECTS = [
     score: '★ 9.2',
     format: 'Medium Format 6x7',
     image: img02,
-    image400: '/images/wedding-photographer-in-mumbai-400w.webp',
+    image400: img02_400,
     alt: 'Kinetic pre-wedding monograph and couple motion study in Mumbai by Dishant Shelar',
     imgTitle: 'Pre-Wedding Photographer in Mumbai – DS Photography & Films',
   },
@@ -117,12 +117,12 @@ export default function HeroSpotlightCarousel() {
   // Continuous position for 60fps/120fps smooth continuous rotation and gesture tracking
   const [pos, setPos] = useState(1); // Start at 1 ('02 Velocity')
   const [isDragging, setIsDragging] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   const posRef = useRef(1);
   const targetPosRef = useRef(1);
   const isDraggingRef = useRef(false);
-  const isHoveredRef = useRef(false);
+  const isCardHoveredRef = useRef(false);
+  const hoverResumeTimerRef = useRef(null);
   const isSpringingRef = useRef(false);
   const lastTimeRef = useRef(performance.now());
   const dragStartXRef = useRef(0);
@@ -136,12 +136,22 @@ export default function HeroSpotlightCarousel() {
   }, [pos]);
 
   useEffect(() => {
-    isHoveredRef.current = isHovered;
-  }, [isHovered]);
-
-  useEffect(() => {
     isDraggingRef.current = isDragging;
   }, [isDragging]);
+
+  const handleCardMouseEnter = useCallback(() => {
+    isCardHoveredRef.current = true;
+    if (hoverResumeTimerRef.current) clearTimeout(hoverResumeTimerRef.current);
+    // Auto-resume continuous turntable rotation after 2.5s even if cursor remains on card
+    hoverResumeTimerRef.current = setTimeout(() => {
+      isCardHoveredRef.current = false;
+    }, 2500);
+  }, []);
+
+  const handleCardMouseLeave = useCallback(() => {
+    if (hoverResumeTimerRef.current) clearTimeout(hoverResumeTimerRef.current);
+    isCardHoveredRef.current = false;
+  }, []);
 
   // Main continuous, buttery-smooth 60fps/120fps rotation loop across all devices (phone & desktop)
   useEffect(() => {
@@ -171,7 +181,7 @@ export default function HeroSpotlightCarousel() {
             posRef.current = nextPos;
             setPos(nextPos);
           }
-        } else if (!isHoveredRef.current && (typeof document === 'undefined' || !document.hidden)) {
+        } else if (!isCardHoveredRef.current && (typeof document === 'undefined' || !document.hidden)) {
           // Continuous, slow, proper, smooth rotation (turntable) - auto-rotates smoothly on phones and desktops
           // 0.18 cards per second = ~5.5s per image, serene and graceful
           const speed = 0.18;
@@ -188,12 +198,16 @@ export default function HeroSpotlightCarousel() {
 
     const handleVisibility = () => {
       lastTimeRef.current = performance.now();
+      if (document.hidden) {
+        isCardHoveredRef.current = false;
+      }
     };
     document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
       cancelAnimationFrame(animId);
       document.removeEventListener('visibilitychange', handleVisibility);
+      if (hoverResumeTimerRef.current) clearTimeout(hoverResumeTimerRef.current);
     };
   }, []);
 
@@ -288,17 +302,14 @@ export default function HeroSpotlightCarousel() {
   return (
     <section
       id="gallery"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       style={{
         position: 'relative',
         height: '100dvh',
-        minHeight: '620px',
-        minHeight: '660px',
+        minHeight: '560px',
         maxHeight: '1080px',
         boxSizing: 'border-box',
-        paddingTop: 'clamp(4.25rem, 6.5vh, 5.25rem)',
-        paddingBottom: 'clamp(1.25rem, 2.5vh, 2rem)',
+        paddingTop: 'clamp(3.8rem, 5.5vh, 4.8rem)',
+        paddingBottom: 'clamp(0.85rem, 1.8vh, 1.6rem)',
         overflow: 'hidden',
         backgroundColor: 'var(--color-off-white)',
         display: 'flex',
@@ -338,7 +349,7 @@ export default function HeroSpotlightCarousel() {
             TOP SECTION: EYEBROW & HEADING
             =================================================================== */}
         <div
-          className="pt-10 sm:pt-6 md:pt-1"
+          className="pt-2 sm:pt-1"
           style={{ flexShrink: 0 }}
         >
           
@@ -370,11 +381,6 @@ export default function HeroSpotlightCarousel() {
             MIDDLE SECTION: INWARD CONCAVE CURVED 3D GALLERY (CLEAN MINIMALIST)
             =================================================================== */}
         <div
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => {
-            handlePointerUp();
-            setIsHovered(false);
-          }}
           onMouseDown={handlePointerDown}
           onMouseMove={handlePointerMove}
           onMouseUp={handlePointerUp}
@@ -384,7 +390,7 @@ export default function HeroSpotlightCarousel() {
           style={{
             position: 'relative',
             width: '100%',
-            height: 'clamp(310px, 37vh, 375px)',
+            height: 'clamp(290px, 35vh, 365px)',
             margin: '0.25rem auto',
             display: 'flex',
             alignItems: 'center',
@@ -434,8 +440,8 @@ export default function HeroSpotlightCarousel() {
             return (
               <div
                 key={item.id}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                onMouseEnter={handleCardMouseEnter}
+                onMouseLeave={handleCardMouseLeave}
                 onClick={() => {
                   if (absD >= 0.45 && isVisible) {
                     targetPosRef.current = Math.round(posRef.current + d);
@@ -518,9 +524,9 @@ export default function HeroSpotlightCarousel() {
                       height="290"
                       style={{ aspectRatio: '200 / 290' }}
                       className="w-full h-full object-cover select-none pointer-events-none"
-                      loading={idx === 1 ? 'eager' : 'lazy'}
-                      fetchPriority={idx === 1 ? 'high' : 'auto'}
-                      decoding={idx === 1 ? 'sync' : 'async'}
+                      loading={Math.abs(d) <= 2.2 ? 'eager' : 'lazy'}
+                      fetchPriority={Math.abs(d) <= 0.8 ? 'high' : 'auto'}
+                      decoding={Math.abs(d) <= 0.8 ? 'sync' : 'async'}
                       draggable={false}
                     />
                   ) : (
