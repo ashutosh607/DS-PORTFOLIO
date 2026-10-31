@@ -639,36 +639,40 @@ export default function ServicesPage() {
               </div>
 
               {/* Category Navigation with smooth iOS kinetic touch-swipe & active centering */}
-              <div
-                data-lenis-prevent
-                ref={categoryNavRef}
-                style={{
-                  marginTop: '55px',
-                  marginBottom: '45px',
-                  WebkitOverflowScrolling: 'touch',
-                  touchAction: 'pan-x',
-                  overscrollBehaviorX: 'contain',
-                }}
-                className="w-full overflow-x-auto no-scrollbar scroll-smooth"
-              >
-                <div className="flex items-center justify-start md:justify-center min-w-max gap-6 sm:gap-9 px-6 sm:px-8">
-                  {categories.map((cat) => {
-                    const isCatSelected = toCanonicalKey(selectedCategoryId) === toCanonicalKey(cat.id);
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        ref={isCatSelected ? activeCategoryBtnRef : null}
-                        onClick={() => handleCategorySelect(cat.id)}
-                        className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer py-3 px-2 min-h-[44px] inline-flex items-center shrink-0 border-b select-none ${isCatSelected
-                          ? 'text-[#101010] font-semibold border-[#101010]'
-                          : 'text-[#625D55] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
-                          }`}
-                      >
-                        {cat.label}
-                      </button>
-                    );
-                  })}
+              <div className="relative w-full mt-10 sm:mt-14 mb-8 sm:mb-11">
+                {/* Visual cue edge gradients on mobile indicating horizontal swipeability */}
+                <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-[#FDFCF8] to-transparent z-10 md:hidden" />
+                <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-[#FDFCF8] to-transparent z-10 md:hidden" />
+
+                <div
+                  data-lenis-prevent="true"
+                  ref={categoryNavRef}
+                  style={{
+                    WebkitOverflowScrolling: 'touch',
+                    touchAction: 'pan-x pan-y',
+                    overscrollBehavior: 'contain',
+                  }}
+                  className="w-full overflow-x-auto no-scrollbar py-2"
+                >
+                  <div className="flex items-center justify-start md:justify-center min-w-max gap-6 sm:gap-9 px-6 sm:px-8">
+                    {categories.map((cat) => {
+                      const isCatSelected = toCanonicalKey(selectedCategoryId) === toCanonicalKey(cat.id);
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          ref={isCatSelected ? activeCategoryBtnRef : null}
+                          onClick={() => handleCategorySelect(cat.id)}
+                          className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer py-3 px-2 min-h-[44px] inline-flex items-center shrink-0 border-b select-none ${isCatSelected
+                            ? 'text-[#101010] font-semibold border-[#101010]'
+                            : 'text-[#625D55] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
+                            }`}
+                        >
+                          {cat.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -750,6 +754,7 @@ export default function ServicesPage() {
                 location={formData.location}
                 coordinates={formData.coordinates}
                 venue={formData.venue}
+                recommendation={formData.locationRecommendation}
               />
 
               {/* Editorial FAQ Section for Conversational & AEO Readiness */}
@@ -862,6 +867,7 @@ export default function ServicesPage() {
                 location={formData.location}
                 coordinates={formData.coordinates}
                 venue={formData.venue}
+                recommendation={formData.locationRecommendation}
               />
             </motion.div>
           )}

@@ -87,7 +87,7 @@ Phone / WhatsApp: ${phone}
 Event Type: ${eventType}
 Target Date: ${eventDate}
 Duration: ${duration}
-Location: ${location}${mapsLink ? `\nMaps: ${mapsLink}` : ''}
+Location: ${location}${formData.locationRecommendation?.badge ? ` (${formData.locationRecommendation.badge})` : ''}${mapsLink ? `\nMaps: ${mapsLink}` : ''}
 
 --- SELECTED COLLECTION ---
 Collection: ${collectionName}
