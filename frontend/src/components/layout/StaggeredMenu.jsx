@@ -543,7 +543,7 @@ export const StaggeredMenu = ({
         inert={!open ? '' : undefined}
       >
         <div className="sm-panel-inner">
-          <ul className="sm-panel-list" role="list" data-numbering={displayItemNumbering || undefined}>
+          <ul className="sm-panel-list" data-numbering={displayItemNumbering || undefined}>
             {items && items.length ? (
               items.map((it, idx) => (
                 <li className="sm-panel-itemWrap" key={it.label + idx}>
@@ -569,7 +569,7 @@ export const StaggeredMenu = ({
                 </li>
               ))
             ) : (
-              <li className="sm-panel-itemWrap" aria-hidden="true">
+              <li className="sm-panel-itemWrap">
                 <span className="sm-panel-item">
                   <span className="sm-panel-itemLabel">No items</span>
                 </span>
@@ -601,7 +601,7 @@ export const StaggeredMenu = ({
           {displaySocials && socialItems && socialItems.length > 0 && (
             <div className="sm-socials" aria-label="Social links">
               <h3 className="sm-socials-title">Studio Inquiries &amp; Socials</h3>
-              <ul className="sm-socials-list" role="list">
+              <ul className="sm-socials-list">
                 {socialItems.map((s, i) => (
                   <li key={s.label + i} className="sm-socials-item">
                     <a
