@@ -137,11 +137,11 @@ export default function BookingBriefForm({
       >
         {/* Section Header: 24px gap below before first field */}
         <div style={{ marginBottom: '24px' }}>
-          <div className="flex items-baseline justify-between gap-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 sm:gap-4">
             <h3
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: '34px',
+                fontSize: 'clamp(22px, 5vw, 34px)',
                 lineHeight: 1.1,
                 fontWeight: 400,
                 color: 'var(--color-obsidian)',
@@ -182,6 +182,7 @@ export default function BookingBriefForm({
           <input
             id="booking-field-name"
             type="text"
+            autoComplete="name"
             value={formData.name || ''}
             onChange={(e) => {
               updateFormData({ name: e.target.value });
@@ -232,6 +233,7 @@ export default function BookingBriefForm({
             <input
               id="booking-field-email"
               type="email"
+              autoComplete="email"
               value={formData.email || ''}
               onChange={(e) => {
                 updateFormData({ email: e.target.value });
@@ -277,15 +279,16 @@ export default function BookingBriefForm({
                 onChange={(e) => updateFormData({ countryCode: e.target.value })}
                 style={{
                   minHeight: '52px',
-                  padding: '14px 12px',
+                  padding: '14px 10px',
                   border: '1px solid #E3DBCC',
                   borderRadius: '8px',
                   background: '#FDFCF8',
                   fontSize: '16px',
                   color: '#101010',
                   boxSizing: 'border-box',
+                  maxWidth: '125px',
                 }}
-                className="outline-none transition-colors focus:border-[#101010] shrink-0 cursor-pointer text-base"
+                className="outline-none transition-colors focus:border-[#101010] shrink-0 cursor-pointer text-base max-w-[125px]"
               >
                 {COUNTRY_CODES.map((item) => (
                   <option key={item.code} value={item.code}>
@@ -297,6 +300,8 @@ export default function BookingBriefForm({
               <input
                 id="booking-field-phone"
                 type="tel"
+                inputMode="tel"
+                autoComplete="tel"
                 value={formData.phone || ''}
                 onChange={(e) => {
                   updateFormData({ phone: e.target.value });
@@ -340,11 +345,11 @@ export default function BookingBriefForm({
       >
         {/* Section Header: 24px gap below before first field */}
         <div style={{ marginBottom: '24px' }}>
-          <div className="flex items-baseline justify-between gap-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 sm:gap-4">
             <h3
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: '34px',
+                fontSize: 'clamp(22px, 5vw, 34px)',
                 lineHeight: 1.1,
                 fontWeight: 400,
                 color: 'var(--color-obsidian)',
@@ -587,11 +592,16 @@ export default function BookingBriefForm({
           <LocationSearchInput
             value={formData.location || ''}
             coordinates={formData.coordinates}
+            initialRecommendation={formData.locationRecommendation}
+            onSelectRecommendedTier={(tier) => {
+              if (onSelectCollection) onSelectCollection(tier);
+            }}
             onChangeLocation={(data) => {
               updateFormData({
                 location: data.location,
                 coordinates: data.coordinates,
                 venue: data.venue,
+                locationRecommendation: data.recommendation,
               });
               if (errors.location) setErrors((prev) => ({ ...prev, location: null }));
             }}
@@ -614,11 +624,11 @@ export default function BookingBriefForm({
       >
         {/* Section Header: 24px gap below before first field */}
         <div style={{ marginBottom: '24px' }}>
-          <div className="flex items-baseline justify-between gap-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 sm:gap-4">
             <h3
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: '34px',
+                fontSize: 'clamp(22px, 5vw, 34px)',
                 lineHeight: 1.1,
                 fontWeight: 400,
                 color: 'var(--color-obsidian)',
@@ -747,11 +757,11 @@ export default function BookingBriefForm({
       >
         {/* Section Header: 24px gap below before textarea */}
         <div style={{ marginBottom: '24px' }}>
-          <div className="flex items-baseline justify-between gap-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 sm:gap-4">
             <h3
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: '34px',
+                fontSize: 'clamp(22px, 5vw, 34px)',
                 lineHeight: 1.1,
                 fontWeight: 400,
                 color: 'var(--color-obsidian)',
@@ -800,7 +810,7 @@ export default function BookingBriefForm({
               border: '1px solid #E3DBCC',
               borderRadius: '10px',
               background: '#FDFCF8',
-              fontSize: '14px',
+              fontSize: '16px',
               lineHeight: 1.6,
               color: '#101010',
               boxSizing: 'border-box',
@@ -824,11 +834,11 @@ export default function BookingBriefForm({
       >
         {/* Section Header: 24px gap below before pills */}
         <div style={{ marginBottom: '24px' }}>
-          <div className="flex items-baseline justify-between gap-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 sm:gap-4">
             <h3
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: '34px',
+                fontSize: 'clamp(22px, 5vw, 34px)',
                 lineHeight: 1.1,
                 fontWeight: 400,
                 color: 'var(--color-obsidian)',

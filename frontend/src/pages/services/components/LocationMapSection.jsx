@@ -5,6 +5,7 @@ export default function LocationMapSection({
   location,
   coordinates,
   venue,
+  recommendation,
 }) {
   const activeQuery = location || 'The Taj Mahal Palace, Mumbai, Maharashtra, India';
 
@@ -90,6 +91,13 @@ export default function LocationMapSection({
                 <p className="font-sans text-xs text-[#7A7770] line-clamp-2 mt-0.5">
                   {location || 'Apollo Bandar, Colaba, Mumbai, Maharashtra 400001'}
                 </p>
+                {recommendation?.badge && (
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    <span className="text-[9px] font-mono tracking-wider px-2 py-0.5 rounded bg-[#FAF5EC] text-[#8C6D3B] border border-[#E8DEC9] uppercase font-semibold">
+                      {recommendation.badge}
+                    </span>
+                  </div>
+                )}
 
                 {hasCoordinates && (
                   <div className="mt-2 pt-2 border-t border-[#E3DBCC]/60 flex items-center justify-between text-[11px] font-mono text-[#55493A]">

@@ -19,6 +19,7 @@ const mediaRouter = require("./routes/media.route");
 const categoryRouter = require("./routes/category.route");
 const serviceRouter = require("./routes/service.route");
 const inquiryRouter = require("./routes/inquiry.route");
+const locationRouter = require("./routes/location.route");
 
 const helmet = require("helmet");
 const { globalLimiter } = require("./middlewares/rateLimiter.middleware");
@@ -151,6 +152,7 @@ app.use("/api/media", mediaRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/services", serviceRouter);
 app.use("/api/inquiries", inquiryRouter);
+app.use("/api/locations", locationRouter);
 
 // Catch-all 404 handler for undefined routes
 app.use((req, res, next) => {

@@ -1,5 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { MapPin, CheckCircle2, X, Loader2, Building2, Landmark, Compass } from 'lucide-react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import {
+  MapPin,
+  CheckCircle2,
+  X,
+  Loader2,
+  Building2,
+  Landmark,
+  Compass,
+  Sparkles,
+  Navigation,
+  ArrowRight,
+  ExternalLink,
+} from 'lucide-react';
+import { fetchLocations, resolveDestinationZone } from '../../../utils/locationService';
 
 /**
  * Curated knowledge base of iconic wedding destinations, heritage palaces,
@@ -722,12 +735,22 @@ export default function LocationSearchInput({
   onChangeLocation,
   error,
   coordinates,
+  onSelectRecommendedTier,
+  initialRecommendation,
 }) {
   const [query, setQuery] = useState(value || '');
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [activeRecommendation, setActiveRecommendation] = useState(() => {
+    if (initialRecommendation) return initialRecommendation;
+    if (value && value.trim().length >= 2) {
+      return resolveDestinationZone({ name: value });
+    }
+    return null;
+  });
+
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const debounceTimerRef = useRef(null);
@@ -736,6 +759,11 @@ export default function LocationSearchInput({
   // Sync internal state if external value changes
   useEffect(() => {
     setQuery(value || '');
+    if (value && value.trim().length >= 2) {
+      setActiveRecommendation((prev) => prev || resolveDestinationZone({ name: value }));
+    } else {
+      setActiveRecommendation(null);
+    }
   }, [value]);
 
   // Auto-scroll highlighted suggestion into view
@@ -767,10 +795,12 @@ export default function LocationSearchInput({
       return;
     }
 
-    // 1. Get instant curated matches (0ms response)
-    const localMatches = searchLocalDestinations(trimmed);
+    // 1. Get instant curated matches (0ms response for local hubs)
+    const localMatches = searchLocalDestinations(trimmed).map((loc) => ({
+      ...loc,
+      recommendation: resolveDestinationZone(loc),
+    }));
 
-    // Show local results immediately if available
     if (localMatches.length > 0) {
       setSuggestions(localMatches);
       setIsOpen(true);
@@ -786,104 +816,66 @@ export default function LocationSearchInput({
     setIsLoading(true);
 
     try {
-      // Query expansion: if search is 'talavpali' or similar, query OpenStreetMap as 'talao pali' as well
-      let expandedQuery = trimmed;
-      const lowerQ = trimmed.toLowerCase().replace(/[^a-z]/g, '');
-      if (lowerQ === 'talavpali' || lowerQ === 'talaopali' || lowerQ === 'talawpali') {
-        expandedQuery = 'talao pali thane';
-      }
+      // 2. Query dynamic geocoding provider via backend / client fallback
+      const apiResults = await fetchLocations(trimmed, signal);
 
-      // Query Photon with proximity bias towards Mumbai/Maharashtra (lat: 19.0760, lon: 72.8777)
-      const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(
-        expandedQuery
-      )}&lat=19.0760&lon=72.8777&limit=8`;
+      // Merge local matches and API results with clean deduplication
+      const merged = [...localMatches];
+      const seenKeys = new Set(
+        localMatches.map((m) => (m.fullAddress || m.title).toLowerCase().replace(/[^a-z0-9]/g, ''))
+      );
 
-      const res = await fetch(photonUrl, { signal });
-      if (!res.ok) throw new Error('Photon query failed');
-      const data = await res.json();
+      (apiResults || []).forEach((apiItem) => {
+        const itemKey = (apiItem.fullAddress || apiItem.title).toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (!seenKeys.has(itemKey)) {
+          seenKeys.add(itemKey);
+          merged.push({
+            ...apiItem,
+            recommendation: apiItem.recommendation || resolveDestinationZone(apiItem),
+          });
+        }
+      });
 
-      if (data && Array.isArray(data.features)) {
-        const apiSuggestions = data.features
-          .map((item) => {
-            const p = item.properties || {};
-            const name = p.name || '';
-            const parts = [
-              name,
-              p.street,
-              p.district,
-              p.city || p.locality,
-              p.state,
-              p.country,
-            ].filter(Boolean);
-
-            // Deduplicate components
-            const displayParts = [];
-            parts.forEach((pt) => {
-              if (!displayParts.some((dp) => dp.toLowerCase() === pt.toLowerCase())) {
-                displayParts.push(pt);
-              }
-            });
-
-            const title = name || p.city || p.country || 'Destination';
-            const subtitle = displayParts.slice(1).join(', ');
-            const fullAddress = displayParts.join(', ');
-
-            let type = 'LOCATION';
-            if (p.osm_value === 'hotel' || p.osm_key === 'tourism') type = 'HOTEL';
-            else if (p.osm_value === 'palace' || p.osm_value === 'castle') type = 'PALACE';
-            else if (p.type === 'city' || p.osm_value === 'city') type = 'CITY';
-            else if (p.osm_value === 'water' || p.osm_key === 'natural') type = 'LANDMARK';
-
-            return {
-              id: 'osm-' + (p.osm_id || Math.random().toString(36).slice(2)),
-              title,
-              subtitle,
-              fullAddress,
-              type,
-              lat: item.geometry?.coordinates ? item.geometry.coordinates[1] : null,
-              lng: item.geometry?.coordinates ? item.geometry.coordinates[0] : null,
-              isCurated: false,
-            };
-          })
-          .filter((item) => item.title && item.title.trim().length > 0);
-
-        // Merge local matches and API results with deduplication
-        const merged = [...localMatches];
-        const seenNames = new Set(
-          localMatches.map((m) => m.title.toLowerCase().replace(/[^a-z0-9]/g, ''))
-        );
-
-        apiSuggestions.forEach((apiItem) => {
-          const normName = apiItem.title.toLowerCase().replace(/[^a-z0-9]/g, '');
-          const normAddress = apiItem.fullAddress.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-          // Check if already present or duplicate
-          let isDup = seenNames.has(normName);
-          if (!isDup) {
-            for (const seen of seenNames) {
-              if (seen.includes(normName) || normName.includes(seen)) {
-                isDup = true;
-                break;
-              }
-            }
-          }
-
-          if (!isDup) {
-            seenNames.add(normName);
-            seenNames.add(normAddress);
-            merged.push(apiItem);
-          }
+      // 3. Fallback entry if 0 results so user can always confirm any custom location
+      if (merged.length === 0) {
+        const customRec = resolveDestinationZone({ name: trimmed });
+        merged.push({
+          id: 'custom-' + Date.now(),
+          title: trimmed,
+          subtitle: 'Custom destination location · Click to confirm',
+          fullAddress: trimmed,
+          type: 'DESTINATION',
+          lat: 18.9220,
+          lng: 72.8347,
+          recommendation: customRec,
+          isCustom: true,
         });
-
-        setSuggestions(merged);
-        setIsOpen(merged.length > 0);
       }
+
+      setSuggestions(merged);
+      setIsOpen(merged.length > 0);
     } catch (err) {
       if (err.name !== 'AbortError') {
         console.warn('Place search API error (showing local results):', err);
-        // Fallback to local matches if network fails
         if (localMatches.length > 0) {
           setSuggestions(localMatches);
+          setIsOpen(true);
+        } else {
+          // Guaranteed graceful fallback even on full network disconnection
+          const fallbackRec = resolveDestinationZone({ name: trimmed });
+          setSuggestions([
+            {
+              id: 'offline-' + Date.now(),
+              title: trimmed,
+              subtitle: 'Custom location (Offline geocoding active)',
+              fullAddress: trimmed,
+              type: 'DESTINATION',
+              lat: 18.9220,
+              lng: 72.8347,
+              recommendation: fallbackRec,
+              isCustom: true,
+            },
+          ]);
           setIsOpen(true);
         }
       }
@@ -897,10 +889,14 @@ export default function LocationSearchInput({
     setQuery(val);
     setSelectedIndex(-1);
 
+    const liveRec = val.trim().length >= 2 ? resolveDestinationZone({ name: val }) : null;
+    setActiveRecommendation(liveRec);
+
     onChangeLocation({
       location: val,
       coordinates: null,
-      venue: val.split(',')[0],
+      venue: val.split(',')[0].trim(),
+      recommendation: liveRec,
     });
 
     if (debounceTimerRef.current) {
@@ -908,8 +904,10 @@ export default function LocationSearchInput({
     }
 
     if (val.trim().length >= 2) {
-      // Immediate local check so user sees instant feedback
-      const instantLocal = searchLocalDestinations(val.trim());
+      const instantLocal = searchLocalDestinations(val.trim()).map((loc) => ({
+        ...loc,
+        recommendation: resolveDestinationZone(loc),
+      }));
       if (instantLocal.length > 0) {
         setSuggestions(instantLocal);
         setIsOpen(true);
@@ -918,7 +916,7 @@ export default function LocationSearchInput({
       setIsLoading(true);
       debounceTimerRef.current = setTimeout(() => {
         searchPlaces(val);
-      }, 180);
+      }, 200);
     } else {
       setSuggestions([]);
       setIsOpen(false);
@@ -934,11 +932,14 @@ export default function LocationSearchInput({
     setIsOpen(false);
     setSuggestions([]);
 
+    const rec = place.recommendation || resolveDestinationZone(place);
+    setActiveRecommendation(rec);
+
     onChangeLocation({
       location: place.fullAddress,
-      coordinates:
-        place.lat && place.lng ? { lat: place.lat, lng: place.lng } : null,
+      coordinates: place.lat && place.lng ? { lat: place.lat, lng: place.lng } : null,
       venue: place.title,
+      recommendation: rec,
     });
   };
 
@@ -946,6 +947,7 @@ export default function LocationSearchInput({
     setQuery('');
     setSuggestions([]);
     setIsOpen(false);
+    setActiveRecommendation(null);
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -953,11 +955,26 @@ export default function LocationSearchInput({
       location: '',
       coordinates: null,
       venue: '',
+      recommendation: null,
     });
   };
 
   const handleKeyDown = (e) => {
-    if (!isOpen || suggestions.length === 0) return;
+    if (!isOpen || suggestions.length === 0) {
+      // If closed but user hits Enter on a typed string, confirm with geocoded recommendation
+      if (e.key === 'Enter' && query.trim().length >= 2) {
+        e.preventDefault();
+        const rec = resolveDestinationZone({ name: query.trim() });
+        setActiveRecommendation(rec);
+        onChangeLocation({
+          location: query.trim(),
+          coordinates: coordinates || { lat: 18.9220, lng: 72.8347 },
+          venue: query.split(',')[0].trim(),
+          recommendation: rec,
+        });
+      }
+      return;
+    }
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -965,9 +982,13 @@ export default function LocationSearchInput({
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
-    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+    } else if (e.key === 'Enter') {
       e.preventDefault();
-      handleSelectPlace(suggestions[selectedIndex]);
+      if (selectedIndex >= 0 && suggestions[selectedIndex]) {
+        handleSelectPlace(suggestions[selectedIndex]);
+      } else if (suggestions.length > 0) {
+        handleSelectPlace(suggestions[0]);
+      }
     } else if (e.key === 'Escape') {
       setIsOpen(false);
     }
@@ -1011,7 +1032,12 @@ export default function LocationSearchInput({
             VENUE
           </span>
         );
-      case 'DESTINATION':
+      case 'DISTRICT':
+        return (
+          <span className="text-[9.5px] font-mono tracking-wider text-[#4A4844] bg-[#F0EBE1] border border-[#D8CEBE] px-1.5 py-0.5 rounded shrink-0">
+            DISTRICT
+          </span>
+        );
       case 'CITY':
         return (
           <span className="text-[9.5px] font-mono tracking-wider text-[#4A4844] bg-[#F3F0E9] border border-[#E3DBCC] px-1.5 py-0.5 rounded shrink-0">
@@ -1021,7 +1047,7 @@ export default function LocationSearchInput({
       default:
         return (
           <span className="text-[9.5px] font-mono tracking-wider text-[#666] bg-[#F5F5F5] px-1.5 py-0.5 rounded shrink-0">
-            MAPS
+            DESTINATION
           </span>
         );
     }
@@ -1038,6 +1064,7 @@ export default function LocationSearchInput({
         return <Landmark size={13} />;
       case 'DESTINATION':
       case 'CITY':
+      case 'DISTRICT':
         return <Compass size={13} />;
       default:
         return <MapPin size={13} />;
@@ -1045,7 +1072,7 @@ export default function LocationSearchInput({
   };
 
   return (
-    <div ref={containerRef} className="w-full space-y-2 relative">
+    <div ref={containerRef} className="w-full space-y-3 relative">
       {/* Search Input Bar */}
       <div className="relative flex items-center">
         <div className="absolute left-4 pointer-events-none text-[#7A7770] flex items-center">
@@ -1065,7 +1092,7 @@ export default function LocationSearchInput({
           onFocus={() => {
             if (suggestions.length > 0) setIsOpen(true);
           }}
-          placeholder="Search venue, heritage palace, hotel, or city..."
+          placeholder="Search any city, district (e.g. Raigad), venue, hotel, or destination..."
           style={{
             width: '100%',
             height: '52px',
@@ -1137,7 +1164,7 @@ export default function LocationSearchInput({
             onTouchMove={(e) => {
               e.stopPropagation();
             }}
-            className="max-h-[290px] overflow-y-auto overscroll-contain"
+            className="max-h-[300px] overflow-y-auto overscroll-contain"
             style={{
               scrollbarWidth: 'thin',
               scrollbarColor: '#D8CEBE transparent',
@@ -1168,6 +1195,13 @@ export default function LocationSearchInput({
                         {item.subtitle}
                       </div>
                     )}
+                    {item.recommendation && (
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-[9px] font-mono tracking-wider px-1.5 py-0.5 rounded bg-[#FAF5EC] text-[#8C6D3B] border border-[#E8DEC9]">
+                          {item.recommendation.badge}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="shrink-0 flex items-center gap-1.5 self-center">
@@ -1191,16 +1225,98 @@ export default function LocationSearchInput({
           <p className="font-sans text-xs text-[#992E2E]">{error}</p>
         ) : (
           <p className="text-[#7A7770] text-[12px] flex items-center gap-1">
-            <span>Search any hotel, palace, resort, landmark, or city.</span>
+            <span>Supports any city, district (e.g. Raigad), village, or international venue.</span>
             {coordinates && (
               <span className="text-[#2E7D32] font-mono text-[11px] font-medium ml-1 flex items-center gap-1">
                 <span>●</span>
-                <span>Coordinates pinned: {coordinates.lat.toFixed(2)}°, {coordinates.lng.toFixed(2)}°</span>
+                <span>Coordinates: {coordinates.lat.toFixed(2)}°, {coordinates.lng.toFixed(2)}°</span>
               </span>
             )}
           </p>
         )}
       </div>
+
+      {/* DYNAMIC PHOTOGRAPHY SERVICE RECOMMENDATION CARD */}
+      {activeRecommendation && (query.trim().length >= 2 || value) && (
+        <div
+          data-testid="location-recommendation-card"
+          className="mt-3 p-4 sm:p-5 rounded-[12px] border border-[#E3DBCC] bg-[#FAF8F5] shadow-xs transition-all"
+        >
+          {/* Header Badge & Pin Status */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-[#E3DBCC]/60">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#101010]" />
+              <span className="font-mono text-[10px] tracking-[0.16em] uppercase font-semibold text-[#55493A]">
+                {activeRecommendation.badge}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-[10px] font-mono text-[#7A6E5D]">
+              <Sparkles size={11} className="text-[#8C6D3B]" />
+              <span className="uppercase">ATELIER ADVISORY</span>
+            </div>
+          </div>
+
+          {/* Recommendation Title & Overview */}
+          <h4
+            style={{ fontFamily: 'var(--font-serif)' }}
+            className="text-[17px] sm:text-[19px] text-[#101010] font-normal leading-tight mb-1.5"
+          >
+            {activeRecommendation.title}
+          </h4>
+
+          <p className="font-sans text-xs sm:text-[12.5px] text-[#55493A] leading-relaxed mb-3">
+            {activeRecommendation.description}
+          </p>
+
+          {/* Surcharge / Logistics Pill */}
+          <div className="p-2 sm:p-2.5 rounded-lg bg-[#F3EFE6] border border-[#E5DDD0] mb-3 flex items-start gap-2">
+            <Navigation size={13} className="text-[#8C6D3B] shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              <span className="block font-mono text-[9.5px] uppercase tracking-wider text-[#7A6E5D] font-semibold mb-0.5">
+                TRAVEL LOGISTICS &amp; CREW DEPLOYMENT
+              </span>
+              <p className="font-sans text-[11.5px] text-[#222] font-medium leading-normal">
+                {activeRecommendation.surchargeNote}
+              </p>
+            </div>
+          </div>
+
+          {/* Highlights & Deliverables */}
+          {activeRecommendation.highlights && (
+            <div className="space-y-1.5 pt-1">
+              <span className="block font-mono text-[9.5px] uppercase tracking-wider text-[#7A6E5D] font-semibold">
+                RECOMMENDED ATELIER CAPABILITIES FOR THIS DESTINATION
+              </span>
+              <ul className="space-y-1 text-xs text-[#55493A]">
+                {activeRecommendation.highlights.map((h, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[11.5px] leading-relaxed">
+                    <span className="text-[#8C6D3B] font-bold">―</span>
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Interactive Action: Apply Recommended Collection */}
+          {onSelectRecommendedTier && activeRecommendation.recommendedTier && (
+            <div className="mt-3.5 pt-3 border-t border-[#E3DBCC]/60 flex items-center justify-between flex-wrap gap-2">
+              <div className="text-[11px] font-sans text-[#7A6E5D]">
+                Recommended suite: <span className="font-semibold text-[#101010]">{activeRecommendation.recommendedTier} Collection</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onSelectRecommendedTier(activeRecommendation.recommendedTier.toLowerCase())}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#101010] text-[#FDFCF8] hover:bg-[#2A2724] text-[11px] font-sans font-medium tracking-wide uppercase transition-colors cursor-pointer"
+              >
+                <span>Select {activeRecommendation.recommendedTier}</span>
+                <ArrowRight size={12} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

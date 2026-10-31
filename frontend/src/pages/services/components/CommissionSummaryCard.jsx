@@ -320,6 +320,13 @@ export default function CommissionSummaryCard({
                         </span>
                       </p>
                     )}
+                    {formData.locationRecommendation?.badge && (
+                      <div className="mt-2 pt-2 border-t border-[#E3DBCC]/60 flex items-center gap-1.5">
+                        <span className="text-[9.5px] font-mono tracking-wider px-2 py-0.5 rounded bg-[#FAF5EC] text-[#8C6D3B] border border-[#E8DEC9] uppercase font-semibold">
+                          {formData.locationRecommendation.badge}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

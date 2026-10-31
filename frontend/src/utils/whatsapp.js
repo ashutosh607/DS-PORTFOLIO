@@ -150,7 +150,7 @@ EVENT DETAILS
 Event: ${eventType}
 Date: ${eventDate}
 Duration: ${duration}
-Location: ${location}${mapsLink ? `\nGoogle Maps: ${mapsLink}` : ''}
+Location: ${location}${formData.locationRecommendation?.badge ? ` (${formData.locationRecommendation.badge})` : ''}${mapsLink ? `\nGoogle Maps: ${mapsLink}` : ''}
 
 ━━━━━━━━━━━━━━━━
 SELECTED COLLECTION
