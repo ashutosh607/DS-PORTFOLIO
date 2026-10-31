@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PhotoPlaceholder from '../common/PhotoPlaceholder';
-import TextBlurReveal from '../common/TextBlurReveal';
 
 import img01 from '../../assets/landing-page-images/landing-01.webp';
 import img01_400 from '../../assets/landing-page-images/landing-01-400w.webp';
@@ -305,11 +304,11 @@ export default function HeroSpotlightCarousel() {
       style={{
         position: 'relative',
         height: '100dvh',
-        minHeight: '560px',
+        minHeight: '620px',
         maxHeight: '1080px',
         boxSizing: 'border-box',
-        paddingTop: 'clamp(3.8rem, 5.5vh, 4.8rem)',
-        paddingBottom: 'clamp(0.85rem, 1.8vh, 1.6rem)',
+        paddingTop: 'clamp(4.2rem, 6vh, 5.2rem)',
+        paddingBottom: 'clamp(1rem, 2vh, 1.8rem)',
         overflow: 'hidden',
         backgroundColor: 'var(--color-off-white)',
         display: 'flex',
@@ -349,29 +348,21 @@ export default function HeroSpotlightCarousel() {
             TOP SECTION: EYEBROW & HEADING
             =================================================================== */}
         <div
-          className="pt-2 sm:pt-1"
+          className="pt-1 sm:pt-2 max-w-4xl mx-auto px-4"
           style={{ flexShrink: 0 }}
         >
-          
 
-          <TextBlurReveal
-            as="h1"
-            text="Photographer in Mumbai – DS Photography & Films"
-            blurAmount={12}
-            stagger={0.06}
-            delay={0.12}
+          <h1
+            className="font-serif text-[28px] sm:text-[38px] md:text-[44px] lg:text-[46px] font-medium text-[#101010] leading-[1.16] tracking-[-0.01em] mx-auto"
             style={{
-              maxWidth: '860px',
-              margin: '0 auto',
-              lineHeight: 1.15,
-              color: 'var(--color-obsidian)',
-              fontSize: 'clamp(1.85rem, 3.2vw, 2.75rem)',
-              letterSpacing: '-0.015em',
-              fontWeight: 400,
+              maxWidth: '960px',
+              textWrap: 'balance',
             }}
-          />
+          >
+            Photographer in Mumbai <span className="font-light text-[#8C7E6C] mx-1 sm:mx-1.5">—</span> DS Photography &amp; Films
+          </h1>
           <p
-            className="text-[13px] sm:text-[14.5px] text-[#5A544C] max-w-2xl mx-auto mt-2.5 px-4 font-sans leading-relaxed"
+            className="text-[14px] sm:text-[15.5px] text-[#2C2722] font-sans font-normal max-w-2xl mx-auto mt-2.5 sm:mt-3 leading-relaxed"
           >
             DS Photography &amp; Films is an editorial wedding and portrait photography studio in Mumbai led by lead photographer and cinematographer Dishant Shelar. We document heartfelt weddings, intimate pre-wedding stories, and portraits across Mumbai and destination venues worldwide.
           </p>
@@ -391,7 +382,7 @@ export default function HeroSpotlightCarousel() {
             position: 'relative',
             width: '100%',
             height: 'clamp(290px, 35vh, 365px)',
-            margin: '0.25rem auto',
+            margin: '0.65rem auto 0.35rem auto',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
