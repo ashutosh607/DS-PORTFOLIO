@@ -353,13 +353,18 @@ export default function HeroSpotlightCarousel() {
         >
 
           <h1
-            className="font-serif text-[28px] sm:text-[38px] md:text-[44px] lg:text-[46px] font-medium text-[#101010] leading-[1.16] tracking-[-0.01em] mx-auto"
             style={{
-              maxWidth: '960px',
-              textWrap: 'balance',
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(1.85rem, 3.2vw, 2.75rem)',
+              fontWeight: 400,
+              lineHeight: 1.15,
+              letterSpacing: '-0.015em',
+              color: 'var(--color-obsidian)',
+              maxWidth: '860px',
+              margin: '0 auto',
             }}
           >
-            Photographer in Mumbai <span className="font-light text-[#8C7E6C] mx-1 sm:mx-1.5">—</span> DS Photography &amp; Films
+            Photographer in Mumbai – DS Photography &amp; Films
           </h1>
           <p
             className="text-[14px] sm:text-[15.5px] text-[#2C2722] font-sans font-normal max-w-2xl mx-auto mt-2.5 sm:mt-3 leading-relaxed"
