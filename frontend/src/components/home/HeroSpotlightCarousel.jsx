@@ -364,7 +364,7 @@ export default function HeroSpotlightCarousel() {
           <p
             className="text-[14px] sm:text-[15.5px] text-[#2C2722] font-sans font-normal max-w-2xl mx-auto mt-2.5 sm:mt-3 leading-relaxed"
           >
-            DS Photography &amp; Films is an editorial wedding and portrait photography studio in Mumbai led by lead photographer and cinematographer Dishant Shelar. We document heartfelt weddings, intimate pre-wedding stories, and portraits across Mumbai and destination venues worldwide.
+            DS Photography &amp; Films is a Mumbai-based wedding and portrait photography studio led by Dishant Shelar, capturing timeless weddings, pre-wedding stories, and portraits across Mumbai and destination locations worldwide.
           </p>
         </div>
 
