@@ -347,7 +347,7 @@ export default function WhyChooseSection() {
             }}
           />
 
-          <div className="flex flex-col gap-2 sm:gap-2.5 lg:gap-2 relative z-10" role="list">
+          <div className="flex flex-col gap-2 sm:gap-2.5 lg:gap-2 relative z-10">
             {PILLARS.map((pillar, i) => {
               const isActive = activeRow === i;
               const IconComponent = pillar.icon;
@@ -358,6 +358,7 @@ export default function WhyChooseSection() {
                   role="button"
                   tabIndex={0}
                   aria-expanded={isActive}
+                  aria-controls={`pillar-content-${pillar.number}`}
                   onMouseEnter={() => {
                     // Only hover on desktop/laptop
                     if (window.innerWidth >= 1024) setActiveRow(i);
@@ -424,6 +425,7 @@ export default function WhyChooseSection() {
 
                       {/* Full original SEO text: always in the HTML DOM, visually collapsed with CSS */}
                       <div
+                        id={`pillar-content-${pillar.number}`}
                         className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out ${
                           isActive
                             ? 'grid-rows-[1fr] opacity-100 mt-2'

@@ -119,6 +119,7 @@ export default function Navbar({ onOpenInquiry }) {
         {/* Studio Identity / Logo */}
         <a
           href="/"
+          aria-label="DS Photography & Films Home"
           onClick={(e) => {
             e.preventDefault();
             navigateWithTransition('/', 'HOME');
@@ -247,6 +248,8 @@ export default function Navbar({ onOpenInquiry }) {
         {/* Right CTA Button & Mobile StaggeredMenu */}
         <div style={{ display: 'flex', alignItems: 'center', height: '100%', gap: '1.25rem' }}>
           <button
+            type="button"
+            aria-label="Book a Session"
             onClick={() => {
               if (location.pathname === '/services') {
                 window.dispatchEvent(new CustomEvent('open-booking-form'));

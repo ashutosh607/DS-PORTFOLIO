@@ -224,7 +224,7 @@
   </noscript>
 
   <!-- Luxury Pure HTML Splash Screen: Instant brand presentation on load, preventing any flash of crawlable content before React mounts -->
-  <div id="initial-splash-screen" style="position:fixed;inset:0;z-index:9999999;background-color:#FAF8F5;display:flex;align-items:center;justify-content:center;transition:opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);">
+  <div id="initial-splash-screen" aria-hidden="true" style="position:fixed;inset:0;z-index:9999999;background-color:#FAF8F5;display:flex;align-items:center;justify-content:center;transition:opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);pointer-events:none;">
     <div style="padding:1.5rem;display:flex;align-items:center;justify-content:center;">
       <img src="/ds-logo-dark-splash.webp" alt="DS Photography &amp; Films — Professional Wedding &amp; Portrait Photographer in Mumbai" title="DS Photography &amp; Films — Fine Art Photographer in Mumbai" width="470" height="340" style="height:clamp(180px,32vh,340px);max-width:min(90vw,560px);aspect-ratio:1415/1023;object-fit:contain;display:block;border:none;outline:none;" />
     </div>
@@ -449,9 +449,10 @@
       var s = document.getElementById('initial-splash-screen');
       if (s) {
         s.style.opacity = '0';
-        setTimeout(function() { if (s && s.parentNode) s.parentNode.removeChild(s); }, 500);
+        s.setAttribute('aria-hidden', 'true');
+        setTimeout(function() { if (s && s.parentNode) s.parentNode.removeChild(s); }, 350);
       }
-    }, 3500);
+      }, 1000);
   </script>
 </body>
 

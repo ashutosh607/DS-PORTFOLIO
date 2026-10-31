@@ -67,7 +67,8 @@ export default function SplashScreen({ onComplete }) {
             backgroundColor: '#FAF8F5',
           }}
           role="dialog"
-          aria-label="DS Photography & Films"
+          aria-modal="true"
+          aria-label="DS Photography & Films Splash Screen"
         >
           {/* Only the Logo in the middle in big, proper size */}
           <motion.div

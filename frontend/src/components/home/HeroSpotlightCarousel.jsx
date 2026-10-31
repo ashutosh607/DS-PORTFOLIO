@@ -377,6 +377,10 @@ export default function HeroSpotlightCarousel() {
             MIDDLE SECTION: INWARD CONCAVE CURVED 3D GALLERY (CLEAN MINIMALIST)
             =================================================================== */}
         <div
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Portfolio Spotlight Showcase"
+          aria-live="polite"
           onMouseDown={handlePointerDown}
           onMouseMove={handlePointerMove}
           onMouseUp={handlePointerUp}
@@ -436,6 +440,9 @@ export default function HeroSpotlightCarousel() {
             return (
               <div
                 key={item.id}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${item.title} — Slide ${idx + 1} of ${total}`}
                 onMouseEnter={handleCardMouseEnter}
                 onMouseLeave={handleCardMouseLeave}
                 onClick={() => {
@@ -578,9 +585,11 @@ export default function HeroSpotlightCarousel() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.15rem', marginBottom: '0.35rem' }}>
             {PROJECTS.map((_, i) => (
               <button
+                type="button"
                 key={i}
                 onClick={() => goToIndex(i)}
-                aria-label={`Go to photo ${i + 1}`}
+                aria-label={`Go to slide ${i + 1} of ${total}`}
+                aria-current={activeNormalizedIndex === i ? 'true' : undefined}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -646,9 +655,10 @@ export default function HeroSpotlightCarousel() {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: '100px', justifyContent: 'flex-end' }}>
               <button
+                type="button"
                 onClick={handlePrev}
                 className="circle-nav-btn"
-                aria-label="Previous photo"
+                aria-label="Previous photo slide"
                 style={{
                   width: '46px',
                   height: '46px',
@@ -666,9 +676,10 @@ export default function HeroSpotlightCarousel() {
                 </svg>
               </button>
               <button
+                type="button"
                 onClick={handleNext}
                 className="circle-nav-btn"
-                aria-label="Next photo"
+                aria-label="Next photo slide"
                 style={{
                   width: '46px',
                   height: '46px',
