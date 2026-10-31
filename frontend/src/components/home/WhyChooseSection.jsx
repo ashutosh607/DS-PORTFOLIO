@@ -73,8 +73,8 @@ const PILLARS = [
 ];
 
 export default function WhyChooseSection() {
-  // Row 03 (index 2) is active by default to match the mockup
-  const [activeRow, setActiveRow] = useState(2);
+  // Row 01 (index 0) active by default, or 03 (index 2)
+  const [activeRow, setActiveRow] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -179,7 +179,7 @@ export default function WhyChooseSection() {
     <div
       id="why-choose"
       ref={sectionRef}
-      className="relative px-5 sm:px-8 lg:px-0 py-10 sm:py-12 lg:py-8 border-t border-[#E3DBCC] overflow-hidden"
+      className="relative py-14 sm:py-20 lg:py-24 border-t border-[#E3DBCC] overflow-hidden"
     >
       {/* Decorative top-right curved arc line */}
       <svg
@@ -203,10 +203,10 @@ export default function WhyChooseSection() {
       {/* =========================================================================
           SECTION HEADER
           ========================================================================= */}
-      <div className="relative z-10 max-w-2xl mb-8 sm:mb-10 lg:mb-7">
+      <div className="relative z-10 max-w-3xl mb-10 sm:mb-12 lg:mb-12">
         {/* Monospace label */}
         <span
-          className="text-[10px] sm:text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-2 sm:mb-2.5 font-semibold transition-all duration-700 ease-out"
+          className="text-[11px] sm:text-xs font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-2.5 sm:mb-3 font-semibold transition-all duration-700 ease-out"
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'translateY(0)' : 'translateY(12px)',
@@ -215,22 +215,21 @@ export default function WhyChooseSection() {
           ATELIER STANDARDS &amp; PHILOSOPHY
         </span>
 
-        {/* Heading masked rise (two lines on mobile) */}
+        {/* Heading masked rise */}
         <div className="overflow-hidden pb-1">
           <h2
-            className="font-serif text-[32px] sm:text-[40px] lg:text-[38px] font-normal text-[#101010] leading-[1.12] mb-2 sm:mb-2.5 transition-transform duration-800 ease-out"
+            className="font-serif text-[30px] sm:text-[38px] md:text-[42px] lg:text-[42px] xl:text-[46px] font-normal text-[#101010] leading-[1.14] mb-3 sm:mb-3.5 transition-transform duration-800 ease-out"
             style={{
               transform: isVisible ? 'translateY(0)' : 'translateY(100%)',
               transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
             }}
           >
-            <span className="block sm:inline lg:block xl:inline">Why Choose DS </span>
-            <span className="block sm:inline lg:block xl:inline">Photography &amp; Films?</span>
+            Why Choose DS Photography &amp; Films?
           </h2>
         </div>
 
-        {/* Thin underline: short accent on mobile, full width on desktop */}
-        <div className="w-16 sm:w-20 lg:w-full lg:max-w-[460px] h-[1px] bg-[#E3DBCC] origin-left mb-3 sm:mb-3.5 overflow-hidden">
+        {/* Thin underline: short accent on mobile, elegant width on desktop */}
+        <div className="w-16 sm:w-24 lg:w-full lg:max-w-[480px] h-[1px] bg-[#E3DBCC] origin-left mb-3.5 sm:mb-4 overflow-hidden">
           <div
             className="h-full bg-[#101010]/30 transition-transform duration-900 ease-out"
             style={{
@@ -244,7 +243,7 @@ export default function WhyChooseSection() {
 
         {/* Subheading: short line shown, full original preserved in DOM for SEO */}
         <p
-          className="text-[13.5px] sm:text-[14.5px] text-[#4A463F] leading-relaxed font-sans transition-all duration-700 ease-out"
+          className="text-[14.5px] sm:text-[16px] lg:text-[15.5px] xl:text-[16.5px] text-[#4A463F] leading-relaxed font-sans transition-all duration-700 ease-out"
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'translateY(0)' : 'translateY(10px)',
@@ -259,16 +258,16 @@ export default function WhyChooseSection() {
       </div>
 
       {/* =========================================================================
-          RESPONSIVE LAYOUT (Mobile: 1 column vertical flow, Desktop: 3 columns)
+          RESPONSIVE LAYOUT (Mobile: 1 column vertical flow, Desktop/Laptop: 3 columns)
           ========================================================================= */}
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-6 xl:gap-8 items-center">
         
         {/* -----------------------------------------------------------------------
-            ARCH-SHAPED COUPLE PHOTO (Wide on mobile, tall on desktop)
+            ARCH-SHAPED PHOTO (Fluid responsive across all screens)
             ----------------------------------------------------------------------- */}
-        <div className="lg:col-span-3 flex justify-center lg:justify-start">
+        <div className="lg:col-span-3 xl:col-span-3 flex justify-center lg:justify-start">
           <div
-            className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[220px] xl:max-w-[245px] aspect-[4/3] sm:aspect-[16/11] lg:aspect-[1/1.42]"
+            className="relative w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[260px] xl:max-w-[290px] 2xl:max-w-[320px] aspect-[4/3] sm:aspect-[16/11] lg:aspect-[1/1.4]"
             style={{
               transform: `translateY(${archParallax}px)`,
               transition: reducedMotion ? 'none' : 'transform 0.15s ease-out',
@@ -276,7 +275,7 @@ export default function WhyChooseSection() {
           >
             {/* Outer delicate arch outline border */}
             <div
-              className="absolute -inset-2.5 sm:-inset-3.5 rounded-t-[140px] sm:rounded-t-[180px] lg:rounded-t-full rounded-b-none lg:rounded-b-xl border border-[#CBB9A4]/60 pointer-events-none transition-all duration-1000 ease-out"
+              className="absolute -inset-2.5 sm:-inset-3 rounded-t-[140px] sm:rounded-t-[180px] lg:rounded-t-full rounded-b-none lg:rounded-b-2xl border border-[#CBB9A4]/60 pointer-events-none transition-all duration-1000 ease-out"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? 'scale(1)' : 'scale(0.96)',
@@ -286,7 +285,7 @@ export default function WhyChooseSection() {
 
             {/* Inner arch container with bottom-to-top wipe reveal */}
             <div
-              className="relative w-full h-full rounded-t-[130px] sm:rounded-t-[170px] lg:rounded-t-full rounded-b-none lg:rounded-b-lg overflow-hidden bg-[#E8E2D5] shadow-[0_8px_30px_rgba(16,16,16,0.06)]"
+              className="relative w-full h-full rounded-t-[130px] sm:rounded-t-[170px] lg:rounded-t-full rounded-b-none lg:rounded-b-xl overflow-hidden bg-[#E8E2D5] shadow-[0_8px_30px_rgba(16,16,16,0.06)]"
               style={{
                 clipPath: isVisible ? 'inset(0% 0% 0% 0%)' : 'inset(100% 0% 0% 0%)',
                 transition: reducedMotion
@@ -338,17 +337,17 @@ export default function WhyChooseSection() {
         {/* -----------------------------------------------------------------------
             CENTER COLUMN: 5 Numbered Rows (01 to 05) with Timeline Dots
             ----------------------------------------------------------------------- */}
-        <div className="lg:col-span-5 relative py-2 lg:py-1">
+        <div className="lg:col-span-5 xl:col-span-5 relative py-2 lg:py-0">
           {/* Continuous vertical hairline timeline line passing through all row dots */}
           <div
-            className="absolute left-[54px] sm:left-[58px] lg:left-[47px] top-6 bottom-6 w-[1px] bg-[#E3DBCC] pointer-events-none z-0 origin-top transition-transform duration-1000 ease-out"
+            className="absolute left-[59px] sm:left-[63px] lg:left-[61px] xl:left-[67px] top-6 bottom-6 w-[1px] bg-[#E3DBCC] pointer-events-none z-0 origin-top transition-transform duration-1000 ease-out"
             style={{
               transform: isVisible ? 'scaleY(1)' : 'scaleY(0)',
               transitionDelay: '0.35s',
             }}
           />
 
-          <div className="flex flex-col gap-1.5 sm:gap-2 lg:gap-1 relative z-10" role="list">
+          <div className="flex flex-col gap-2 sm:gap-2.5 lg:gap-2 relative z-10" role="list">
             {PILLARS.map((pillar, i) => {
               const isActive = activeRow === i;
               const IconComponent = pillar.icon;
@@ -360,7 +359,7 @@ export default function WhyChooseSection() {
                   tabIndex={0}
                   aria-expanded={isActive}
                   onMouseEnter={() => {
-                    // Only hover on desktop
+                    // Only hover on desktop/laptop
                     if (window.innerWidth >= 1024) setActiveRow(i);
                   }}
                   onFocus={() => setActiveRow(i)}
@@ -371,9 +370,9 @@ export default function WhyChooseSection() {
                       setActiveRow(isActive ? null : i);
                     }
                   }}
-                  className={`group relative rounded-2xl lg:rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 lg:px-3 lg:py-2 min-h-[50px] cursor-pointer transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8C7764] ${
+                  className={`group relative rounded-2xl lg:rounded-xl px-3.5 py-3 sm:px-4 sm:py-3.5 lg:px-4 lg:py-3 xl:px-5 xl:py-3.5 min-h-[56px] cursor-pointer transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8C7764] ${
                     isActive
-                      ? 'bg-[#F4EFE6] shadow-[0_2px_10px_rgba(20,18,15,0.04)]'
+                      ? 'bg-[#F4EFE6] shadow-[0_2px_12px_rgba(20,18,15,0.06)]'
                       : 'hover:bg-[#FAF7F0] active:bg-[#F4EFE6]/60'
                   }`}
                   style={{
@@ -382,10 +381,10 @@ export default function WhyChooseSection() {
                     transitionDelay: `${0.2 + i * 0.06}s`,
                   }}
                 >
-                  <div className="flex items-center gap-3 sm:gap-3.5 lg:gap-3">
+                  <div className="flex items-center gap-3 sm:gap-3.5 lg:gap-3 xl:gap-3.5">
                     {/* Number: 01 to 05 in light serif */}
                     <span
-                      className={`font-serif text-[20px] sm:text-[23px] lg:text-[21px] font-light tracking-tight min-w-[28px] text-center transition-colors duration-300 ${
+                      className={`font-serif text-[21px] sm:text-[23px] lg:text-[21px] xl:text-[23px] font-light tracking-tight min-w-[28px] text-center transition-colors duration-300 ${
                         isActive ? 'text-[#101010] font-normal' : 'text-[#7A746B] group-hover:text-[#101010]'
                       }`}
                     >
@@ -405,7 +404,7 @@ export default function WhyChooseSection() {
 
                     {/* Icon circular container */}
                     <div
-                      className={`w-8 h-8 sm:w-9 sm:h-9 lg:w-8 lg:h-8 rounded-full border flex items-center justify-center shrink-0 transition-all duration-300 ${
+                      className={`w-8 h-8 sm:w-9 sm:h-9 lg:w-8 lg:h-8 xl:w-9 xl:h-9 rounded-full border flex items-center justify-center shrink-0 transition-all duration-300 ${
                         isActive
                           ? 'bg-[#EAE3D4] border-[#C5B9A5] text-[#101010] scale-105'
                           : 'bg-[#FAF8F5] border-[#E3DBCC] text-[#625D55] group-hover:border-[#C5B9A5] group-hover:text-[#101010]'
@@ -416,10 +415,10 @@ export default function WhyChooseSection() {
 
                     {/* Text block */}
                     <div className="flex-1 min-w-0 pr-1">
-                      <h3 className="font-serif text-[15.5px] sm:text-[17px] lg:text-[16px] font-normal text-[#101010] leading-snug">
+                      <h3 className="font-serif text-[16.5px] sm:text-[18px] lg:text-[16.5px] xl:text-[18px] font-normal text-[#101010] leading-snug">
                         {pillar.heading}
                       </h3>
-                      <p className="text-[11.5px] sm:text-[12.5px] lg:text-[11.5px] text-[#7A746B] font-sans truncate sm:whitespace-normal">
+                      <p className="text-[12.5px] sm:text-[13.5px] lg:text-[12.5px] xl:text-[13.5px] text-[#7A746B] font-sans truncate sm:whitespace-normal">
                         {pillar.shortText}
                       </p>
 
@@ -427,7 +426,7 @@ export default function WhyChooseSection() {
                       <div
                         className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out ${
                           isActive
-                            ? 'grid-rows-[1fr] opacity-100 mt-1.5'
+                            ? 'grid-rows-[1fr] opacity-100 mt-2'
                             : 'grid-rows-[0fr] opacity-0 mt-0 pointer-events-none'
                         }`}
                         style={{
@@ -435,7 +434,7 @@ export default function WhyChooseSection() {
                         }}
                       >
                         <div className="overflow-hidden">
-                          <p className="text-[11.5px] sm:text-[12.5px] lg:text-[11.5px] text-[#4A463F] leading-relaxed font-sans pt-1.5 border-t border-[#E3DBCC]/50">
+                          <p className="text-[13px] sm:text-[14px] lg:text-[13px] xl:text-[14px] text-[#4A463F] leading-relaxed font-sans pt-2 border-t border-[#E3DBCC]/60">
                             {pillar.fullText}
                           </p>
                         </div>
@@ -465,14 +464,14 @@ export default function WhyChooseSection() {
         </div>
 
         {/* -----------------------------------------------------------------------
-            RIGHT COLUMN: Dark "Reserve Your Date" Card (Sleek on mobile, with image on desktop)
+            RIGHT COLUMN: Dark "Reserve Your Date" Card (Sleek across all devices)
             ----------------------------------------------------------------------- */}
-        <div className="lg:col-span-4 flex justify-center lg:justify-end">
+        <div className="lg:col-span-4 xl:col-span-4 flex justify-center lg:justify-end">
           <div
             ref={cardRef}
             onMouseMove={handleCardMouseMove}
             onMouseLeave={handleCardMouseLeave}
-            className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[290px] xl:max-w-[315px] bg-[#101010] text-[#FDFCF8] rounded-[24px] lg:rounded-[22px] p-6 sm:p-7 lg:p-5 flex flex-col justify-between shadow-[0_18px_45px_rgba(16,16,16,0.18)] transition-transform duration-300 ease-out"
+            className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[310px] xl:max-w-[340px] 2xl:max-w-[360px] bg-[#101010] text-[#FDFCF8] rounded-[24px] lg:rounded-[22px] p-6 sm:p-7 lg:p-6 xl:p-7 flex flex-col justify-between shadow-[0_18px_45px_rgba(16,16,16,0.18)] transition-transform duration-300 ease-out"
             style={{
               transform: reducedMotion
                 ? 'none'
@@ -483,8 +482,8 @@ export default function WhyChooseSection() {
                 : 'opacity 0.8s ease-out, transform 0.8s ease-out',
             }}
           >
-            {/* Top botanical photo: visible only on desktop */}
-            <div className="relative w-full h-[120px] sm:h-[135px] xl:h-[145px] rounded-xl overflow-hidden mb-3.5 bg-[#1a1a1a] hidden lg:block">
+            {/* Top botanical photo: visible on desktop, tablet, and mobile */}
+            <div className="relative w-full h-[130px] sm:h-[150px] lg:h-[135px] xl:h-[155px] rounded-xl overflow-hidden mb-4 sm:mb-5 lg:mb-4 bg-[#1a1a1a]">
               <img
                 src={driedBotanical}
                 alt="Archival dried botanical in warm chiaroscuro light – DS Photography Atelier"
@@ -496,21 +495,21 @@ export default function WhyChooseSection() {
                   animation: reducedMotion ? 'none' : 'kenBurnsLoop 18s ease-in-out infinite',
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#101010]/50 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#101010]/60 via-transparent to-transparent pointer-events-none" />
             </div>
 
             {/* Card Content Area */}
             <div className="flex-1 flex flex-col justify-between">
-              <div className="mb-5 lg:mb-3.5">
-                <span className="text-[10px] lg:text-[9px] font-mono uppercase tracking-[0.22em] text-[#CBB9A4] block mb-1.5 font-semibold">
+              <div className="mb-5 sm:mb-6 lg:mb-5">
+                <span className="text-[10.5px] sm:text-[11px] lg:text-[10.5px] font-mono uppercase tracking-[0.22em] text-[#CBB9A4] block mb-2 font-semibold">
                   DATE RESERVATION
                 </span>
-                <h3 className="font-serif text-[24px] sm:text-[26px] lg:text-[22px] font-normal text-[#FDFCF8] leading-tight mb-2">
+                <h3 className="font-serif text-[24px] sm:text-[28px] lg:text-[24px] xl:text-[27px] font-normal text-[#FDFCF8] leading-tight mb-2 sm:mb-2.5">
                   Reserve Your Date
                 </h3>
 
                 {/* Subtitle with full original text in DOM */}
-                <p className="text-[13px] lg:text-[12px] text-[#E3DBCC]/85 leading-relaxed font-sans">
+                <p className="text-[13.5px] sm:text-[14.5px] lg:text-[13.5px] xl:text-[14px] text-[#E3DBCC]/90 leading-relaxed font-sans">
                   Peak dates book 4 to 9 months ahead.
                   <span className="sr-only">
                     {' '}Peak wedding dates across Mumbai, Goa, and Maharashtra reserve 4 to 9 months in advance. Share your celebration plans with us.
@@ -527,7 +526,7 @@ export default function WhyChooseSection() {
               >
                 <Link
                   to="/services#book"
-                  className="group relative inline-flex items-center justify-center gap-2.5 w-full bg-[#FDFCF8] text-[#101010] py-3.5 lg:py-2.5 px-6 lg:px-4 rounded-full font-mono text-[11px] lg:text-[10.5px] font-semibold uppercase tracking-[0.16em] hover:bg-[#E3DBCC] active:scale-[0.98] transition-all duration-300 shadow-md"
+                  className="group relative inline-flex items-center justify-center gap-2.5 w-full bg-[#FDFCF8] text-[#101010] py-3.5 sm:py-4 lg:py-3 xl:py-3.5 px-6 rounded-full font-mono text-xs sm:text-[12.5px] lg:text-[11.5px] xl:text-[12px] font-semibold uppercase tracking-[0.16em] hover:bg-[#E3DBCC] active:scale-[0.98] transition-all duration-300 shadow-md"
                   style={{
                     transform: reducedMotion
                       ? 'none'
@@ -568,7 +567,7 @@ export default function WhyChooseSection() {
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          * {
+          #why-choose * {
             animation-duration: 0.01ms !important;
             animation-iteration-count: 1 !important;
             transition-duration: 0.01ms !important;
