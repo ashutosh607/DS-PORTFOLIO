@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Plus, Minus, ArrowRight, Sparkles } from 'lucide-react';
-import { useEditorialReveal } from '../../utils/useEditorialReveal';
 
 export const HOMEPAGE_FAQS = [
   {
@@ -60,10 +60,78 @@ export const HOMEPAGE_FAQS = [
   },
 ];
 
+/**
+ * Animated word-by-word reveal component.
+ * When the accordion panel opens, each word glides up smoothly with subtle blur dissolve.
+ */
+function AnimatedAnswer({ text }) {
+  const words = text.split(' ');
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.016,
+        delayChildren: 0.06,
+      },
+    },
+  };
+
+  const wordVariants = {
+    hidden: {
+      opacity: 0,
+      y: 10,
+      filter: 'blur(4px)',
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: {
+        duration: 0.32,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
+
+  return (
+    <motion.p
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="pt-3.5 pr-4 sm:pr-8 text-[13.5px] sm:text-[14.5px] text-[#4A463F] leading-relaxed font-sans max-w-3xl flex flex-wrap"
+    >
+      {words.map((word, i) => {
+        const isUrl = word.startsWith('http://') || word.startsWith('https://');
+        return (
+          <span key={i} className="inline-block overflow-hidden mr-[0.28em] py-0.5">
+            <motion.span
+              variants={wordVariants}
+              className="inline-block will-change-transform"
+            >
+              {isUrl ? (
+                <a
+                  href={word}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#101010] underline underline-offset-4 hover:text-[#7A746B] transition-colors"
+                >
+                  {word}
+                </a>
+              ) : (
+                word
+              )}
+            </motion.span>
+          </span>
+        );
+      })}
+    </motion.p>
+  );
+}
+
 export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
-  // First item open by default
   const [openId, setOpenId] = useState(faqs[0]?.id || null);
-  const [headerRef, headerRevealed] = useEditorialReveal(0.12);
 
   const toggleFaq = (id) => {
     setOpenId((prev) => (prev === id ? null : id));
@@ -73,58 +141,50 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
     <section
       id="faq"
       aria-label="Frequently Asked Questions"
-      className="w-full bg-[#FDFCF8] text-[#101010] py-20 sm:py-28 lg:py-32 border-t border-[#E3DBCC] relative overflow-hidden"
+      className="w-full bg-[#FAF8F5] text-[#101010] pt-12 sm:pt-16 pb-16 sm:pb-24 border-t border-[#E3DBCC] relative overflow-hidden"
     >
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 relative z-10">
-        
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8">
         {/* Section Header */}
-        <div ref={headerRef} className="max-w-2xl mb-12 sm:mb-16">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] font-semibold">
-              FREQUENTLY ASKED QUESTIONS · ATELIER AEO
-            </span>
-            <Sparkles size={12} className="text-[#CBB9A4] animate-sparkle-twinkle" aria-hidden="true" />
-          </div>
-
-          <div className="editorial-mask-wrap mb-3.5 sm:mb-4">
-            <h2
-              className={`font-serif text-[32px] sm:text-[42px] lg:text-[46px] font-normal text-[#101010] leading-tight editorial-mask-rise ${
-                headerRevealed ? 'is-revealed' : ''
-              }`}
-            >
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          {/* Underline hairline */}
-          <div className="w-16 sm:w-24 h-[1px] bg-[#E3DBCC] mb-4 overflow-hidden">
-            <div
-              className={`h-full bg-[#101010]/30 editorial-draw-line ${
-                headerRevealed ? 'is-revealed' : ''
-              }`}
-            />
-          </div>
-
-          <p
-            className={`text-[14px] sm:text-[15.5px] text-[#4A463F] leading-relaxed editorial-fade-up ${
-              headerRevealed ? 'is-revealed' : ''
-            }`}
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 22, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-2xl mb-10 sm:mb-14"
+        >
+          <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-3 font-semibold">
+            FREQUENTLY ASKED QUESTIONS · AEO
+          </span>
+          <h2 className="font-serif text-[32px] sm:text-[42px] lg:text-[46px] font-normal text-[#101010] leading-tight mb-4">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-[14px] sm:text-[15px] text-[#4A463F] leading-relaxed">
             Direct, factual guidance on wedding coverage, booking timelines, destination commissions, and archival delivery with Dishant Shelar.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Minimalist Numbered Accordion List: 100% crawlable in DOM, zero display:none */}
-        <div className="flex flex-col border-t border-[#E3DBCC]">
+        {/* FAQ Accordion List with Pop-up Item Entrances */}
+        <div className="flex flex-col gap-2.5 sm:gap-3">
           {faqs.map((faq, index) => {
             const isOpen = openId === faq.id;
             const numberFormatted = String(index + 1).padStart(2, '0');
 
             return (
-              <div
+              <motion.div
                 key={faq.id || index}
-                className={`border-b border-[#E3DBCC] transition-colors duration-300 ${
-                  isOpen ? 'bg-[#FAF7F2]/70' : 'hover:bg-[#FAF8F5]'
+                layout
+                initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{
+                  duration: 0.45,
+                  delay: Math.min(index * 0.04, 0.35),
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className={`transition-all duration-350 ease-out rounded-2xl ${
+                  isOpen
+                    ? 'bg-[#FAF7F2] p-5 sm:p-6 border border-[#E3DBCC] shadow-[0_8px_30px_-6px_rgba(20,18,15,0.06)]'
+                    : 'p-4 sm:p-5 hover:bg-[#FAF7F2]/60 border border-[#E3DBCC]/60'
                 }`}
               >
                 <button
@@ -132,77 +192,63 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                   onClick={() => toggleFaq(faq.id)}
                   aria-expanded={isOpen}
                   aria-controls={`faq-answer-${faq.id}`}
-                  className="w-full py-5 sm:py-6 px-3 sm:px-4 flex items-center justify-between gap-4 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#101010]"
+                  className="w-full flex items-start justify-between gap-4 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101010] focus-visible:ring-offset-2 rounded-xs"
                 >
-                  <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-                    {/* Number in light serif matching Why Choose */}
+                  <div className="flex items-start gap-3 sm:gap-4 min-w-0">
                     <span
-                      className={`font-serif text-lg sm:text-xl transition-colors duration-300 shrink-0 ${
+                      className={`font-serif text-base sm:text-lg transition-colors shrink-0 mt-0.5 ${
                         isOpen ? 'text-[#101010] font-normal' : 'text-[#8C7764] font-light group-hover:text-[#101010]'
                       }`}
                     >
                       {numberFormatted}
                     </span>
-
                     <h3
-                      className={`font-serif text-[18px] sm:text-[21px] leading-snug transition-colors m-0 ${
-                        isOpen ? 'text-[#101010] font-medium' : 'text-[#2C2722] font-normal group-hover:text-[#101010]'
+                      className={`font-serif text-[18px] sm:text-[21px] leading-snug transition-colors m-0 p-0 inline-block ${
+                        isOpen
+                          ? 'text-[#101010] font-medium'
+                          : 'text-[#2C2722] font-normal group-hover:text-[#101010]'
                       }`}
                     >
                       {faq.question}
                     </h3>
                   </div>
-
-                  {/* Thin + turning into - icon */}
-                  <span
-                    className={`w-8 h-8 rounded-full border flex items-center justify-center shrink-0 transition-all duration-300 ${
-                      isOpen
-                        ? 'border-[#101010] bg-[#101010] text-[#FDFCF8] rotate-180'
-                        : 'border-[#CBB9A4] bg-transparent text-[#625D55] group-hover:border-[#101010] group-hover:text-[#101010]'
-                    }`}
+                  <motion.span
+                    animate={{
+                      rotate: isOpen ? 180 : 0,
+                      backgroundColor: isOpen ? '#101010' : '#FAF8F5',
+                      borderColor: isOpen ? '#101010' : '#C5B9A5',
+                      color: isOpen ? '#FAF8F5' : '#625D55',
+                      scale: isOpen ? 1.05 : 1,
+                    }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    className="mt-1 w-7 h-7 rounded-full border flex items-center justify-center shrink-0 group-hover:border-[#101010] group-hover:text-[#101010]"
                   >
-                    {isOpen ? <Minus size={13} strokeWidth={1.5} /> : <Plus size={13} strokeWidth={1.5} />}
-                  </span>
+                    <ChevronDown size={14} />
+                  </motion.span>
                 </button>
 
-                {/* Answer Container: permanently in DOM for crawlers via CSS grid rows */}
-                <div
-                  id={`faq-answer-${faq.id}`}
-                  className={`editorial-expandable-grid px-3 sm:px-4 ${
-                    isOpen ? 'is-expanded' : ''
-                  }`}
-                >
-                  <div className="editorial-expandable-content">
-                    <div className="pl-9 sm:pl-12 pr-4 sm:pr-8 pb-5 sm:pb-6 text-[14px] sm:text-[15px] text-[#4A463F] leading-relaxed font-sans">
-                      <p>
-                        {faq.answer.split(' ').map((word, i) => {
-                          const isUrl = word.startsWith('http://') || word.startsWith('https://');
-                          if (isUrl) {
-                            return (
-                              <React.Fragment key={i}>
-                                <a
-                                  href={word}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-[#101010] underline underline-offset-4 hover:text-[#7A746B] transition-colors"
-                                >
-                                  {word}
-                                </a>{' '}
-                              </React.Fragment>
-                            );
-                          }
-                          return word + ' ';
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      id={`faq-answer-${faq.id}`}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-7 sm:pl-9">
+                        <AnimatedAnswer text={faq.answer} />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             );
           })}
         </div>
 
-        {/* Helpful Footer Inquiries Link */}
+        {/* Helpful Footer CTAs */}
         <div className="mt-12 pt-8 border-t border-[#E3DBCC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="text-[13px] text-[#625D55]">
             Have a custom destination wedding or date in mind?
@@ -225,7 +271,6 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
             </Link>
           </div>
         </div>
-
       </div>
     </section>
   );

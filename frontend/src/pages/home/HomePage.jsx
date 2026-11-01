@@ -17,7 +17,6 @@ const EditorialDisciplinesSection = lazy(() => import('../../components/home/Edi
 const ArtAndApproachSection = lazy(() => import('../../components/home/ArtAndApproachSection'));
 const WhyChooseSection = lazy(() => import('../../components/home/WhyChooseSection'));
 const WhatWeDoEditorial = lazy(() => import('../../components/home/WhatWeDoEditorial'));
-const ClosingCtaSection = lazy(() => import('../../components/home/ClosingCtaSection'));
 
 export default function HomePage() {
   const location = useLocation();
@@ -78,9 +77,6 @@ export default function HomePage() {
 
           {/* Section E: Minimalist Numbered Accordion FAQ */}
           <EditorialFaqSection />
-
-          {/* Section G: Closing Atmospheric Call-To-Action Card */}
-          <ClosingCtaSection />
         </Suspense>
       </main>
     </>
