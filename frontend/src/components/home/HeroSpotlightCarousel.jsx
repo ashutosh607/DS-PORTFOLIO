@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Plus, Minus } from 'lucide-react';
 import PhotoPlaceholder from '../common/PhotoPlaceholder';
 
 import img01 from '../../assets/landing-page-images/landing-01.webp';
@@ -118,7 +116,6 @@ export default function HeroSpotlightCarousel() {
   // Continuous position for 60fps/120fps smooth continuous rotation and gesture tracking
   const [pos, setPos] = useState(1); // Start at 1 ('02 Velocity')
   const [isDragging, setIsDragging] = useState(false);
-  const [isStoryExpanded, setIsStoryExpanded] = useState(false);
 
   const posRef = useRef(1);
   const targetPosRef = useRef(1);
@@ -354,12 +351,6 @@ export default function HeroSpotlightCarousel() {
           className="pt-1 sm:pt-2 max-w-4xl mx-auto px-4"
           style={{ flexShrink: 0 }}
         >
-          {/* Eyebrow Micro-Label */}
-          <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] font-semibold block mb-1.5 sm:mb-2">
-            FINE ART PHOTOGRAPHY &amp; CINEMATOGRAPHY · MUMBAI
-          </span>
-
-          {/* Single H1 in Cormorant Garamond */}
           <h1
             style={{
               fontFamily: 'var(--font-serif)',
@@ -374,57 +365,12 @@ export default function HeroSpotlightCarousel() {
           >
             Photographer in Mumbai – DS Photography &amp; Films
           </h1>
-
-          {/* One-line Visible Tagline */}
-          <p className="text-[14px] sm:text-[15.5px] text-[#4A463F] font-sans font-normal max-w-xl mx-auto mt-1 sm:mt-1.5 leading-relaxed">
-            Candid weddings, pre-wedding stories &amp; fine-art portraits.
+          <p
+            className="text-[14px] sm:text-[15.5px] text-[#2C2722] font-sans font-normal max-w-2xl mx-auto mt-2.5 sm:mt-3 leading-relaxed"
+          >
+            DS Photography &amp; Films is a Mumbai-based wedding and portrait photography studio led by Dishant Shelar, capturing timeless weddings, pre-wedding stories, and portraits across Mumbai and destination locations worldwide.
           </p>
-
-          {/* Collapsible Disclosure: Keeps 100% of SEO copy in DOM without display:none */}
-          <div className="mt-2.5 sm:mt-3 flex flex-col items-center">
-            <button
-              type="button"
-              onClick={() => setIsStoryExpanded((prev) => !prev)}
-              aria-expanded={isStoryExpanded}
-              aria-controls="hero-story-content"
-              className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-[0.18em] text-[#625D55] hover:text-[#101010] transition-colors py-1 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#101010]"
-            >
-              {isStoryExpanded ? <Minus size={12} /> : <Plus size={12} />}
-              <span>{isStoryExpanded ? 'Close Story' : 'Read Our Story'}</span>
-            </button>
-
-            <div
-              id="hero-story-content"
-              className={`editorial-expandable-grid w-full max-w-2xl text-center ${
-                isStoryExpanded ? 'is-expanded' : ''
-              }`}
-            >
-              <div className="editorial-expandable-content">
-                <p className="text-[13px] sm:text-[14px] text-[#4A463F] font-sans pt-2 pb-1 leading-relaxed max-w-xl mx-auto">
-                  DS Photography &amp; Films is a fine-art wedding and portrait photography studio in Mumbai, Maharashtra, founded and led by lead photographer and cinematographer Dishant Shelar. We specialize in capturing candid wedding moments, intimate pre-wedding stories, editorial portraits, atmospheric events, and cinematic wedding films across Mumbai and destination venues worldwide.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Two Buttons Only: Primary Pill & Secondary Editorial Arrow Link */}
-          <div className="flex items-center justify-center gap-4 sm:gap-6 mt-3 sm:mt-4">
-            <Link
-              to="/services#book"
-              className="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-[#101010] text-[#FDFCF8] text-[11.5px] font-mono tracking-[0.16em] uppercase font-semibold hover:bg-[#252525] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm"
-            >
-              Reserve Your Date
-            </Link>
-            <Link
-              to="/collections"
-              className="inline-flex items-center gap-1.5 text-[12px] font-mono tracking-[0.15em] uppercase text-[#101010] hover:text-[#7A6E5D] transition-colors font-medium group"
-            >
-              <span>View Portfolio</span>
-              <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
         </div>
-
 
         {/* ===================================================================
             MIDDLE SECTION: INWARD CONCAVE CURVED 3D GALLERY (CLEAN MINIMALIST)
