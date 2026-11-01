@@ -682,7 +682,7 @@ textarea {
   display: inline-block;
   vertical-align: baseline;
   opacity: 0;
-  transform: translateY(var(--la-y, 14px));
+  transform: translateY(var(--la-y, 0px));
   filter: blur(var(--la-blur, 4px));
   transition-property: opacity, transform, filter;
   transition-duration: var(--la-dur, 0.58s);

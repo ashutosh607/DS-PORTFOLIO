@@ -36,7 +36,7 @@ function seededRandom(seed) {
  * @param {number} [wordSpread=0.32] - Total temporal spread across all words in simultaneous mode
  * @param {number} [wordJitter=0.10] - Organic variation between words
  * @param {number} [wordStagger=0.08] - Stagger between words (used in sequential mode)
- * @param {number} [yOffset=14] - Starting vertical displacement in px
+ * @param {number} [yOffset=0] - Starting vertical displacement in px (0 for pure in-place simultaneous letter appearance)
  * @param {number} [blurAmount=4] - Starting optical blur in px
  * @param {number} [threshold=0.15] - IntersectionObserver threshold (0 to 1)
  * @param {boolean} [immediate=false] - If true, triggers immediately on mount / after splash (for Hero above fold)
@@ -58,7 +58,7 @@ export default function LetterAssembly({
   wordSpread = 0.32,
   wordJitter = 0.10,
   wordStagger = 0.08,
-  yOffset = 14,
+  yOffset = 0,
   blurAmount = 4,
   threshold = 0.15,
   immediate = false,

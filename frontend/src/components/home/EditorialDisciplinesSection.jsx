@@ -469,7 +469,7 @@ export default function EditorialDisciplinesSection() {
 
                 {/* Sliding Soft Dark Overlay on hover/tap */}
                 <div
-                  className={`absolute inset-0 z-20 bg-[#101010]/92 backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-6 sm:p-7 flex flex-col justify-between ${
+                  className={`absolute inset-0 z-30 bg-[#101010] backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-6 sm:p-7 flex flex-col justify-between ${
                     isHoveredOrActive ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
                   }`}
                 >
