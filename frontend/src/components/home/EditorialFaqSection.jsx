@@ -44,7 +44,7 @@ export const HOMEPAGE_FAQS = [
     id: 'view-portfolio',
     question: 'How can I view the photography portfolio?',
     answer:
-      'You can explore our complete photography portfolio across all collections—including weddings, pre-wedding sessions, portraits, events, and commercial commissions—directly on our Collections page at https://www.dishantshelarphotography.in/collections.',
+      'You can explore our complete photography portfolio across all collections—including weddings, pre-wedding sessions, portraits, events, and commercial commissions—directly on our Collections page at https://www.dishantshelarphotography.in/collections',
   },
   {
     id: 'pre-wedding',
