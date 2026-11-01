@@ -362,15 +362,16 @@ export default function WhyChooseSection() {
                   aria-expanded={isActive}
                   aria-controls={`pillar-content-${pillar.number}`}
                   onMouseEnter={() => {
-                    // Only hover on desktop/laptop
-                    if (window.innerWidth >= 1024) setActiveRow(i);
+                    // Only hover on desktop/laptop with real mouse
+                    if (typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth >= 1024) {
+                      setActiveRow(i);
+                    }
                   }}
-                  onFocus={() => setActiveRow(i)}
-                  onClick={() => setActiveRow(isActive ? null : i)}
+                  onClick={() => setActiveRow((prev) => (prev === i ? null : i))}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      setActiveRow(isActive ? null : i);
+                      setActiveRow((prev) => (prev === i ? null : i));
                     }
                   }}
                   className={`group relative rounded-2xl lg:rounded-xl px-3.5 py-3 sm:px-4 sm:py-3.5 lg:px-4 lg:py-3 xl:px-5 xl:py-3.5 min-h-[56px] cursor-pointer transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8C7764] ${

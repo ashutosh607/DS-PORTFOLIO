@@ -155,8 +155,16 @@ export default function EditorialDisciplinesSection() {
               <div
                 key={item.number}
                 onClick={() => handleCardClick(idx)}
-                onMouseEnter={() => setActiveCard(idx)}
-                onMouseLeave={() => setActiveCard(null)}
+                onMouseEnter={() => {
+                  if (typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+                    setActiveCard(idx);
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+                    setActiveCard(null);
+                  }
+                }}
                 className="group relative h-[480px] sm:h-[520px] lg:h-[560px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-[#1E1B18] shadow-[0_12px_36px_-8px_rgba(16,14,12,0.12)] cursor-pointer transition-all duration-500 ease-out flex flex-col justify-end p-6 sm:p-7 border border-[#E3DBCC]/30 hover:border-[#CBB9A4]"
               >
                 {/* Background Image with subtle zoom on hover */}
@@ -185,9 +193,22 @@ export default function EditorialDisciplinesSection() {
                       <span className="font-mono text-xs font-semibold tracking-widest text-[#CBB9A4]">
                         FOLIO {item.number}
                       </span>
-                      <span className="text-[10px] font-mono uppercase tracking-[0.18em] px-2.5 py-0.5 rounded-full bg-white/10 text-[#FDFCF8] border border-white/15">
-                        {item.badge}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono uppercase tracking-[0.18em] px-2.5 py-0.5 rounded-full bg-white/10 text-[#FDFCF8] border border-white/15">
+                          {item.badge}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveCard(null);
+                          }}
+                          aria-label="Close folio details"
+                          className="lg:hidden w-6 h-6 rounded-full bg-white/15 text-white flex items-center justify-center text-xs hover:bg-white/25 transition-colors cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
 
                     <h2 className="font-serif text-2xl sm:text-[26px] font-normal text-[#FDFCF8] leading-tight mb-2">
