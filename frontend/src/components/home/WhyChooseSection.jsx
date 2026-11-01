@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Camera, Film, Heart, Sparkles, MapPin, ArrowRight } from 'lucide-react';
+import { Camera, Film, Heart, BookOpen, MapPin, ArrowRight } from 'lucide-react';
 
 // Curated studio assets
 import driedBotanical from '../../assets/dried-botanical.jpg';
@@ -54,7 +54,7 @@ const PILLARS = [
     shortText: 'Fine-art albums and high-resolution files.',
     fullText:
       'Color-graded high-resolution digital master files and handcrafted Italian leather-bound albums delivered within 3 weeks of selection.',
-    icon: Sparkles,
+    icon: BookOpen,
     image: heirloomsPhoto,
     objectPosition: 'center 48%',
     alt: 'Handcrafted archival leather wedding albums and heirloom deliverables',
