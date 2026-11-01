@@ -1,6 +1,7 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { useLocation } from 'react-router-dom';
 import HeroSpotlightCarousel from '../../components/home/HeroSpotlightCarousel';
+import KeywordMarqueeSection from '../../components/home/KeywordMarqueeSection';
 import SEOHead from '../../components/common/SEOHead';
 import {
   buildLocalBusinessSchema,
@@ -12,20 +13,23 @@ import { SEO_CONFIG } from '../../utils/seoConfig';
 import EditorialFaqSection, { HOMEPAGE_FAQS } from '../../components/home/EditorialFaqSection';
 
 // Below-the-fold components lazily loaded via React Suspense
-const WhatWeDoEditorial = lazy(() => import('../../components/home/WhatWeDoEditorial'));
 const EditorialDisciplinesSection = lazy(() => import('../../components/home/EditorialDisciplinesSection'));
+const ArtAndApproachSection = lazy(() => import('../../components/home/ArtAndApproachSection'));
+const WhyChooseSection = lazy(() => import('../../components/home/WhyChooseSection'));
+const WhatWeDoEditorial = lazy(() => import('../../components/home/WhatWeDoEditorial'));
+const ClosingCtaSection = lazy(() => import('../../components/home/ClosingCtaSection'));
 
 export default function HomePage() {
   const location = useLocation();
 
   useEffect(() => {
-    // If navigated with hash (e.g. #what-we-do, #about, or #faq), scroll to target
+    // If navigated with hash (e.g. #disciplines, #why-choose, #about, or #faq), scroll to target
     if (location.hash) {
       const el = document.querySelector(location.hash);
       if (el) {
         setTimeout(() => {
           el.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        }, 120);
       }
     } else {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -53,18 +57,30 @@ export default function HomePage() {
       />
 
       <main>
-        {/* Hero Spotlight Gallery - Critical Above The Fold */}
+        {/* Section A: Hero Spotlight Gallery & Story Disclosure */}
         <HeroSpotlightCarousel />
 
-        <Suspense fallback={<div className="min-h-[300px] bg-[var(--color-off-white)]" />}>
-          {/* Spacious, Artistic Editorial Photography Section: What We Do */}
-          <WhatWeDoEditorial />
+        {/* Section F: Studio Disciplines & Locations Marquee */}
+        <KeywordMarqueeSection />
 
-          {/* Editorial Photography Disciplines & Atelier Standards */}
+        <Suspense fallback={<div className="min-h-[300px] bg-[var(--color-off-white)]" />}>
+          {/* Section B: 4 Tall Image-Led Discipline Cards with Sliding Overlays */}
           <EditorialDisciplinesSection />
 
-          {/* Answer Engine Optimization (AEO) Editorial FAQ Section */}
+          {/* Section C: The Art & Approach Scroll-Linked Word Reveal & Arch Photo */}
+          <ArtAndApproachSection />
+
+          {/* Section D: Why Choose DS Photography & Films (5 Rows, Arch Photo & Dark Card) */}
+          <WhyChooseSection />
+
+          {/* Section 5: Pinned Scroll Monograph Deck ("Our Photography Portfolio") */}
+          <WhatWeDoEditorial />
+
+          {/* Section E: Minimalist Numbered Accordion FAQ */}
           <EditorialFaqSection />
+
+          {/* Section G: Closing Atmospheric Call-To-Action Card */}
+          <ClosingCtaSection />
         </Suspense>
       </main>
     </>

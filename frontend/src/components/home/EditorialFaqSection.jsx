@@ -1,62 +1,50 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Plus, Minus, ArrowRight, Sparkles } from 'lucide-react';
+import { useEditorialReveal } from '../../utils/useEditorialReveal';
 
 export const HOMEPAGE_FAQS = [
   {
-    id: 'photographer-identity',
-    question: 'Who is the photographer behind DS Photography & Films?',
+    id: 'pricing-factors',
+    question: 'How much does wedding photography cost in Mumbai?',
     answer:
-      'DS Photography & Films is founded and led by Dishant Shelar, a Mumbai-based fine-art photographer and cinematographer. Specializing in candid weddings, intimate pre-wedding monographs, and editorial portraiture, Dishant personally leads creative direction and principal camera coverage for all atelier commissions.',
-  },
-  {
-    id: 'services-available',
-    question: 'What photography and film services are available?',
-    answer:
-      'We provide bespoke wedding photography and cinematic films, intimate pre-wedding couple sessions, editorial personal portraits, milestone birthday celebrations, atmospheric galas and events, and haute commercial brand campaigns across Mumbai and destination venues.',
+      'Wedding photography investment in Mumbai depends on event duration (single-day versus multi-day ceremonies), required crew size (candid photographers, traditional photographers, and cinematographers), venue locations, and selected deliverables such as handcrafted fine-art heirloom albums or aerial drone coverage. We provide bespoke quotes tailored to each celebration.',
   },
   {
     id: 'how-to-book',
-    question: 'How can I book a wedding photographer in Mumbai?',
+    question: 'How can I book DS Photography & Films?',
     answer:
-      'You can enquire directly through the online date reservation form on our Services page or message Dishant Shelar on WhatsApp (+91 90823 78510). Because we accept only a limited number of commissions each season to maintain meticulous quality, early enquiry is strongly advised.',
+      'You can reserve your date through the online booking brief on our Services page (https://www.dishantshelarphotography.in/services) or message Dishant Shelar directly on WhatsApp at +91 90823 78510. We recommend reserving 4 to 9 months in advance.',
   },
   {
-    id: 'pricing-factors',
-    question: 'What affects wedding photography and film pricing in Mumbai?',
+    id: 'pre-wedding',
+    question: 'Does DS Photography & Films offer pre-wedding photography?',
     answer:
-      'Investment tiers depend on event duration (single-day vs. multi-day rituals), required crew size (candid photographers, traditional documentarians, and cinematographers), geographic venue locations, and requested deliverables such as handcrafted fine-art albums and aerial drone cinematography.',
+      'Yes, we specialize in intimate, cinematic pre-wedding photography sessions across Mumbai, coastal retreats in Alibaug and Goa, and destination estates across India.',
   },
   {
-    id: 'lead-time',
-    question: 'How early should we reserve our wedding date?',
+    id: 'services-available',
+    question: 'What types of photography services are available?',
     answer:
-      'Most couples secure their dates 4 to 9 months in advance, particularly for peak wedding season dates across Mumbai, Goa, and Maharashtra. Dates are reserved on a first-confirmed basis upon payment of the booking retainer.',
-  },
-  {
-    id: 'coverage-inclusion',
-    question: 'What is included in full wedding photography coverage?',
-    answer:
-      'Our commissions include comprehensive ritual documentation, unscripted candid moments, fine-art bridal portraiture, color-graded high-resolution master photographs, private online delivery, and bespoke handcrafted leather-bound heirloom albums based on your selected package.',
+      'We provide luxury wedding photography and films, candid pre-wedding couple sessions, editorial personal portraits, milestone birthday celebrations, atmospheric events, and commercial brand commissions.',
   },
   {
     id: 'view-portfolio',
     question: 'How can I view the photography portfolio?',
     answer:
-      'You can explore our complete photography portfolio across all collections—including weddings, pre-wedding sessions, portraits, events, and commercial commissions—directly on our Collections page at https://www.dishantshelarphotography.in/collections',
-  },
-  {
-    id: 'pre-wedding',
-    question: 'Does DS Photography & Films offer pre-wedding shoots?',
-    answer:
-      'Yes. We create intimate, cinematic pre-wedding monographs across iconic heritage locations in South Mumbai, coastal beachscapes like Alibaug and Goa, and private destination estates, tailored to reflect each couple’s personal narrative.',
+      'You can explore our complete photography portfolio across all collections—including weddings, pre-wedding sessions, portraits, events, and commercial commissions—directly on our Collections page at https://www.dishantshelarphotography.in/collections.',
   },
   {
     id: 'destination-travel',
-    question: 'Does the studio travel for destination weddings?',
+    question: 'Does DS Photography & Films travel outside Mumbai?',
     answer:
-      'Yes. While based in Mumbai, Dishant Shelar frequently travels across Maharashtra, Goa, Rajasthan, and international destinations. Travel and lodging arrangements are coordinated transparently during date confirmation.',
+      'Yes. While based in Mumbai, Dishant Shelar regularly travels across Maharashtra, Goa, Rajasthan, and destination venues worldwide. Travel logistics are coordinated during booking.',
+  },
+  {
+    id: 'photographer-identity',
+    question: 'Who is the photographer behind DS Photography & Films?',
+    answer:
+      'DS Photography & Films is founded and led by Dishant Shelar, a Mumbai-based fine-art photographer and cinematographer. Specializing in candid weddings, intimate pre-wedding monographs, and editorial portraiture, Dishant personally leads creative direction and principal camera coverage for all atelier commissions.',
   },
   {
     id: 'delivery-timeline',
@@ -72,78 +60,10 @@ export const HOMEPAGE_FAQS = [
   },
 ];
 
-/**
- * Animated word-by-word reveal component.
- * When the accordion panel opens, each word glides up smoothly with subtle blur dissolve.
- */
-function AnimatedAnswer({ text }) {
-  const words = text.split(' ');
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.016,
-        delayChildren: 0.06,
-      },
-    },
-  };
-
-  const wordVariants = {
-    hidden: {
-      opacity: 0,
-      y: 10,
-      filter: 'blur(4px)',
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      filter: 'blur(0px)',
-      transition: {
-        duration: 0.32,
-        ease: [0.16, 1, 0.3, 1],
-      },
-    },
-  };
-
-  return (
-    <motion.p
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="pt-3.5 pr-4 sm:pr-8 text-[13.5px] sm:text-[14.5px] text-[#4A463F] leading-relaxed font-sans max-w-3xl flex flex-wrap"
-    >
-      {words.map((word, i) => {
-        const isUrl = word.startsWith('http://') || word.startsWith('https://');
-        return (
-          <span key={i} className="inline-block overflow-hidden mr-[0.28em] py-0.5">
-            <motion.span
-              variants={wordVariants}
-              className="inline-block will-change-transform"
-            >
-              {isUrl ? (
-                <a
-                  href={word}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#101010] underline underline-offset-4 hover:text-[#7A746B] transition-colors"
-                >
-                  {word}
-                </a>
-              ) : (
-                word
-              )}
-            </motion.span>
-          </span>
-        );
-      })}
-    </motion.p>
-  );
-}
-
 export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
+  // First item open by default
   const [openId, setOpenId] = useState(faqs[0]?.id || null);
+  const [headerRef, headerRevealed] = useEditorialReveal(0.12);
 
   const toggleFaq = (id) => {
     setOpenId((prev) => (prev === id ? null : id));
@@ -153,48 +73,58 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
     <section
       id="faq"
       aria-label="Frequently Asked Questions"
-      className="w-full bg-[#FAF8F5] text-[#101010] pt-10 sm:pt-14 pb-20 sm:pb-28 border-t border-[#E3DBCC]"
+      className="w-full bg-[#FDFCF8] text-[#101010] py-20 sm:py-28 lg:py-32 border-t border-[#E3DBCC] relative overflow-hidden"
     >
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 relative z-10">
+        
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 22, scale: 0.98 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-2xl mb-12 sm:mb-16"
-        >
-          <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-3 font-medium">
-            FREQUENTLY ASKED QUESTIONS · AEO
-          </span>
-          <h2 className="font-serif text-[32px] sm:text-[42px] font-normal text-[#101010] leading-tight mb-4">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-[14px] sm:text-[15px] text-[#4A463F] leading-relaxed">
+        <div ref={headerRef} className="max-w-2xl mb-12 sm:mb-16">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] font-semibold">
+              FREQUENTLY ASKED QUESTIONS · ATELIER AEO
+            </span>
+            <Sparkles size={12} className="text-[#CBB9A4] animate-sparkle-twinkle" aria-hidden="true" />
+          </div>
+
+          <div className="editorial-mask-wrap mb-3.5 sm:mb-4">
+            <h2
+              className={`font-serif text-[32px] sm:text-[42px] lg:text-[46px] font-normal text-[#101010] leading-tight editorial-mask-rise ${
+                headerRevealed ? 'is-revealed' : ''
+              }`}
+            >
+              Frequently Asked Questions
+            </h2>
+          </div>
+
+          {/* Underline hairline */}
+          <div className="w-16 sm:w-24 h-[1px] bg-[#E3DBCC] mb-4 overflow-hidden">
+            <div
+              className={`h-full bg-[#101010]/30 editorial-draw-line ${
+                headerRevealed ? 'is-revealed' : ''
+              }`}
+            />
+          </div>
+
+          <p
+            className={`text-[14px] sm:text-[15.5px] text-[#4A463F] leading-relaxed editorial-fade-up ${
+              headerRevealed ? 'is-revealed' : ''
+            }`}
+          >
             Direct, factual guidance on wedding coverage, booking timelines, destination commissions, and archival delivery with Dishant Shelar.
           </p>
-        </motion.div>
+        </div>
 
-        {/* FAQ Accordion List with Pop-up Item Entrances */}
-        <div className="flex flex-col gap-2.5 sm:gap-3">
+        {/* Minimalist Numbered Accordion List: 100% crawlable in DOM, zero display:none */}
+        <div className="flex flex-col border-t border-[#E3DBCC]">
           {faqs.map((faq, index) => {
             const isOpen = openId === faq.id;
+            const numberFormatted = String(index + 1).padStart(2, '0');
+
             return (
-              <motion.div
+              <div
                 key={faq.id || index}
-                layout
-                initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{
-                  duration: 0.45,
-                  delay: Math.min(index * 0.04, 0.35),
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className={`transition-all duration-350 ease-out rounded-2xl ${
-                  isOpen
-                    ? 'bg-[#FAF7F2] p-5 sm:p-6 border border-[#E3DBCC] shadow-[0_8px_30px_-6px_rgba(20,18,15,0.06)]'
-                    : 'p-4 sm:p-5 hover:bg-[#FAF7F2]/60 border border-[#E3DBCC]/60'
+                className={`border-b border-[#E3DBCC] transition-colors duration-300 ${
+                  isOpen ? 'bg-[#FAF7F2]/70' : 'hover:bg-[#FAF8F5]'
                 }`}
               >
                 <button
@@ -202,52 +132,77 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                   onClick={() => toggleFaq(faq.id)}
                   aria-expanded={isOpen}
                   aria-controls={`faq-answer-${faq.id}`}
-                  className="w-full flex items-start justify-between gap-4 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101010] focus-visible:ring-offset-2 rounded-xs"
+                  className="w-full py-5 sm:py-6 px-3 sm:px-4 flex items-center justify-between gap-4 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#101010]"
                 >
-                  <h3
-                    className={`font-serif text-[18px] sm:text-[21px] leading-snug transition-colors m-0 p-0 inline-block ${
+                  <div className="flex items-center gap-4 sm:gap-6 min-w-0">
+                    {/* Number in light serif matching Why Choose */}
+                    <span
+                      className={`font-serif text-lg sm:text-xl transition-colors duration-300 shrink-0 ${
+                        isOpen ? 'text-[#101010] font-normal' : 'text-[#8C7764] font-light group-hover:text-[#101010]'
+                      }`}
+                    >
+                      {numberFormatted}
+                    </span>
+
+                    <h3
+                      className={`font-serif text-[18px] sm:text-[21px] leading-snug transition-colors m-0 ${
+                        isOpen ? 'text-[#101010] font-medium' : 'text-[#2C2722] font-normal group-hover:text-[#101010]'
+                      }`}
+                    >
+                      {faq.question}
+                    </h3>
+                  </div>
+
+                  {/* Thin + turning into - icon */}
+                  <span
+                    className={`w-8 h-8 rounded-full border flex items-center justify-center shrink-0 transition-all duration-300 ${
                       isOpen
-                        ? 'text-[#101010] font-medium'
-                        : 'text-[#2C2722] font-normal group-hover:text-[#101010]'
+                        ? 'border-[#101010] bg-[#101010] text-[#FDFCF8] rotate-180'
+                        : 'border-[#CBB9A4] bg-transparent text-[#625D55] group-hover:border-[#101010] group-hover:text-[#101010]'
                     }`}
                   >
-                    {faq.question}
-                  </h3>
-                  <motion.span
-                    animate={{
-                      rotate: isOpen ? 180 : 0,
-                      backgroundColor: isOpen ? '#101010' : '#FAF8F5',
-                      borderColor: isOpen ? '#101010' : '#C5B9A5',
-                      color: isOpen ? '#FAF8F5' : '#625D55',
-                      scale: isOpen ? 1.05 : 1,
-                    }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                    className="mt-1 w-7 h-7 rounded-full border flex items-center justify-center shrink-0 group-hover:border-[#101010] group-hover:text-[#101010]"
-                  >
-                    <ChevronDown size={14} />
-                  </motion.span>
+                    {isOpen ? <Minus size={13} strokeWidth={1.5} /> : <Plus size={13} strokeWidth={1.5} />}
+                  </span>
                 </button>
 
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      id={`faq-answer-${faq.id}`}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <AnimatedAnswer text={faq.answer} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+                {/* Answer Container: permanently in DOM for crawlers via CSS grid rows */}
+                <div
+                  id={`faq-answer-${faq.id}`}
+                  className={`editorial-expandable-grid px-3 sm:px-4 ${
+                    isOpen ? 'is-expanded' : ''
+                  }`}
+                >
+                  <div className="editorial-expandable-content">
+                    <div className="pl-9 sm:pl-12 pr-4 sm:pr-8 pb-5 sm:pb-6 text-[14px] sm:text-[15px] text-[#4A463F] leading-relaxed font-sans">
+                      <p>
+                        {faq.answer.split(' ').map((word, i) => {
+                          const isUrl = word.startsWith('http://') || word.startsWith('https://');
+                          if (isUrl) {
+                            return (
+                              <React.Fragment key={i}>
+                                <a
+                                  href={word}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#101010] underline underline-offset-4 hover:text-[#7A746B] transition-colors"
+                                >
+                                  {word}
+                                </a>{' '}
+                              </React.Fragment>
+                            );
+                          }
+                          return word + ' ';
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div>
 
-        {/* Helpful Footer CTAs */}
+        {/* Helpful Footer Inquiries Link */}
         <div className="mt-12 pt-8 border-t border-[#E3DBCC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="text-[13px] text-[#625D55]">
             Have a custom destination wedding or date in mind?
@@ -270,6 +225,7 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
             </Link>
           </div>
         </div>
+
       </div>
     </section>
   );
