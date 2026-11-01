@@ -176,11 +176,13 @@ export default function WhyChooseSection() {
   const cardParallax = !reducedMotion ? -(scrollY * 0.035) : 0;
 
   return (
-    <div
+    <section
       id="why-choose"
       ref={sectionRef}
-      className="relative pt-14 sm:pt-20 lg:pt-24 pb-4 sm:pb-6 border-t border-[#E3DBCC] overflow-hidden"
+      aria-label="Why Choose DS Photography & Films"
+      className="w-full bg-[#FAF8F5] relative pt-16 sm:pt-24 lg:pt-32 pb-16 sm:pb-24 border-t border-[#E3DBCC] overflow-hidden"
     >
+      <div className="max-w-[1440px] mx-auto px-5 sm:px-8 md:px-10 lg:px-10 xl:px-16 relative z-10">
       {/* Decorative top-right curved arc line */}
       <svg
         className="absolute top-0 right-0 w-[300px] sm:w-[460px] lg:w-[480px] h-[200px] sm:h-[280px] pointer-events-none z-0 overflow-visible opacity-40 sm:opacity-50"
@@ -576,6 +578,7 @@ export default function WhyChooseSection() {
           }
         }
       `}</style>
-    </div>
+      </div>
+    </section>
   );
 }
