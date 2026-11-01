@@ -15,6 +15,18 @@
   <link rel="icon" type="image/png" href="/ds-logo-dark-opt.png" />
   <link rel="apple-touch-icon" href="/ds-logo-dark-opt.png" />
 
+  <script>
+    // SPA Deep Link Handler: If a static server serves 404.html for known client routes, redirect cleanly
+    (function() {
+      var path = window.location.pathname;
+      var knownRoutes = ['/about', '/collections', '/services', '/photographer-in-mumbai', '/terms', '/portfolio'];
+      var isKnown = knownRoutes.some(function(r) { return path === r || path.startsWith(r + '/'); });
+      if (isKnown) {
+        window.location.replace('/?p=' + encodeURIComponent(path + window.location.search + window.location.hash));
+      }
+    })();
+  </script>
+
   <!-- Google Fonts Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

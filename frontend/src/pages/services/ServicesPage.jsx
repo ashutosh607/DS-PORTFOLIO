@@ -515,9 +515,9 @@ export default function ServicesPage() {
       }}
     >
       <SEOHead
-        title="Photography Services &amp; Investment | DS Photography &amp; Films Mumbai"
-        description="Explore bespoke wedding photography, pre-wedding films, portrait sessions, and event packages in Mumbai by Dishant Shelar. Request a tailored date consultation."
-        keywords="photographer in mumbai, wedding photographer in mumbai, photography packages mumbai, wedding photography price mumbai, pre-wedding packages mumbai, portrait photography mumbai, event photographer in mumbai"
+        title="Photography Packages &amp; Pricing in Mumbai | DS Photography"
+        description="Explore photography packages and pricing in Mumbai by DS Photography. Bespoke commissions for weddings, pre-weddings, and portraits. Reserve your date."
+        keywords="photography packages in mumbai, wedding photographer in mumbai price, professional photography services mumbai, affordable wedding photographer in mumbai, book a photographer in mumbai, wedding photography packages in mumbai"
         canonicalUrl={`${SEO_CONFIG.siteUrl}/services`}
         schema={[buildServicesListSchema(), buildFaqSchema(HOMEPAGE_FAQS)]}
         breadcrumbs={buildBreadcrumbSchema([

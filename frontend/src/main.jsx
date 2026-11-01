@@ -7,6 +7,13 @@ import { API_BASE_URL } from './utils/api.js'
 
 // In production (Vercel), automatically route relative /api, /uploads, and /categories to Render backend URL
 if (typeof window !== 'undefined') {
+  // Handle SPA deep-link fallback from static hosts (e.g., /?p=/about)
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectPath = searchParams.get('p');
+  if (redirectPath) {
+    window.history.replaceState(null, null, redirectPath);
+  }
+
   const originalFetch = window.fetch;
   window.fetch = function (resource, init) {
     let url = typeof resource === 'string' ? resource : resource?.url || '';

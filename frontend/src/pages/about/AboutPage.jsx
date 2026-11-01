@@ -44,9 +44,9 @@ export default function AboutPage() {
   return (
     <>
       <SEOHead
-        title="About Dishant Shelar | Mumbai Wedding & Portrait Photographer | DS Photography & Films"
-        description="Learn about Dishant Shelar, founder and lead photographer of DS Photography & Films in Mumbai. Explore our documentary storytelling approach, artistic vision, and photography commissions."
-        keywords="about dishant shelar, dishant shelar photographer, ds photography and films, wedding photographer in mumbai, candid wedding photographer mumbai, portrait photographer mumbai, photographer biography mumbai"
+        title="About Dishant Shelar | Photographer in Mumbai"
+        description="Learn about Dishant Shelar, professional photographer in Mumbai behind DS Photography & Films. Explore our candid approach, experience and studio philosophy."
+        keywords="about dishant shelar, dishant shelar photographer, photographer in mumbai, professional photographer in mumbai, wedding photographer mumbai, portrait photographer mumbai, ds photography"
         canonicalUrl={`${SEO_CONFIG.siteUrl}/about`}
         ogType="profile"
         schema={[

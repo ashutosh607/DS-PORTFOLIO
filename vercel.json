@@ -71,7 +71,7 @@
       "destination": "/index.html"
     },
     {
-      "source": "/collections/:slug",
+      "source": "/collections/:slug*",
       "destination": "/index.html"
     },
     {
@@ -96,6 +96,10 @@
     },
     {
       "source": "/admin/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/((?!api/|uploads/|.*\\.[\\w]+$).*)",
       "destination": "/index.html"
     }
   ],

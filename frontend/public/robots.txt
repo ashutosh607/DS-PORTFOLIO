@@ -4,6 +4,8 @@
 # Default Crawlers (Googlebot, Bingbot, Standard Search Engines)
 User-agent: *
 Allow: /
+Allow: /about
+Allow: /photographer-in-mumbai
 Allow: /collections
 Allow: /collections/
 Allow: /services

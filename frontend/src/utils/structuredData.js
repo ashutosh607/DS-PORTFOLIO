@@ -18,7 +18,7 @@ export function buildLocalBusinessSchema(currentUrl = SEO_CONFIG.siteUrl) {
       `${SEO_CONFIG.siteUrl}${SEO_CONFIG.defaultOgImage}`,
       `${SEO_CONFIG.siteUrl}${SEO_CONFIG.logoDark}`,
     ],
-    description: 'Leading photographer in Mumbai, DS Photography & Films captures bespoke weddings, candid pre-wedding shoots, and fine-art portraits by Dishant Shelar.',
+    description: 'Professional photographer in Mumbai, DS Photography & Films captures bespoke weddings, candid pre-wedding shoots, and fine-art portraits by Dishant Shelar.',
     telephone: SEO_CONFIG.contact.phone,
     email: SEO_CONFIG.contact.email,
     priceRange: '₹₹₹₹',

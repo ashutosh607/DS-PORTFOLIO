@@ -82,10 +82,10 @@ export default function SEOHead({
     };
 
     // 2. Standard Meta
-    const metaDesc = description || `Leading photographer in Mumbai, DS Photography & Films captures bespoke weddings, candid pre-wedding shoots, and fine-art portraits by Dishant Shelar.`;
+    const metaDesc = description || `Looking for a professional photographer in Mumbai? DS Photography captures weddings, pre-weddings and portraits with a refined, candid approach. Enquire today.`;
     setMetaTag('name', 'description', metaDesc);
 
-    const metaKeywords = keywords || 'wedding photographer mumbai, photographer in mumbai, pre wedding photographer mumbai, candid wedding photography, fine art wedding cinematography, portrait photographer mumbai, ds photography, dishant shelar';
+    const metaKeywords = keywords || 'professional photographer in mumbai, photographer in mumbai, wedding photographer in mumbai, best wedding photographer in mumbai, pre wedding photographer in mumbai, portrait photographer in mumbai, ds photography, dishant shelar';
     setMetaTag('name', 'keywords', metaKeywords);
 
     // 3. Robots

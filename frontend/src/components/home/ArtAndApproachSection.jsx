@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 import { useEditorialReveal } from '../../utils/useEditorialReveal';
 import approachArchPhoto from '../../assets/landing-down-animation/IMG_7785.webp';
@@ -77,6 +78,7 @@ export default function ArtAndApproachSection() {
                 <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] font-semibold">
                   ATELIER PHILOSOPHY · HONEST OBSERVATION
                 </span>
+
                 <Sparkles size={12} className="text-[#CBB9A4] animate-sparkle-twinkle" aria-hidden="true" />
               </div>
 
@@ -86,7 +88,7 @@ export default function ArtAndApproachSection() {
                     headerRevealed ? 'is-revealed' : ''
                   }`}
                 >
-                  The Art and Approach Behind Our Photography
+                  Meet Dishant Shelar – Your Photographer in Mumbai
                 </h2>
               </div>
 
@@ -121,16 +123,21 @@ export default function ArtAndApproachSection() {
                   >
                     {word}
                   </span>
+
                 );
               })}
             </p>
 
             {/* Editorial citation micro-tag */}
-            <div className="mt-8 pt-6 border-t border-[#E3DBCC]/70 flex items-center gap-3">
+            <div className="mt-8 pt-6 border-t border-[#E3DBCC]/70 flex flex-wrap items-center justify-between gap-3">
               <span className="w-6 h-[1px] bg-[#101010]/40" />
               <span className="font-mono text-xs uppercase tracking-widest text-[#625D55]">
                 Dishant Shelar · Creative Director
               </span>
+              <Link to="/about" className="font-mono text-[11px] uppercase tracking-widest text-[#101010] hover:text-[#7A6E5D] transition-colors underline underline-offset-4 font-semibold">
+                Learn More About Dishant →
+              </Link>
+
             </div>
           </div>
 

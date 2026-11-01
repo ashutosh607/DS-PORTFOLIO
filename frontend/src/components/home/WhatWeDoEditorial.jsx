@@ -432,7 +432,7 @@ export default function WhatWeDoEditorial() {
       }}
     >
       <div className="sr-only">
-        <h2>Our Photography Portfolio</h2>
+        <h2>Explore Our Photography Portfolio</h2>
         <p>Curated fine-art wedding, pre-wedding, and portrait monographs captured in Mumbai by Dishant Shelar.</p>
       </div>
       {/* Keyframes for subtle organic floating drift once in resting position */}

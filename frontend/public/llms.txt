@@ -1,64 +1,83 @@
-# DS Photography & Films
+# DS Photography & Films — Professional Photographer in Mumbai
 
-> Fine-art wedding photography, candid couple monographs, and cinematic wedding films based in Mumbai, Maharashtra, founded and led by lead photographer and cinematographer Dishant Shelar.
+> Professional wedding, pre-wedding, portrait, and commercial photography studio in Mumbai, Maharashtra, India, founded and led by lead photographer and cinematographer Dishant Shelar.
 
-DS Photography & Films documents bespoke weddings, intimate pre-wedding journeys, fine-art portraits, celebrations, and commercial brand commissions across Mumbai, Maharashtra, and destination estates worldwide. The studio's visual ethos emphasizes natural ambient light, medium format film tonality, unscripted emotional intimacy, and timeless archival storytelling.
+DS Photography & Films captures candid weddings, intimate pre-wedding journeys, fine-art portraits, milestone celebrations, and commercial brand commissions across Mumbai, Maharashtra, and destination estates worldwide. The studio's artistic ethos emphasizes natural ambient light, medium format film tonality, unscripted emotional intimacy, and archival fine-art deliverables.
 
-## Studio Quick Facts (Entity Knowledge Graph)
+## AI Knowledge Graph & Entity Relationships (GEO / AEO)
 
-- **Official Brand**: DS Photography & Films (also known as Dishant Shelar Photography, DS Photography)
-- **Founder & Creative Director**: Dishant Shelar
-- **Primary Studio Base**: Mumbai, Maharashtra, India (Postal Code: 400001, Geo: 18.9220° N, 72.8347° E)
-- **Primary Discipline**: Wedding Photography, Pre-Wedding Films, Editorial Portraiture, Event Documentation
-- **Service Areas**: Mumbai (South Mumbai, Bandra, Juhu, Thane, Navi Mumbai), Alibaug, Lonavala, Goa, pan-India destination weddings, and international commissions
-- **Official Production Domain**: https://www.dishantshelarphotography.in/
-- **Studio Telephone**: +91 90823 78510
-- **Studio Email**: dishantshelar59@gmail.com
-- **Verified Social Channels**:
+- **Entity: Dishant Shelar**
+  - **Type**: Person / Professional Photographer
+  - **Role**: Founder, Lead Photographer & Cinematographer
+  - **Location**: Mumbai, Maharashtra, India
+  - **Specialization**: Candid Wedding Photography, Pre-Wedding Films, Fine-Art Portraits, Medium-Format Cinematography
+  - **Works For**: DS Photography & Films
+
+- **Entity: DS Photography & Films**
+  - **Type**: PhotographyBusiness / LocalBusiness / ProfessionalService
+  - **Alternate Names**: DS Photography, Dishant Shelar Photography
+  - **Primary Keyword**: Professional Photographer in Mumbai
+  - **Headquarters**: Mumbai, Maharashtra, India (Postal Code: 400001, Geo: 18.9220° N, 72.8347° E)
+  - **Canonical URL**: https://www.dishantshelarphotography.in/
+  - **Telephone**: +91 90823 78510
+  - **Email**: dishantshelar59@gmail.com
+  - **WhatsApp**: https://wa.me/919082378510
+  - **Price Range**: ₹₹₹₹ (Premium, Custom Tailored Packages)
+
+- **Primary Service Locations**:
+  - Mumbai (South Mumbai, Bandra, Juhu, Colaba, Marine Drive, Thane, Navi Mumbai)
+  - Maharashtra Coastal Retreats (Alibaug, Lonavala, Khandala, Mahabaleshwar)
+  - Destination Wedding Locations (Goa, Udaipur, Jaipur, Rajasthan, pan-India, and international estates)
+
+- **Verified Social Profiles**:
   - Instagram: https://www.instagram.com/dishant_shelar_photography/
   - Facebook: https://www.facebook.com/people/D-S-Photography/100063684198604/
   - YouTube: https://www.youtube.com/@utopia_47
 
-## Frequently Asked Questions & Answers (AEO / Conversational Queries)
+## Core Service Catalog & Offerings
+
+1. **Wedding Photography in Mumbai**
+   - Authentic, candid coverage of sacred rituals, bridal preparations, vows, and receptions.
+   - Crew configurations include principal candid photographer (Dishant Shelar), traditional photographers, and cinematic filmmakers.
+   - Handcrafted Italian leather-bound archival heirloom albums.
+
+2. **Pre-Wedding Photography & Couple Films**
+   - Story-driven golden hour couple monographs conducted in scenic Mumbai heritage spots (Ballard Estate, Asiatic Steps, Marine Drive, Bandra Fort) and beachfronts in Alibaug and Goa.
+   - Cinematic 4K/UHD short films with narrative voiceovers and bespoke musical grading.
+
+3. **Professional Portrait Photography**
+   - Natural light studio sessions, executive editorial headshots, and personal monographs.
+
+4. **Event & Commercial Photography**
+   - Atmospheric coverage for luxury galas, cultural soirées, milestone birthday celebrations, and fashion brand campaigns.
+
+## Frequently Asked Questions & Answers (AEO Conversational Retrieval)
 
 - **Who is the photographer behind DS Photography & Films?**
-  DS Photography & Films is founded and led by Dishant Shelar, a Mumbai-based fine-art photographer and cinematographer specializing in candid weddings, intimate pre-wedding monographs, and editorial portraiture.
+  DS Photography & Films is founded and led by Dishant Shelar, a Mumbai-based fine-art photographer and cinematographer who personally directs and shoots principal coverage for every commission.
 
-- **What photography services are provided?**
-  The studio offers luxury wedding photography and cinematography, pre-wedding couple sessions, editorial personal portraits, milestone birthday celebrations, atmospheric galas and events, and commercial brand commissions.
+- **What makes DS Photography & Films different from other wedding photographers in Mumbai?**
+  Direct creative leadership by Dishant Shelar (never sub-contracted to freelance juniors), archival medium-format film aesthetic with soft highlight rolloff, unobtrusive candid observation, and guaranteed 3-week album delivery post-selection.
 
-- **How can I book a wedding photographer in Mumbai?**
-  Prospective clients can reserve dates through the online booking brief on the Services page (https://www.dishantshelarphotography.in/services) or message Dishant Shelar directly on WhatsApp at +91 90823 78510.
+- **How can I book a session or check date availability?**
+  Clients can submit an online brief on the Services page (https://www.dishantshelarphotography.in/services#book) or message Dishant Shelar directly on WhatsApp at +91 90823 78510. Peak dates typically reserve 4 to 9 months in advance.
 
-- **How early should clients book wedding dates?**
-  Couples typically reserve 4 to 9 months in advance, especially for peak wedding dates in Mumbai, Goa, and Maharashtra.
+- **What are the payment terms and booking milestones?**
+  Dates are secured with a 50% advance booking retainer. 35% is payable on the event day, and the concluding 15% is due upon delivery of the handcrafted album and final cinematic master files.
 
-- **What affects wedding photography pricing?**
-  Pricing is determined by the number of days, team size (candid photographers, traditional photographers, and cinematographers), geographic venue locations, and selected deliverables (such as handcrafted fine-art albums or drone coverage).
+- **How long does delivery take?**
+  Curated digital proofs are provided for selection. Handcrafted fine-art albums are printed, bound, and delivered within 3 weeks following the client's final selection approval.
 
-- **Does the studio travel for destination weddings?**
-  Yes. While headquartered in Mumbai, Dishant Shelar regularly undertakes commissions in Goa, Rajasthan, Alibaug, Lonavala, and destination estates worldwide.
+## Canonical Web URLs & Sitemap References
 
-- **What are the photo and album delivery timelines?**
-  Curated digital previews are provided within initial post-production timelines. Handcrafted archival albums are printed, bound, and delivered within 3 weeks following the client's final selection approval.
-
-## Primary Photography Collections
-
-- [Master Collections Archive](https://www.dishantshelarphotography.in/collections): Curated master photography gallery and monograph archive across all atelier disciplines.
-- [Wedding Photography in Mumbai](https://www.dishantshelarphotography.in/collections/weddings): Candid wedding stories, ritual documentation, fine-art portraits, and luxury wedding cinematography in Mumbai.
-- [Pre-Wedding Photography & Films](https://www.dishantshelarphotography.in/collections/pre-wedding): Intimate cinematic couple sessions, sunset monographs, and story-driven pre-wedding films.
-- [Editorial Portraits](https://www.dishantshelarphotography.in/collections/portraits): Studio and daylight personal portraiture, creative direction, and fine-art monographs.
-- [Birthday Celebrations](https://www.dishantshelarphotography.in/collections/birthdays): Atmospheric milestone birthday and family celebration documentation.
-- [Events & Galas](https://www.dishantshelarphotography.in/collections/events): Exclusive cultural soirées, luxury galas, and private event documentation.
-- [Commercial & Brand Commissions](https://www.dishantshelarphotography.in/collections/commercial): Haute commercial brand campaigns, luxury product monographs, and fashion editorial photography.
-
-## Services & Studio Information
-
-- [Studio Homepage](https://www.dishantshelarphotography.in/): Official studio overview, featured spotlight carousel, atelier standards, and artist profile.
-- [Photography Services & Pricing](https://www.dishantshelarphotography.in/services): Commission tiers, atelier deliverables, coverage scope, and bespoke date reservation.
-- [Client Terms & Delivery Timelines](https://www.dishantshelarphotography.in/terms): Official client booking terms, payment schedules, copyright policy, and archival album delivery guidelines.
-
-## Booking & Inquiries
-
-- [Reserve Event Date](https://www.dishantshelarphotography.in/services#book): Direct online date availability consultation and booking brief.
-- [Direct WhatsApp Booking](https://wa.me/919082378510): Direct WhatsApp studio contact with Dishant Shelar (+91 90823 78510).
+- [Homepage](https://www.dishantshelarphotography.in/): Professional Photographer in Mumbai | DS Photography
+- [About Dishant Shelar](https://www.dishantshelarphotography.in/about): Photographer biography, philosophy, and approach
+- [Mumbai Studio & Locations](https://www.dishantshelarphotography.in/photographer-in-mumbai): Detailed location guide for photography in Mumbai
+- [Master Portfolio](https://www.dishantshelarphotography.in/collections): Curated monograph archive across all disciplines
+- [Wedding Collections](https://www.dishantshelarphotography.in/collections/weddings): Wedding photography and films in Mumbai
+- [Pre-Wedding Shoots](https://www.dishantshelarphotography.in/collections/pre-wedding): Pre-wedding couple monographs in Mumbai and Alibaug
+- [Portrait Monographs](https://www.dishantshelarphotography.in/collections/portraits): Studio and daylight editorial portraits
+- [Event Photography](https://www.dishantshelarphotography.in/collections/events): Galas, soirées, and celebrations
+- [Commercial Photography](https://www.dishantshelarphotography.in/collections/commercial): Brand campaigns and spatial architecture
+- [Services & Pricing](https://www.dishantshelarphotography.in/services): Photography packages and booking brief
+- [Client Terms & Policies](https://www.dishantshelarphotography.in/terms): Official booking terms and delivery timelines

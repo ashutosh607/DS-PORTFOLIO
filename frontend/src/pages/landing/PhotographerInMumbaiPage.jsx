@@ -173,9 +173,9 @@ export default function PhotographerInMumbaiPage({ onOpenInquiry }) {
   return (
     <>
       <SEOHead
-        title="Photographer in Mumbai | Wedding & Portrait Photography – DS Photography"
-        description="Looking for a professional photographer in Mumbai? DS Photography & Films offers bespoke wedding, pre-wedding, and portrait photography by Dishant Shelar."
-        keywords="photographer in mumbai, professional photographer in mumbai, wedding photographer in mumbai, best wedding photographer in mumbai, pre wedding photographer in mumbai, portrait photographer in mumbai, candid wedding photographer mumbai, photography studio in mumbai"
+        title="Professional Photographer in Mumbai | DS Photography & Films"
+        description="Looking for a professional photographer in Mumbai? DS Photography & Films captures bespoke weddings, candid pre-weddings, and portraits by Dishant Shelar."
+        keywords="professional photographer in mumbai, photographer in mumbai, best photographer in mumbai, wedding photographer in mumbai, candid wedding photographer mumbai, pre wedding photographer in mumbai, portrait photographer in mumbai, photography services in mumbai"
         canonicalUrl={`${SEO_CONFIG.siteUrl}/photographer-in-mumbai`}
         ogType="website"
         schema={[

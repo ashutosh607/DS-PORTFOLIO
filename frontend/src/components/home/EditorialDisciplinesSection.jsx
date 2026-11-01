@@ -24,7 +24,7 @@ const DISCIPLINES = [
   },
   {
     number: '02',
-    h2Title: 'Pre-Wedding Photography in Mumbai',
+    h2Title: 'Candid Wedding & Pre-Wedding Photography',
     subtitle: 'Intimate Couple Monographs & Films',
     shortText: 'Crafted in natural golden-hour luminescence across South Mumbai heritage architecture and coastal beachscapes.',
     fullText:
@@ -37,7 +37,7 @@ const DISCIPLINES = [
   },
   {
     number: '03',
-    h2Title: 'Professional Portrait Photography',
+    h2Title: 'Professional Portrait Photography in Mumbai',
     subtitle: 'Editorial Personal & Daylight Monographs',
     shortText: 'Soulful daylight personal portraits, creative direction, and fine-art monographs in Mumbai.',
     fullText:
