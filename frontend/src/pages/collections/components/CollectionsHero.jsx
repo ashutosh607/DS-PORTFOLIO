@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import TextBlurReveal from '../../../components/common/TextBlurReveal';
+import LetterAssembly from '../../../components/common/LetterAssembly';
 
 export default function CollectionsHero({
   onScrollToExplore,
@@ -274,13 +275,15 @@ export default function CollectionsHero({
 
             return (
               <>
-                <TextBlurReveal
+                <LetterAssembly
                   key={`hero-h1-${heroInfo.heading}`}
                   as="h1"
+                  immediate={true}
                   text={heroInfo.heading}
-                  blurAmount={12}
-                  stagger={0.06}
-                  delay={0.1}
+                  delay={0.12}
+                  duration={0.9}
+                  charStagger={0.026}
+                  wordStagger={0.09}
                   style={{
                     fontFamily: 'var(--font-serif)',
                     fontSize: 'clamp(2.2rem, 3.8vw, 3.6rem)',
@@ -289,6 +292,7 @@ export default function CollectionsHero({
                     letterSpacing: '-0.025em',
                     color: '#151515',
                     marginBottom: '1.4rem',
+                    display: 'block',
                   }}
                 />
                 <TextBlurReveal

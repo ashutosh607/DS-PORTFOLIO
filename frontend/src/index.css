@@ -663,3 +663,54 @@ textarea {
   }
 }
 
+/* ==========================================================================
+   Letter Assembly Animation (Cinematic Staggered Character Reveal)
+   ========================================================================== */
+.letter-assembly-wrap {
+  display: inline-block;
+  vertical-align: baseline;
+  text-rendering: optimizeLegibility;
+}
+
+.letter-assembly-word {
+  display: inline-block;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+.letter-assembly-char {
+  display: inline-block;
+  vertical-align: baseline;
+  opacity: 0;
+  transform: translateY(var(--la-y, 18px));
+  filter: blur(var(--la-blur, 4px));
+  transition-property: opacity, transform, filter;
+  transition-duration: var(--la-dur, 0.85s);
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--la-delay, 0s);
+  will-change: opacity, transform, filter;
+}
+
+.letter-assembly-wrap.is-revealed .letter-assembly-char {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
+}
+
+.letter-assembly-wrap.is-complete .letter-assembly-char {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition: none;
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter-assembly-char {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+    will-change: auto !important;
+  }
+}

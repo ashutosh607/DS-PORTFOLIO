@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, MessageCircle, MapPin, Camera, Film, Heart, Shield, Sparkles } from 'lucide-react';
 import SEOHead from '../../components/common/SEOHead';
 import ScrollCardReveal from '../../components/common/ScrollCardReveal';
+import LetterAssembly from '../../components/common/LetterAssembly';
 import {
   buildLocalBusinessSchema,
   buildBreadcrumbSchema,
@@ -217,9 +218,16 @@ export default function PhotographerInMumbaiPage({ onOpenInquiry }) {
             </div>
 
             {/* Target Single H1 Heading */}
-            <h1 className="font-serif text-[34px] sm:text-[50px] md:text-[62px] lg:text-[70px] text-[#101010] font-normal leading-[1.08] tracking-[-0.02em] max-w-5xl mx-auto mb-6">
-              Photographer in Mumbai – DS Photography &amp; Films
-            </h1>
+            <LetterAssembly
+              as="h1"
+              immediate={true}
+              text="Photographer in Mumbai – DS Photography & Films"
+              delay={0.12}
+              duration={0.9}
+              charStagger={0.024}
+              wordStagger={0.085}
+              className="font-serif text-[34px] sm:text-[50px] md:text-[62px] lg:text-[70px] text-[#101010] font-normal leading-[1.08] tracking-[-0.02em] max-w-5xl mx-auto mb-6 block"
+            />
 
             {/* Primary Content Paragraph */}
             <p className="text-[15px] sm:text-[17px] text-[#4A463F] max-w-3xl mx-auto leading-relaxed font-sans mb-10">
@@ -271,9 +279,12 @@ export default function PhotographerInMumbaiPage({ onOpenInquiry }) {
               <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-3 font-semibold">
                 CURATED COMMISSIONS • MUMBAI
               </span>
-              <h2 className="font-serif text-[32px] sm:text-[44px] font-normal text-[#101010] leading-tight mb-4">
-                Photography Disciplines Crafted in Mumbai
-              </h2>
+              <LetterAssembly
+                as="h2"
+                text="Guide to Photography Locations in Mumbai"
+                delay={0.08}
+                className="font-serif text-[32px] sm:text-[44px] font-normal text-[#101010] leading-tight mb-4 block"
+              />
               <p className="text-[14px] sm:text-[15.5px] text-[#4A463F] leading-relaxed max-w-2xl font-sans">
                 Every celebration and personal monograph is approached with quiet observation and artistic reverence. Explore our core photography disciplines across Mumbai.
               </p>
@@ -412,9 +423,12 @@ export default function PhotographerInMumbaiPage({ onOpenInquiry }) {
               <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-3 font-semibold">
                 OUR PHILOSOPHY • ATELIER STANDARDS
               </span>
-              <h2 className="font-serif text-[28px] sm:text-[38px] font-normal text-[#101010] leading-tight">
-                Why Discerning Couples Choose DS Photography
-              </h2>
+              <LetterAssembly
+                as="h2"
+                text="Why Discerning Couples Choose DS Photography"
+                delay={0.08}
+                className="font-serif text-[28px] sm:text-[38px] font-normal text-[#101010] leading-tight block"
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">

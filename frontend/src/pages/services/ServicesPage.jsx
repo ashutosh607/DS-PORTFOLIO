@@ -14,6 +14,7 @@ import { handleWhatsAppSubmit } from '../../utils/whatsapp';
 import { handleEmailSubmit } from '../../utils/email';
 import { getApiUrl } from '../../utils/api';
 import TextBlurReveal from '../../components/common/TextBlurReveal';
+import LetterAssembly from '../../components/common/LetterAssembly';
 import ScrollCardReveal from '../../components/common/ScrollCardReveal';
 import SEOHead from '../../components/common/SEOHead';
 import { buildServicesListSchema, buildBreadcrumbSchema, buildFaqSchema } from '../../utils/structuredData';
@@ -603,12 +604,14 @@ export default function ServicesPage() {
                   STAGE 01 · COMMISSION SELECTION
                 </span>
 
-                <TextBlurReveal
+                <LetterAssembly
                   as="h1"
+                  immediate={true}
                   text="Choose Your Experience"
-                  blurAmount={12}
-                  stagger={0.06}
                   delay={0.08}
+                  duration={0.9}
+                  charStagger={0.026}
+                  wordStagger={0.09}
                   style={{
                     fontFamily: 'var(--font-serif)',
                     fontSize: 'clamp(2.6rem, 4.8vw, 4.4rem)',
@@ -617,6 +620,7 @@ export default function ServicesPage() {
                     color: 'var(--color-obsidian)',
                     fontWeight: 400,
                     textAlign: 'center',
+                    display: 'block',
                   }}
                 />
 
@@ -790,7 +794,14 @@ export default function ServicesPage() {
 
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
                   <div>
-                    <h2
+                    <LetterAssembly
+                      as="h2"
+                      immediate={true}
+                      text="LET'S MAKE IT OFFICIAL."
+                      delay={0.08}
+                      duration={0.85}
+                      charStagger={0.025}
+                      wordStagger={0.09}
                       style={{
                         fontFamily: 'var(--font-serif)',
                         fontSize: 'clamp(34px, 4.5vw, 56px)',
@@ -799,10 +810,9 @@ export default function ServicesPage() {
                         color: 'var(--color-obsidian)',
                         margin: 0,
                         letterSpacing: '-0.02em',
+                        display: 'block',
                       }}
-                    >
-                      LET'S MAKE IT OFFICIAL.
-                    </h2>
+                    />
 
                     <p
                       style={{

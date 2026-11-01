@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Logo from './Logo';
+import LetterAssembly from '../common/LetterAssembly';
 import { useCategories } from '../../utils/categoryManager';
 
 export default function Footer({ onOpenInquiry }) {
@@ -77,12 +78,14 @@ export default function Footer({ onOpenInquiry }) {
             <div className="flex items-center gap-4">
               <Logo variant="light" height={48} withText={false} />
               <div className="flex flex-col">
-                <span
+                <LetterAssembly
+                  as="span"
+                  text="DS PHOTOGRAPHY"
+                  delay={0.1}
+                  duration={0.8}
                   style={{ fontFamily: 'var(--font-serif)' }}
                   className="text-xl sm:text-2xl font-medium tracking-[0.1em] text-[#FDFCF8] uppercase leading-tight"
-                >
-                  DS PHOTOGRAPHY
-                </span>
+                />
                 <span className="font-sans text-[10px] tracking-[0.24em] text-[#CBB9A4] uppercase font-semibold mt-1">
                   • Photography • Videography • Films
                 </span>

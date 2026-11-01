@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import photographerImg from '../../assets/photographer.webp';
 import photographerImg400 from '../../assets/photographer-400w.webp';
 import TextBlurReveal from '../common/TextBlurReveal';
+import LetterAssembly from '../common/LetterAssembly';
 import ScrollCardReveal from '../common/ScrollCardReveal';
 
 /**
@@ -100,10 +101,9 @@ export default function AboutSection({ imageUrl = null }) {
             {/* Top Row: Label & Arched Typography Stamp */}
             <div className="about-header-row">
               <div className="about-label-wrap">
-                <TextBlurReveal
+                <LetterAssembly
                   as="h2"
                   text="The Art and Approach Behind Our Photography"
-                  blurAmount={6}
                   delay={0.05}
                   className="about-section-label"
                 />

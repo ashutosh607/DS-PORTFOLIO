@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import LetterAssembly from '../common/LetterAssembly';
 
 export const HOMEPAGE_FAQS = [
   {
@@ -155,9 +156,11 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
           <span className="text-[11px] font-mono tracking-[0.25em] uppercase text-[#625D55] block mb-3 font-semibold">
             FREQUENTLY ASKED QUESTIONS · AEO
           </span>
-          <h2 className="font-serif text-[32px] sm:text-[42px] lg:text-[46px] font-normal text-[#101010] leading-tight mb-4">
-            Frequently Asked Questions
-          </h2>
+          <LetterAssembly
+            as="h2"
+            className="font-serif text-[32px] sm:text-[42px] lg:text-[46px] font-normal text-[#101010] leading-tight mb-4 block"
+            text="Frequently Asked Questions"
+          />
           <p className="text-[14px] sm:text-[15px] text-[#4A463F] leading-relaxed">
             Direct, factual guidance on wedding coverage, booking timelines, destination commissions, and archival delivery with Dishant Shelar.
           </p>

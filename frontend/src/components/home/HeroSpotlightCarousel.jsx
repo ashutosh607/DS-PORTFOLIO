@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PhotoPlaceholder from '../common/PhotoPlaceholder';
+import LetterAssembly from '../common/LetterAssembly';
 
 import img01 from '../../assets/landing-page-images/landing-01.webp';
 import img01_400 from '../../assets/landing-page-images/landing-01-400w.webp';
@@ -351,7 +352,15 @@ export default function HeroSpotlightCarousel() {
           className="pt-1 sm:pt-2 max-w-4xl mx-auto px-4"
           style={{ flexShrink: 0 }}
         >
-          <h1
+          <LetterAssembly
+            as="h1"
+            immediate={true}
+            delay={0.15}
+            duration={0.9}
+            charStagger={0.026}
+            wordStagger={0.09}
+            yOffset={18}
+            blurAmount={5}
             style={{
               fontFamily: 'var(--font-serif)',
               fontSize: 'clamp(1.85rem, 3.2vw, 2.75rem)',
@@ -361,10 +370,10 @@ export default function HeroSpotlightCarousel() {
               color: 'var(--color-obsidian)',
               maxWidth: '860px',
               margin: '0 auto',
+              display: 'block',
             }}
-          >
-            Professional Photographer in Mumbai
-          </h1>
+            text="Professional Photographer in Mumbai"
+          />
           <p
             className="text-[14px] sm:text-[15.5px] text-[#2C2722] font-sans font-normal max-w-2xl mx-auto mt-2.5 sm:mt-3 leading-relaxed"
           >

@@ -654,7 +654,7 @@ export default function WhyChooseSection() {
       id="why-choose"
       ref={sectionRef}
       aria-label="Why Choose DS Photography & Films"
-      className="w-full bg-[#FAF8F5] relative pt-16 sm:pt-24 lg:pt-32 pb-16 sm:pb-24 border-t border-[#E3DBCC] overflow-hidden"
+      className="w-full bg-[#FAF8F5] relative pt-16 sm:pt-24 lg:pt-32 pb-16 sm:pb-24 border-t border-[#E3DBCC] overflow-hidden scroll-mt-24 sm:scroll-mt-28"
     >
       <div className="max-w-[1440px] mx-auto px-5 sm:px-8 md:px-10 lg:px-10 xl:px-16 relative z-10">
         {/* 6) Decorative top-right curved arc line */}
