@@ -389,7 +389,7 @@ export default function WhyChooseSection() {
                     {/* Number: 01 to 05 in light serif */}
                     <span
                       className={`font-serif text-[21px] sm:text-[23px] lg:text-[21px] xl:text-[23px] font-light tracking-tight min-w-[28px] text-center transition-colors duration-300 ${
-                        isActive ? 'text-[#101010] font-normal' : 'text-[#7A746B] group-hover:text-[#101010]'
+                        isActive ? 'text-[#101010] font-normal' : 'text-[#5C564D] group-hover:text-[#101010]'
                       }`}
                     >
                       {pillar.number}
@@ -422,7 +422,7 @@ export default function WhyChooseSection() {
                       <h3 className="font-serif text-[16.5px] sm:text-[18px] lg:text-[16.5px] xl:text-[18px] font-normal text-[#101010] leading-snug">
                         {pillar.heading}
                       </h3>
-                      <p className="text-[12.5px] sm:text-[13.5px] lg:text-[12.5px] xl:text-[13.5px] text-[#7A746B] font-sans truncate sm:whitespace-normal">
+                      <p className="text-[12.5px] sm:text-[13.5px] lg:text-[12.5px] xl:text-[13.5px] text-[#5C564D] font-sans truncate sm:whitespace-normal">
                         {pillar.shortText}
                       </p>
 
@@ -447,7 +447,7 @@ export default function WhyChooseSection() {
                     </div>
 
                     {/* Arrow indicator: rotates down on mobile when active */}
-                    <div className="shrink-0 text-[#8C7764] pl-1">
+                    <div className="shrink-0 text-[#625D55] pl-1">
                       <ArrowRight
                         className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-300 ${
                           isActive

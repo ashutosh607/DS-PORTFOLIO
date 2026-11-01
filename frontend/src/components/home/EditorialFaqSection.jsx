@@ -197,7 +197,7 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                   <div className="flex items-start gap-3 sm:gap-4 min-w-0">
                     <span
                       className={`font-serif text-base sm:text-lg transition-colors shrink-0 mt-0.5 ${
-                        isOpen ? 'text-[#101010] font-normal' : 'text-[#8C7764] font-light group-hover:text-[#101010]'
+                        isOpen ? 'text-[#101010] font-normal' : 'text-[#625D55] font-light group-hover:text-[#101010]'
                       }`}
                     >
                       {numberFormatted}

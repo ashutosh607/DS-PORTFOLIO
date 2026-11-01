@@ -117,8 +117,9 @@ export default function ArtAndApproachSection() {
                     key={index}
                     className="inline-block mr-[0.28em] transition-colors duration-500 ease-out"
                     style={{
-                      color: isIlluminated ? '#101010' : '#C5BDB0',
-                      opacity: isIlluminated ? 1 : 0.45,
+                      color: isIlluminated ? '#101010' : '#5C564D',
+                      opacity: 1,
+                      transition: 'color 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
                     }}
                   >
                     {word}
@@ -177,7 +178,7 @@ export default function ArtAndApproachSection() {
                 />
 
                 {/* Subtle bottom film-grain vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
 
                 {/* Micro Arch Label */}
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-[10px] font-mono tracking-widest text-[#FDFCF8] uppercase pointer-events-none">
