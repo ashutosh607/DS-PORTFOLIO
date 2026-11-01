@@ -2,10 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 import { useEditorialReveal } from '../../utils/useEditorialReveal';
+import RandomReveal from '../common/RandomReveal';
 import approachArchPhoto from '../../assets/landing-down-animation/IMG_7785.webp';
 
-const PHILOSOPHY_PARAGRAPH =
-  'Led by Dishant Shelar, DS Photography & Films operates on the philosophy that photography should be honest, emotive, and timeless. Rather than forcing awkward poses or chasing fleeting trends, we observe quietly and capture genuine interactions. We utilize natural ambient light and subtle framing to create photographs that feel like fine art while preserving the true emotional essence of the moment.';
+const PHILOSOPHY_SEGMENTS = [
+  {
+    text: 'Led by Dishant Shelar, DS Photography & Films operates on the philosophy that photography should be honest, emotive, and timeless. Rather than forcing awkward poses or chasing fleeting trends, we observe quietly',
+    className: 'text-[#1a1a1a]',
+  },
+  {
+    text: 'and capture genuine interactions. We utilize natural ambient light and subtle framing to create photographs that feel like fine art while preserving the true emotional essence of the moment.',
+    className: 'text-[#8a8a8a]',
+  },
+];
 
 export default function ArtAndApproachSection() {
   const containerRef = useRef(null);
@@ -51,9 +60,7 @@ export default function ArtAndApproachSection() {
   // Parallax subtle vertical drift on arch photo
   const parallaxY = !prefersReducedMotion ? (scrollProgress - 0.5) * -45 : 0;
 
-  // Words array for word-by-word scroll illumination
-  const words = PHILOSOPHY_PARAGRAPH.split(' ');
-  const totalWords = words.length;
+
 
   return (
     <section
@@ -102,32 +109,18 @@ export default function ArtAndApproachSection() {
               </div>
             </div>
 
-            {/* Large Scroll-Linked Illuminated Statement: 100% crawlable in DOM */}
-            <p
+            {/* Scroll-Triggered Random Letter Reveal Statement: 100% crawlable in DOM */}
+            <RandomReveal
+              as="p"
               className="font-serif text-[24px] sm:text-[28px] md:text-[32px] lg:text-[34px] xl:text-[36px] font-normal leading-[1.38] tracking-[-0.01em]"
-              aria-label={PHILOSOPHY_PARAGRAPH}
-            >
-              {words.map((word, index) => {
-                // Map word index to a scroll activation window across 0.25 to 0.75 progress
-                const wordStart = 0.22 + (index / totalWords) * 0.48;
-                const isIlluminated = prefersReducedMotion || scrollProgress >= wordStart;
-
-                return (
-                  <span
-                    key={index}
-                    className="inline-block mr-[0.28em] transition-colors duration-500 ease-out"
-                    style={{
-                      color: isIlluminated ? '#101010' : '#5C564D',
-                      opacity: 1,
-                      transition: 'color 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
-                    }}
-                  >
-                    {word}
-                  </span>
-
-                );
-              })}
-            </p>
+              segments={PHILOSOPHY_SEGMENTS}
+              threshold={0.3}
+              minDelay={0}
+              maxDelay={1.2}
+              duration={0.4}
+              blurAmount={4}
+              yOffset={6}
+            />
 
             {/* Editorial citation micro-tag */}
             <div className="mt-8 pt-6 border-t border-[#E3DBCC]/70 flex flex-wrap items-center justify-between gap-3">

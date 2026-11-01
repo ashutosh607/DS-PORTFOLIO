@@ -2,6 +2,10 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * SmoothScroll Component
@@ -42,15 +46,18 @@ export default function SmoothScroll({ children }) {
 
     window.lenis = lenis;
 
-    let rafId;
-    function raf(time) {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    }
-    rafId = requestAnimationFrame(raf);
+    // Connect Lenis to ScrollTrigger for perfectly synchronized scrub & trigger updates
+    lenis.on('scroll', ScrollTrigger.update);
+
+    // Sync GSAP ticker with Lenis raf for buttery 60/120fps lockstep execution
+    const tickerUpdate = (time) => {
+      lenis.raf(time * 1000);
+    };
+    gsap.ticker.add(tickerUpdate);
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      gsap.ticker.remove(tickerUpdate);
       lenis.destroy();
       if (window.lenis === lenis) {
         window.lenis = null;

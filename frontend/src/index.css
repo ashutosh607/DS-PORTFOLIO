@@ -539,3 +539,127 @@ textarea {
     opacity: 0.6 !important;
   }
 }
+
+/* ==========================================================================
+   Random Letter Reveal Animation (Editorial Atelier Paragraph)
+   ========================================================================== */
+.random-reveal-word {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 0.28em;
+}
+
+.random-reveal-char {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(4px);
+  transform: translateY(6px);
+  transition-property: opacity, filter, transform;
+  transition-duration: 0.4s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, filter, transform;
+}
+
+.random-reveal-char.is-revealed {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .random-reveal-char {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ==========================================================================
+   FOLIO Cards GSAP Lens Focus & Parallax Optimizations
+   ========================================================================== */
+.folio-card {
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.folio-img-wrap {
+  transform: translateZ(0);
+}
+
+.folio-img {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.folio-arrow {
+  will-change: transform;
+  transform-origin: center center;
+}
+
+/* ==========================================================================
+   Why Choose Section (Atelier Standards) GSAP & Light Sweep Optimizations
+   ========================================================================== */
+.why-arch-outline {
+  transform-origin: center center;
+}
+
+.why-arch-inner {
+  will-change: clip-path;
+  transform: translateZ(0);
+}
+
+.why-arch-img {
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.why-reserve-card {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.why-sweep-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.why-sweep-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+  transform: skewX(-22deg);
+  animation: whyLightSweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes whyLightSweep {
+  0%, 65% {
+    left: -120%;
+  }
+  100% {
+    left: 220%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .why-sweep-btn::before {
+    animation: none !important;
+    display: none !important;
+  }
+}
+

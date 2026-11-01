@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Plus, Minus, Sparkles } from 'lucide-react';
 import { useEditorialReveal } from '../../utils/useEditorialReveal';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 
 import weddingImg from '../../assets/landing-page-images/landing-07.webp';
 import preWeddingImg from '../../assets/landing-down-animation/_0006027.webp';
 import portraitImg from '../../assets/landing-page-images/landing-01.webp';
 import eventImg from '../../assets/landing-page-images/landing-03.webp';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const DISCIPLINES = [
   {
@@ -67,6 +72,7 @@ export default function EditorialDisciplinesSection() {
   const [headerRef, headerRevealed] = useEditorialReveal(0.12);
   const [activeCard, setActiveCard] = useState(null);
   const [expandedDetails, setExpandedDetails] = useState({});
+  const sectionRef = useRef(null);
 
   const toggleDetail = (e, index) => {
     e.stopPropagation();
@@ -80,8 +86,286 @@ export default function EditorialDisciplinesSection() {
     setActiveCard((prev) => (prev === index ? null : index));
   };
 
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      // 1. Reduced Motion: Instant reveal with no animations
+      mm.add('(prefers-reduced-motion: reduce)', () => {
+        gsap.set(['.folio-card', '.folio-img', '.folio-label', '.folio-title', '.folio-arrow'], {
+          clearProps: 'all',
+        });
+        gsap.set('.folio-card', {
+          opacity: 1,
+          filter: 'none',
+          x: 0,
+          y: 0,
+          scale: 1,
+        });
+        gsap.set('.folio-img', {
+          scale: 1,
+        });
+        gsap.set(['.folio-label', '.folio-title'], {
+          opacity: 1,
+          y: 0,
+        });
+        gsap.set('.folio-arrow', {
+          scale: 1,
+        });
+      });
+
+      // 2. Desktop (>= 768px): Cinematic lens pull-focus, stagger, 3D entrance, parallax & hover
+      mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
+        const cards = gsap.utils.toArray('.folio-card');
+        const images = gsap.utils.toArray('.folio-img');
+        const labels = gsap.utils.toArray('.folio-label');
+        const titles = gsap.utils.toArray('.folio-title');
+        const arrows = gsap.utils.toArray('.folio-arrow');
+
+        const cardOffsets = [
+          { x: -120, y: 60 },
+          { x: 0, y: 140 },
+          { x: 0, y: 140 },
+          { x: 120, y: 60 },
+        ];
+
+        // Initial state per card: opacity 0, filter: blur(24px), scale 0.94
+        cards.forEach((card, i) => {
+          const offset = cardOffsets[i] || { x: 0, y: 140 };
+          gsap.set(card, {
+            opacity: 0,
+            filter: 'blur(24px)',
+            scale: 0.94,
+            x: offset.x,
+            y: offset.y,
+            willChange: 'transform, filter',
+          });
+        });
+
+        // Initial state for lens focus settling, text, and circular arrow
+        gsap.set(images, { scale: 1.3 });
+        gsap.set(labels, { opacity: 0 });
+        gsap.set(titles, { opacity: 0, y: 30 });
+        gsap.set(arrows, { scale: 0 });
+
+        // Scroll-in animation (trigger once, start: "top 85%")
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: '.folio-cards-grid',
+            start: 'top 85%',
+            once: true,
+          },
+          onComplete: () => {
+            // Remove blur filter completely on complete to avoid GPU cost
+            gsap.set(cards, { filter: 'none', willChange: 'auto' });
+          },
+        });
+
+        // 2. Animate to: opacity 1, x 0, y 0, scale 1, filter blur(0px) duration 1.4, ease "power4.out", stagger 0.15 (order 1 -> 4)
+        tl.to(
+          cards,
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 1.4,
+            ease: 'power4.out',
+            stagger: 0.15,
+          },
+          0
+        );
+
+        // 3. Inside each card, animate <img> from scale 1.3 to 1 over 1.8s with "power3.out" (lens settling into focus)
+        tl.to(
+          images,
+          {
+            scale: 1,
+            duration: 1.8,
+            ease: 'power3.out',
+            stagger: 0.15,
+          },
+          0
+        );
+
+        // 4. After cards land, animate the text & arrows:
+        // "FOLIO 0X" label fades in
+        tl.to(
+          labels,
+          {
+            opacity: 1,
+            duration: 0.5,
+            ease: 'power2.out',
+            stagger: 0.1,
+          },
+          0.85
+        );
+
+        // Title slides up from y: 30 with opacity 0 -> 1 (stagger 0.1, ease "power3.out")
+        tl.to(
+          titles,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+            stagger: 0.1,
+          },
+          0.95
+        );
+
+        // Arrow button scales from 0 to 1 with "back.out(1.7)"
+        tl.to(
+          arrows,
+          {
+            scale: 1,
+            duration: 0.6,
+            ease: 'back.out(1.7)',
+            stagger: 0.1,
+          },
+          1.1
+        );
+
+        // Subtle scroll parallax on images: yPercent from -8 to 8 with ScrollTrigger scrub: 1
+        cards.forEach((card, i) => {
+          const img = images[i];
+          const arrow = arrows[i];
+
+          if (img) {
+            gsap.fromTo(
+              img,
+              { yPercent: -8 },
+              {
+                yPercent: 8,
+                ease: 'none',
+                scrollTrigger: {
+                  trigger: card,
+                  start: 'top bottom',
+                  end: 'bottom top',
+                  scrub: 1,
+                },
+              }
+            );
+          }
+
+          // Hover: card lifts y: -10, image scales 1.06, arrow button rotates -45deg, 0.5s "power2.out". Reverses on mouse leave.
+          const onEnter = () => {
+            gsap.to(card, { y: -10, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
+            if (img) gsap.to(img, { scale: 1.06, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
+            if (arrow) gsap.to(arrow, { rotation: -45, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
+          };
+
+          const onLeave = () => {
+            gsap.to(card, { y: 0, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
+            if (img) gsap.to(img, { scale: 1, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
+            if (arrow) gsap.to(arrow, { rotation: 0, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
+          };
+
+          card.addEventListener('mouseenter', onEnter);
+          card.addEventListener('mouseleave', onLeave);
+        });
+      });
+
+      // 3. Mobile (< 768px): All cards come from y: 80 only, stagger 0.1, smaller blur (12px), no hover effects
+      mm.add('(max-width: 767px) and (prefers-reduced-motion: no-preference)', () => {
+        const cards = gsap.utils.toArray('.folio-card');
+        const images = gsap.utils.toArray('.folio-img');
+        const labels = gsap.utils.toArray('.folio-label');
+        const titles = gsap.utils.toArray('.folio-title');
+        const arrows = gsap.utils.toArray('.folio-arrow');
+
+        gsap.set(cards, {
+          opacity: 0,
+          filter: 'blur(12px)',
+          scale: 0.96,
+          x: 0,
+          y: 80,
+          willChange: 'transform, filter',
+        });
+
+        gsap.set(images, { scale: 1.2 });
+        gsap.set(labels, { opacity: 0 });
+        gsap.set(titles, { opacity: 0, y: 20 });
+        gsap.set(arrows, { scale: 0 });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: '.folio-cards-grid',
+            start: 'top 85%',
+            once: true,
+          },
+          onComplete: () => {
+            gsap.set(cards, { filter: 'none', willChange: 'auto' });
+          },
+        });
+
+        tl.to(
+          cards,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 1.1,
+            ease: 'power3.out',
+            stagger: 0.1,
+          },
+          0
+        );
+
+        tl.to(
+          images,
+          {
+            scale: 1,
+            duration: 1.4,
+            ease: 'power3.out',
+            stagger: 0.1,
+          },
+          0
+        );
+
+        tl.to(
+          labels,
+          {
+            opacity: 1,
+            duration: 0.4,
+            ease: 'power2.out',
+            stagger: 0.08,
+          },
+          0.6
+        );
+
+        tl.to(
+          titles,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: 'power3.out',
+            stagger: 0.08,
+          },
+          0.7
+        );
+
+        tl.to(
+          arrows,
+          {
+            scale: 1,
+            duration: 0.5,
+            ease: 'back.out(1.7)',
+            stagger: 0.08,
+          },
+          0.8
+        );
+      });
+    },
+    { scope: sectionRef }
+  );
+
   return (
     <section
+      ref={sectionRef}
       id="disciplines"
       aria-label="Photography Disciplines & Atelier Services"
       className="w-full bg-[#FAF8F5] text-[#101010] pt-20 sm:pt-28 lg:pt-32 pb-16 sm:pb-24 border-t border-[#E3DBCC] relative overflow-hidden"
@@ -146,7 +430,7 @@ export default function EditorialDisciplinesSection() {
         </div>
 
         {/* 4 Tall Image-Led Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7 lg:gap-6">
+        <div className="folio-cards-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7 lg:gap-6">
           {DISCIPLINES.map((item, idx) => {
             const isHoveredOrActive = activeCard === idx;
             const isExpanded = !!expandedDetails[idx];
@@ -165,21 +449,23 @@ export default function EditorialDisciplinesSection() {
                     setActiveCard(null);
                   }
                 }}
-                className="group relative h-[480px] sm:h-[520px] lg:h-[560px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-[#1E1B18] shadow-[0_12px_36px_-8px_rgba(16,14,12,0.12)] cursor-pointer transition-all duration-500 ease-out flex flex-col justify-end p-6 sm:p-7 border border-[#E3DBCC]/30 hover:border-[#CBB9A4]"
+                className="folio-card group relative h-[480px] sm:h-[520px] lg:h-[560px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-[#1E1B18] shadow-[0_12px_36px_-8px_rgba(16,14,12,0.12)] cursor-pointer flex flex-col justify-end p-6 sm:p-7 border border-[#E3DBCC]/30 hover:border-[#CBB9A4] transition-colors duration-300"
               >
-                {/* Background Image with subtle zoom on hover */}
-                <img
-                  src={item.image}
-                  alt={item.alt}
-                  title={`${item.h2Title} — DS Photography & Films`}
-                  width="400"
-                  height="600"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 select-none"
-                  loading="lazy"
-                />
+                {/* Background Image Container with parallax headroom (oversized by 16% to allow -8 to 8% scrub without gaps) */}
+                <div className="folio-img-wrap absolute -top-[8%] -bottom-[8%] left-0 right-0 overflow-hidden pointer-events-none">
+                  <img
+                    src={item.image}
+                    alt={item.alt}
+                    title={`${item.h2Title} — DS Photography & Films`}
+                    width="400"
+                    height="600"
+                    className="folio-img w-full h-full object-cover select-none"
+                    loading="lazy"
+                  />
+                </div>
 
                 {/* Subtle base gradient so resting typography remains legible */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-opacity duration-400 group-hover:opacity-0" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-opacity duration-400 group-hover:opacity-0 pointer-events-none" />
 
                 {/* Sliding Soft Dark Overlay on hover/tap */}
                 <div
@@ -269,14 +555,14 @@ export default function EditorialDisciplinesSection() {
                 {/* Resting State Content (Bottom of Card) */}
                 <div className="relative z-10 transition-opacity duration-300 group-hover:opacity-0 pointer-events-none">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-xs font-semibold tracking-widest text-[#E3DBCC]">
+                    <span className="folio-label font-mono text-xs font-semibold tracking-widest text-[#E3DBCC]">
                       FOLIO {item.number}
                     </span>
-                    <span className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/25 flex items-center justify-center text-white">
+                    <span className="folio-arrow w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/25 flex items-center justify-center text-white origin-center">
                       <ArrowRight size={13} />
                     </span>
                   </div>
-                  <h2 className="font-serif text-2xl font-normal text-[#FDFCF8] leading-tight">
+                  <h2 className="folio-title font-serif text-2xl font-normal text-[#FDFCF8] leading-tight">
                     {item.h2Title}
                   </h2>
                 </div>
