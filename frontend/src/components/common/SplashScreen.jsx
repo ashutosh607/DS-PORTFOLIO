@@ -25,11 +25,15 @@ export default function SplashScreen({ onComplete }) {
     // Start smooth fade-out after 750ms
     const timer = setTimeout(() => {
       setIsVisible(false);
+      window.__dsSplashExiting = true;
+      window.dispatchEvent(new CustomEvent('ds-splash-exit'));
     }, 750);
 
     // Allow click or keypress to immediately dismiss
     const handleDismiss = () => {
       setIsVisible(false);
+      window.__dsSplashExiting = true;
+      window.dispatchEvent(new CustomEvent('ds-splash-exit'));
     };
 
     window.addEventListener('keydown', handleDismiss);
@@ -44,6 +48,8 @@ export default function SplashScreen({ onComplete }) {
   const handleAnimationComplete = () => {
     if (!isVisible) {
       document.body.style.overflow = '';
+      window.__dsSplashDone = true;
+      window.dispatchEvent(new CustomEvent('ds-splash-complete'));
       if (onComplete) onComplete();
     }
   };

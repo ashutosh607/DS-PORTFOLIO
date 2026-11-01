@@ -465,11 +465,11 @@ export default function EditorialDisciplinesSection() {
                 </div>
 
                 {/* Subtle base gradient so resting typography remains legible */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-opacity duration-400 group-hover:opacity-0 pointer-events-none" />
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-opacity duration-400 pointer-events-none ${isHoveredOrActive ? 'opacity-0' : 'opacity-100 group-hover:opacity-0'}`} />
 
                 {/* Sliding Soft Dark Overlay on hover/tap */}
                 <div
-                  className={`absolute inset-0 bg-[#101010]/92 backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-6 sm:p-7 flex flex-col justify-between ${
+                  className={`absolute inset-0 z-20 bg-[#101010]/92 backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-6 sm:p-7 flex flex-col justify-between ${
                     isHoveredOrActive ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
                   }`}
                 >
@@ -553,7 +553,11 @@ export default function EditorialDisciplinesSection() {
                 </div>
 
                 {/* Resting State Content (Bottom of Card) */}
-                <div className="relative z-10 transition-opacity duration-300 group-hover:opacity-0 pointer-events-none">
+                <div className={`relative z-10 transition-all duration-300 pointer-events-none ${
+                  isHoveredOrActive
+                    ? 'opacity-0 invisible translate-y-2'
+                    : 'opacity-100 visible translate-y-0 group-hover:opacity-0 group-hover:invisible'
+                }`}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="folio-label font-mono text-xs font-semibold tracking-widest text-[#E3DBCC]">
                       FOLIO {item.number}

@@ -1,38 +1,45 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 /**
+ * Deterministic pseudo-random hash in [0, 1) for consistent SSR/hydration and organic jitter.
+ */
+function seededRandom(seed) {
+  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/**
  * LetterAssembly
  *
- * Cinematic, staggered letter-assembly text animation for DS Photography & Films.
+ * Cinematic, simultaneous letter-assembly text animation for DS Photography & Films.
  *
- * Each character begins with a subtle positional offset and optical blur,
- * then smoothly arrives at its exact resting position in a coordinated sequence.
- *
- * Key features:
- * - Zero Layout Shift (CLS = 0) with words wrapped in inline-block spans
- * - Words never break mid-word (whitespace: nowrap per word)
- * - Accessibility: plain text in aria-label on root, aria-hidden on inner spans
- * - SEO compliance: complete text indexable by crawlers
- * - Screen readers hear the cohesive sentence, not individual letters
- * - Prefers-reduced-motion: instantly rendered with zero animation
- * - Mobile & desktop optimized with lightweight GPU-accelerated CSS transitions
- * - Cleans up GPU memory (`will-change: auto`, `filter: none`) once assembled
- * - Supports two-tone or styled segments
+ * Recreates the exact multi-line simultaneous reveal from the reference video:
+ * - Words and sentences across lines assemble simultaneously, with letters streaming into words in parallel.
+ * - Respects the splash screen: delays above-the-fold assembly until the logo splash screen finishes/fades out!
+ * - Zero Layout Shift (CLS = 0) with words wrapped in inline-block spans.
+ * - Words never break mid-word (whitespace: nowrap per word).
+ * - Full accessibility: plain text in aria-label on root, aria-hidden on inner spans.
+ * - Screen readers hear the complete, unfragmented sentence.
+ * - Prefers-reduced-motion: instantly rendered with zero animation.
+ * - Cleans up GPU memory (`will-change: auto`, `filter: none`, `transform: none`) once assembled.
  *
  * @param {string} [text] - Text string to animate
  * @param {React.ReactNode} [children] - Alternative string child
  * @param {Array<{text: string, className?: string}>} [segments] - Multi-styled segments
+ * @param {'simultaneous' | 'sequential'} [mode='simultaneous'] - Reveal mode: 'simultaneous' (default, multi-line parallel) or 'sequential'
  * @param {string} [as='h2'] - Semantic tag ('h1', 'h2', 'h3', 'p', 'span', 'div')
  * @param {string} [className=''] - Container styling
  * @param {React.CSSProperties} [style={}] - Container inline styles
- * @param {number} [delay=0.08] - Initial delay in seconds before animation begins
- * @param {number} [duration=0.85] - Transition duration per character in seconds
- * @param {number} [charStagger=0.025] - Stagger between characters (in seconds, e.g. 25ms)
- * @param {number} [wordStagger=0.09] - Delay between word starts (in seconds, e.g. 90ms)
- * @param {number} [yOffset=18] - Starting vertical displacement in px
+ * @param {number} [delay=0.08] - Base delay in seconds before animation begins
+ * @param {number} [duration=0.58] - Transition duration per character in seconds
+ * @param {number} [charStagger=0.022] - Stagger between characters inside a word (in seconds, e.g. 22ms)
+ * @param {number} [wordSpread=0.32] - Total temporal spread across all words in simultaneous mode
+ * @param {number} [wordJitter=0.10] - Organic variation between words
+ * @param {number} [wordStagger=0.08] - Stagger between words (used in sequential mode)
+ * @param {number} [yOffset=14] - Starting vertical displacement in px
  * @param {number} [blurAmount=4] - Starting optical blur in px
  * @param {number} [threshold=0.15] - IntersectionObserver threshold (0 to 1)
- * @param {boolean} [immediate=false] - If true, triggers immediately on mount (for Hero above fold)
+ * @param {boolean} [immediate=false] - If true, triggers immediately on mount / after splash (for Hero above fold)
  * @param {boolean} [once=true] - Trigger once only
  * @param {string} [wordClassName=''] - Extra classes for word spans
  * @param {string} [charClassName=''] - Extra classes for character spans
@@ -41,14 +48,17 @@ export default function LetterAssembly({
   text,
   children,
   segments,
+  mode = 'simultaneous',
   as: Component = 'h2',
   className = '',
   style = {},
   delay = 0.08,
-  duration = 0.85,
-  charStagger = 0.025,
-  wordStagger = 0.09,
-  yOffset = 18,
+  duration = 0.58,
+  charStagger = 0.022,
+  wordSpread = 0.32,
+  wordJitter = 0.10,
+  wordStagger = 0.08,
+  yOffset = 14,
   blurAmount = 4,
   threshold = 0.15,
   immediate = false,
@@ -67,7 +77,23 @@ export default function LetterAssembly({
     );
   }, []);
 
-  const [isRevealed, setIsRevealed] = useState(isReducedMotion || immediate);
+  // Check if splash screen is currently covering the screen
+  const isSplashCurrentlyActive = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    if (window.__dsSplashDone) return false;
+    return Boolean(
+      document.getElementById('initial-splash-screen') ||
+      document.querySelector('[role="dialog"][aria-label*="Splash"]') ||
+      document.querySelector('.fixed.inset-0.z-\\[9999999\\]')
+    );
+  }, []);
+
+  // If splash is active, start hidden until splash completes/fades!
+  const [isRevealed, setIsRevealed] = useState(() => {
+    if (isReducedMotion) return true;
+    if (immediate && !isSplashCurrentlyActive) return true;
+    return false;
+  });
   const [isComplete, setIsComplete] = useState(isReducedMotion);
 
   // Normalize segments: string text -> single segment, or use provided segments
@@ -88,20 +114,38 @@ export default function LetterAssembly({
       .trim();
   }, [normalizedSegments]);
 
-  // Pre-process words and character data with global continuous indexing
+  // Pre-process words and character data with simultaneous multi-line coordination
   const { processedSegments, totalDuration } = useMemo(() => {
+    // 1. First pass: count total words across all segments
+    let count = 0;
+    normalizedSegments.forEach((seg) => {
+      const words = seg.text ? seg.text.trim().split(/\s+/).filter(Boolean) : [];
+      count += words.length;
+    });
+    const totalWords = Math.max(1, count);
+
+    // 2. Second pass: structure words and characters with simultaneous delays
     let runningWordIdx = 0;
     let maxCharDelay = 0;
 
     const segs = normalizedSegments.map((seg, sIdx) => {
-      // Split by whitespace while preserving punctuation
       const words = seg.text ? seg.text.trim().split(/\s+/).filter(Boolean) : [];
       const startWordIdx = runningWordIdx;
       runningWordIdx += words.length;
 
       const wordsData = words.map((word, wIdx) => {
         const globalWordIdx = startWordIdx + wIdx;
-        const wordBaseDelay = delay + globalWordIdx * wordStagger;
+
+        let wordBaseDelay;
+        if (mode === 'sequential') {
+          wordBaseDelay = delay + globalWordIdx * wordStagger;
+        } else {
+          // Simultaneous multi-line mode: words across all lines begin together
+          // with a gentle wave and organic jitter so every line animates simultaneously
+          const progress = totalWords > 1 ? globalWordIdx / (totalWords - 1) : 0;
+          const jitter = (seededRandom(globalWordIdx + 42) - 0.5) * wordJitter;
+          wordBaseDelay = Math.max(0, delay + progress * wordSpread + jitter);
+        }
 
         const chars = word.split('').map((char, cIdx) => {
           const charDelay = wordBaseDelay + cIdx * charStagger;
@@ -133,17 +177,58 @@ export default function LetterAssembly({
     return {
       processedSegments: segs,
       totalDuration: calculatedTotalDuration,
-      totalWords: runningWordIdx,
+      totalWordCount: totalWords,
     };
-  }, [normalizedSegments, delay, duration, charStagger, wordStagger]);
+  }, [normalizedSegments, mode, delay, duration, charStagger, wordSpread, wordJitter, wordStagger]);
 
-  // Scroll or immediate trigger via IntersectionObserver
+  // Trigger animation: waits for splash screen if active, otherwise triggers on mount or scroll
   useEffect(() => {
-    if (isReducedMotion || immediate) {
+    if (isReducedMotion) {
       setIsRevealed(true);
       return;
     }
 
+    if (immediate) {
+      // Check if splash screen is actively showing
+      const hasActiveSplash =
+        typeof window !== 'undefined' &&
+        !window.__dsSplashDone &&
+        (document.getElementById('initial-splash-screen') ||
+          document.querySelector('[role="dialog"][aria-label*="Splash"]') ||
+          document.querySelector('.fixed.inset-0.z-\\[9999999\\]'));
+
+      if (hasActiveSplash) {
+        let triggered = false;
+        const trigger = () => {
+          if (triggered) return;
+          triggered = true;
+          setTimeout(() => {
+            setIsRevealed(true);
+          }, Math.max(20, delay * 1000));
+        };
+
+        // Trigger when the splash screen begins fading out or completes
+        window.addEventListener('ds-splash-exit', trigger, { once: true });
+        window.addEventListener('ds-splash-complete', trigger, { once: true });
+
+        // Safety fallback timer: in case event was missed, reveal after max 1.5s
+        const fallback = setTimeout(trigger, 1500);
+
+        return () => {
+          window.removeEventListener('ds-splash-exit', trigger);
+          window.removeEventListener('ds-splash-complete', trigger);
+          clearTimeout(fallback);
+        };
+      } else {
+        // No splash screen active, reveal immediately after delay
+        const timer = setTimeout(() => {
+          setIsRevealed(true);
+        }, Math.max(20, delay * 1000));
+        return () => clearTimeout(timer);
+      }
+    }
+
+    // Scroll-triggered IntersectionObserver for below-the-fold content
     const node = containerRef.current;
     if (!node) return;
 
@@ -174,7 +259,7 @@ export default function LetterAssembly({
     return () => {
       observer.disconnect();
     };
-  }, [immediate, once, threshold, isReducedMotion]);
+  }, [immediate, once, threshold, isReducedMotion, delay]);
 
   // Once all letters have landed, clean up GPU will-change and filters
   useEffect(() => {
@@ -256,4 +341,3 @@ export default function LetterAssembly({
     </Component>
   );
 }
-

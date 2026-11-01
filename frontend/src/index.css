@@ -682,11 +682,11 @@ textarea {
   display: inline-block;
   vertical-align: baseline;
   opacity: 0;
-  transform: translateY(var(--la-y, 18px));
+  transform: translateY(var(--la-y, 14px));
   filter: blur(var(--la-blur, 4px));
   transition-property: opacity, transform, filter;
-  transition-duration: var(--la-dur, 0.85s);
-  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-duration: var(--la-dur, 0.58s);
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: var(--la-delay, 0s);
   will-change: opacity, transform, filter;
 }

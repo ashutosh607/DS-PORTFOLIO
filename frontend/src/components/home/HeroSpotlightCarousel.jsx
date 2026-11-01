@@ -355,12 +355,13 @@ export default function HeroSpotlightCarousel() {
           <LetterAssembly
             as="h1"
             immediate={true}
-            delay={0.15}
-            duration={0.9}
-            charStagger={0.026}
-            wordStagger={0.09}
-            yOffset={18}
-            blurAmount={5}
+            delay={0.06}
+            duration={0.65}
+            charStagger={0.024}
+            wordSpread={0.16}
+            wordJitter={0.06}
+            yOffset={14}
+            blurAmount={4}
             style={{
               fontFamily: 'var(--font-serif)',
               fontSize: 'clamp(1.85rem, 3.2vw, 2.75rem)',
@@ -374,11 +375,19 @@ export default function HeroSpotlightCarousel() {
             }}
             text="Professional Photographer in Mumbai"
           />
-          <p
-            className="text-[14px] sm:text-[15.5px] text-[#2C2722] font-sans font-normal max-w-2xl mx-auto mt-2.5 sm:mt-3 leading-relaxed"
-          >
-            DS Photography &amp; Films is led by Dishant Shelar, a professional photographer in Mumbai capturing candid weddings, intimate pre-wedding stories, and fine-art portraits across Mumbai and destination locations worldwide.
-          </p>
+          <LetterAssembly
+            as="p"
+            immediate={true}
+            delay={0.18}
+            duration={0.55}
+            charStagger={0.02}
+            wordSpread={0.36}
+            wordJitter={0.12}
+            yOffset={12}
+            blurAmount={3.5}
+            className="text-[14px] sm:text-[15.5px] text-[#2C2722] font-sans font-normal max-w-2xl mx-auto mt-2.5 sm:mt-3 leading-relaxed block"
+            text="DS Photography & Films is led by Dishant Shelar, a professional photographer in Mumbai capturing candid weddings, intimate pre-wedding stories, and fine-art portraits across Mumbai and destination locations worldwide."
+          />
         </div>
 
         {/* ===================================================================
