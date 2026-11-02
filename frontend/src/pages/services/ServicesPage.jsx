@@ -19,6 +19,7 @@ import ScrollCardReveal from '../../components/common/ScrollCardReveal';
 import SEOHead from '../../components/common/SEOHead';
 import { buildServicesListSchema, buildBreadcrumbSchema, buildFaqSchema } from '../../utils/structuredData';
 import { SEO_CONFIG } from '../../utils/seoConfig';
+import { DEFAULT_SERVICES } from './data/servicesData';
 
 const SERVICES_CACHE_KEY = 'ds_portfolio_cached_services';
 
@@ -37,8 +38,8 @@ export default function ServicesPage() {
 
   const { categories: dynamicCategories } = useCategories();
   const [backendCategories, setBackendCategories] = useState([]);
-  const [allActiveServices, setAllActiveServices] = useState([]);
-  const [servicesLoaded, setServicesLoaded] = useState(false);
+  const [allActiveServices, setAllActiveServices] = useState(DEFAULT_SERVICES);
+  const [servicesLoaded, setServicesLoaded] = useState(true);
 
   // Canonical category matcher
   const toCanonicalKey = (str) =>
@@ -98,6 +99,7 @@ export default function ServicesPage() {
     if (lower === 'wedding' || lower === 'weddings') return 'WEDDINGS';
     if (lower === 'pre-wedding' || lower === 'prewedding') return 'PRE-WEDDING';
     if (lower === 'birthday' || lower === 'birthdays') return 'BIRTHDAYS';
+    if (lower === 'baby-shower' || lower === 'babyshower' || lower === 'baby_shower') return 'BABY SHOWER';
     if (lower === 'portrait' || lower === 'portraits') return 'PORTRAITS';
     if (lower === 'event' || lower === 'events') return 'EVENTS';
     if (lower === 'commercial') return 'COMMERCIAL';
@@ -117,6 +119,7 @@ export default function ServicesPage() {
       { id: 'wedding', label: 'WEDDINGS', slug: 'wedding' },
       { id: 'pre-wedding', label: 'PRE-WEDDING', slug: 'pre-wedding' },
       { id: 'birthday', label: 'BIRTHDAYS', slug: 'birthday' },
+      { id: 'baby-shower', label: 'BABY SHOWER', slug: 'baby-shower' },
       { id: 'portrait', label: 'PORTRAITS', slug: 'portrait' },
       { id: 'event', label: 'EVENTS', slug: 'event' },
       { id: 'commercial', label: 'COMMERCIAL', slug: 'commercial' },
@@ -233,8 +236,17 @@ export default function ServicesPage() {
       );
       if (matchedCat) {
         setSelectedCategoryId(matchedCat.id);
+        const catKey = toCanonicalKey(matchedCat.label || matchedCat.id);
+        let eventName = matchedCat.label;
+        if (catKey === 'wedding') eventName = 'Wedding';
+        else if (catKey === 'prewedding') eventName = 'Pre-Wedding';
+        else if (catKey === 'birthday') eventName = 'Birthdays';
+        else if (catKey === 'babyshower') eventName = 'Baby Shower';
+        else if (catKey === 'portrait') eventName = 'Portraits';
+        else if (catKey === 'event') eventName = 'Events';
+        else if (catKey === 'commercial') eventName = 'Commercial';
         updateFormData({
-          eventType: matchedCat.label === 'WEDDING' ? 'Wedding' : matchedCat.label,
+          eventType: eventName,
         });
       }
     }
@@ -314,8 +326,17 @@ export default function ServicesPage() {
       (c) => toCanonicalKey(c.id) === toCanonicalKey(categoryId) || toCanonicalKey(c.label) === toCanonicalKey(categoryId)
     );
     if (matched) {
+      const catKey = toCanonicalKey(matched.label || matched.id);
+      let eventName = matched.label;
+      if (catKey === 'wedding') eventName = 'Wedding';
+      else if (catKey === 'prewedding') eventName = 'Pre-Wedding';
+      else if (catKey === 'birthday') eventName = 'Birthdays';
+      else if (catKey === 'babyshower') eventName = 'Baby Shower';
+      else if (catKey === 'portrait') eventName = 'Portraits';
+      else if (catKey === 'event') eventName = 'Events';
+      else if (catKey === 'commercial') eventName = 'Commercial';
       updateFormData({
-        eventType: matched.label === 'WEDDINGS' || matched.label === 'WEDDING' ? 'Wedding' : matched.label,
+        eventType: eventName,
       });
     }
     // Auto-select the signature or first collection for the newly selected category from real active services
@@ -665,9 +686,14 @@ export default function ServicesPage() {
                         <button
                           key={cat.id}
                           type="button"
+                          role="tab"
+                          aria-selected={isCatSelected}
+                          aria-controls={`panel-${cat.id}`}
+                          id={`tab-${cat.id}`}
+                          tabIndex={0}
                           ref={isCatSelected ? activeCategoryBtnRef : null}
                           onClick={() => handleCategorySelect(cat.id)}
-                          className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer py-3 px-2 min-h-[44px] inline-flex items-center shrink-0 border-b select-none ${isCatSelected
+                          className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer py-3 px-2 min-h-[44px] inline-flex items-center shrink-0 border-b select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#101010]/30 focus-visible:ring-offset-2 ${isCatSelected
                             ? 'text-[#101010] font-semibold border-[#101010]'
                             : 'text-[#625D55] hover:text-[#101010] border-transparent hover:border-[#C5B9A5]'
                             }`}
@@ -684,11 +710,18 @@ export default function ServicesPage() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={selectedCategoryId}
+                  id={`panel-${selectedCategoryId}`}
+                  role="tabpanel"
+                  aria-labelledby={`tab-${selectedCategoryId}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[clamp(28px,3vw,56px)] items-stretch"
+                  className={`grid gap-[clamp(28px,3vw,56px)] items-stretch ${
+                    activeCollections.length === 1
+                      ? 'grid-cols-1 max-w-[440px] mx-auto w-full'
+                      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                  }`}
                 >
                   {activeCollections.length > 0 ? (
                     activeCollections.map((col, idx) => (

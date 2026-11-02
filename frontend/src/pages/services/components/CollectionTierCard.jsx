@@ -77,11 +77,17 @@ export default function CollectionTierCard({
         'Archival presentation folio in Belgian linen',
       ];
 
-  // Uniform 4 concise items per card for flawless structural consistency
+  // Preserve all 5 deliverables for Pre-Wedding, Birthday, and Baby Shower collections
+  const isFullDeliverablesCard =
+    rawDeliverables.length === 5 ||
+    ['pre-wedding', 'birthday', 'baby-shower'].includes(
+      String(collection.category || '').toLowerCase().trim()
+    );
+
   const condensedDeliverables = rawDeliverables
     .map(condenseDeliverable)
     .filter(Boolean)
-    .slice(0, 4);
+    .slice(0, isFullDeliverablesCard ? 5 : 4);
 
   const title = collection.title || collection.eyebrow || 'Collection';
   const subtitle = collection.subtitle || '';

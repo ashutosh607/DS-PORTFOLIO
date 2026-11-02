@@ -37,12 +37,16 @@ export default function BookingBriefForm({
     .filter((n) => typeof n === 'string' && n.trim().length > 0)
     .filter((n) => !['commercial'].includes(n.toLowerCase().trim()));
 
-  const baseEventNames =
-    collectionNames.length > 0
-      ? collectionNames
-      : ['Weddings', 'Pre-Wedding', 'Engagement', 'Events', 'Birthdays', 'Baby Shower', 'Portraits'];
-
-  const celebrationTypes = Array.from(new Set([...baseEventNames, 'Other']));
+  const celebrationTypes = Array.from(
+    new Set([
+      'Weddings',
+      'Pre-Wedding',
+      'Birthdays',
+      'Baby Shower',
+      ...collectionNames,
+      'Other',
+    ])
+  );
 
   const handleSelectEventType = (type) => {
     updateFormData({
