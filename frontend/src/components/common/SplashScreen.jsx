@@ -1,108 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import dsLogoDark from '../../assets/ds-logo-dark-splash.webp';
+import React, { useEffect, useRef } from 'react';
 
 /**
- * Clean Studio Logo Splash Screen
+ * Clean Studio Logo Splash Screen Controller
  * 
- * Displays ONLY the logo in the middle in a big, proper size on initial visit,
- * and then smoothly fades out to reveal the website.
+ * Directly orchestrates the initial splash screen for a 100% glitch-free,
+ * velvety-smooth entrance and exit:
+ * - Entrance: Logo smoothly focuses and breathes in via GPU-accelerated CSS from millisecond 0.
+ * - Holding: Holds serenely in center for ~1000-1100ms total page load time.
+ * - Exit: Dissolves seamlessly (opacity 1 -> 0, subtle scale up) over 0.75s to unveil the website.
+ * - Zero flash, zero double-render, zero glitch!
  */
 export default function SplashScreen({ onComplete }) {
-  const [isVisible, setIsVisible] = useState(true);
+  const isExitedRef = useRef(false);
 
   useEffect(() => {
-    // Immediately remove static HTML splash screen so React Framer Motion takes over seamlessly
     const staticSplash = document.getElementById('initial-splash-screen');
-    if (staticSplash) {
-      staticSplash.remove();
-    }
 
     // Prevent background scrolling while splash is active
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    // Start smooth fade-out after 750ms
-    const timer = setTimeout(() => {
-      setIsVisible(false);
+    const triggerExit = () => {
+      if (isExitedRef.current) return;
+      isExitedRef.current = true;
       window.__dsSplashExiting = true;
       window.dispatchEvent(new CustomEvent('ds-splash-exit'));
-    }, 750);
 
-    // Allow click or keypress to immediately dismiss
-    const handleDismiss = () => {
-      setIsVisible(false);
-      window.__dsSplashExiting = true;
-      window.dispatchEvent(new CustomEvent('ds-splash-exit'));
+      if (staticSplash) {
+        staticSplash.classList.add('splash-exit');
+        staticSplash.style.pointerEvents = 'none';
+
+        // Wait for CSS transition (750ms) to complete smoothly
+        setTimeout(() => {
+          document.body.style.overflow = originalOverflow;
+          window.__dsSplashDone = true;
+          window.dispatchEvent(new CustomEvent('ds-splash-complete'));
+          if (staticSplash.parentNode) {
+            staticSplash.parentNode.removeChild(staticSplash);
+          }
+          if (onComplete) onComplete();
+        }, 750);
+      } else {
+        document.body.style.overflow = originalOverflow;
+        window.__dsSplashDone = true;
+        window.dispatchEvent(new CustomEvent('ds-splash-complete'));
+        if (onComplete) onComplete();
+      }
     };
 
-    window.addEventListener('keydown', handleDismiss);
+    if (staticSplash) {
+      // Allow click or keydown to skip splash immediately
+      staticSplash.addEventListener('click', triggerExit);
+      window.addEventListener('keydown', triggerExit);
 
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('keydown', handleDismiss);
+      // Holding duration: ensures the logo entrance (750ms) completes + brief elegant pause (~350ms)
+      const pageAge = typeof performance !== 'undefined' ? performance.now() : 0;
+      const remainingHold = Math.max(350, 1100 - pageAge);
+
+      const timer = setTimeout(triggerExit, remainingHold);
+
+      return () => {
+        clearTimeout(timer);
+        staticSplash.removeEventListener('click', triggerExit);
+        window.removeEventListener('keydown', triggerExit);
+        document.body.style.overflow = originalOverflow;
+      };
+    } else {
       document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-
-  const handleAnimationComplete = () => {
-    if (!isVisible) {
-      document.body.style.overflow = '';
       window.__dsSplashDone = true;
       window.dispatchEvent(new CustomEvent('ds-splash-complete'));
       if (onComplete) onComplete();
     }
-  };
+  }, [onComplete]);
 
-  return (
-    <AnimatePresence mode="wait" onExitComplete={handleAnimationComplete}>
-      {isVisible && (
-        <motion.div
-          key="ds-splash-screen"
-          initial={{ opacity: 1 }}
-          exit={{
-            opacity: 0,
-            transition: {
-              duration: 0.85,
-              ease: [0.4, 0, 0.2, 1],
-            },
-          }}
-          onClick={() => setIsVisible(false)}
-          className="fixed inset-0 z-[9999999] flex items-center justify-center select-none cursor-pointer"
-          style={{
-            backgroundColor: '#FAF8F5',
-          }}
-          role="dialog"
-          aria-modal="true"
-          aria-label="DS Photography & Films Splash Screen"
-        >
-          {/* Only the Logo in the middle in big, proper size */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.7,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="flex items-center justify-center p-6"
-          >
-            <img
-              src={dsLogoDark}
-              alt="DS Photography & Films — Photographer in Mumbai"
-              title="DS Photography & Films — Fine Art Wedding & Portrait Studio in Mumbai"
-              width="470"
-              height="340"
-              className="object-contain w-auto select-none pointer-events-none"
-              style={{
-                height: 'clamp(180px, 32vh, 340px)',
-                maxWidth: 'min(90vw, 560px)',
-                aspectRatio: '1415 / 1023',
-                display: 'block',
-              }}
-            />
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+  return null;
 }
