@@ -580,12 +580,12 @@ export default function HeroSpotlightCarousel() {
         />
 
         {/* ===================================================================
-            BOTTOM CONTROLS: 7 DOTS, COUNTER & ARROWS (CLEAN & MINIMAL)
+            BOTTOM CONTROLS: 7 DOTS (CLEAN & MINIMAL)
             =================================================================== */}
-        <div style={{ flexShrink: 0, paddingBottom: '0.5rem' }}>
+        <div style={{ flexShrink: 0, paddingBottom: '0.75rem', paddingTop: '0.25rem' }}>
 
           {/* 7 Minimalist Pagination Dots with Touch-Friendly 44px Tap Targets */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.15rem', marginBottom: '0.35rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.15rem' }}>
             {PROJECTS.map((_, i) => (
               <button
                 type="button"
@@ -617,89 +617,6 @@ export default function HeroSpotlightCarousel() {
                 />
               </button>
             ))}
-          </div>
-
-          {/* Bottom Bar: Slide Counter (Left) & Minimal Circular Navigation Arrows (Right) */}
-          <div
-            className="px-4 sm:px-6"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              maxWidth: '920px',
-              margin: '0 auto',
-              paddingTop: '0.2rem',
-            }}
-          >
-            <div style={{ textAlign: 'left', minWidth: '100px' }}>
-              <span
-                style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontSize: '1.85rem',
-                  fontWeight: 500,
-                  color: 'var(--color-obsidian)',
-                  lineHeight: 1,
-                }}
-              >
-                {String(activeNormalizedIndex + 1).padStart(2, '0')}
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '0.8rem',
-                  color: 'var(--color-obsidian-muted)',
-                  marginLeft: '0.35rem',
-                  fontWeight: 600,
-                }}
-              >
-                / {String(total).padStart(2, '0')}
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: '100px', justifyContent: 'flex-end' }}>
-              <button
-                type="button"
-                onClick={handlePrev}
-                className="circle-nav-btn"
-                aria-label="Previous photo slide"
-                style={{
-                  width: '46px',
-                  height: '46px',
-                  minWidth: '46px',
-                  minHeight: '46px',
-                  backgroundColor: '#FFFFFF',
-                  border: '1.5px solid #1E1B18',
-                  color: '#101010',
-                  boxShadow: '0 4px 14px rgba(16, 16, 16, 0.12)',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 18l-6-6 6-6" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={handleNext}
-                className="circle-nav-btn"
-                aria-label="Next photo slide"
-                style={{
-                  width: '46px',
-                  height: '46px',
-                  minWidth: '46px',
-                  minHeight: '46px',
-                  backgroundColor: '#FFFFFF',
-                  border: '1.5px solid #1E1B18',
-                  color: '#101010',
-                  boxShadow: '0 4px 14px rgba(16, 16, 16, 0.12)',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 18l6-6-6-6" />
-                </svg>
-              </button>
-            </div>
           </div>
 
         </div>
