@@ -135,7 +135,8 @@ app.get("/", (req, res) => {
     status: "Active",
     version: "1.0.0",
     endpoints: {
-      health: "/api/v1/health",
+      health: "/health",
+      apiHealth: "/api/v1/health",
       admin: "/api/admin",
       media: "/api/media",
       categories: "/api/categories",
@@ -145,6 +146,13 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
+// Health Check
+app.get("/health", (_req, res) => {
+  res
+    .status(200)
+    .json({ success: true, status: "ok", timestamp: new Date().toISOString() });
+});
+
 app.use("/api/v1/health", healthRouter);
 app.use("/api/v1/upload", uploadRouter);
 app.use("/api/admin", adminRouter);
@@ -172,14 +180,14 @@ connectDB()
 
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on port ${PORT}`);
-      console.log(`🔗 Health Check: http://localhost:${PORT}/api/v1/health`);
+      console.log(`🔗 Health Check: http://localhost:${PORT}/health`);
     });
   })
   .catch((err) => {
     console.warn("⚠️  MongoDB connection failed:", err.message);
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT} (Database offline - connect MongoDB to persist media)`);
-      console.log(`🔗 Health Check: http://localhost:${PORT}/api/v1/health`);
+      console.log(`🔗 Health Check: http://localhost:${PORT}/health`);
     });
   });
 
