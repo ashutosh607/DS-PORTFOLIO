@@ -8,7 +8,7 @@ function nonBlockingCss() {
     transformIndexHtml(html) {
       return html.replace(
         /<link rel="stylesheet" crossorigin href="(\/assets\/[^"]+\.css)">/g,
-        '<link rel="preload" as="style" href="$1">\n  <link rel="stylesheet" crossorigin href="$1" media="print" onload="this.media=\'all\'">\n  <noscript><link rel="stylesheet" href="$1"></noscript>'
+        '<link rel="preload" as="style" crossorigin href="$1">\n  <link rel="stylesheet" crossorigin href="$1" media="print" onload="this.media=\'all\'">\n  <noscript><link rel="stylesheet" href="$1"></noscript>'
       );
     },
   };
@@ -62,6 +62,12 @@ export default defineConfig({
             normalized.includes('/node_modules/motion-utils/')
           ) {
             return 'vendor-motion';
+          }
+          if (
+            normalized.includes('/node_modules/gsap/') ||
+            normalized.includes('/node_modules/@gsap/')
+          ) {
+            return 'vendor-gsap';
           }
           if (normalized.includes('/node_modules/lenis/')) {
             return 'vendor-lenis';

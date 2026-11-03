@@ -30,37 +30,47 @@ export default function SmoothScroll({ children }) {
 
     const isMobile = window.innerWidth < 768;
 
-    const lenis = new Lenis({
-      duration: isMobile ? 1.15 : 1.35,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Deep exponential ease-out for velvet glide
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 0.88,
-      touchMultiplier: isMobile ? 1.3 : 1.5,
-      syncTouch: isMobile,
-      syncTouchLerp: 0.085,
-      touchInertiaExponent: 1.75,
-      infinite: false,
-    });
+    let lenisInstance = null;
+    let tickerUpdate = null;
 
-    window.lenis = lenis;
+    // Defer initialization slightly so initial FCP and LCP render uninterrupted
+    const initTimer = setTimeout(() => {
+      const lenis = new Lenis({
+        duration: isMobile ? 1.0 : 1.35,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Deep exponential ease-out for velvet glide
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 0.88,
+        touchMultiplier: 1.0,
+        syncTouch: false, // Maintain native, zero-lag 120Hz touch scrolling on mobile to keep TBT & INP at 0
+        infinite: false,
+      });
 
-    // Connect Lenis to ScrollTrigger for perfectly synchronized scrub & trigger updates
-    lenis.on('scroll', ScrollTrigger.update);
+      lenisInstance = lenis;
+      window.lenis = lenis;
 
-    // Sync GSAP ticker with Lenis raf for buttery 60/120fps lockstep execution
-    const tickerUpdate = (time) => {
-      lenis.raf(time * 1000);
-    };
-    gsap.ticker.add(tickerUpdate);
-    gsap.ticker.lagSmoothing(0);
+      // Connect Lenis to ScrollTrigger for perfectly synchronized scrub & trigger updates
+      lenis.on('scroll', ScrollTrigger.update);
+
+      // Sync GSAP ticker with Lenis raf for buttery 60/120fps lockstep execution
+      tickerUpdate = (time) => {
+        lenis.raf(time * 1000);
+      };
+      gsap.ticker.add(tickerUpdate);
+      gsap.ticker.lagSmoothing(0);
+    }, 60);
 
     return () => {
-      gsap.ticker.remove(tickerUpdate);
-      lenis.destroy();
-      if (window.lenis === lenis) {
-        window.lenis = null;
+      clearTimeout(initTimer);
+      if (tickerUpdate) {
+        gsap.ticker.remove(tickerUpdate);
+      }
+      if (lenisInstance) {
+        lenisInstance.destroy();
+        if (window.lenis === lenisInstance) {
+          window.lenis = null;
+        }
       }
     };
   }, [location.pathname]);

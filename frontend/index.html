@@ -54,29 +54,31 @@
   <link rel="manifest" href="/site.webmanifest" />
   <meta name="theme-color" content="#101010" />
 
-  <!-- Preload True Mobile LCP Image (Velocity Monograph) -->
+  <!-- Preload Critical Splash Brand Logo -->
+  <link rel="preload" as="image" href="/ds-logo-dark-splash.webp" type="image/webp" fetchpriority="high" />
+
+  <!-- Preload Critical LCP Hero Image (02 Velocity Monograph) -->
   <link
     rel="preload"
     as="image"
-    href="/images/landing-02-400w.webp"
-    imagesrcset="/images/landing-02-400w.webp 400w"
+    href="/images/landing/landing-02-400w.webp"
+    imagesrcset="/images/landing/landing-02-400w.webp 400w, /images/landing/landing-02.webp 800w"
     imagesizes="(max-width: 768px) 180px, 200px"
     type="image/webp"
-    fetchpriority="high"
-    media="(max-width: 768px)" />
+    fetchpriority="high" />
 
   <!-- Google Fonts Preconnect & Optimized Font Loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400&family=Cormorant+Garamond:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
     media="print"
     onload="this.media='all'">
   <noscript>
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400&family=Cormorant+Garamond:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap">
   </noscript>
 
   <!-- Complete Schema.org JSON-LD Knowledge Graph -->
@@ -237,7 +239,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.75s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.55s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
@@ -253,7 +255,7 @@
       opacity: 0;
       animation: splashLogoEnter 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards;
       will-change: opacity, transform, filter;
-      transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     #initial-splash-screen.splash-exit #initial-splash-logo {

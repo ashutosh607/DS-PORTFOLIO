@@ -28,7 +28,7 @@ import AddEditServiceModal from './components/AddEditServiceModal';
 import AddCategoryModal from './components/AddCategoryModal';
 import EditCategoryModal from './components/EditCategoryModal';
 import CollectionTierCard from '../services/components/CollectionTierCard';
-import driedBotanical from '../../assets/dried-botanical.jpg';
+import driedBotanical from '../../assets/dried-botanical.webp';
 import './AdminDashboard.css';
 
 const DEFAULT_CATEGORIES = [
