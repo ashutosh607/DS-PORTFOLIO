@@ -60,7 +60,7 @@ const PROJECTS = [
   {
     id: '04',
     title: 'Sentinel',
-    subtitle: 'The Parisian Solitude',
+    subtitle: 'The Atelier Solitude',
     category: 'Portraits',
     year: '2025',
     score: '★ 9.1',
@@ -80,7 +80,7 @@ const PROJECTS = [
     format: 'Leica Summilux 50mm',
     image: img05,
     image400: img05_400,
-    alt: 'Fine art portrait framed in natural ambient luminescence by Dishant Shelar in Mumbai',
+    alt: 'Fine art portrait framed in natural ambient light by Dishant Shelar in Mumbai',
     imgTitle: 'Portrait Photography in Mumbai – Dishant Shelar Studio',
   },
   {
@@ -386,7 +386,7 @@ export default function HeroSpotlightCarousel() {
             yOffset={0}
             blurAmount={3.5}
             className="text-[14px] sm:text-[15.5px] text-[#2C2722] font-sans font-normal max-w-2xl mx-auto mt-2.5 sm:mt-3 leading-relaxed block"
-            text="DS Photography & Films is led by Dishant Shelar, a professional photographer in Mumbai capturing candid weddings, intimate pre-wedding stories, and fine-art portraits across Mumbai and destination locations worldwide."
+            text="DS Photography & Films is led by Dishant Shelar, a professional photographer in Mumbai capturing candid weddings, intimate pre-wedding stories, and fine-art portraits across Mumbai and destination locations in Maharashtra."
           />
         </div>
 

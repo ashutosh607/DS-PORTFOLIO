@@ -242,7 +242,7 @@ export default function CollectionsHero({
             const CATEGORY_HERO_MAP = {
               weddings: {
                 heading: 'Luxury Wedding Photography in Mumbai',
-                subheading: 'Candid wedding stories and cinematic monographs captured across Mumbai, Alibaug, and destination estates.',
+                subheading: 'Candid wedding stories and cinematic films captured across Mumbai, Alibaug, and destination estates.',
               },
               'pre-wedding': {
                 heading: 'Pre-Wedding Photography & Films in Mumbai',
@@ -250,7 +250,7 @@ export default function CollectionsHero({
               },
               portraits: {
                 heading: 'Editorial Portrait Photography in Mumbai',
-                subheading: 'Fine-art daylight portraits, studio monographs, and timeless personal portraiture by Dishant Shelar.',
+                subheading: 'Natural daylight portraits, studio sessions, and timeless personal portraits by Dishant Shelar.',
               },
               birthdays: {
                 heading: 'Milestone Celebration & Birthday Photography in Mumbai',
@@ -258,11 +258,11 @@ export default function CollectionsHero({
               },
               events: {
                 heading: 'Exclusive Event & Gala Photography in Mumbai',
-                subheading: 'Curated coverage of cultural soirées, luxury galas, and corporate celebrations in Mumbai.',
+                subheading: 'Curated coverage of private parties, cultural events, and corporate celebrations in Mumbai.',
               },
               commercial: {
                 heading: 'Commercial & Fashion Editorial Photography in Mumbai',
-                subheading: 'Haute brand campaigns, product monographs, and fashion editorial storytelling with bespoke visual direction.',
+                subheading: 'Brand campaigns, product photography, and fashion editorial storytelling with creative visual direction.'
               },
             };
 

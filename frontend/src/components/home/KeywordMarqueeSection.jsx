@@ -7,11 +7,11 @@ const KEYWORDS = [
   'Cinematic Films',
   'South Mumbai',
   'Bandra & Juhu',
+  'Thane & Navi Mumbai',
   'Alibaug Coastal',
-  'Goa Beachscapes',
-  'Rajasthan Palaces',
-  'Destinations Worldwide',
-  'Archival Medium-Format',
+  'Lonavala & Khandala',
+  'Pune & Karjat',
+  'Classic Film Tones',
 ];
 
 export default function KeywordMarqueeSection() {

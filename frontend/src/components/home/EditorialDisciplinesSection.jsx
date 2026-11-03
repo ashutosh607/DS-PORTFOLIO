@@ -18,9 +18,9 @@ const DISCIPLINES = [
     number: '01',
     h2Title: 'Wedding Photographer in Mumbai',
     subtitle: 'Sacred Rituals & Candid Moments',
-    shortText: 'Documenting timeless wedding stories across Mumbai and destination venues worldwide with medium-format film tonality.',
+    shortText: 'Documenting timeless wedding stories across Mumbai and destination venues in Maharashtra with natural, classic film colors.',
     fullText:
-      'Your wedding is a once-in-a-lifetime milestone deserving of timeless preservation. As a leading wedding photographer in Mumbai, Dishant Shelar documents sacred rituals, heartfelt family emotions, and spontaneous celebrations with an editorial eye and medium-format film aesthetic. From traditional South Mumbai heritage ceremonies to contemporary beachfront celebrations, our team captures raw emotion without intrusive posing.',
+      'Your wedding is a once-in-a-lifetime milestone deserving of timeless preservation. As a leading wedding photographer in Mumbai, Dishant Shelar documents sacred rituals, heartfelt family emotions, and spontaneous celebrations with an artistic eye and classic film style. From traditional South Mumbai heritage ceremonies to beachfront celebrations, our team captures real emotion without awkward posing.',
     image: weddingImg,
     alt: 'Intimate wedding couple portrait with bridal bouquet in Mumbai by Dishant Shelar',
     link: '/collections/weddings',
@@ -30,36 +30,36 @@ const DISCIPLINES = [
   {
     number: '02',
     h2Title: 'Candid Wedding & Pre-Wedding Photography',
-    subtitle: 'Intimate Couple Monographs & Films',
-    shortText: 'Crafted in natural golden-hour luminescence across South Mumbai heritage architecture and coastal beachscapes.',
+    subtitle: 'Couple Photo Stories & Films',
+    shortText: 'Captured in beautiful golden-hour light across South Mumbai heritage spots and scenic beaches.',
     fullText:
-      'Our pre-wedding shoots in Mumbai capture the authentic connection between couples in natural golden-hour luminescence. Whether navigating historic South Mumbai architecture, the shores of Alibaug, or private scenic retreats in Maharashtra, we craft intimate couple monographs and cinematic short films that narrate your love story truthfully.',
+      'Our pre-wedding shoots in Mumbai capture the authentic connection between couples in warm golden-hour light. Whether walking through historic South Mumbai streets, the beaches of Alibaug, or private scenic retreats in Maharashtra, we create intimate couple photos and cinematic short films that tell your true story.',
     image: preWeddingImg,
     alt: 'Romantic pre-wedding couple photography session in natural light by Dishant Shelar',
     link: '/collections/pre-wedding',
     linkLabel: 'View Pre-Wedding Shoots',
-    badge: 'Couple Monographs',
+    badge: 'Couple Stories',
   },
   {
     number: '03',
     h2Title: 'Professional Portrait Photography in Mumbai',
-    subtitle: 'Editorial Personal & Daylight Monographs',
-    shortText: 'Soulful daylight personal portraits, creative direction, and fine-art monographs in Mumbai.',
+    subtitle: 'Personal Portraits & Daylight Sessions',
+    shortText: 'Natural daylight portraits, professional headshots, and creative photography in Mumbai.',
     fullText:
-      'We create fine-art personal portraits, executive headshots, and editorial fashion monographs in Mumbai. With mindful lighting and thoughtful composition, each portrait session brings out your natural character with depth, soul, and timeless elegance.',
+      'We create natural personal portraits, professional headshots, and creative fashion photography in Mumbai. Using soft natural light and clean composition, each portrait session brings out your true personality with depth, warmth, and timeless style.',
     image: portraitImg,
     alt: 'Editorial fashion portrait photography and fine-art daylight monograph in Mumbai by Dishant Shelar',
     link: '/collections/portraits',
-    linkLabel: 'View Portrait Monographs',
-    badge: 'Editorial Portraiture',
+    linkLabel: 'View Portrait Gallery',
+    badge: 'Portrait Sessions',
   },
   {
     number: '04',
     h2Title: 'Event & Commercial Photography',
-    subtitle: 'Atmospheric Galas & Haute Brand Campaigns',
-    shortText: 'Sophisticated documentation for luxury soirées, milestone celebrations, and brand commissions.',
+    subtitle: 'Special Events & Brand Campaigns',
+    shortText: 'High-quality photography for private parties, milestone celebrations, and brand events.',
     fullText:
-      'Beyond weddings, DS Photography & Films documents exclusive cultural galas, milestone birthday celebrations, corporate soirées, and commercial brand campaigns across Mumbai. Our commercial work brings narrative storytelling and refined visual aesthetics to brand imagery.',
+      'Beyond weddings, DS Photography & Films captures cultural gatherings, milestone birthday parties, corporate events, and commercial brand campaigns across Mumbai. We bring storytelling and clean visual style to every event and product shoot.',
     image: eventImg,
     alt: 'Joyful celebration and festive ceremony event photography in Mumbai by Dishant Shelar',
     link: '/collections/events',
@@ -424,7 +424,7 @@ export default function EditorialDisciplinesSection() {
           >
             Every celebration has an unrepeatable rhythm.
             <span className="sr-only">
-              {' '}From intimate golden-hour pre-wedding monographs to multi-day wedding rituals, our commissions are approached with quiet observation and artistic reverence across Mumbai and destination venues worldwide.
+              {' '}From intimate golden-hour pre-wedding monographs to multi-day wedding rituals, our commissions are approached with quiet observation and artistic reverence across Mumbai and destination venues in Maharashtra.
             </span>
           </p>
         </div>

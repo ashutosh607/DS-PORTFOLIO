@@ -113,7 +113,7 @@ export default function NotFoundPage() {
           transition={{ duration: 0.6, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
           className="font-serif text-sm sm:text-base tracking-[0.16em] text-[#7A6E5D] uppercase mb-4"
         >
-          The Monograph Cannot Be Found
+          The Page Cannot Be Found
         </motion.p>
 
         {/* Description */}

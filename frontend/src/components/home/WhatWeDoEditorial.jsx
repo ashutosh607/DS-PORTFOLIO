@@ -40,8 +40,8 @@ const PHOTO_TITLES = [
 
 const PHOTO_METADATA = [
   'Fine art bridal portrait and wedding ceremony in Mumbai by DS Photography',
-  'Candid wedding monograph and bridal moment in Maharashtra by Dishant Shelar',
-  'Intimate pre-wedding couple monograph captured in natural sunlight',
+  'Candid wedding photo and bridal moment in Maharashtra by Dishant Shelar',
+  'Intimate pre-wedding couple photo captured in natural sunlight',
   'Editorial bridal heirloom and vintage veil detail in Mumbai',
   'Emotional wedding vows and sacred moments preserved with fine art framing',
   'Atmospheric celebration and joyful evening toast by DS Photography',

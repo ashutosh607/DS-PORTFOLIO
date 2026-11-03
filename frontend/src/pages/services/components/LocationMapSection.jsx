@@ -43,7 +43,7 @@ export default function LocationMapSection({
             </h3>
             <p className="font-sans text-sm text-[#7A7770] mt-1.5 max-w-xl">
               {location
-                ? `Live Google Map view for ${location}. Our atelier travels worldwide for commissioned assignments.`
+                ? `Live Google Map view for ${location}. Our atelier travels across Mumbai and Maharashtra for commissioned assignments.`
                 : 'Select your event venue in the form above to pin and preview your celebration destination.'}
             </p>
           </div>

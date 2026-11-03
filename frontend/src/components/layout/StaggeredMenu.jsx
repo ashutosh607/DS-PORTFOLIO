@@ -495,7 +495,7 @@ export const StaggeredMenu = ({
         style={!showLogo ? { justifyContent: 'flex-end' } : undefined}
       >
         {showLogo && (
-          <div className="sm-logo" aria-label="Logo">
+          <div className="sm-logo">
             {logoUrl ? (
               <img
                 src={logoUrl}
@@ -599,7 +599,7 @@ export const StaggeredMenu = ({
           </div>
 
           {displaySocials && socialItems && socialItems.length > 0 && (
-            <div className="sm-socials" aria-label="Social links">
+            <div className="sm-socials">
               <h3 className="sm-socials-title">Studio Inquiries &amp; Socials</h3>
               <ul className="sm-socials-list">
                 {socialItems.map((s, i) => (

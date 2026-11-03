@@ -21,7 +21,7 @@ export const HOMEPAGE_FAQS = [
     id: 'pre-wedding',
     question: 'Does DS Photography & Films offer pre-wedding photography?',
     answer:
-      'Yes, we specialize in intimate, cinematic pre-wedding photography sessions across Mumbai, coastal retreats in Alibaug and Goa, and destination estates across India.',
+      'Yes, we specialize in intimate, cinematic pre-wedding photography sessions across Mumbai, coastal retreats in Alibaug, and scenic destination estates across Maharashtra.',
   },
   {
     id: 'services-available',
@@ -39,13 +39,13 @@ export const HOMEPAGE_FAQS = [
     id: 'destination-travel',
     question: 'Does DS Photography & Films travel outside Mumbai?',
     answer:
-      'Yes. While based in Mumbai, Dishant Shelar regularly travels across Maharashtra, Goa, Rajasthan, and destination venues worldwide. Travel logistics are coordinated during booking.',
+      'Yes. While based in Mumbai, Dishant Shelar regularly travels across Maharashtra, including Alibaug, Lonavala, Pune, Karjat, and nearby scenic destinations. Travel logistics are coordinated during booking.',
   },
   {
     id: 'photographer-identity',
     question: 'Who is the photographer behind DS Photography & Films?',
     answer:
-      'DS Photography & Films is founded and led by Dishant Shelar, a Mumbai-based fine-art photographer and cinematographer. Specializing in candid weddings, intimate pre-wedding monographs, and editorial portraiture, Dishant personally leads creative direction and principal camera coverage for all atelier commissions.',
+      'DS Photography & Films is founded and led by Dishant Shelar, a Mumbai-based fine-art photographer and cinematographer. Specializing in candid weddings, intimate pre-wedding shoots, and professional portraits, Dishant personally leads the photography and creative direction for every client.',
   },
   {
     id: 'delivery-timeline',
@@ -57,7 +57,7 @@ export const HOMEPAGE_FAQS = [
     id: 'service-locations',
     question: 'Which locations in Mumbai and Maharashtra does the studio serve?',
     answer:
-      'Our primary coverage spans all across Mumbai (including South Mumbai, Bandra, Juhu, Thane, and Navi Mumbai), coastal retreats in Alibaug, hill destinations in Lonavala, and beach weddings in Goa.',
+      'Our primary coverage spans all across Mumbai (including South Mumbai, Bandra, Juhu, Thane, and Navi Mumbai), coastal retreats in Alibaug, hill destinations in Lonavala & Khandala, and Pune & Karjat retreats.',
   },
 ];
 
@@ -184,10 +184,18 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                   delay: Math.min(index * 0.04, 0.35),
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className={`transition-all duration-350 ease-out rounded-2xl ${
+                onMouseEnter={() => {
+                  if (
+                    typeof window !== 'undefined' &&
+                    window.matchMedia('(hover: hover) and (pointer: fine)').matches
+                  ) {
+                    setOpenId(faq.id);
+                  }
+                }}
+                className={`transition-colors duration-300 rounded-2xl ${
                   isOpen
                     ? 'bg-[#FAF7F2] p-5 sm:p-6 border border-[#E3DBCC] shadow-[0_8px_30px_-6px_rgba(20,18,15,0.06)]'
-                    : 'p-4 sm:p-5 hover:bg-[#FAF7F2]/60 border border-[#E3DBCC]/60'
+                    : 'p-5 sm:p-6 hover:bg-[#FAF7F2]/60 border border-[#E3DBCC]/60'
                 }`}
               >
                 <button
@@ -223,7 +231,7 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                       color: isOpen ? '#FAF8F5' : '#625D55',
                       scale: isOpen ? 1.05 : 1,
                     }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                     className="mt-1 w-7 h-7 rounded-full border flex items-center justify-center shrink-0 group-hover:border-[#101010] group-hover:text-[#101010]"
                   >
                     <ChevronDown size={14} />
@@ -237,7 +245,10 @@ export default function EditorialFaqSection({ faqs = HOMEPAGE_FAQS }) {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{
+                        height: { duration: 0.36, ease: [0.16, 1, 0.3, 1] },
+                        opacity: { duration: 0.28, ease: 'easeOut' },
+                      }}
                       className="overflow-hidden"
                     >
                       <div className="pl-7 sm:pl-9">

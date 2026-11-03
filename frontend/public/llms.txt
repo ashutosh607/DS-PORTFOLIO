@@ -2,7 +2,7 @@
 
 > Professional wedding, pre-wedding, portrait, and commercial photography studio in Mumbai, Maharashtra, India, founded and led by lead photographer and cinematographer Dishant Shelar.
 
-DS Photography & Films captures candid weddings, intimate pre-wedding journeys, fine-art portraits, milestone celebrations, and commercial brand commissions across Mumbai, Maharashtra, and destination estates worldwide. The studio's artistic ethos emphasizes natural ambient light, medium format film tonality, unscripted emotional intimacy, and archival fine-art deliverables.
+DS Photography & Films captures candid weddings, intimate pre-wedding journeys, fine-art portraits, milestone celebrations, and commercial brand commissions across Mumbai, Thane, Navi Mumbai, and destination locations across Maharashtra. The studio's artistic ethos emphasizes natural ambient light, medium format film tonality, unscripted emotional intimacy, and archival fine-art deliverables.
 
 ## AI Knowledge Graph & Entity Relationships (GEO / AEO)
 
@@ -27,7 +27,7 @@ DS Photography & Films captures candid weddings, intimate pre-wedding journeys, 
 - **Primary Service Locations**:
   - Mumbai (South Mumbai, Bandra, Juhu, Colaba, Marine Drive, Thane, Navi Mumbai)
   - Maharashtra Coastal Retreats (Alibaug, Lonavala, Khandala, Mahabaleshwar)
-  - Destination Wedding Locations (Goa, Udaipur, Jaipur, Rajasthan, pan-India, and international estates)
+  - Maharashtra Wedding Locations (Alibaug, Lonavala, Khandala, Pune, Karjat, Mahabaleshwar, and nearby retreats)
 
 - **Verified Social Profiles**:
   - Instagram: https://www.instagram.com/dishant_shelar_photography/
@@ -42,14 +42,14 @@ DS Photography & Films captures candid weddings, intimate pre-wedding journeys, 
    - Handcrafted Italian leather-bound archival heirloom albums.
 
 2. **Pre-Wedding Photography & Couple Films**
-   - Story-driven golden hour couple monographs conducted in scenic Mumbai heritage spots (Ballard Estate, Asiatic Steps, Marine Drive, Bandra Fort) and beachfronts in Alibaug and Goa.
+   - Story-driven golden hour couple photo sessions conducted in scenic Mumbai heritage spots (Ballard Estate, Asiatic Steps, Marine Drive, Bandra Fort) and beachfronts in Alibaug and the Konkan coast.
    - Cinematic 4K/UHD short films with narrative voiceovers and bespoke musical grading.
 
 3. **Professional Portrait Photography**
-   - Natural light studio sessions, executive editorial headshots, and personal monographs.
+   - Natural light studio sessions, executive editorial headshots, and personal portraits.
 
 4. **Event & Commercial Photography**
-   - Atmospheric coverage for luxury galas, cultural soirées, milestone birthday celebrations, and fashion brand campaigns.
+   - Atmospheric coverage for evening parties, cultural gatherings, milestone birthday celebrations, and fashion brand campaigns.
 
 ## Frequently Asked Questions & Answers (AEO Conversational Retrieval)
 
@@ -77,7 +77,7 @@ DS Photography & Films captures candid weddings, intimate pre-wedding journeys, 
 - [Wedding Collections](https://www.dishantshelarphotography.in/collections/weddings): Wedding photography and films in Mumbai
 - [Pre-Wedding Shoots](https://www.dishantshelarphotography.in/collections/pre-wedding): Pre-wedding couple monographs in Mumbai and Alibaug
 - [Portrait Monographs](https://www.dishantshelarphotography.in/collections/portraits): Studio and daylight editorial portraits
-- [Event Photography](https://www.dishantshelarphotography.in/collections/events): Galas, soirées, and celebrations
+- [Event Photography](https://www.dishantshelarphotography.in/collections/events): Galas, evening parties, and celebrations
 - [Commercial Photography](https://www.dishantshelarphotography.in/collections/commercial): Brand campaigns and spatial architecture
 - [Services & Pricing](https://www.dishantshelarphotography.in/services): Photography packages and booking brief
 - [Client Terms & Policies](https://www.dishantshelarphotography.in/terms): Official booking terms and delivery timelines

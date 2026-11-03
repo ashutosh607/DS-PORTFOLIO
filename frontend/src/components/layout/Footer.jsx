@@ -96,7 +96,7 @@ export default function Footer({ onOpenInquiry }) {
             </div>
 
             <p className="font-sans text-xs sm:text-[13px] text-[#F3F0E9]/65 leading-relaxed max-w-sm pt-1">
-              Fine art wedding photography, candid couple monographs, and cinematic wedding films based in Mumbai and traveling worldwide.
+              Fine art wedding photography, candid couple monographs, and cinematic wedding films based in Mumbai and available across Maharashtra.
             </p>
 
             <div className="pt-2">

@@ -411,7 +411,7 @@ export default function EditMediaModal({
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g., Lake Como Ceremony"
+                  placeholder="e.g., Alibaug Sunset Ceremony"
                   className="admin-form-input"
                 />
               </div>

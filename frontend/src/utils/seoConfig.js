@@ -42,10 +42,10 @@ export const SEO_CONFIG = {
     { name: 'Bandra', type: 'AdministrativeArea' },
     { name: 'Alibaug', type: 'City' },
     { name: 'Lonavala', type: 'City' },
-    { name: 'Goa', type: 'State' },
+    { name: 'Thane', type: 'City' },
     { name: 'Maharashtra', type: 'AdministrativeArea' },
     { name: 'India', type: 'Country' },
-    { name: 'Worldwide Destinations', type: 'Place' },
+    { name: 'Pune', type: 'City' },
   ],
 
   // Social Profiles
@@ -66,13 +66,13 @@ export const SEO_CONFIG = {
       name: 'Luxury Wedding Photography',
       serviceType: 'Wedding Photography',
       description: 'Candid wedding stories, timeless rituals, fine-art bridal portraiture, and heirloom albums crafted across Mumbai, Maharashtra, and destination venues.',
-      areaServed: 'Mumbai, Maharashtra & Worldwide',
+      areaServed: 'Mumbai & Maharashtra',
     },
     {
       name: 'Pre-Wedding Cinematography & Couple Monographs',
       serviceType: 'Pre-Wedding Photography',
       description: 'Intimate pre-wedding photography and cinematic couple films capturing authentic romance in natural light and scenic architectural estates.',
-      areaServed: 'Mumbai, Alibaug, Lonavala & Destination Locations',
+      areaServed: 'Mumbai, Alibaug, Lonavala & Maharashtra Venues',
     },
     {
       name: 'Fine Art & Editorial Portrait Photography',
@@ -89,14 +89,14 @@ export const SEO_CONFIG = {
     {
       name: 'Gala, Cultural & Corporate Event Photography',
       serviceType: 'Event Photography',
-      description: 'Sophisticated documentation of luxury galas, private soirées, brand launches, and cultural symposiums with architectural presence.',
-      areaServed: 'Mumbai & Across India',
+      description: 'Professional documentation of celebrations, private parties, brand launches, and cultural gatherings with timeless style.',
+      areaServed: 'Mumbai & Maharashtra',
     },
     {
-      name: 'Commercial Brand & Haute Editorial Campaigns',
+      name: 'Commercial Brand & Editorial Campaigns',
       serviceType: 'Commercial Photography',
-      description: 'Spatial poetics, luxury product monograph captures, and haute fashion editorial campaigns for distinguished labels.',
-      areaServed: 'Mumbai & Worldwide',
+      description: 'Creative direction, luxury product photography, and modern fashion editorial campaigns for distinguished labels.',
+      areaServed: 'Mumbai & Maharashtra',
     },
   ],
 };

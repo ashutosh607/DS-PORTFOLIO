@@ -18,7 +18,7 @@ function seededRandom(seed) {
  * - Respects the splash screen: delays above-the-fold assembly until the logo splash screen finishes/fades out!
  * - Zero Layout Shift (CLS = 0) with words wrapped in inline-block spans.
  * - Words never break mid-word (whitespace: nowrap per word).
- * - Full accessibility: plain text in aria-label on root, aria-hidden on inner spans.
+ * - Full accessibility: plain text in .sr-only span for screen readers, aria-hidden="true" on decorative animated spans.
  * - Screen readers hear the complete, unfragmented sentence.
  * - Prefers-reduced-motion: instantly rendered with zero animation.
  * - Cleans up GPU memory (`will-change: auto`, `filter: none`, `transform: none`) once assembled.
@@ -301,8 +301,11 @@ export default function LetterAssembly({
         '--la-blur': `${blurAmount}px`,
         ...style,
       }}
-      aria-label={rawPlainText}
     >
+      {/* Complete readable sentence for screen readers and search engines */}
+      <span className="sr-only">{rawPlainText}</span>
+
+      {/* Decorative animated characters hidden from screen readers */}
       <span aria-hidden="true" className="inline">
         {processedSegments.map((seg, sIdx) => {
           const isLastSegment = sIdx === processedSegments.length - 1;

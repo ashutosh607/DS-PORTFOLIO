@@ -40,7 +40,7 @@ export default function BookingBriefForm({
   const baseEventNames =
     collectionNames.length > 0
       ? collectionNames
-      : ['Weddings', 'Pre-Wedding', 'Engagement', 'Events', 'Birthdays', 'Baby Shower', 'Portraits'];
+      : ['Weddings', 'Pre-Wedding', 'Birthdays', 'Portraits', 'Events', 'Commercial'];
 
   const celebrationTypes = Array.from(new Set([...baseEventNames, 'Other']));
 

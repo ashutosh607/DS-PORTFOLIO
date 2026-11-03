@@ -22,58 +22,58 @@ gsap.registerPlugin(ScrollTrigger);
 const PILLARS = [
   {
     number: '01',
-    heading: 'Direct Creative Leadership',
-    shortText: 'Dishant personally shoots every commission.',
+    heading: 'Personal Photography & Creative Direction',
+    shortText: 'Personally photographed by lead photographer Dishant Shelar.',
     fullText:
-      'Dishant Shelar personally directs and shoots principal coverage for every single atelier commission, guaranteeing uncompromising artistic quality.',
+      'Every wedding and portrait photography assignment is personally directed and photographed by Dishant Shelar, ensuring consistent quality, attention to detail and a distinctive artistic vision.',
     icon: Camera,
     image: photographerPhoto,
     objectPosition: 'center 12%',
-    alt: 'Dishant Shelar lead photographer directing wedding coverage in Mumbai',
+    alt: 'Dishant Shelar professional photographer in Mumbai directing wedding and portrait photography',
   },
   {
     number: '02',
-    heading: 'Medium-Format Film Tonality',
-    shortText: 'Rich, organic, and timeless.',
+    heading: 'Timeless Wedding Photography',
+    shortText: 'Natural colours, beautiful details and timeless photographs.',
     fullText:
-      'Soft highlight rolloff, organic film grain, and subtle color palettes inspired by archival medium-format photography.',
+      'Thoughtfully captured wedding photographs with natural skin tones, elegant compositions and timeless editing that preserve the emotions and beauty of your celebration.',
     icon: Film,
     image: filmTonalityPhoto,
     objectPosition: 'center 45%',
-    alt: 'Archival medium-format film tonality wedding photography in Mumbai',
+    alt: 'Timeless wedding photography in Mumbai with natural colors and elegant compositions',
   },
   {
     number: '03',
-    heading: 'Unobtrusive Storytelling',
-    shortText: 'Honest moments, quietly observed.',
+    heading: 'Candid Wedding Storytelling',
+    shortText: 'Genuine emotions, naturally captured moments.',
     fullText:
-      'Quiet, observant candid documentation that allows you and your families to be fully present and enjoy your celebration freely.',
+      'From meaningful family moments to spontaneous celebrations, we capture candid wedding photography that tells your story naturally, without interrupting the experience.',
     icon: Heart,
     image: storytellingPhoto,
     objectPosition: 'center 20%',
-    alt: 'Candid unscripted emotional wedding storytelling in Mumbai Maharashtra',
+    alt: 'Candid wedding photographer in Mumbai capturing genuine emotions and natural moments',
   },
   {
     number: '04',
-    heading: 'Archival Heirlooms & Delivery',
-    shortText: 'Fine-art albums and high-resolution files.',
+    heading: 'Premium Albums & Digital Delivery',
+    shortText: 'Fine-art wedding albums and high-resolution photographs.',
     fullText:
-      'Color-graded high-resolution digital master files and handcrafted Italian leather-bound albums delivered within 3 weeks of selection.',
+      'Receive professionally edited, high-resolution wedding photographs and beautifully handcrafted fine-art albums, preserving your most meaningful memories for generations.',
     icon: BookOpen,
     image: heirloomsPhoto,
     objectPosition: 'center 48%',
-    alt: 'Handcrafted archival leather wedding albums and heirloom deliverables',
+    alt: 'Handcrafted fine-art wedding albums and professional wedding photography services',
   },
   {
     number: '05',
-    heading: 'Mumbai & Destination Coverage',
-    shortText: 'From Mumbai to wherever love takes you.',
+    heading: 'Mumbai & Maharashtra Photography Coverage',
+    shortText: 'Wedding and portrait photography across Maharashtra.',
     fullText:
-      'Extensive on-location expertise across South Mumbai, Bandra, Juhu, Thane, Alibaug, Goa, Rajasthan, and international destination estates.',
+      'Based in Mumbai, we provide wedding and portrait photography across Mumbai, Thane, Navi Mumbai, Pune, Nashik, Alibaug, Lonavala and destinations throughout Maharashtra.',
     icon: MapPin,
     image: destinationPhoto,
     objectPosition: 'center 22%',
-    alt: 'Destination wedding photographer across Mumbai, Goa, Rajasthan and international estates',
+    alt: 'Wedding photography in Maharashtra and portrait photographer in Mumbai',
   },
 ];
 
@@ -912,7 +912,7 @@ export default function WhyChooseSection() {
                   <p className="why-reserve-desc text-[13.5px] sm:text-[14.5px] lg:text-[13.5px] xl:text-[14px] text-[#E3DBCC]/90 leading-relaxed font-sans">
                     Peak dates book 4 to 9 months ahead.
                     <span className="sr-only">
-                      {' '}Peak wedding dates across Mumbai, Goa, and Maharashtra reserve 4 to 9 months in advance. Share your celebration plans with us.
+                      {' '}Peak wedding dates across Mumbai, Alibaug, and Maharashtra reserve 4 to 9 months in advance. Share your celebration plans with us.
                     </span>
                   </p>
                 </div>

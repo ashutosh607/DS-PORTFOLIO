@@ -38,8 +38,6 @@ const DEFAULT_CATEGORIES = [
   { id: 'portrait', label: 'Portraits', slug: 'portraits' },
   { id: 'event', label: 'Events', slug: 'events' },
   { id: 'commercial', label: 'Commercial', slug: 'commercial' },
-  { id: 'baby', label: 'Baby', slug: 'baby' },
-  { id: 'maternity', label: 'Maternity', slug: 'maternity' },
 ];
 
 // Curated thumbnail images matching the editorial aesthetic

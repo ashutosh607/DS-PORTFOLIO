@@ -49,17 +49,17 @@ function resolveDestinationZone(meta = {}) {
   if (hasExplicitNonIndiaCountry || matchesInternationalKeyword) {
     return {
       zone: 'INTERNATIONAL_DESTINATION',
-      badge: 'WORLDWIDE ATELIER RESIDENCY',
-      zoneLabel: 'International / Worldwide Destination',
-      surchargeNote: 'Worldwide Destination Residency · Passport Ready Atelier Team',
+      badge: 'OUT-OF-REGION INQUIRY',
+      zoneLabel: 'Out-of-Region Destination (Primary Base: Maharashtra)',
+      surchargeNote: 'Primary Base: Mumbai & Maharashtra · Special Commissions by Prior Arrangement',
       recommendedTier: 'Luxury',
       recommendedCategory: 'wedding',
-      title: 'Worldwide Architectural & Destination Commission',
-      description: 'Comprehensive multi-day residency crafted for European villas, Middle Eastern palaces, and worldwide private estates.',
-      logistics: 'Atelier travel, carnets, and international coordination inclusive in residency suite.',
+      title: 'Special Out-of-Region Commission Inquiry',
+      description: 'DS Photography & Films operates primarily across Mumbai, Alibaug, Lonavala, Pune, and Maharashtra venues. Out-of-region commissions are evaluated upon special request.',
+      logistics: 'Bespoke travel and accommodation arrangements coordinated upon availability.',
       highlights: [
         'Dedicated Creative Director & Principal Cinematographer',
-        'Specialist European lab processing for 120 medium format analog film',
+        'Specialist master lab processing for 120 medium format analog film',
         'Handcrafted 14x14 Italian leather master album + 2 parent folios',
       ],
     };
@@ -136,7 +136,7 @@ function resolveDestinationZone(meta = {}) {
     recommendedTier: 'Luxury',
     recommendedCategory: 'wedding',
     title: 'National Heritage Palace & Beachfront Residency',
-    description: 'Comprehensive multi-day coverage for royal palace venues in Rajasthan, coastal sanctuaries in Goa, and backwater estates in Kerala.',
+    description: 'Comprehensive multi-day coverage for heritage venues, coastal sanctuaries in Alibaug, and scenic resort estates across Maharashtra.',
     logistics: 'Full production crew deployed via domestic flights with dedicated equipment insurance.',
     highlights: [
       'Full atelier team: Principal Master, Cinema Director & Aerial Pilot',

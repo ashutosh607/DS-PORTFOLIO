@@ -367,12 +367,12 @@ export default function CollectionsPage({ onOpenInquiry }) {
     },
     'pre-wedding': {
       title: 'Pre Wedding Photographer in Mumbai | DS Photography',
-      description: 'Pre wedding photographer in Mumbai capturing intimate couple monographs and cinematic short films in golden-hour light across Mumbai and Alibaug.',
+      description: 'Pre-wedding photographer in Mumbai capturing intimate couple shoots and cinematic short films in golden-hour light across Mumbai and Alibaug.',
       keywords: 'pre wedding photographer in mumbai, pre wedding shoot in mumbai, pre wedding photography packages mumbai, couple photoshoot in mumbai',
     },
     portraits: {
       title: 'Portrait Photographer in Mumbai | DS Photography',
-      description: 'Professional portrait photographer in Mumbai creating fine-art monographs, daylight studio portraits, and editorial personal branding by Dishant Shelar.',
+      description: 'Professional portrait photographer in Mumbai creating daylight studio portraits, professional headshots, and personal branding by Dishant Shelar.',
       keywords: 'portrait photographer in mumbai, professional portrait photography mumbai, fine art portraits mumbai, studio photographer mumbai',
     },
     birthdays: {
@@ -382,12 +382,12 @@ export default function CollectionsPage({ onOpenInquiry }) {
     },
     events: {
       title: 'Event Photographer in Mumbai | DS Photography',
-      description: 'Event photographer in Mumbai for luxury galas, cultural soirées, and celebrations. Documenting unforgettable gatherings with documentary elegance.',
+      description: 'Event photographer in Mumbai for private parties, cultural events, and celebrations. Documenting unforgettable gatherings with documentary elegance.',
       keywords: 'event photographer in mumbai, professional event photography mumbai, corporate event photography mumbai, gala photography mumbai',
     },
     commercial: {
       title: 'Commercial Photographer in Mumbai | DS Photography',
-      description: 'Commercial photographer in Mumbai specializing in luxury brand monographs, editorial campaigns, and spatial architecture by Dishant Shelar.',
+      description: 'Commercial photographer in Mumbai specializing in brand photography, editorial campaigns, and architectural spaces by Dishant Shelar.',
       keywords: 'commercial photographer in mumbai, commercial photography services mumbai, brand campaign photographer mumbai, editorial fashion photographer mumbai',
     },
   };

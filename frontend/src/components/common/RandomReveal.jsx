@@ -172,53 +172,57 @@ export default function RandomReveal({
       ref={containerRef}
       className={`relative ${className}`}
       style={style}
-      aria-label={letterData.fullText}
       {...restProps}
     >
-      {letterData.segments.map((seg) => (
-        <span key={seg.id} className={seg.className} style={seg.style}>
-          {seg.words.map((word) => (
-            <span
-              key={word.id}
-              className="random-reveal-word inline-block whitespace-nowrap mr-[0.28em]"
-            >
-              {word.chars.map((charObj) => (
-                <span
-                  key={charObj.charIndex}
-                  aria-hidden="true"
-                  className={`random-reveal-char inline-block ${
-                    isRevealed ? 'is-revealed' : ''
-                  }`}
-                  style={{
-                    opacity: isRevealed || prefersReducedMotion ? 1 : 0,
-                    filter: prefersReducedMotion
-                      ? 'none'
-                      : isRevealed
-                      ? 'blur(0px)'
-                      : `blur(${blurAmount}px)`,
-                    transform: prefersReducedMotion
-                      ? 'none'
-                      : isRevealed
-                      ? 'translateY(0px)'
-                      : `translateY(${yOffset}px)`,
-                    transitionProperty: 'opacity, filter, transform',
-                    transitionDuration: prefersReducedMotion ? '0s' : `${duration}s`,
-                    transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                    transitionDelay: prefersReducedMotion
-                      ? '0s'
-                      : isRevealed
-                      ? `${charObj.delay}s`
-                      : '0s',
-                    willChange: isRevealed ? 'auto' : 'opacity, filter, transform',
-                  }}
-                >
-                  {charObj.char}
-                </span>
-              ))}
-            </span>
-          ))}
-        </span>
-      ))}
+      {/* Screen-reader accessible full text string */}
+      <span className="sr-only">{letterData.fullText}</span>
+
+      {/* Decorative animated characters hidden from screen readers */}
+      <span aria-hidden="true" className="inline">
+        {letterData.segments.map((seg) => (
+          <span key={seg.id} className={seg.className} style={seg.style}>
+            {seg.words.map((word) => (
+              <span
+                key={word.id}
+                className="random-reveal-word inline-block whitespace-nowrap mr-[0.28em]"
+              >
+                {word.chars.map((charObj) => (
+                  <span
+                    key={charObj.charIndex}
+                    className={`random-reveal-char inline-block ${
+                      isRevealed ? 'is-revealed' : ''
+                    }`}
+                    style={{
+                      opacity: isRevealed || prefersReducedMotion ? 1 : 0,
+                      filter: prefersReducedMotion
+                        ? 'none'
+                        : isRevealed
+                        ? 'blur(0px)'
+                        : `blur(${blurAmount}px)`,
+                      transform: prefersReducedMotion
+                        ? 'none'
+                        : isRevealed
+                        ? 'translateY(0px)'
+                        : `translateY(${yOffset}px)`,
+                      transitionProperty: 'opacity, filter, transform',
+                      transitionDuration: prefersReducedMotion ? '0s' : `${duration}s`,
+                      transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      transitionDelay: prefersReducedMotion
+                        ? '0s'
+                        : isRevealed
+                        ? `${charObj.delay}s`
+                        : '0s',
+                      willChange: isRevealed ? 'auto' : 'opacity, filter, transform',
+                    }}
+                  >
+                    {charObj.char}
+                  </span>
+                ))}
+              </span>
+            ))}
+          </span>
+        ))}
+      </span>
     </Component>
   );
 }

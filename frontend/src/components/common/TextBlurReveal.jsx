@@ -39,7 +39,7 @@ export default function TextBlurReveal({
 
   const wordVariants = {
     hidden: {
-      opacity: 1,
+      opacity: 0,
       filter: shouldReduceMotion ? 'none' : `blur(${blurAmount}px)`,
       y: shouldReduceMotion ? 0 : yOffset,
     },

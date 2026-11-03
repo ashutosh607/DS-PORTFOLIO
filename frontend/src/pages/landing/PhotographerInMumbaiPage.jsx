@@ -33,7 +33,7 @@ const MUMBAI_SERVICES = [
     h2Title: 'Pre-Wedding Photography in Mumbai',
     subtitle: 'Golden Hour Romance & Cinematic Films',
     description:
-      'We craft intimate couple monographs and cinematic short films that narrate your connection naturally. Sessions are conducted across historic South Mumbai architecture, breezy coastal stretches, and quiet weekend retreats.',
+      'We craft intimate couple photo stories and cinematic short films that narrate your connection naturally. Sessions are conducted across historic South Mumbai architecture, breezy coastal stretches, and quiet weekend retreats.',
     link: '/collections/pre-wedding',
     linkLabel: 'View Pre-Wedding Shoots',
     venues: 'Ballard Estate, Asiatic Steps, Marine Drive, Bandra Fort, Alibaug coastline',
@@ -47,7 +47,7 @@ const MUMBAI_SERVICES = [
     h2Title: 'Professional Portrait Photography',
     subtitle: 'Authentic Studio & Natural Light Monographs',
     description:
-      'Nuanced lighting, sculptural shadows, and medium-format tonal depth. Ideal for artists, creative entrepreneurs, and personal monographs seeking authentic character over generic studio stiffness.',
+      'Nuanced lighting, sculptural shadows, and medium-format depth. Ideal for artists, creative entrepreneurs, and personal portraits seeking authentic character over generic studio stiffness.',
     link: '/collections/portraits',
     linkLabel: 'View Portrait Monographs',
     venues: 'Daylight studio sessions & atmospheric outdoor architectural locations in Mumbai',
@@ -59,9 +59,9 @@ const MUMBAI_SERVICES = [
     number: '04',
     badge: 'EVENTS & COMMISSIONS',
     h2Title: 'Event & Commercial Photography in Mumbai',
-    subtitle: 'Milestone Celebrations & Haute Brand Campaigns',
+    subtitle: 'Milestone Celebrations & Brand Campaigns',
     description:
-      'Atmospheric documentation of milestone birthdays, cultural soirées, luxury galas, and bespoke brand campaigns across Mumbai. We preserve the energy and refined spatial aesthetic of every gathering.',
+      'Atmospheric documentation of milestone birthdays, cultural events, evening celebrations, and brand campaigns across Mumbai. We preserve the energy and refined visual aesthetic of every gathering.',
     link: '/collections/events',
     linkLabel: 'Explore Event Portfolio',
     venues: 'Luxury banquets, private residences, boutique spaces across Mumbai',
@@ -76,7 +76,7 @@ const LOCAL_LOCATIONS = [
     number: '01',
     area: 'South Mumbai Heritage District',
     description:
-      'Victorian Gothic architecture, basalt stone facades, and tree-lined avenues of Ballard Estate, Fort, and the Asiatic Library. Timeless elegance for couple monographs and classic portraiture.',
+      'Victorian Gothic architecture, basalt stone facades, and tree-lined avenues of Ballard Estate, Fort, and the Asiatic Library. Timeless elegance for couple photo sessions and classic portraits.',
   },
   {
     number: '02',
@@ -113,9 +113,9 @@ const CLIENT_TESTIMONIALS = [
   },
   {
     quote:
-      'The portrait monograph Dishant created for my personal brand was exactly what I envisioned—timeless, sophisticated, and deeply honest. Highly recommended for anyone in Mumbai.',
+      'The portrait session Dishant created for my personal brand was exactly what I envisioned—timeless, sophisticated, and deeply honest. Highly recommended for anyone in Mumbai.',
     client: 'Vikram M.',
-    event: 'Editorial Portrait Monograph, Mumbai Studio',
+    event: 'Editorial Portrait Session, Mumbai Studio',
   },
 ];
 
@@ -231,7 +231,7 @@ export default function PhotographerInMumbaiPage({ onOpenInquiry }) {
 
             {/* Primary Content Paragraph */}
             <p className="text-[15px] sm:text-[17px] text-[#4A463F] max-w-3xl mx-auto leading-relaxed font-sans mb-10">
-              DS Photography &amp; Films is an editorial wedding and portrait photography studio founded by lead photographer Dishant Shelar in Mumbai, Maharashtra. We document heartfelt ceremonies, intimate romance, and individual monographs with timeless tonality, unobtrusive presence, and cinematic light across Mumbai and destination venues worldwide.
+              DS Photography &amp; Films is an editorial wedding and portrait photography studio founded by lead photographer Dishant Shelar in Mumbai, Maharashtra. We document heartfelt ceremonies, intimate romance, and personal portraits with timeless style, unobtrusive presence, and cinematic light across Mumbai and destination venues in Maharashtra.
             </p>
 
             {/* Native Studio Action Buttons */}
@@ -286,7 +286,7 @@ export default function PhotographerInMumbaiPage({ onOpenInquiry }) {
                 className="font-serif text-[32px] sm:text-[44px] font-normal text-[#101010] leading-tight mb-4 block"
               />
               <p className="text-[14px] sm:text-[15.5px] text-[#4A463F] leading-relaxed max-w-2xl font-sans">
-                Every celebration and personal monograph is approached with quiet observation and artistic reverence. Explore our core photography disciplines across Mumbai.
+                Every celebration and personal portrait session is approached with quiet observation and artistic reverence. Explore our core photography disciplines across Mumbai.
               </p>
             </div>
 
@@ -466,7 +466,7 @@ export default function PhotographerInMumbaiPage({ onOpenInquiry }) {
                 What Couples &amp; Clients Say
               </h2>
               <p className="text-[14px] sm:text-[15.5px] text-[#4A463F] leading-relaxed max-w-2xl font-sans">
-                Authentic feedback from weddings, couple monographs, and editorial sessions documented across Mumbai.
+                Authentic feedback from weddings, couple shoots, and editorial sessions documented across Mumbai.
               </p>
             </div>
 

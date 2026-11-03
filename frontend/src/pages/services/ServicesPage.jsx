@@ -19,15 +19,19 @@ import ScrollCardReveal from '../../components/common/ScrollCardReveal';
 import SEOHead from '../../components/common/SEOHead';
 import { buildServicesListSchema, buildBreadcrumbSchema, buildFaqSchema } from '../../utils/structuredData';
 import { SEO_CONFIG } from '../../utils/seoConfig';
+import { DEFAULT_SERVICES } from './data/defaultServices';
 
 const SERVICES_CACHE_KEY = 'ds_portfolio_cached_services';
 
-// Proactively purge any stale legacy cached services to guarantee fresh real-time data
-try {
-  localStorage.removeItem(SERVICES_CACHE_KEY);
-} catch (e) {
-  // Ignore in restricted environments
-}
+// Categories strictly prohibited from appearing in public Services
+const EXCLUDED_SERVICES_CATEGORIES = new Set([
+  'baby',
+  'babyshower',
+  'babyshowers',
+  'baby-shower',
+  'baby_shower',
+  'maternity',
+]);
 
 export default function ServicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,8 +41,21 @@ export default function ServicesPage() {
 
   const { categories: dynamicCategories } = useCategories();
   const [backendCategories, setBackendCategories] = useState([]);
-  const [allActiveServices, setAllActiveServices] = useState([]);
-  const [servicesLoaded, setServicesLoaded] = useState(false);
+  const [allActiveServices, setAllActiveServices] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem(SERVICES_CACHE_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {
+        // Fallback
+      }
+    }
+    return DEFAULT_SERVICES;
+  });
+  const [servicesLoaded, setServicesLoaded] = useState(true);
 
   // Canonical category matcher
   const toCanonicalKey = (str) =>
@@ -67,7 +84,14 @@ export default function ServicesPage() {
         const json = await res.json();
         if (Array.isArray(json.data)) {
           const activeOnly = json.data.filter((s) => s.isActive !== false);
-          setAllActiveServices(activeOnly);
+          if (activeOnly.length > 0) {
+            setAllActiveServices(activeOnly);
+            try {
+              localStorage.setItem(SERVICES_CACHE_KEY, JSON.stringify(activeOnly));
+            } catch {
+              // Ignore in private browsing
+            }
+          }
         }
       }
     } catch (err) {
@@ -101,8 +125,6 @@ export default function ServicesPage() {
     if (lower === 'portrait' || lower === 'portraits') return 'PORTRAITS';
     if (lower === 'event' || lower === 'events') return 'EVENTS';
     if (lower === 'commercial') return 'COMMERCIAL';
-    if (lower === 'baby') return 'BABY';
-    if (lower === 'maternity') return 'MATERNITY';
     return raw.toUpperCase();
   };
 
@@ -127,7 +149,7 @@ export default function ServicesPage() {
 
     const addCategory = (id, label, slug, name) => {
       const canonical = toCanonicalKey(id || slug || label);
-      if (!canonical || seen.has(canonical)) return;
+      if (!canonical || seen.has(canonical) || EXCLUDED_SERVICES_CATEGORIES.has(canonical)) return;
       seen.add(canonical);
       pool.push({
         id: id || slug,
@@ -140,13 +162,13 @@ export default function ServicesPage() {
     // Standard baselines first for clean ordering
     standardBaselines.forEach((b) => addCategory(b.id, b.label, b.slug, b.label));
 
-    // Dynamic categories from collections
+    // Dynamic categories from collections (excluding baby shower / maternity)
     (dynamicCategories || []).forEach((c) => {
       const slug = (c.slug || c.id || c.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
       if (slug) addCategory(slug, formatCategoryLabel(c.name || slug), slug, c.name);
     });
 
-    // Backend categories
+    // Backend categories (excluding baby shower / maternity)
     (backendCategories || []).forEach((c) => {
       const slug = (c.slug || c.id || c.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '').toLowerCase().trim();
       if (slug) addCategory(slug, formatCategoryLabel(c.name || slug), slug, c.name);
@@ -160,22 +182,25 @@ export default function ServicesPage() {
       }
     });
 
-    // If initial loading state before services response arrived, return pool
-    if (!servicesLoaded && servicePool.length === 0) {
-      return pool;
+    // Fallback directly to official baselines if servicePool is empty
+    if (servicePool.length === 0) {
+      return standardBaselines;
     }
 
-    // STRICT RULE: Only display categories that actually have at least 1 active service in DB!
+    // STRICT RULE: Only display categories that actually have at least 1 active service in DB and are not excluded!
     return pool.filter((cat) => {
       const catKey = toCanonicalKey(cat.id);
       const catLabelKey = toCanonicalKey(cat.label);
+      if (EXCLUDED_SERVICES_CATEGORIES.has(catKey) || EXCLUDED_SERVICES_CATEGORIES.has(catLabelKey)) {
+        return false;
+      }
       return servicePool.some((s) => {
         if (s.isActive === false) return false;
         const sCat = toCanonicalKey(s.category);
         return sCat === catKey || sCat === catLabelKey;
       });
     });
-  }, [allActiveServices, dynamicCategories, backendCategories, servicesLoaded]);
+  }, [allActiveServices, dynamicCategories, backendCategories]);
 
   const [stage, setStage] = useState(queryStep === 'book' || (typeof window !== 'undefined' && window.location.hash === '#book') ? 2 : 1); // 1 = Collections, 2 = Booking Form, 3 = Confirmation
   const [selectedCategoryId, setSelectedCategoryId] = useState('wedding');
@@ -626,9 +651,9 @@ export default function ServicesPage() {
 
                 <TextBlurReveal
                   as="p"
-                  text="Every story deserves a collection that feels right for you. Curated with archival permanence, medium format tonality, and understated elegance."
-                  blurAmount={8}
-                  delay={0.2}
+                  text="Every story deserves a collection that feels right for you. Curated with classic film tones, natural light, and understated elegance."
+                  blurAmount={6}
+                  delay={0.15}
                   style={{
                     maxWidth: '650px',
                     margin: '24px auto 0',

@@ -6,7 +6,7 @@ export const CATEGORIES = [
     tagline: 'Honest moments, beautifully preserved as they unfold.',
     quote: 'A love story, in every frame.',
     medium: 'Leica M11 · 35mm Summilux & 50mm Noctilux',
-    location: 'Lake Como & Private Estates',
+    location: 'South Mumbai & Heritage Estates',
     // French arch top
     cardShapeStyle: {
       borderRadius: '9999px 9999px 4px 4px',
@@ -15,7 +15,7 @@ export const CATEGORIES = [
     coverImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1400&auto=format&fit=crop',
-      title: 'Ceremony at Lake Como',
+      title: 'Ceremony at Coastal Heritage Estate',
       count: '01 / 06',
       caption: 'A love story, in every frame.',
       meta: 'Leica M11 · 35mm Summilux · F/1.4 · Natural Twilight',
@@ -66,7 +66,7 @@ export const CATEGORIES = [
       {
         id: 'w-8',
         image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=800&auto=format&fit=crop',
-        tag: 'Villa Balbianello Promenade',
+        tag: 'Heritage Promenade — Sunset Glow',
         meta: '75mm Summicron · Soft Sunlight',
       },
     ],
@@ -78,7 +78,7 @@ export const CATEGORIES = [
     tagline: 'Intimate anticipation before the grand celebration.',
     quote: 'Quiet chapters before the vows.',
     medium: 'Hasselblad H6D · Natural Ambient Glow',
-    location: 'Cap d’Antibes & Parisian Terraces',
+    location: 'Alibaug Coast & Mumbai Terraces',
     // French arch top
     cardShapeStyle: {
       borderRadius: '9999px 9999px 4px 4px',
@@ -90,7 +90,7 @@ export const CATEGORIES = [
       title: 'Golden Hour Promenade',
       count: '02 / 06',
       caption: 'Quiet chapters before the vows.',
-      meta: 'Hasselblad 80mm · Mediterranean Warm Glow',
+      meta: 'Hasselblad 80mm · Coastal Warm Glow',
     },
     supporting: [
       {
@@ -120,13 +120,13 @@ export const CATEGORIES = [
       {
         id: 'pw-5',
         image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=800&auto=format&fit=crop',
-        tag: 'Cliffside Promenade — Mediterranean Breeze',
+        tag: 'Coastal Promenade — Sea Breeze',
         meta: '50mm F/1.4 · Natural Spray',
       },
       {
         id: 'pw-6',
         image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop',
-        tag: 'Cobblestone Romance — Parisian Twilight',
+        tag: 'Heritage Lane — Twilight Glow',
         meta: '35mm Summilux · Dusk Glow',
       },
       {
@@ -144,7 +144,7 @@ export const CATEGORIES = [
     tagline: 'Milestone celebrations, laughter, and timeless nostalgia.',
     quote: 'Moments of joy etched forever.',
     medium: 'Leica SL2 · 50mm F/1.2 & 28mm Elmarit',
-    location: 'Hôtel Particulier & Private Salons',
+    location: 'Mumbai Private Salons & Lawns',
     // French arch top
     cardShapeStyle: {
       borderRadius: '9999px 9999px 4px 4px',
@@ -156,7 +156,7 @@ export const CATEGORIES = [
       title: 'Candlelit Celebration',
       count: '03 / 06',
       caption: 'Moments of joy etched forever.',
-      meta: 'Leica SL2 · 50mm · Warm Luminescence',
+      meta: 'Leica SL2 · 50mm · Warm Ambient Light',
     },
     supporting: [
       {
@@ -192,7 +192,7 @@ export const CATEGORIES = [
     tagline: 'Authentic presence, evocative gazes, and nuanced light.',
     quote: 'Soulful character in every glance.',
     medium: 'Hasselblad 503CW · Carl Zeiss 80mm Planar',
-    location: 'Paris Atelier & Natural Light Daylight Studio',
+    location: 'Mumbai Atelier & Daylight Studio',
     // French arch top
     cardShapeStyle: {
       borderRadius: '9999px 9999px 4px 4px',
@@ -237,10 +237,10 @@ export const CATEGORIES = [
     id: '05',
     name: 'Events',
     slug: 'events',
-    tagline: 'Atmospheric galas, spatial depth, and unstaged energy.',
+    tagline: 'Evening celebrations, candid energy, and memorable moments.',
     quote: 'The living pulse of celebrated evenings.',
     medium: 'Leica Q3 · 28mm Summilux & Leica M11',
-    location: 'Palais Brongniart & Private Châteaux',
+    location: 'Grand Ballroom & Heritage Lawns',
     // French arch top
     cardShapeStyle: {
       borderRadius: '9999px 9999px 4px 4px',
@@ -249,7 +249,7 @@ export const CATEGORIES = [
     coverImage: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1400&auto=format&fit=crop',
-      title: 'Gala Evening at the Grand Salon',
+      title: 'Grand Evening Celebration',
       count: '05 / 06',
       caption: 'The living pulse of celebrated evenings.',
       meta: 'Leica Q3 · 28mm Summilux · F/1.7 · Ambient Chandeliers',
@@ -259,7 +259,7 @@ export const CATEGORIES = [
         id: 'e-1',
         image: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?q=80&w=800&auto=format&fit=crop',
         tag: 'Champagne Cascade — Movement & Light',
-        meta: '28mm Summilux · 1/250s · Available Luminescence',
+        meta: '28mm Summilux · 1/250s · Available Natural Light',
       },
       {
         id: 'e-2',
@@ -285,10 +285,10 @@ export const CATEGORIES = [
     id: '06',
     name: 'Commercial',
     slug: 'commercial',
-    tagline: 'Haute editorial campaigns, luxury objects, and spatial poetics.',
-    quote: 'Purity of form, shadow, and tactile desire.',
+    tagline: 'Creative brand campaigns, product styling, and clean aesthetics.',
+    quote: 'Clean visual storytelling for modern brands.',
     medium: 'Phase One IQ4 150MP & Schneider Kreuznach',
-    location: 'Atelier Minimaliste & Concept Showrooms',
+    location: 'Mumbai Atelier & Concept Studios',
     // French arch top
     cardShapeStyle: {
       borderRadius: '9999px 9999px 4px 4px',
@@ -297,7 +297,7 @@ export const CATEGORIES = [
     coverImage: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=800&auto=format&fit=crop',
     featured: {
       image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1400&auto=format&fit=crop',
-      title: 'Haute Parfumerie & Stone Pedestal',
+      title: 'Luxury Perfume & Stone Setting',
       count: '06 / 06',
       caption: 'Purity of form, shadow, and tactile desire.',
       meta: 'Phase One IQ4 · 120mm Macro · Directional Studio Sunlight',
@@ -306,19 +306,19 @@ export const CATEGORIES = [
       {
         id: 'c-1',
         image: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?q=80&w=800&auto=format&fit=crop',
-        tag: 'Architectural Flacon — Botanical Cast Shadows',
+        tag: 'Perfume Bottle & Botanical Shadow',
         meta: 'Schneider 80mm · Precision Chiaroscuro',
       },
       {
         id: 'c-2',
         image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=800&auto=format&fit=crop',
-        tag: 'Haute Joaillerie — Gold & Raw Mineral',
+        tag: 'Fine Jewelry — Gold & Raw Mineral',
         meta: '120mm Macro · Micro Prism Focus',
       },
       {
         id: 'c-3',
         image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=800&auto=format&fit=crop',
-        tag: 'Interior Spatial Poetics — Minimalist Gallery',
+        tag: 'Modern Interior Design — Minimalist Space',
         meta: 'Medium Format 35mm Shift · Archival',
       },
       {

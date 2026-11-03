@@ -780,7 +780,7 @@ export default function AddMediaModal({
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g., Lake Como Vows"
+                  placeholder="e.g., Alibaug Beach Vows"
                   className="admin-form-input"
                 />
               </div>
