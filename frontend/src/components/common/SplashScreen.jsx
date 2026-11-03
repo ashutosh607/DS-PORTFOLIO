@@ -30,7 +30,7 @@ export default function SplashScreen({ onComplete }) {
         staticSplash.classList.add('splash-exit');
         staticSplash.style.pointerEvents = 'none';
 
-        // Wait for CSS transition (750ms) to complete smoothly
+        // Wait for CSS transition (550ms) to complete smoothly
         setTimeout(() => {
           document.body.style.overflow = originalOverflow;
           window.__dsSplashDone = true;
@@ -39,7 +39,7 @@ export default function SplashScreen({ onComplete }) {
             staticSplash.parentNode.removeChild(staticSplash);
           }
           if (onComplete) onComplete();
-        }, 750);
+        }, 550);
       } else {
         document.body.style.overflow = originalOverflow;
         window.__dsSplashDone = true;
@@ -53,9 +53,9 @@ export default function SplashScreen({ onComplete }) {
       staticSplash.addEventListener('click', triggerExit);
       window.addEventListener('keydown', triggerExit);
 
-      // Holding duration: ensures the logo entrance (750ms) completes + brief elegant pause (~350ms)
+      // Holding duration: ensures the logo entrance completes with an elegant holding pause
       const pageAge = typeof performance !== 'undefined' ? performance.now() : 0;
-      const remainingHold = Math.max(350, 1100 - pageAge);
+      const remainingHold = Math.max(120, 900 - pageAge);
 
       const timer = setTimeout(triggerExit, remainingHold);
 

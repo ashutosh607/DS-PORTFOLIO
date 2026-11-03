@@ -2,21 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PhotoPlaceholder from '../common/PhotoPlaceholder';
 import LetterAssembly from '../common/LetterAssembly';
 
-import img01 from '../../assets/landing-page-images/landing-01.webp';
-import img01_400 from '../../assets/landing-page-images/landing-01-400w.webp';
-import img02 from '../../assets/landing-page-images/landing-02.webp';
-import img02_400 from '../../assets/landing-page-images/landing-02-400w.webp';
-import img03 from '../../assets/landing-page-images/landing-03.webp';
-import img03_400 from '../../assets/landing-page-images/landing-03-400w.webp';
-import img04 from '../../assets/landing-page-images/landing-04.webp';
-import img04_400 from '../../assets/landing-page-images/landing-04-400w.webp';
-import img05 from '../../assets/landing-page-images/landing-05.webp';
-import img05_400 from '../../assets/landing-page-images/landing-05-400w.webp';
-import img06 from '../../assets/landing-page-images/landing-06.webp';
-import img06_400 from '../../assets/landing-page-images/landing-06-400w.webp';
-import img07 from '../../assets/landing-page-images/landing-07.webp';
-import img07_400 from '../../assets/landing-page-images/landing-07-400w.webp';
-
+// High-performance static webp assets with deterministic URLs for 100% preload matching
 const PROJECTS = [
   {
     id: '01',
@@ -26,8 +12,8 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.4',
     format: 'Hasselblad 100c · 80mm',
-    image: img01,
-    image400: img01_400,
+    image: '/images/landing/landing-01.webp',
+    image400: '/images/landing/landing-01-400w.webp',
     alt: 'High fashion editorial monograph and candid bridal study in Mumbai by DS Photography',
     imgTitle: 'Editorial & Wedding Photographer in Mumbai – DS Photography & Films',
   },
@@ -39,8 +25,8 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.2',
     format: 'Medium Format 6x7',
-    image: img02,
-    image400: img02_400,
+    image: '/images/landing/landing-02.webp',
+    image400: '/images/landing/landing-02-400w.webp',
     alt: 'Kinetic pre-wedding monograph and couple motion study in Mumbai by Dishant Shelar',
     imgTitle: 'Pre-Wedding Photographer in Mumbai – DS Photography & Films',
   },
@@ -52,8 +38,8 @@ const PROJECTS = [
     year: '2026',
     score: '★ 9.6',
     format: 'Large Format 4x5',
-    image: img03,
-    image400: img03_400,
+    image: '/images/landing/landing-03.webp',
+    image400: '/images/landing/landing-03-400w.webp',
     alt: 'Fine art architectural chiaroscuro and spatial luxury monograph in Mumbai Maharashtra',
     imgTitle: 'Fine Art & Architecture Photographer in Mumbai – Dishant Shelar',
   },
@@ -65,8 +51,8 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.1',
     format: '35mm Tri-X 400',
-    image: img04,
-    image400: img04_400,
+    image: '/images/landing/landing-04.webp',
+    image400: '/images/landing/landing-04-400w.webp',
     alt: '35mm monochrome candid portrait study by DS Photography & Films Mumbai',
     imgTitle: 'Professional Portrait Photographer in Mumbai – DS Photography',
   },
@@ -78,8 +64,8 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.0',
     format: 'Leica Summilux 50mm',
-    image: img05,
-    image400: img05_400,
+    image: '/images/landing/landing-05.webp',
+    image400: '/images/landing/landing-05-400w.webp',
     alt: 'Fine art portrait framed in natural ambient light by Dishant Shelar in Mumbai',
     imgTitle: 'Portrait Photography in Mumbai – Dishant Shelar Studio',
   },
@@ -91,8 +77,8 @@ const PROJECTS = [
     year: '2026',
     score: '★ 9.5',
     format: 'Hasselblad H6D',
-    image: img06,
-    image400: img06_400,
+    image: '/images/landing/landing-06.webp',
+    image400: '/images/landing/landing-06-400w.webp',
     alt: 'Editorial monograph capture and subtle tonal geometry by DS Photography in Mumbai',
     imgTitle: 'Commercial & Editorial Photographer in Mumbai – DS Photography',
   },
@@ -104,8 +90,8 @@ const PROJECTS = [
     year: '2025',
     score: '★ 9.3',
     format: 'Platinotype Gelatin Silver',
-    image: img07,
-    image400: img07_400,
+    image: '/images/landing/landing-07.webp',
+    image400: '/images/landing/landing-07-400w.webp',
     alt: 'Archival platinotype print monograph and fine-art photographic proof by Mumbai photographer',
     imgTitle: 'Fine Art Monograph Photography in Mumbai – DS Photography & Films',
   },
@@ -544,9 +530,9 @@ export default function HeroSpotlightCarousel() {
                       height="290"
                       style={{ aspectRatio: '200 / 290' }}
                       className="w-full h-full object-cover select-none pointer-events-none"
-                      loading={Math.abs(d) <= 2.2 ? 'eager' : 'lazy'}
-                      fetchPriority={Math.abs(d) <= 0.8 ? 'high' : 'auto'}
-                      decoding={Math.abs(d) <= 0.8 ? 'sync' : 'async'}
+                      loading={Math.abs(d) < 0.5 ? 'eager' : 'lazy'}
+                      fetchPriority={Math.abs(d) < 0.5 ? 'high' : 'auto'}
+                      decoding={Math.abs(d) < 0.5 ? 'sync' : 'async'}
                       draggable={false}
                     />
                   ) : (

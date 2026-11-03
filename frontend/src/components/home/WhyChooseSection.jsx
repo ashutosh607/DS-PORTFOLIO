@@ -6,7 +6,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
 // Curated studio assets
-import driedBotanical from '../../assets/dried-botanical.jpg';
+import driedBotanical from '../../assets/dried-botanical.webp';
+import driedBotanical400 from '../../assets/dried-botanical-400w.webp';
 import defaultArchPhoto from '../../assets/landing-down-animation/IMG_7785.webp';
 import photographerPhoto from '../../assets/photographer.webp';
 import filmTonalityPhoto from '../../assets/landing-down-animation/DSP09982.webp';
@@ -888,9 +889,12 @@ export default function WhyChooseSection() {
               {/* Top botanical photo */}
               <div className="relative w-full h-[130px] sm:h-[150px] lg:h-[135px] xl:h-[155px] rounded-xl overflow-hidden mb-4 sm:mb-5 lg:mb-4 bg-[#1a1a1a]">
                 <img
-                  src={driedBotanical}
+                  src={driedBotanical400}
+                  srcSet={`${driedBotanical400} 400w, ${driedBotanical} 800w`}
+                  sizes="(max-width: 640px) 340px, 400px"
                   alt="Archival dried botanical in warm chiaroscuro light – DS Photography Atelier"
                   loading="lazy"
+                  decoding="async"
                   width="400"
                   height="280"
                   className="why-botanical-img w-full h-full object-cover select-none"
